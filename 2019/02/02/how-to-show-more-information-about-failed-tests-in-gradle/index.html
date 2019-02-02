@@ -96,24 +96,24 @@
 
 
 
-  <meta name="description" content="IssueToday I met a bug in SharePoint 2013, I failed to resize my app part by using postMessage. Here is my code: var message = &quot;&amp;lt;Message senderId=&quot; + senderId + &quot;&amp;gt;&quot; + &quot;resize(&quot; + width + &quot;,&quot; + h">
+  <meta name="description" content="在build.gradle中添加如下设置： test &amp;#123;    testLogging &amp;#123;        exceptionFormat = &apos;full&apos;    &amp;#125;&amp;#125; 参考:  Gradle Goodness: Show More Information About Failed Tests">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;">
-<meta property="og:url" content="/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/index.html">
+<meta property="og:title" content="如何在 Gradle 的测试中显示详尽的错误信息">
+<meta property="og:url" content="/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="IssueToday I met a bug in SharePoint 2013, I failed to resize my app part by using postMessage. Here is my code: var message = &quot;&amp;lt;Message senderId=&quot; + senderId + &quot;&amp;gt;&quot; + &quot;resize(&quot; + width + &quot;,&quot; + h">
+<meta property="og:description" content="在build.gradle中添加如下设置： test &amp;#123;    testLogging &amp;#123;        exceptionFormat = &apos;full&apos;    &amp;#125;&amp;#125; 参考:  Gradle Goodness: Show More Information About Failed Tests">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-01-19T13:43:28.211Z">
+<meta property="og:updated_time" content="2019-02-02T01:40:04.487Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;">
-<meta name="twitter:description" content="IssueToday I met a bug in SharePoint 2013, I failed to resize my app part by using postMessage. Here is my code: var message = &quot;&amp;lt;Message senderId=&quot; + senderId + &quot;&amp;gt;&quot; + &quot;resize(&quot; + width + &quot;,&quot; + h">
+<meta name="twitter:title" content="如何在 Gradle 的测试中显示详尽的错误信息">
+<meta name="twitter:description" content="在build.gradle中添加如下设置： test &amp;#123;    testLogging &amp;#123;        exceptionFormat = &apos;full&apos;    &amp;#125;&amp;#125; 参考:  Gradle Goodness: Show More Information About Failed Tests">
 
 
 
 
 
 
-  <link rel="canonical" href="/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/">
+  <link rel="canonical" href="/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/">
 
 
 
@@ -123,7 +123,7 @@
   };
 </script>
 
-  <title>Fail to resize SharePoint App Part if "Chrome Type" is "None" or "Border Only" | Übung macht den Meister</title>
+  <title>如何在 Gradle 的测试中显示详尽的错误信息 | Übung macht den Meister</title>
   
 
 
@@ -288,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/">
+    <link itemprop="mainEntityOfPage" href="/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Frederick">
@@ -305,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Fail to resize SharePoint App Part if "Chrome Type" is "None" or "Border Only"
+          <h1 class="post-title" itemprop="name headline">如何在 Gradle 的测试中显示详尽的错误信息
 
               
             
@@ -331,24 +331,12 @@
                 
               
 
-              <time title="Created: 2015-09-10 00:00:00" itemprop="dateCreated datePublished" datetime="2015-09-10T00:00:00+08:00">2015-09-10</time>
+              <time title="Created: 2019-02-02 00:00:00 / Modified: 09:40:04" itemprop="dateCreated datePublished" datetime="2019-02-02T00:00:00+08:00">2019-02-02</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-01-19 21:43:28" itemprop="dateModified" datetime="2019-01-19T21:43:28+08:00">2019-01-19</time>
               
             
           </span>
@@ -365,7 +353,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/SharePoint-Add-in/" itemprop="url" rel="index"><span itemprop="name">SharePoint Add-in</span></a></span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Gradle/" itemprop="url" rel="index"><span itemprop="name">Gradle</span></a></span>
 
                 
                 
@@ -400,21 +388,11 @@
       
 
       
-        <h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">"&lt;Message senderId="</span> + senderId + <span class="string">"&gt;"</span> + <span class="string">"resize("</span> + width + <span class="string">","</span> + height + <span class="string">")&lt;/Message&gt;"</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
-<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">'style'</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
-<p>Then I located the code in my web part page which throws the error:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">'_ChromeTitle'</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">'width:100% !important;'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
-<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint" target="_blank" rel="noopener">here</a>,<br>you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx" target="_blank" rel="noopener">patch</a> to fix this bug.</p>
-<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">'_ChromeTitle'</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">'width:100% !important;'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Hope it’s helpful.</p>
-<hr>
-<p>Reference:</p>
+        <p>在<code>build.gradle</code>中添加如下设置：</p>
+<figure class="highlight subunit"><table><tr><td class="code"><pre><span class="line"><span class="keyword">test </span>&#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = 'full'</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参考:</p>
 <ul>
-<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint" target="_blank" rel="noopener">Dynamic Width and Height for iFrame (App Part)</a></li>
+<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html" target="_blank" rel="noopener">Gradle Goodness: Show More Information About Failed Tests</a></li>
 </ul>
 
       
@@ -446,8 +424,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/" rel="next" title="Add property to web with JavaScript in SharePoint 2013 App">
-                <i class="fa fa-chevron-left"></i> Add property to web with JavaScript in SharePoint 2013 App
+              <a href="/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/" rel="next" title="How to get access to other drives in Ubuntu on Windows 10">
+                <i class="fa fa-chevron-left"></i> How to get access to other drives in Ubuntu on Windows 10
               </a>
             
           </div>
@@ -455,10 +433,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/" rel="prev" title="Add new list field in SharePoint App upgrade">
-                Add new list field in SharePoint App upgrade <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -503,17 +477,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <div class="site-overview-wrap sidebar-panel">
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -574,23 +539,6 @@
         </div>
       </div>
 
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Issue"><span class="nav-number">1.</span> <span class="nav-text">Issue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Solution"><span class="nav-number">2.</span> <span class="nav-text">Solution</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
       
 
       
