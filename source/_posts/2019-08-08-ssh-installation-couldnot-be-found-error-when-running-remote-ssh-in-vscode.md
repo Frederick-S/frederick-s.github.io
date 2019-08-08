@@ -7,3 +7,7 @@ I ran into an error when running "Remote - SSH" in Visual Studio Code on Windows
 > VS Code will look for the `ssh` command in the PATH. Failing that, on Windows it will attempt to find `ssh.exe` in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the `remote.SSH.path` property to `settings.json`.
 
 My git client was not installed in the default path, thus VS Code couldn't find the `ssh` command. So I added the `remote.SSH.path` property to `settings.json` and problem solved.
+
+Reference:
+
+- [Installing a supported SSH client](https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client)
