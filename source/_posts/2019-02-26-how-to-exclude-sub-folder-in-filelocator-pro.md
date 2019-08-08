@@ -1,4 +1,6 @@
 title: 如何在 FileLocator Pro 中排除子文件夹 
+categories:
+- FileLocator Pro
 ---
 
 在搜索路径后加上 `-yourFolderName`，文件夹间以 `;` 分隔。
