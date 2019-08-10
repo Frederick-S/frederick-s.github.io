@@ -70,7 +70,7 @@ theme: next
 deploy:
   type: git
   repo: git@github.com:Frederick-S/frederick-s.github.io.git
-  branch: gh-pages
+  branch: master
 
 index_generator:
   path: ''
