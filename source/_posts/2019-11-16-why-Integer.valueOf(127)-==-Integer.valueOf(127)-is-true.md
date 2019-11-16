@@ -29,7 +29,7 @@ if (integer3 == integer4) {
 
 `Integer integer1 = 3` 发生了自动装箱，编译器会将其等价转换为 `Integer integer1 = Integer.valueOf(3)`，所以 `integer1 == integer2`。而通过构造函数创建的 `Integer` 对象属于不同的对象，指向不同的内存地址，所以 `integer3 != integer4`。
 
-另外，可以通过增加虚拟机的参数 `-XX:AutoBoxCacheMax=size` 来设置整型缓存的最大值。
+另外，可以通过增加虚拟机的参数 `-XX:AutoBoxCacheMax=size` 来设置整型缓存的最大值，如 `-XX:AutoBoxCacheMax=500` 表示-128到500的整型会被缓存。
 
 参考:
 
