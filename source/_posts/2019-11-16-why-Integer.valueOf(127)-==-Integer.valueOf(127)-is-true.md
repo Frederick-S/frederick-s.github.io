@@ -31,7 +31,7 @@ if (integer3 == integer4) {
 
 另外，可以通过增加虚拟机的参数 `-XX:AutoBoxCacheMax=size` 来设置整型缓存的最大值，如 `-XX:AutoBoxCacheMax=500` 表示-128到500的整型会被缓存。
 
-参考:
+参考：
 
 * [Java Integer Cache — Why Integer.valueOf(127) == Integer.valueOf(127) Is True](https://medium.com/@njnareshjoshi/java-integer-cache-why-integer-valueof-127-integer-valueof-127-is-true-e5076824a3d5)
 * [Java Integer Cache](https://javapapers.com/java/java-integer-cache/)

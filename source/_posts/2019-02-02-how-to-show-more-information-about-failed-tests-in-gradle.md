@@ -13,6 +13,6 @@ test {
 }
 ```
 
-参考:
+参考：
 
 - [Gradle Goodness: Show More Information About Failed Tests](http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html)
