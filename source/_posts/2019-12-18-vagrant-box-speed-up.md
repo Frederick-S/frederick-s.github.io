@@ -3,7 +3,7 @@ categories:
 - Vagrant
 ---
 
-可以使用[清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/)上的镜像。例如需要下载 `Ubuntu 18` 的镜像，先在站内找到对应镜像的地址，然后在终端执行 `vagrant box add https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box --name ubuntu/bionic`，下载完成后即可执行 `vagrant init ubuntu/bionic` 等操作。
+可以使用[清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/)上的镜像。例如需要下载 `Ubuntu 18` 的镜像，先在站内找到对应镜像的地址（例如：`https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box`），然后在终端执行 `vagrant box add 镜像的地址 --name ubuntu/bionic`，下载完成后即可执行 `vagrant init ubuntu/bionic` 等操作。
 
 参考：
 
