@@ -108,6 +108,8 @@ public class AppTest {
 
 ![alt](/images/jacoco-multiple-modules-demo.png)
 
+完整的代码可参考 [GitHub](https://github.com/Frederick-S/jacoco-multiple-modules-demo)。
+
 参考：
 
 - [Jacoco report aggregation for code coverage](https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp)
