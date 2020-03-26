@@ -1,8 +1,6 @@
 title: JaCoCo 配置 Maven 多模块覆盖率测试
 categories:
 - Java
-- Maven
-- JaCoCo
 ---
 
 首先构建一个多模块的 `Maven` 项目，项目结构如下：
