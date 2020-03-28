@@ -1,5 +1,5 @@
 title: 如何在 FileLocator Pro 中排除子文件夹 
-categories:
+tags:
 - FileLocator Pro
 ---
 

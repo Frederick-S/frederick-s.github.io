@@ -1,5 +1,5 @@
 title: How to get access to other drives in Ubuntu on Windows 10
-categories:
+tags:
 - Ubuntu
 ---
 

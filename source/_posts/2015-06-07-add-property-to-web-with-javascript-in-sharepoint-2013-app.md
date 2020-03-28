@@ -1,5 +1,5 @@
 title: Add property to web with JavaScript in SharePoint 2013 App
-categories:
+tags:
 - SharePoint Add-in
 ---
 

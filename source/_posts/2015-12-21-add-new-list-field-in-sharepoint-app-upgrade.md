@@ -1,5 +1,5 @@
 title: Add new list field in SharePoint App upgrade
-categories:
+tags:
 - SharePoint Add-in
 ---
 

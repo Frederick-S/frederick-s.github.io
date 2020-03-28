@@ -1,5 +1,5 @@
 title: How to enable word wrap in VS Code
-categories:
+tags:
 - Visual Studio Code
 ---
 

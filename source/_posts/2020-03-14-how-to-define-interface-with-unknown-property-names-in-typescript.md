@@ -1,5 +1,5 @@
 title: 如何在 TypeScript 中定义属性名未知的对象类型
-categories:
+tags:
 - TypeScript
 ---
 

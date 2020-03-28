@@ -1,5 +1,5 @@
 title: VS Code remote development tool error - An SSH installation couldn't be found
-categories:
+tags:
 - Visual Studio Code
 ---
 

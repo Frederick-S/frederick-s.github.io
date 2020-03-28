@@ -1,5 +1,5 @@
 title: 如何在 Gradle 的测试中显示详尽的错误信息
-categories:
+tags:
 - Gradle
 ---
 

@@ -1,5 +1,5 @@
 title: Vagrant 镜像下载加速
-categories:
+tags:
 - Vagrant
 ---
 

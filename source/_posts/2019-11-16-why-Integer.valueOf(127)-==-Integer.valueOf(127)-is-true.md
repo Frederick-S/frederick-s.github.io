@@ -1,5 +1,5 @@
 title: 为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True
-categories:
+tags:
 - Java
 ---
 

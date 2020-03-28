@@ -1,5 +1,5 @@
 title: 如何在 Dockerfile 中定义变量
-categories:
+tags:
 - Docker
 ---
 

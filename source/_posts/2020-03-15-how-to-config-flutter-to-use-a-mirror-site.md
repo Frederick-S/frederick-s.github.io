@@ -1,5 +1,5 @@
 title: 配置 Flutter 国内镜像
-categories:
+tags:
 - Flutter
 ---
 

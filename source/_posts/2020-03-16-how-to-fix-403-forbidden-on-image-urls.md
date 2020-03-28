@@ -1,5 +1,5 @@
 title: 如何解决访问外部图片返回 403 Forbidden 错误
-categories:
+tags:
 - HTTP
 ---
 

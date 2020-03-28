@@ -1,5 +1,5 @@
 title: VS Code error - No source control providers registered
-categories:
+tags:
 - Visual Studio Code
 ---
 

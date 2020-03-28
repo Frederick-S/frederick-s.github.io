@@ -1,5 +1,5 @@
 title: 如何解决“Waiting for another flutter command to release the startup lock...”
-categories:
+tags:
 - Flutter
 ---
 

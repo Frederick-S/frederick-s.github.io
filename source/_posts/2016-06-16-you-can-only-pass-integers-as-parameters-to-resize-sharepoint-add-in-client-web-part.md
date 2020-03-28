@@ -1,5 +1,5 @@
 title: You can only pass integers as parameters to resize SharePoint Add-in Client Web Part
-categories:
+tags:
 - SharePoint Add-in
 ---
 

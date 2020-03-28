@@ -1,5 +1,5 @@
 title: Fail to resize SharePoint App Part if "Chrome Type" is "None" or "Border Only"
-categories:
+tags:
 - SharePoint Add-in
 ---
 
