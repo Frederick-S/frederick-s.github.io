@@ -53,6 +53,9 @@ title: 一些在线书籍（不定期更新）
 - [JavaScript Garden](https://bonsaiden.github.io/JavaScript-Garden/)
 - [Robust Client-Side JavaScript](https://molily.de/robust-javascript/)
 
+### TypeScript
+- [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
+
 ### Python
 - [The Hitchhiker's Guide to Python!](https://docs.python-guide.org/)
 - [Intermediate Python](http://book.pythontips.com/en/latest/)
