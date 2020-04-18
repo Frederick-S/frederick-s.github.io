@@ -19,7 +19,7 @@
     "hexo-server": "^1.0.0"
   },
   "scripts": {
-    "server": "hexo server",
+    "serve": "hexo server",
     "clean": "hexo clean",
     "generate": "hexo generate",
     "deploy": "hexo deploy"
