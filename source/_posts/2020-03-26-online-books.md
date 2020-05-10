@@ -23,16 +23,25 @@ title: 一些在线书籍（不定期更新）
 - [Build Your Own Lisp](http://www.buildyourownlisp.com/)
 - [A Compiler Writing Journey](https://github.com/DoctorWkt/acwj)
 
+## Operating Systems
+- [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/)
+- [Writing an OS in Rust](https://os.phil-opp.com/)
+- [Think OS: A Brief Introduction to Operating Systems](http://greenteapress.com/thinkos/html/index.html)
+
 ## Database
 - [Foundations of Databases](http://webdam.inria.fr/Alice/)
 - [The Internals of PostgreSQL](http://www.interdb.jp/pg/index.html)
 
-## Operating Systems
-- [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/)
-- [Writing an OS in Rust](https://os.phil-opp.com/)
-
 ## Networking
 - [The TCP/IP Guide](http://www.tcpipguide.com/free/index.htm)
+
+## Linux
+- [Linux Inside](https://0xax.gitbooks.io/linux-insides/content/index.html)
+- [The Linux Kernel](https://www.tldp.org/LDP/tlk/tlk.html)
+- [Linux Kernel Teaching](https://linux-kernel-labs.github.io/refs/heads/master/)
+- [Linux From Scratch](http://www.linuxfromscratch.org/lfs/view/stable/)
+- [The Linux Command Line](http://linuxcommand.org/tlcl.php)
+- [UNIX TOOLBOX](http://cb.vu/unixtoolbox.xhtml)
 
 ## Programming
 - [How to Design Programs](https://htdp.org/)
@@ -88,13 +97,14 @@ title: 一些在线书籍（不定期更新）
 ### Haskell
 - [What I Wish I Knew When Learning Haskell](http://dev.stephendiehl.com/hask/)
 
-## Linux
-- [Linux Inside](https://0xax.gitbooks.io/linux-insides/content/index.html)
-- [The Linux Kernel](https://www.tldp.org/LDP/tlk/tlk.html)
-- [Linux Kernel Teaching](https://linux-kernel-labs.github.io/refs/heads/master/)
-
 ## Redis
 - [Redis in Action](https://redislabs.com/redis-in-action/)
+- [The Little Redis Book](https://github.com/karlseguin/the-little-redis-book)
+
+## Git
+- [git - the simple guide](https://rogerdudler.github.io/git-guide/)
+- [Pro Git](https://git-scm.com/book/en/v2)
+- [Git Magic](http://www-cs-students.stanford.edu/~blynn/gitmagic/)
 
 ## German
 - [A Foundation Course in Reading German](https://courses.dcs.wisc.edu/wp/readinggerman/)
