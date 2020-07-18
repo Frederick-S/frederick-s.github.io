@@ -1,6 +1,7 @@
 title: An enum switch case label must be the unqualified name of an enumeration constant
 tags:
 - Java
+- Maven
 ---
 
 `An enum switch case label must be the unqualified name of an enumeration constant` 是 `Java` 中常见的编译错误，基本上 `Google` 搜索出来的错误场景都是因为在 `switch` 中使用枚举时搭配了类名造成，例如：
