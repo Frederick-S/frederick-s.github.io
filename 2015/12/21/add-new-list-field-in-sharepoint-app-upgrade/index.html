@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.1">
+<meta name="generator" content="Hexo 5.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -128,14 +128,14 @@
     <a href="/" rel="section"><i class="home fa-fw"></i>Home</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>Tags</a>
-
-  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>Tags</a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -245,14 +245,14 @@
 
       
         <p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx" target="_blank" rel="noopener">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>The <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
 <p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">"MyList\Elements.xml"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>And it works. Hope it’s helpful.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx" target="_blank" rel="noopener">How to: Update app web components in SharePoint 2013</a></li>
+<li><a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 
     </div>
@@ -350,7 +350,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

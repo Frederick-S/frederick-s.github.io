@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.1">
+<meta name="generator" content="Hexo 5.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -128,14 +128,14 @@
     <a href="/" rel="section"><i class="home fa-fw"></i>Home</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>Tags</a>
-
-  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>Tags</a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -246,12 +246,12 @@
       
         <p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
 <p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"referrer"</span> <span class="attr">content</span>=<span class="string">"no-referrer"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls" target="_blank" rel="noopener">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8" target="_blank" rel="noopener">解决图片访问403 Forbidden问题</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
 </ul>
 
     </div>
@@ -349,7 +349,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

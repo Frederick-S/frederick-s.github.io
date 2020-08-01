@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
-    <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
-    <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">"&lt;Message senderId="</span> + senderId + <span class="string">"&gt;"</span> + <span class="string">"resize("</span> + width + <span class="string">","</span> + height + <span class="string">")&lt;/Message&gt;"</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
+    <title>Add property to web with JavaScript in SharePoint 2013 App</title>
+    <url>/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/</url>
+    <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
+<h2 id="Add-property-to-web"><a href="#Add-property-to-web" class="headerlink" title="Add property to web"></a>Add property to web</h2><p>Adding custom property to web is easy. Let’s just see the code:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a new property</span></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">props.set_item(<span class="string">&quot;MyProperty&quot;</span>, <span class="string">&quot;My property value&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply change to web</span></span><br><span class="line">web.update();</span><br><span class="line">context.load(web);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Success.&quot;</span>);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
-<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">'style'</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+<p>How do we know “MyProperty” is really added to web? We can check it here: <code>http://your_web/_api/web/AllProperties?$select=MyProperty</code>. The result looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">entry</span> <span class="attr">xml:base</span>=<span class="string">&quot;http://your_web/test/_api/&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2005/Atom&quot;</span> <span class="attr">xmlns:d</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices&quot;</span> <span class="attr">xmlns:m</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span> <span class="attr">xmlns:georss</span>=<span class="string">&quot;http://www.georss.org/georss&quot;</span> <span class="attr">xmlns:gml</span>=<span class="string">&quot;http://www.opengis.net/gml&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>http://your_web/_api/web/AllProperties<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">term</span>=<span class="string">&quot;SP.PropertyValues&quot;</span> <span class="attr">scheme</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;edit&quot;</span> <span class="attr">href</span>=<span class="string">&quot;web/AllProperties&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">updated</span>&gt;</span>2013-12-04T04:37:07Z<span class="tag">&lt;/<span class="name">updated</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span> /&gt;</span>;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">content</span> <span class="attr">type</span>=<span class="string">&quot;application/xml&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">m:properties</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">d:myproperty</span>&gt;</span>My property value<span class="tag">&lt;/<span class="name">d:myproperty</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">m:properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>Then I located the code in my web part page which throws the error:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">'_ChromeTitle'</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">'width:100% !important;'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Read-property-from-web"><a href="#Read-property-from-web" class="headerlink" title="Read property from web"></a>Read property from web</h2><p>We have two approaches to read properties from web: <code>props.get_item(&quot;PropertyKey&quot;)</code> or <code>REST API</code>.</p>
+<h3 id="The-get-item-method"><a href="#The-get-item-method" class="headerlink" title="The get_item method"></a>The get_item method</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">context.load(props);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prop = props.get_item(<span class="string">&quot;MyProperty&quot;</span>);</span><br><span class="line">    alert(prop);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
-<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
-<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint" target="_blank" rel="noopener">here</a>, you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx" target="_blank" rel="noopener">patch</a> to fix this bug.</p>
-<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">'_ChromeTitle'</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">'width:100% !important;'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="The-REST-API"><a href="#The-REST-API" class="headerlink" title="The REST API"></a>The REST API</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> executor = <span class="keyword">new</span> SP.RequestExecutor(<span class="string">&#x27;http://your_web&#x27;</span>);</span><br><span class="line">executor.executeAsync(&#123;</span><br><span class="line">    url: <span class="string">&#x27;http://your_web/_api/web/AllProperties?$select=MyProperty&#x27;</span>,</span><br><span class="line">    method: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">    headers: &#123; <span class="string">&quot;Accept&quot;</span>: <span class="string">&quot;application/json; odata=verbose&quot;</span> &#125;,</span><br><span class="line">    success: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="built_in">JSON</span>.parse(response.body);</span><br><span class="line">        alert(obj.d.MyProperty);</span><br><span class="line">    &#125;,</span><br><span class="line">    error: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        alert(response.body);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
-<p>Hope it’s helpful.</p>
+<p>And here is the json query result, very straightforward:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;d&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;__metadata&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;uri&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;SP.PropertyValues&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;MyProperty&quot;</span>: <span class="string">&quot;My property value&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>Reference:</p>
 <ul>
-<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint" target="_blank" rel="noopener">Dynamic Width and Height for iFrame (App Part)</a></li>
+<li><a href="http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx">HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -28,26 +28,26 @@
       </tags>
   </entry>
   <entry>
-    <title>Add property to web with JavaScript in SharePoint 2013 App</title>
-    <url>/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/</url>
-    <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
-<h2 id="Add-property-to-web"><a href="#Add-property-to-web" class="headerlink" title="Add property to web"></a>Add property to web</h2><p>Adding custom property to web is easy. Let’s just see the code:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a new property</span></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">props.set_item(<span class="string">"MyProperty"</span>, <span class="string">"My property value"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply change to web</span></span><br><span class="line">web.update();</span><br><span class="line">context.load(web);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"Success."</span>);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"Request failed."</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+    <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
+    <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
+    <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">&quot;&lt;Message senderId=&quot;</span> + senderId + <span class="string">&quot;&gt;&quot;</span> + <span class="string">&quot;resize(&quot;</span> + width + <span class="string">&quot;,&quot;</span> + height + <span class="string">&quot;)&lt;/Message&gt;&quot;</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
 
-<p>How do we know “MyProperty” is really added to web? We can check it here: <code>http://your_web/_api/web/AllProperties?$select=MyProperty</code>. The result looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8" ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">entry</span> <span class="attr">xml:base</span>=<span class="string">"http://your_web/test/_api/"</span> <span class="attr">xmlns</span>=<span class="string">"http://www.w3.org/2005/Atom"</span> <span class="attr">xmlns:d</span>=<span class="string">"http://schemas.microsoft.com/ado/2007/08/dataservices"</span> <span class="attr">xmlns:m</span>=<span class="string">"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"</span> <span class="attr">xmlns:georss</span>=<span class="string">"http://www.georss.org/georss"</span> <span class="attr">xmlns:gml</span>=<span class="string">"http://www.opengis.net/gml"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>http://your_web/_api/web/AllProperties<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">term</span>=<span class="string">"SP.PropertyValues"</span> <span class="attr">scheme</span>=<span class="string">"http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"edit"</span> <span class="attr">href</span>=<span class="string">"web/AllProperties"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">updated</span>&gt;</span>2013-12-04T04:37:07Z<span class="tag">&lt;/<span class="name">updated</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span> /&gt;</span>;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">content</span> <span class="attr">type</span>=<span class="string">"application/xml"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">m:properties</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">d:myproperty</span>&gt;</span>My property value<span class="tag">&lt;/<span class="name">d:myproperty</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">m:properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">&#x27;style&#x27;</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="Read-property-from-web"><a href="#Read-property-from-web" class="headerlink" title="Read property from web"></a>Read property from web</h2><p>We have two approaches to read properties from web: <code>props.get_item(&quot;PropertyKey&quot;)</code> or <code>REST API</code>.</p>
-<h3 id="The-get-item-method"><a href="#The-get-item-method" class="headerlink" title="The get_item method"></a>The get_item method</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">context.load(props);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prop = props.get_item(<span class="string">"MyProperty"</span>);</span><br><span class="line">    alert(prop);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"Request failed."</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>Then I located the code in my web part page which throws the error:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="The-REST-API"><a href="#The-REST-API" class="headerlink" title="The REST API"></a>The REST API</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> executor = <span class="keyword">new</span> SP.RequestExecutor(<span class="string">'http://your_web'</span>);</span><br><span class="line">executor.executeAsync(&#123;</span><br><span class="line">    url: <span class="string">'http://your_web/_api/web/AllProperties?$select=MyProperty'</span>,</span><br><span class="line">    method: <span class="string">'GET'</span>,</span><br><span class="line">    headers: &#123; <span class="string">"Accept"</span>: <span class="string">"application/json; odata=verbose"</span> &#125;,</span><br><span class="line">    success: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="built_in">JSON</span>.parse(response.body);</span><br><span class="line">        alert(obj.d.MyProperty);</span><br><span class="line">    &#125;,</span><br><span class="line">    error: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        alert(response.body);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
+<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">here</a>, you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx">patch</a> to fix this bug.</p>
+<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>And here is the json query result, very straightforward:</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"d"</span>: &#123;</span><br><span class="line">        <span class="attr">"__metadata"</span>: &#123;</span><br><span class="line">            <span class="attr">"id"</span>: <span class="string">"http://your_web/_api/web/AllProperties"</span>,</span><br><span class="line">            <span class="attr">"uri"</span>: <span class="string">"http://your_web/_api/web/AllProperties"</span>,</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"SP.PropertyValues"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"MyProperty"</span>: <span class="string">"My property value"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<p>Hope it’s helpful.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx" target="_blank" rel="noopener">HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013</a></li>
+<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -58,14 +58,14 @@
     <title>Add new list field in SharePoint App upgrade</title>
     <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
     <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx" target="_blank" rel="noopener">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
 <p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">"MyList\Elements.xml"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>And it works. Hope it’s helpful.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx" target="_blank" rel="noopener">How to: Update app web components in SharePoint 2013</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -85,27 +85,27 @@
       </tags>
   </entry>
   <entry>
-    <title>如何在 FileLocator Pro 中排除子文件夹</title>
-    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
-    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
-<p>参考：</p>
+    <title>How to get access to other drives in Ubuntu on Windows 10</title>
+    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
+    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
+<p>Reference:</p>
 <ul>
-<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search" target="_blank" rel="noopener">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
+<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>FileLocator Pro</tag>
+        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
     <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
     <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
     <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">test</span> &#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = <span class="string">'full'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">test</span> &#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = <span class="string">&#x27;full&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>参考：</p>
 <ul>
-<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html" target="_blank" rel="noopener">Gradle Goodness: Show More Information About Failed Tests</a></li>
+<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html">Gradle Goodness: Show More Information About Failed Tests</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -113,16 +113,16 @@
       </tags>
   </entry>
   <entry>
-    <title>How to get access to other drives in Ubuntu on Windows 10</title>
-    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
-    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
-<p>Reference:</p>
+    <title>如何在 FileLocator Pro 中排除子文件夹</title>
+    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
+    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
+<p>参考：</p>
 <ul>
-<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows" target="_blank" rel="noopener">How do I change Drive with bash on windows?</a></li>
+<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Ubuntu</tag>
+        <tag>FileLocator Pro</tag>
       </tags>
   </entry>
   <entry>
@@ -135,7 +135,7 @@
 <p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client" target="_blank" rel="noopener">Installing a supported SSH client</a></li>
+<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -147,14 +147,14 @@
     <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
     <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
 <p>不过，整型缓存只适用于自动装箱的情况，不适用于通过构造函数创建的 <code>Integer</code> 对象间的比较，在下述代码中，最终的输出结果是 <code>integer1 == integer2</code> 和 <code>integer3 != integer4</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Integer integer1 = <span class="number">3</span>;</span><br><span class="line">Integer integer2 = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer1 == integer2) &#123;</span><br><span class="line">    System.out.println(<span class="string">"integer1 == integer2"</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">"integer1 != integer2"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Integer integer3 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line">Integer integer4 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer3 == integer4) &#123;</span><br><span class="line">    System.out.println(<span class="string">"integer3 == integer4"</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">"integer3 != integer4"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Integer integer1 = <span class="number">3</span>;</span><br><span class="line">Integer integer2 = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer1 == integer2) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 == integer2&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 != integer2&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Integer integer3 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line">Integer integer4 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer3 == integer4) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 == integer4&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 != integer4&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>Integer integer1 = 3</code> 发生了自动装箱，编译器会将其等价转换为 <code>Integer integer1 = Integer.valueOf(3)</code>，所以 <code>integer1 == integer2</code>。而通过构造函数创建的 <code>Integer</code> 对象属于不同的对象，指向不同的内存地址，所以 <code>integer3 != integer4</code>。</p>
 <p>另外，可以通过增加虚拟机的参数 <code>-XX:AutoBoxCacheMax=size</code> 来设置整型缓存的最大值，如 <code>-XX:AutoBoxCacheMax=500</code> 表示-128到500的整型会被缓存。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://medium.com/@njnareshjoshi/java-integer-cache-why-integer-valueof-127-integer-valueof-127-is-true-e5076824a3d5" target="_blank" rel="noopener">Java Integer Cache — Why Integer.valueOf(127) == Integer.valueOf(127) Is True</a></li>
-<li><a href="https://javapapers.com/java/java-integer-cache/" target="_blank" rel="noopener">Java Integer Cache</a></li>
+<li><a href="https://medium.com/@njnareshjoshi/java-integer-cache-why-integer-valueof-127-integer-valueof-127-is-true-e5076824a3d5">Java Integer Cache — Why Integer.valueOf(127) == Integer.valueOf(127) Is True</a></li>
+<li><a href="https://javapapers.com/java/java-integer-cache/">Java Integer Cache</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -167,7 +167,20 @@
     <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers" target="_blank" rel="noopener">Git missing in VS Code – No source control providers</a></li>
+<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How to enable word wrap in VS Code</title>
+    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
+    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -177,10 +190,10 @@
   <entry>
     <title>Vagrant 镜像下载加速</title>
     <url>/2019/12/18/vagrant-box-speed-up/</url>
-    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/" target="_blank" rel="noopener">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
+    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302" target="_blank" rel="noopener">vagrant box国内有镜像地址可以下载吗？</a></li>
+<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -188,49 +201,21 @@
       </tags>
   </entry>
   <entry>
-    <title>How to enable word wrap in VS Code</title>
-    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
-    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode" target="_blank" rel="noopener">How to switch word wrap on and off in VSCode?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 TypeScript 中定义属性名未知的对象类型</title>
     <url>/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/</url>
-    <content><![CDATA[<p>在某些场景下，我们会使用 <code>{}</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">'Alice'</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">'Bob'</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&#x27;Alice&#x27;</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">&#x27;Bob&#x27;</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>而在 <code>TypeScript</code> 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这种情况下可以借助 <a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#indexable-types" target="_blank" rel="noopener">Indexable Types</a> 解决，以上述的例子为例：</p>
-<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">interface</span> CarOwners &#123;</span><br><span class="line">    [key: <span class="built_in">string</span>]: Car;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> carOwners: CarOwners = &#123;</span><br><span class="line">    <span class="string">'Alice'</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">'Bob'</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而在 <code>TypeScript</code> 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这种情况下可以借助 <a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#indexable-types">Indexable Types</a> 解决，以上述的例子为例：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">interface</span> CarOwners &#123;</span><br><span class="line">    [key: <span class="built_in">string</span>]: Car;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> carOwners: CarOwners = &#123;</span><br><span class="line">    <span class="string">&#x27;Alice&#x27;</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">&#x27;Bob&#x27;</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>参考：</p>
 <ul>
-<li><a href="https://github.com/Microsoft/TypeScript/issues/7803" target="_blank" rel="noopener">Type annotation for object with unknown properties but known property types?</a></li>
+<li><a href="https://github.com/Microsoft/TypeScript/issues/7803">Type annotation for object with unknown properties but known property types?</a></li>
 </ul>
 ]]></content>
       <tags>
         <tag>TypeScript</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>配置 Flutter 国内镜像</title>
-    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
-    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site" target="_blank" rel="noopener">Configuring Flutter to use a mirror site</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -241,7 +226,22 @@
 
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock" target="_blank" rel="noopener">Waiting for another flutter command to release the startup lock</a></li>
+<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>配置 Flutter 国内镜像</title>
+    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
+    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -253,12 +253,12 @@
     <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
     <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
 <p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"referrer"</span> <span class="attr">content</span>=<span class="string">"no-referrer"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls" target="_blank" rel="noopener">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8" target="_blank" rel="noopener">解决图片访问403 Forbidden问题</a></li>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -287,10 +287,10 @@
 
 <p>此时在 <code>root</code> 模块下执行 <code>mvn test</code>，执行成功后在 <code>app/target/site/jacoco-aggregate</code> 目录下就会生成各个模块的覆盖测试报告：</p>
 <p><img src="/images/jacoco-multiple-modules-demo.png" alt="alt"></p>
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo" target="_blank" rel="noopener">GitHub</a>。</p>
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo">GitHub</a>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp" target="_blank" rel="noopener">Jacoco report aggregation for code coverage</a></li>
+<li><a href="https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp">Jacoco report aggregation for code coverage</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -303,125 +303,125 @@
     <title>一些在线书籍（不定期更新）</title>
     <url>/2020/03/26/online-books/</url>
     <content><![CDATA[<h2 id="Math"><a href="#Math" class="headerlink" title="Math"></a>Math</h2><ul>
-<li><a href="https://www.probabilitycourse.com/" target="_blank" rel="noopener">Introduction to Probability, Statistics, and Random Processes</a></li>
-<li><a href="http://textbooks.math.gatech.edu/ila/index.html" target="_blank" rel="noopener">Interactive Linear Algebra</a></li>
-<li><a href="https://mml-book.github.io/" target="_blank" rel="noopener">Mathematics for Machine Learning</a></li>
-<li><a href="https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/" target="_blank" rel="noopener">Probabilistic Programming &amp; Bayesian Methods for Hackers</a></li>
+<li><a href="https://www.probabilitycourse.com/">Introduction to Probability, Statistics, and Random Processes</a></li>
+<li><a href="http://textbooks.math.gatech.edu/ila/index.html">Interactive Linear Algebra</a></li>
+<li><a href="https://mml-book.github.io/">Mathematics for Machine Learning</a></li>
+<li><a href="https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/">Probabilistic Programming &amp; Bayesian Methods for Hackers</a></li>
 </ul>
 <h2 id="Computer-Science"><a href="#Computer-Science" class="headerlink" title="Computer Science"></a>Computer Science</h2><ul>
-<li><a href="https://www.cs.hmc.edu/twiki/bin/view/CSforAll/" target="_blank" rel="noopener">CS for All</a></li>
-<li><a href="http://infolab.stanford.edu/~ullman/focs.html" target="_blank" rel="noopener">Foundations of Computer Science</a></li>
-<li><a href="http://www.openbookproject.net/books/StudentCSP/" target="_blank" rel="noopener">CS Principles: Big Ideas in Programming</a></li>
-<li><a href="http://openbookproject.net/thinkcs/python/english3e/" target="_blank" rel="noopener">How to Think Like a Computer Scientist</a></li>
-<li><a href="https://www.bottomupcs.com/index.xhtml" target="_blank" rel="noopener">Computer Science from the Bottom Up</a></li>
+<li><a href="https://www.cs.hmc.edu/twiki/bin/view/CSforAll/">CS for All</a></li>
+<li><a href="http://infolab.stanford.edu/~ullman/focs.html">Foundations of Computer Science</a></li>
+<li><a href="http://www.openbookproject.net/books/StudentCSP/">CS Principles: Big Ideas in Programming</a></li>
+<li><a href="http://openbookproject.net/thinkcs/python/english3e/">How to Think Like a Computer Scientist</a></li>
+<li><a href="https://www.bottomupcs.com/index.xhtml">Computer Science from the Bottom Up</a></li>
 </ul>
 <h2 id="Algorithm-amp-Data-Structures"><a href="#Algorithm-amp-Data-Structures" class="headerlink" title="Algorithm &amp; Data Structures"></a>Algorithm &amp; Data Structures</h2><ul>
-<li><a href="http://jeffe.cs.illinois.edu/teaching/algorithms/" target="_blank" rel="noopener">Algorithms</a></li>
-<li><a href="http://www.openbookproject.net/books/pythonds/" target="_blank" rel="noopener">Problem Solving with Algorithms and Data Structures using Python</a></li>
+<li><a href="http://jeffe.cs.illinois.edu/teaching/algorithms/">Algorithms</a></li>
+<li><a href="http://www.openbookproject.net/books/pythonds/">Problem Solving with Algorithms and Data Structures using Python</a></li>
 </ul>
 <h2 id="Compiler-amp-Interpreter"><a href="#Compiler-amp-Interpreter" class="headerlink" title="Compiler &amp; Interpreter"></a>Compiler &amp; Interpreter</h2><ul>
-<li><a href="http://craftinginterpreters.com/" target="_blank" rel="noopener">Crafting Interpreters</a></li>
-<li><a href="http://www.buildyourownlisp.com/" target="_blank" rel="noopener">Build Your Own Lisp</a></li>
-<li><a href="https://github.com/DoctorWkt/acwj" target="_blank" rel="noopener">A Compiler Writing Journey</a></li>
+<li><a href="http://craftinginterpreters.com/">Crafting Interpreters</a></li>
+<li><a href="http://www.buildyourownlisp.com/">Build Your Own Lisp</a></li>
+<li><a href="https://github.com/DoctorWkt/acwj">A Compiler Writing Journey</a></li>
 </ul>
 <h2 id="Operating-Systems"><a href="#Operating-Systems" class="headerlink" title="Operating Systems"></a>Operating Systems</h2><ul>
-<li><a href="http://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener">Operating Systems: Three Easy Pieces</a></li>
-<li><a href="https://os.phil-opp.com/" target="_blank" rel="noopener">Writing an OS in Rust</a></li>
-<li><a href="http://greenteapress.com/thinkos/html/index.html" target="_blank" rel="noopener">Think OS: A Brief Introduction to Operating Systems</a></li>
+<li><a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">Operating Systems: Three Easy Pieces</a></li>
+<li><a href="https://os.phil-opp.com/">Writing an OS in Rust</a></li>
+<li><a href="http://greenteapress.com/thinkos/html/index.html">Think OS: A Brief Introduction to Operating Systems</a></li>
 </ul>
 <h2 id="Database"><a href="#Database" class="headerlink" title="Database"></a>Database</h2><ul>
-<li><a href="http://webdam.inria.fr/Alice/" target="_blank" rel="noopener">Foundations of Databases</a></li>
-<li><a href="http://www.interdb.jp/pg/index.html" target="_blank" rel="noopener">The Internals of PostgreSQL</a></li>
+<li><a href="http://webdam.inria.fr/Alice/">Foundations of Databases</a></li>
+<li><a href="http://www.interdb.jp/pg/index.html">The Internals of PostgreSQL</a></li>
 </ul>
 <h2 id="Networking"><a href="#Networking" class="headerlink" title="Networking"></a>Networking</h2><ul>
-<li><a href="http://www.tcpipguide.com/free/index.htm" target="_blank" rel="noopener">The TCP/IP Guide</a></li>
+<li><a href="http://www.tcpipguide.com/free/index.htm">The TCP/IP Guide</a></li>
 </ul>
 <h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><ul>
-<li><a href="https://0xax.gitbooks.io/linux-insides/content/index.html" target="_blank" rel="noopener">Linux Inside</a></li>
-<li><a href="https://www.tldp.org/LDP/tlk/tlk.html" target="_blank" rel="noopener">The Linux Kernel</a></li>
-<li><a href="https://linux-kernel-labs.github.io/refs/heads/master/" target="_blank" rel="noopener">Linux Kernel Teaching</a></li>
-<li><a href="http://www.linuxfromscratch.org/lfs/view/stable/" target="_blank" rel="noopener">Linux From Scratch</a></li>
-<li><a href="http://linuxcommand.org/tlcl.php" target="_blank" rel="noopener">The Linux Command Line</a></li>
-<li><a href="http://cb.vu/unixtoolbox.xhtml" target="_blank" rel="noopener">UNIX TOOLBOX</a></li>
+<li><a href="https://0xax.gitbooks.io/linux-insides/content/index.html">Linux Inside</a></li>
+<li><a href="https://www.tldp.org/LDP/tlk/tlk.html">The Linux Kernel</a></li>
+<li><a href="https://linux-kernel-labs.github.io/refs/heads/master/">Linux Kernel Teaching</a></li>
+<li><a href="http://www.linuxfromscratch.org/lfs/view/stable/">Linux From Scratch</a></li>
+<li><a href="http://linuxcommand.org/tlcl.php">The Linux Command Line</a></li>
+<li><a href="http://cb.vu/unixtoolbox.xhtml">UNIX TOOLBOX</a></li>
 </ul>
 <h2 id="Programming"><a href="#Programming" class="headerlink" title="Programming"></a>Programming</h2><ul>
-<li><a href="https://htdp.org/" target="_blank" rel="noopener">How to Design Programs</a></li>
-<li><a href="https://sarabander.github.io/sicp/html/index.xhtml" target="_blank" rel="noopener">Structure and Interpretation of Computer Programs</a></li>
-<li><a href="http://www.sicpdistilled.com/" target="_blank" rel="noopener">SICP Distilled</a></li>
-<li><a href="https://mostly-adequate.gitbooks.io/mostly-adequate-guide/" target="_blank" rel="noopener">Mostly Adequate Guide to Functional Programming</a></li>
+<li><a href="https://htdp.org/">How to Design Programs</a></li>
+<li><a href="https://sarabander.github.io/sicp/html/index.xhtml">Structure and Interpretation of Computer Programs</a></li>
+<li><a href="http://www.sicpdistilled.com/">SICP Distilled</a></li>
+<li><a href="https://mostly-adequate.gitbooks.io/mostly-adequate-guide/">Mostly Adequate Guide to Functional Programming</a></li>
 </ul>
 <h2 id="Programming-Languages"><a href="#Programming-Languages" class="headerlink" title="Programming Languages"></a>Programming Languages</h2><h3 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h3><ul>
-<li><a href="https://wiki.sei.cmu.edu/confluence/display/java/SEI+CERT+Oracle+Coding+Standard+for+Java" target="_blank" rel="noopener">SEI CERT Oracle Coding Standard for Java</a></li>
-<li><a href="https://shipilev.net/jvm/anatomy-quarks/" target="_blank" rel="noopener">JVM Anatomy Quarks</a></li>
+<li><a href="https://wiki.sei.cmu.edu/confluence/display/java/SEI+CERT+Oracle+Coding+Standard+for+Java">SEI CERT Oracle Coding Standard for Java</a></li>
+<li><a href="https://shipilev.net/jvm/anatomy-quarks/">JVM Anatomy Quarks</a></li>
 </ul>
 <h3 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h3><ul>
-<li><a href="https://eloquentjavascript.net/" target="_blank" rel="noopener">Eloquent JavaScript</a></li>
-<li><a href="http://speakingjs.com/" target="_blank" rel="noopener">Speaking JavaScript: An In-Depth Guide for Programmers</a></li>
-<li><a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/" target="_blank" rel="noopener">Learning JavaScript Design Patterns</a></li>
-<li><a href="https://javascript.info/" target="_blank" rel="noopener">The Modern JavaScript Tutorial</a></li>
-<li><a href="https://bonsaiden.github.io/JavaScript-Garden/" target="_blank" rel="noopener">JavaScript Garden</a></li>
-<li><a href="https://molily.de/robust-javascript/" target="_blank" rel="noopener">Robust Client-Side JavaScript</a></li>
+<li><a href="https://eloquentjavascript.net/">Eloquent JavaScript</a></li>
+<li><a href="http://speakingjs.com/">Speaking JavaScript: An In-Depth Guide for Programmers</a></li>
+<li><a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/">Learning JavaScript Design Patterns</a></li>
+<li><a href="https://javascript.info/">The Modern JavaScript Tutorial</a></li>
+<li><a href="https://bonsaiden.github.io/JavaScript-Garden/">JavaScript Garden</a></li>
+<li><a href="https://molily.de/robust-javascript/">Robust Client-Side JavaScript</a></li>
 </ul>
 <h3 id="TypeScript"><a href="#TypeScript" class="headerlink" title="TypeScript"></a>TypeScript</h3><ul>
-<li><a href="https://basarat.gitbook.io/typescript/" target="_blank" rel="noopener">TypeScript Deep Dive</a></li>
+<li><a href="https://basarat.gitbook.io/typescript/">TypeScript Deep Dive</a></li>
 </ul>
 <h3 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h3><ul>
-<li><a href="https://docs.python-guide.org/" target="_blank" rel="noopener">The Hitchhiker’s Guide to Python!</a></li>
-<li><a href="http://book.pythontips.com/en/latest/" target="_blank" rel="noopener">Intermediate Python</a></li>
-<li><a href="https://www.fullstackpython.com/" target="_blank" rel="noopener">Full Stack Python</a></li>
-<li><a href="https://www.obeythetestinggoat.com/pages/book.html" target="_blank" rel="noopener">Test-Driven Development with Python</a></li>
-<li><a href="https://diveinto.org/python3/table-of-contents.html" target="_blank" rel="noopener">Dive Into Python 3</a></li>
-<li><a href="https://automatetheboringstuff.com/2e/" target="_blank" rel="noopener">Automate the Boring Stuff with Python</a></li>
-<li><a href="https://docs.quantifiedcode.com/python-anti-patterns/" target="_blank" rel="noopener">The Little Book of Python Anti-Patterns</a></li>
+<li><a href="https://docs.python-guide.org/">The Hitchhiker’s Guide to Python!</a></li>
+<li><a href="http://book.pythontips.com/en/latest/">Intermediate Python</a></li>
+<li><a href="https://www.fullstackpython.com/">Full Stack Python</a></li>
+<li><a href="https://www.obeythetestinggoat.com/pages/book.html">Test-Driven Development with Python</a></li>
+<li><a href="https://diveinto.org/python3/table-of-contents.html">Dive Into Python 3</a></li>
+<li><a href="https://automatetheboringstuff.com/2e/">Automate the Boring Stuff with Python</a></li>
+<li><a href="https://docs.quantifiedcode.com/python-anti-patterns/">The Little Book of Python Anti-Patterns</a></li>
 </ul>
 <h3 id="Clojure"><a href="#Clojure" class="headerlink" title="Clojure"></a>Clojure</h3><ul>
-<li><a href="https://www.braveclojure.com/clojure-for-the-brave-and-true/" target="_blank" rel="noopener">Clojure for the Brave and True</a></li>
+<li><a href="https://www.braveclojure.com/clojure-for-the-brave-and-true/">Clojure for the Brave and True</a></li>
 </ul>
 <h3 id="Ruby"><a href="#Ruby" class="headerlink" title="Ruby"></a>Ruby</h3><ul>
-<li><a href="https://i-love-ruby.gitlab.io/" target="_blank" rel="noopener">I Love Ruby</a></li>
-<li><a href="https://www.railstutorial.org/book" target="_blank" rel="noopener">Ruby on Rails Tutorial</a></li>
+<li><a href="https://i-love-ruby.gitlab.io/">I Love Ruby</a></li>
+<li><a href="https://www.railstutorial.org/book">Ruby on Rails Tutorial</a></li>
 </ul>
 <h3 id="Racket"><a href="#Racket" class="headerlink" title="Racket"></a>Racket</h3><ul>
-<li><a href="https://beautifulracket.com/" target="_blank" rel="noopener">Beautiful Racket</a></li>
+<li><a href="https://beautifulracket.com/">Beautiful Racket</a></li>
 </ul>
 <h3 id="Rust"><a href="#Rust" class="headerlink" title="Rust"></a>Rust</h3><ul>
-<li><a href="https://rust-unofficial.github.io/too-many-lists/index.html" target="_blank" rel="noopener">Learn Rust With Entirely Too Many Linked Lists</a></li>
+<li><a href="https://rust-unofficial.github.io/too-many-lists/index.html">Learn Rust With Entirely Too Many Linked Lists</a></li>
 </ul>
 <h3 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h3><ul>
-<li><a href="https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html" target="_blank" rel="noopener">High Performance Go Workshop</a></li>
-<li><a href="https://go101.org/article/101.html" target="_blank" rel="noopener">Go 101</a></li>
+<li><a href="https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html">High Performance Go Workshop</a></li>
+<li><a href="https://go101.org/article/101.html">Go 101</a></li>
 </ul>
 <h3 id="OCaml"><a href="#OCaml" class="headerlink" title="OCaml"></a>OCaml</h3><ul>
-<li><a href="https://www.cs.cornell.edu/courses/cs3110/2019sp/textbook/" target="_blank" rel="noopener">Functional Programming in OCaml</a></li>
+<li><a href="https://www.cs.cornell.edu/courses/cs3110/2019sp/textbook/">Functional Programming in OCaml</a></li>
 </ul>
 <h3 id="Haskell"><a href="#Haskell" class="headerlink" title="Haskell"></a>Haskell</h3><ul>
-<li><a href="http://dev.stephendiehl.com/hask/" target="_blank" rel="noopener">What I Wish I Knew When Learning Haskell</a></li>
+<li><a href="http://dev.stephendiehl.com/hask/">What I Wish I Knew When Learning Haskell</a></li>
 </ul>
 <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><ul>
-<li><a href="https://redislabs.com/redis-in-action/" target="_blank" rel="noopener">Redis in Action</a></li>
-<li><a href="https://github.com/karlseguin/the-little-redis-book" target="_blank" rel="noopener">The Little Redis Book</a></li>
+<li><a href="https://redislabs.com/redis-in-action/">Redis in Action</a></li>
+<li><a href="https://github.com/karlseguin/the-little-redis-book">The Little Redis Book</a></li>
 </ul>
 <h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><ul>
-<li><a href="https://rogerdudler.github.io/git-guide/" target="_blank" rel="noopener">git - the simple guide</a></li>
-<li><a href="https://git-scm.com/book/en/v2" target="_blank" rel="noopener">Pro Git</a></li>
-<li><a href="http://www-cs-students.stanford.edu/~blynn/gitmagic/" target="_blank" rel="noopener">Git Magic</a></li>
+<li><a href="https://rogerdudler.github.io/git-guide/">git - the simple guide</a></li>
+<li><a href="https://git-scm.com/book/en/v2">Pro Git</a></li>
+<li><a href="http://www-cs-students.stanford.edu/~blynn/gitmagic/">Git Magic</a></li>
 </ul>
 <h2 id="German"><a href="#German" class="headerlink" title="German"></a>German</h2><ul>
-<li><a href="https://courses.dcs.wisc.edu/wp/readinggerman/" target="_blank" rel="noopener">A Foundation Course in Reading German</a></li>
+<li><a href="https://courses.dcs.wisc.edu/wp/readinggerman/">A Foundation Course in Reading German</a></li>
 </ul>
 <h2 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h2><ul>
-<li><a href="https://www.aosabook.org/en/index.html" target="_blank" rel="noopener">The Architecture of Open Source Applications</a></li>
-<li><a href="https://mixmastamyk.bitbucket.io/pro_soft_dev/" target="_blank" rel="noopener">Professional Software Development</a></li>
-<li><a href="http://gee.cs.oswego.edu/dl/oosdw3/index.html" target="_blank" rel="noopener">Object-Oriented System Development</a></li>
-<li><a href="http://book.mixu.net/distsys/" target="_blank" rel="noopener">Distributed systems for fun and profit</a></li>
-<li><a href="https://hpbn.co/" target="_blank" rel="noopener">High Performance Browser Networking</a></li>
-<li><a href="https://97-things-every-x-should-know.gitbooks.io/97-things-every-programmer-should-know/content/en/" target="_blank" rel="noopener">97 Things Every Programmer Should Know</a></li>
-<li><a href="https://berb.github.io/diploma-thesis/community/index.html" target="_blank" rel="noopener">Concurrent Programming for Scalable Web Architectures</a></li>
-<li><a href="https://12factor.net/" target="_blank" rel="noopener">The Twelve-Factor App</a></li>
-<li><a href="https://dwheeler.com/secure-programs/Secure-Programs-HOWTO/index.html" target="_blank" rel="noopener">Secure Programming HOWTO</a></li>
-<li><a href="http://www.ibiblio.org/kuphaldt/electricCircuits/" target="_blank" rel="noopener">Lessons In Electric Circuits</a></li>
-<li><a href="https://toc.cryptobook.us/" target="_blank" rel="noopener">A Graduate Course in Applied Cryptography</a></li>
-<li><a href="http://imrannazar.com/GameBoy-Emulation-in-JavaScript" target="_blank" rel="noopener">GameBoy Emulation in JavaScript</a></li>
+<li><a href="https://www.aosabook.org/en/index.html">The Architecture of Open Source Applications</a></li>
+<li><a href="https://mixmastamyk.bitbucket.io/pro_soft_dev/">Professional Software Development</a></li>
+<li><a href="http://gee.cs.oswego.edu/dl/oosdw3/index.html">Object-Oriented System Development</a></li>
+<li><a href="http://book.mixu.net/distsys/">Distributed systems for fun and profit</a></li>
+<li><a href="https://hpbn.co/">High Performance Browser Networking</a></li>
+<li><a href="https://97-things-every-x-should-know.gitbooks.io/97-things-every-programmer-should-know/content/en/">97 Things Every Programmer Should Know</a></li>
+<li><a href="https://berb.github.io/diploma-thesis/community/index.html">Concurrent Programming for Scalable Web Architectures</a></li>
+<li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
+<li><a href="https://dwheeler.com/secure-programs/Secure-Programs-HOWTO/index.html">Secure Programming HOWTO</a></li>
+<li><a href="http://www.ibiblio.org/kuphaldt/electricCircuits/">Lessons In Electric Circuits</a></li>
+<li><a href="https://toc.cryptobook.us/">A Graduate Course in Applied Cryptography</a></li>
+<li><a href="http://imrannazar.com/GameBoy-Emulation-in-JavaScript">GameBoy Emulation in JavaScript</a></li>
 </ul>
 ]]></content>
   </entry>
@@ -436,7 +436,7 @@
 
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile" target="_blank" rel="noopener">How to define a variable in a Dockerfile?</a></li>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -451,7 +451,7 @@
 
 <p>参考：</p>
 <ul>
-<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host" target="_blank" rel="noopener">Configure ssh-key path to use for a specific host</a></li>
+<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -470,7 +470,7 @@
 
 <p>参考：</p>
 <ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368" target="_blank" rel="noopener">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
+<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -499,7 +499,7 @@
 <h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br></pre></td></tr></table></figure>
 
-<p>执行成功后会在 <code>App.Tests/TestResults/{random-string}</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
+<p>执行成功后会在 <code>App.Tests/TestResults/&#123;random-string&#125;</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
 <p>但是，自动创建的单元测试项目默认添加的 <code>coverlet</code> 依赖是 <code>coverlet.collector</code>，目前还不支持在控制台中打印测试覆盖率报告：</p>
 <blockquote>
 <p>At the moment VSTest integration doesn’t support all features of msbuild and .NET tool, for instance show result on console, report merging and threshold validation. We’re working to fill the gaps.</p>
@@ -517,18 +517,18 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test &#x2F;p:CollectCoverage&#x3D;true &#x2F;p:CoverletOutputFormat&#x3D;opencover</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;coverage.opencover.xml</span><br></pre></td></tr></table></figure>
 
 <h3 id="coverlet-collector"><a href="#coverlet-collector" class="headerlink" title="coverlet.collector"></a>coverlet.collector</h3><p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
-<figure class="highlight ps"><table><tr><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">"./App.Tests/TestResults"</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">"coverage.cobertura.xml"</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> -Recurse -Path <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="nomarkup">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> -Destination <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight ps"><table><tr><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">&quot;./App.Tests/TestResults&quot;</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">&quot;coverage.cobertura.xml&quot;</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Recurse</span> <span class="literal">-Path</span> <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="operator">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> <span class="literal">-Destination</span> <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
 
 <p>相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
 
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo" target="_blank" rel="noopener">dotnet-core-coverlet-msbuild-demo</a> 及 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo" target="_blank" rel="noopener">dotnet-core-coverlet-collector-demo</a>。</p>
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf" target="_blank" rel="noopener">Code Coverage in .NET Core Projects</a></li>
-<li><a href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md" target="_blank" rel="noopener">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
-<li><a href="https://github.com/codecov/codecov-exe" target="_blank" rel="noopener">codecov-exe</a></li>
-<li><a href="https://superuser.com/questions/149537/windows-file-copy-move-with-filename-regular-expressions" target="_blank" rel="noopener">Windows: File copy/move with filename regular expressions?</a></li>
+<li><a href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf">Code Coverage in .NET Core Projects</a></li>
+<li><a href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
+<li><a href="https://github.com/codecov/codecov-exe">codecov-exe</a></li>
+<li><a href="https://superuser.com/questions/149537/windows-file-copy-move-with-filename-regular-expressions">Windows: File copy/move with filename regular expressions?</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -538,7 +538,7 @@
   <entry>
     <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
     <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
-    <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4" target="_blank" rel="noopener">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
+    <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
 
 <h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
@@ -554,12 +554,12 @@
 <p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
 
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo" target="_blank" rel="noopener">flutter-travis-build-demo</a>。</p>
-<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/" target="_blank" rel="noopener">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
+<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4" target="_blank" rel="noopener">Building Flutter APKs and IPAs on Travis</a></li>
-<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b" target="_blank" rel="noopener">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
+<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
+<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -575,7 +575,7 @@
 <p>这个问题在 <code>Flutter</code> 的 <code>GitHub</code> 仓库中也有人提到，解决方法也比较简单，删除 <code>App.framework</code> 文件夹即可，即 <code>rm -rf ios/Flutter/App.framework</code>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://github.com/flutter/flutter/issues/50568" target="_blank" rel="noopener">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
+<li><a href="https://github.com/flutter/flutter/issues/50568">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -585,7 +585,7 @@
   <entry>
     <title>【分享】隐私政策生成器</title>
     <url>/2020/05/04/share-privacy-policy-generator/</url>
-    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/" target="_blank" rel="noopener">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
+    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
@@ -594,8 +594,8 @@
     <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
     <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
 <ul>
-<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy" target="_blank" rel="noopener">Google Play</a></li>
-<li><a href="https://github.com/Frederick-S/nhk-easy-mobile" target="_blank" rel="noopener">GitHub</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy">Google Play</a></li>
+<li><a href="https://github.com/Frederick-S/nhk-easy-mobile">GitHub</a></li>
 </ul>
 <p><img src="/images/nhk-1.png" alt="alt"></p>
 <p><img src="/images/nhk-2.png" alt="alt"></p>
@@ -613,8 +613,8 @@
 <p>最后，我们需要将 <code>rsync</code> 加入到定时任务中进行自动备份。执行 <code>crontab -e</code>，将定时任务添加到文件中，如每小时执行一次：<code>0 * * * * rsync -az --delete /data1/ server2-user@server2-ip:/data2</code>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps" target="_blank" rel="noopener">How To Use Rsync to Sync Local and Remote Directories on a VPS</a></li>
-<li><a href="https://www.howtogeek.com/135533/how-to-use-rsync-to-backup-your-data-on-linux/" target="_blank" rel="noopener">How to Use rsync to Backup Your Data on Linux</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps">How To Use Rsync to Sync Local and Remote Directories on a VPS</a></li>
+<li><a href="https://www.howtogeek.com/135533/how-to-use-rsync-to-backup-your-data-on-linux/">How to Use rsync to Backup Your Data on Linux</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -625,10 +625,10 @@
     <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
     <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
     <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">"spring"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">"summer"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">"spring"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
 <ol>
@@ -638,7 +638,7 @@
 <p>出现这样的原因是 <code>Jenkins</code> 执行构建任务时执行的编译命令是 <code>mvn compile</code>，在 <code>A</code> 提交任务时，构建服务器下载了 <code>some.package</code> 的 <code>a.b-SNAPSHOT</code> 版本，由于是 <code>SNAPSHOT</code> 版本，在 <code>B</code> 提交任务时，构建服务器没有重新下载 <code>some.package</code>，导致服务器中的 <code>some.package</code> 没有 <code>B</code> 新增的修改，从而出现编译错误，解决方法是在编译时增加 <code>-U</code> 参数来强制更新 <code>SNAPSHOT</code>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876" target="_blank" rel="noopener">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
+<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -656,11 +656,26 @@
 </ol>
 <p>参考：</p>
 <ul>
-<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder" target="_blank" rel="noopener">How to reveal dot files in finder?</a></li>
+<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
 </ul>
 ]]></content>
       <tags>
         <tag>Mac</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决 add-apt-repository: not found 错误</title>
+    <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
+    <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
       </tags>
   </entry>
 </search>

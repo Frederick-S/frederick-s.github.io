@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.1">
+<meta name="generator" content="Hexo 5.0.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -123,14 +123,14 @@
     <a href="/" rel="section"><i class="home fa-fw"></i>Home</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>Tags</a>
-
-  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>Tags</a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -194,6 +194,71 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/08/01/how-to-fix-add-apt-repository-not-found-error/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/01/how-to-fix-add-apt-repository-not-found-error/" class="post-title-link" itemprop="url">如何解决 add-apt-repository: not found 错误</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-08-01 00:00:00 / Modified: 19:29:57" itemprop="dateCreated datePublished" datetime="2020-08-01T00:00:00+08:00">2020-08-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/07/26/how-to-show-hidden-files-in-mac-finder/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -240,7 +305,7 @@
 </ol>
 <p>参考：</p>
 <ul>
-<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder" target="_blank" rel="noopener">How to reveal dot files in finder?</a></li>
+<li><a target="_blank" rel="noopener" href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
 </ul>
 
       
@@ -307,10 +372,10 @@
 
       
           <p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">"spring"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">"summer"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">"spring"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
 <ol>
@@ -320,7 +385,7 @@
 <p>出现这样的原因是 <code>Jenkins</code> 执行构建任务时执行的编译命令是 <code>mvn compile</code>，在 <code>A</code> 提交任务时，构建服务器下载了 <code>some.package</code> 的 <code>a.b-SNAPSHOT</code> 版本，由于是 <code>SNAPSHOT</code> 版本，在 <code>B</code> 提交任务时，构建服务器没有重新下载 <code>some.package</code>，导致服务器中的 <code>some.package</code> 没有 <code>B</code> 新增的修改，从而出现编译错误，解决方法是在编译时增加 <code>-U</code> 参数来强制更新 <code>SNAPSHOT</code>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876" target="_blank" rel="noopener">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
 </ul>
 
       
@@ -395,8 +460,8 @@
 <p>最后，我们需要将 <code>rsync</code> 加入到定时任务中进行自动备份。执行 <code>crontab -e</code>，将定时任务添加到文件中，如每小时执行一次：<code>0 * * * * rsync -az --delete /data1/ server2-user@server2-ip:/data2</code>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps" target="_blank" rel="noopener">How To Use Rsync to Sync Local and Remote Directories on a VPS</a></li>
-<li><a href="https://www.howtogeek.com/135533/how-to-use-rsync-to-backup-your-data-on-linux/" target="_blank" rel="noopener">How to Use rsync to Backup Your Data on Linux</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps">How To Use Rsync to Sync Local and Remote Directories on a VPS</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.howtogeek.com/135533/how-to-use-rsync-to-backup-your-data-on-linux/">How to Use rsync to Backup Your Data on Linux</a></li>
 </ul>
 
       
@@ -464,8 +529,8 @@
       
           <p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
 <ul>
-<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy" target="_blank" rel="noopener">Google Play</a></li>
-<li><a href="https://github.com/Frederick-S/nhk-easy-mobile" target="_blank" rel="noopener">GitHub</a></li>
+<li><a target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=nhk.nhk_easy">Google Play</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Frederick-S/nhk-easy-mobile">GitHub</a></li>
 </ul>
 <p><img src="/images/nhk-1.png" alt="alt"></p>
 <p><img src="/images/nhk-2.png" alt="alt"></p>
@@ -539,7 +604,7 @@
 <p>这个问题在 <code>Flutter</code> 的 <code>GitHub</code> 仓库中也有人提到，解决方法也比较简单，删除 <code>App.framework</code> 文件夹即可，即 <code>rm -rf ios/Flutter/App.framework</code>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://github.com/flutter/flutter/issues/50568" target="_blank" rel="noopener">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/flutter/flutter/issues/50568">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
 </ul>
 
       
@@ -605,7 +670,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/" target="_blank" rel="noopener">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
+          <p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a target="_blank" rel="noopener" href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
 
       
@@ -671,7 +736,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4" target="_blank" rel="noopener">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
+          <h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a target="_blank" rel="noopener" href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
 
 <h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
@@ -687,12 +752,12 @@
 <p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
 
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo" target="_blank" rel="noopener">flutter-travis-build-demo</a>。</p>
-<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/" target="_blank" rel="noopener">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
+<p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
+<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a target="_blank" rel="noopener" href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4" target="_blank" rel="noopener">Building Flutter APKs and IPAs on Travis</a></li>
-<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b" target="_blank" rel="noopener">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
 </ul>
 
       
@@ -776,7 +841,7 @@
 <h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br></pre></td></tr></table></figure>
 
-<p>执行成功后会在 <code>App.Tests/TestResults/{random-string}</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
+<p>执行成功后会在 <code>App.Tests/TestResults/&#123;random-string&#125;</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
 <p>但是，自动创建的单元测试项目默认添加的 <code>coverlet</code> 依赖是 <code>coverlet.collector</code>，目前还不支持在控制台中打印测试覆盖率报告：</p>
 <blockquote>
 <p>At the moment VSTest integration doesn’t support all features of msbuild and .NET tool, for instance show result on console, report merging and threshold validation. We’re working to fill the gaps.</p>
@@ -794,18 +859,18 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test &#x2F;p:CollectCoverage&#x3D;true &#x2F;p:CoverletOutputFormat&#x3D;opencover</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;coverage.opencover.xml</span><br></pre></td></tr></table></figure>
 
 <h3 id="coverlet-collector"><a href="#coverlet-collector" class="headerlink" title="coverlet.collector"></a>coverlet.collector</h3><p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
-<figure class="highlight ps"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">"./App.Tests/TestResults"</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">"coverage.cobertura.xml"</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> -Recurse -Path <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="nomarkup">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> -Destination <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight ps"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">&quot;./App.Tests/TestResults&quot;</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">&quot;coverage.cobertura.xml&quot;</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Recurse</span> <span class="literal">-Path</span> <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="operator">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> <span class="literal">-Destination</span> <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
 
 <p>相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
 
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo" target="_blank" rel="noopener">dotnet-core-coverlet-msbuild-demo</a> 及 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo" target="_blank" rel="noopener">dotnet-core-coverlet-collector-demo</a>。</p>
+<p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf" target="_blank" rel="noopener">Code Coverage in .NET Core Projects</a></li>
-<li><a href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md" target="_blank" rel="noopener">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
-<li><a href="https://github.com/codecov/codecov-exe" target="_blank" rel="noopener">codecov-exe</a></li>
-<li><a href="https://superuser.com/questions/149537/windows-file-copy-move-with-filename-regular-expressions" target="_blank" rel="noopener">Windows: File copy/move with filename regular expressions?</a></li>
+<li><a target="_blank" rel="noopener" href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf">Code Coverage in .NET Core Projects</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/codecov/codecov-exe">codecov-exe</a></li>
+<li><a target="_blank" rel="noopener" href="https://superuser.com/questions/149537/windows-file-copy-move-with-filename-regular-expressions">Windows: File copy/move with filename regular expressions?</a></li>
 </ul>
 
       
@@ -879,78 +944,7 @@
 
 <p>参考：</p>
 <ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368" target="_blank" rel="noopener">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/04/04/how-to-configure-ssh-key-path/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/04/how-to-configure-ssh-key-path/" class="post-title-link" itemprop="url">SSH 连接服务器时指定私钥的路径</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-04-04 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-04T00:00:00+08:00">2020-04-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-07-26 06:57:01" itemprop="dateModified" datetime="2020-07-26T06:57:01+08:00">2020-07-26</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host" target="_blank" rel="noopener">Configure ssh-key path to use for a specific host</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
 </ul>
 
       
@@ -1036,7 +1030,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
