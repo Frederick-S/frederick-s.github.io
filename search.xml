@@ -98,6 +98,19 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 FileLocator Pro 中排除子文件夹</title>
+    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
+    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>FileLocator Pro</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
     <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
     <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
@@ -110,19 +123,6 @@
 ]]></content>
       <tags>
         <tag>Gradle</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 FileLocator Pro 中排除子文件夹</title>
-    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
-    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>FileLocator Pro</tag>
       </tags>
   </entry>
   <entry>
@@ -188,19 +188,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Vagrant 镜像下载加速</title>
-    <url>/2019/12/18/vagrant-box-speed-up/</url>
-    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Vagrant</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 TypeScript 中定义属性名未知的对象类型</title>
     <url>/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/</url>
     <content><![CDATA[<p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
@@ -216,6 +203,19 @@
 ]]></content>
       <tags>
         <tag>TypeScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vagrant 镜像下载加速</title>
+    <url>/2019/12/18/vagrant-box-speed-up/</url>
+    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Vagrant</tag>
       </tags>
   </entry>
   <entry>
