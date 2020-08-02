@@ -194,6 +194,75 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2019/12/14/how-to-enable-word-wrap-in-vscode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/12/14/how-to-enable-word-wrap-in-vscode/" class="post-title-link" itemprop="url">How to enable word wrap in VS Code</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-12-14 00:00:00" itemprop="dateCreated datePublished" datetime="2019-12-14T00:00:00+08:00">2019-12-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-26 06:57:01" itemprop="dateModified" datetime="2020-07-26T06:57:01+08:00">2020-07-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
+<p>Reference:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -841,93 +910,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/" class="post-title-link" itemprop="url">Add property to web with JavaScript in SharePoint 2013 App</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2015-06-07 00:00:00" itemprop="dateCreated datePublished" datetime="2015-06-07T00:00:00+08:00">2015-06-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-07-26 06:57:01" itemprop="dateModified" datetime="2020-07-26T06:57:01+08:00">2020-07-26</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
-<h2 id="Add-property-to-web"><a href="#Add-property-to-web" class="headerlink" title="Add property to web"></a>Add property to web</h2><p>Adding custom property to web is easy. Let’s just see the code:</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a new property</span></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">props.set_item(<span class="string">&quot;MyProperty&quot;</span>, <span class="string">&quot;My property value&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply change to web</span></span><br><span class="line">web.update();</span><br><span class="line">context.load(web);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Success.&quot;</span>);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>How do we know “MyProperty” is really added to web? We can check it here: <code>http://your_web/_api/web/AllProperties?$select=MyProperty</code>. The result looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">entry</span> <span class="attr">xml:base</span>=<span class="string">&quot;http://your_web/test/_api/&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2005/Atom&quot;</span> <span class="attr">xmlns:d</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices&quot;</span> <span class="attr">xmlns:m</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span> <span class="attr">xmlns:georss</span>=<span class="string">&quot;http://www.georss.org/georss&quot;</span> <span class="attr">xmlns:gml</span>=<span class="string">&quot;http://www.opengis.net/gml&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>http://your_web/_api/web/AllProperties<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">term</span>=<span class="string">&quot;SP.PropertyValues&quot;</span> <span class="attr">scheme</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;edit&quot;</span> <span class="attr">href</span>=<span class="string">&quot;web/AllProperties&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">updated</span>&gt;</span>2013-12-04T04:37:07Z<span class="tag">&lt;/<span class="name">updated</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span> /&gt;</span>;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">content</span> <span class="attr">type</span>=<span class="string">&quot;application/xml&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">m:properties</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">d:myproperty</span>&gt;</span>My property value<span class="tag">&lt;/<span class="name">d:myproperty</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">m:properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="Read-property-from-web"><a href="#Read-property-from-web" class="headerlink" title="Read property from web"></a>Read property from web</h2><p>We have two approaches to read properties from web: <code>props.get_item(&quot;PropertyKey&quot;)</code> or <code>REST API</code>.</p>
-<h3 id="The-get-item-method"><a href="#The-get-item-method" class="headerlink" title="The get_item method"></a>The get_item method</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">context.load(props);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prop = props.get_item(<span class="string">&quot;MyProperty&quot;</span>);</span><br><span class="line">    alert(prop);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="The-REST-API"><a href="#The-REST-API" class="headerlink" title="The REST API"></a>The REST API</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> executor = <span class="keyword">new</span> SP.RequestExecutor(<span class="string">&#x27;http://your_web&#x27;</span>);</span><br><span class="line">executor.executeAsync(&#123;</span><br><span class="line">    url: <span class="string">&#x27;http://your_web/_api/web/AllProperties?$select=MyProperty&#x27;</span>,</span><br><span class="line">    method: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">    headers: &#123; <span class="string">&quot;Accept&quot;</span>: <span class="string">&quot;application/json; odata=verbose&quot;</span> &#125;,</span><br><span class="line">    success: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="built_in">JSON</span>.parse(response.body);</span><br><span class="line">        alert(obj.d.MyProperty);</span><br><span class="line">    &#125;,</span><br><span class="line">    error: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        alert(response.body);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>And here is the json query result, very straightforward:</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;d&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;__metadata&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;uri&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;SP.PropertyValues&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;MyProperty&quot;</span>: <span class="string">&quot;My property value&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Reference:</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx">HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -993,14 +979,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
