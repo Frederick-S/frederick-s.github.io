@@ -28,6 +28,24 @@
       </tags>
   </entry>
   <entry>
+    <title>Add new list field in SharePoint App upgrade</title>
+    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
+    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>And it works. Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
     <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
     <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
@@ -48,24 +66,6 @@
 <p>Reference:</p>
 <ul>
 <li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Add new list field in SharePoint App upgrade</title>
-    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
-    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
-<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>And it works. Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -113,6 +113,19 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 FileLocator Pro 中排除子文件夹</title>
+    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
+    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>FileLocator Pro</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
     <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
     <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
@@ -127,19 +140,6 @@
 ]]></content>
       <tags>
         <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 FileLocator Pro 中排除子文件夹</title>
-    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
-    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>FileLocator Pro</tag>
       </tags>
   </entry>
   <entry>
@@ -175,19 +175,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Vagrant 镜像下载加速</title>
-    <url>/2019/12/18/vagrant-box-speed-up/</url>
-    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Vagrant</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>How to enable word wrap in VS Code</title>
     <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
     <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
@@ -201,18 +188,16 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
-    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
-    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
-
+    <title>Vagrant 镜像下载加速</title>
+    <url>/2019/12/18/vagrant-box-speed-up/</url>
+    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
+<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Flutter</tag>
+        <tag>Vagrant</tag>
       </tags>
   </entry>
   <entry>
@@ -234,20 +219,18 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
+    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
+    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
 
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>HTTP</tag>
+        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -263,6 +246,23 @@
 ]]></content>
       <tags>
         <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
       </tags>
   </entry>
   <entry>
@@ -297,6 +297,24 @@
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -424,24 +442,6 @@
 <li><a href="http://imrannazar.com/GameBoy-Emulation-in-JavaScript">GameBoy Emulation in JavaScript</a></li>
 </ul>
 ]]></content>
-  </entry>
-  <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
   </entry>
   <entry>
     <title>SSH 连接服务器时指定私钥的路径</title>
@@ -622,6 +622,23 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 Finder 中显示隐藏文件</title>
+    <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
+    <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
+<ol>
+<li>在终端中输入 <code>defaults write com.apple.finder AppleShowAllFiles YES</code>，然后重启 <code>Finder</code></li>
+<li>在 <code>Finder</code> 中使用快捷键 <code>Shift + Command + &quot;.&quot;</code></li>
+</ol>
+<p>参考：</p>
+<ul>
+<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Mac</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
     <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
     <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
@@ -644,23 +661,6 @@
       <tags>
         <tag>Java</tag>
         <tag>Maven</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 Finder 中显示隐藏文件</title>
-    <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
-    <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
-<ol>
-<li>在终端中输入 <code>defaults write com.apple.finder AppleShowAllFiles YES</code>，然后重启 <code>Finder</code></li>
-<li>在 <code>Finder</code> 中使用快捷键 <code>Shift + Command + &quot;.&quot;</code></li>
-</ol>
-<p>参考：</p>
-<ul>
-<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Mac</tag>
       </tags>
   </entry>
   <entry>
@@ -691,6 +691,66 @@
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何减小 Docker 镜像的大小</title>
+    <url>/2020/08/04/how-to-reduce-docker-image-size/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>首先来看一个例子，构建一个 <code>C</code> 语言版的 <code>hello world</code> 镜像：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* hello.c */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应的 <code>Dockerfile</code> 为：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>然后执行 <code>docker build -t hello-world .</code> 构建一个名为 <code>hello-world</code> 的镜像，然而以这种方式构建的镜像的大小竟然有1.19 GB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              b11e170bd1d2        6 minutes ago       1.19GB</span><br></pre></td></tr></table></figure>
+
+<p>因为这种构建方式生成的镜像会同时包含 <code>gcc</code> 镜像的内容，查看 <code>gcc</code> 镜像大小发现达到了1.19 GB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">gcc                 latest              21f378ba43ec        11 days ago         1.19GB</span><br></pre></td></tr></table></figure>
+
+<p>如果我们把基础镜像换成 <code>Ubuntu</code> 并安装 <code>gcc</code> 编译 <code>hello.c</code> 重新构建镜像，最后的镜像大小为213 MB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM ubuntu</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install gcc -y</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE</span><br><span class="line">hello-world         latest              42f17d1d12a5        About a minute ago   213MB</span><br></pre></td></tr></table></figure>
+
+<p>虽然新镜像相比1.19 GB有大幅减少，但相比于 <code>hello-world</code> 程序本身的大小（17k）来说，213 MB依然是个庞大的数字：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ls hello -hl</span><br><span class="line">-rwxr-xr-x 1 root root 17K Aug  4 13:54 hello</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="Multi-stage"><a href="#Multi-stage" class="headerlink" title="Multi-stage"></a>Multi-stage</h3><p>对于 <code>hello-world</code> 这个镜像来说，我们真正需要的只是最终的可执行程序，而并不关心中间的编译过程，如果能将编译阶段作为一个临时阶段而并不包含在最终的镜像中，则可有效减少最终的镜像大小。针对此，<code>Docker</code> 在 17.05 版本开始提供了名为 <code>multi-stage</code> 构建的功能。我们将原来的 <code>Dockerfile</code> 稍作修改，将原来的编译阶段抽取为一个 <code>stage</code>，然后将编译好的可执行文件复制到最终的 <code>stage</code> 中：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM ubuntu</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>最终的镜像大小只有73.9 MB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              7dd2b51c53b2        7 minutes ago       73.9MB</span><br></pre></td></tr></table></figure>
+
+<h3 id="FROM-scratch"><a href="#FROM-scratch" class="headerlink" title="FROM scratch"></a><code>FROM scratch</code></h3><p>在上一步中，我们使用 <code>Ubuntu</code> 作为基础镜像来运行 <code>hello-world</code>，相比于一个可执行程序，<code>Ubuntu</code> 依然过于庞大，有没有比 <code>Ubuntu</code> 更轻量的镜像呢？有，那就是 <code>scratch</code>，这表示一个空的镜像，继续将 <code>Dockerfile</code> 稍作修改：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM scratch</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>最终的镜像大小只有16.4 KB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              676253b0e9c4        31 minutes ago      16.4kB</span><br></pre></td></tr></table></figure>
+
+<p>不过在运行该镜像时却提示错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">standard_init_linux.go:211: exec user process caused &quot;no such file or directory&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这是因为这种方式构建出的镜像缺少 <code>hello-world</code> 运行时依赖的库。我们可以在编译 <code>hello-world</code> 时通过指定 <code>-static</code> 参数将依赖的库包含到最后的可执行文件中来解决这个问题：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c -static</span><br><span class="line">FROM scratch</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>不过包含了依赖的库后最终镜像的大小也上涨为945 KB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e6a1fccc2de7        9 seconds ago       945kB</span><br></pre></td></tr></table></figure>
+
+<p>另外，如果不想将依赖的库包含到最终的镜像中，可以使用 <code>busybox:glibc</code> 这个基础镜像，该镜像包含了 <code>C</code> 语言的标准库，有了这个镜像在编译 <code>hello-world</code> 时则无需指定 <code>-static</code> 参数：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM busybox:glibc</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>不过由于该镜像本身有一定大小，最终镜像的大小达到了5.22 MB：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e2f2c0544800        7 seconds ago       5.22MB</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过 <code>multi-stage</code> 构建可以有效的减少 <code>Docker</code> 镜像的大小，而基础镜像的选择则要具体情况分析，在满足需求的情况下选择合理的基础镜像。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://www.ardanlabs.com/blog/2020/02/docker-images-part1-reducing-image-size.html">Docker Images : Part I - Reducing Image Size</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
       </tags>
   </entry>
 </search>
