@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
+    <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
+    <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">&quot;&lt;Message senderId=&quot;</span> + senderId + <span class="string">&quot;&gt;&quot;</span> + <span class="string">&quot;resize(&quot;</span> + width + <span class="string">&quot;,&quot;</span> + height + <span class="string">&quot;)&lt;/Message&gt;&quot;</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
+
+<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">&#x27;style&#x27;</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+
+<p>Then I located the code in my web part page which throws the error:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
+<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">here</a>, you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx">patch</a> to fix this bug.</p>
+<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Add property to web with JavaScript in SharePoint 2013 App</title>
     <url>/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/</url>
     <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
@@ -86,33 +113,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
-    <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
-    <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">&quot;&lt;Message senderId=&quot;</span> + senderId + <span class="string">&quot;&gt;&quot;</span> + <span class="string">&quot;resize(&quot;</span> + width + <span class="string">&quot;,&quot;</span> + height + <span class="string">&quot;)&lt;/Message&gt;&quot;</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
-
-<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">&#x27;style&#x27;</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
-
-<p>Then I located the code in my web part page which throws the error:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
-<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">here</a>, you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx">patch</a> to fix this bug.</p>
-<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 FileLocator Pro 中排除子文件夹</title>
     <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
     <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
@@ -123,23 +123,6 @@
 ]]></content>
       <tags>
         <tag>FileLocator Pro</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
-    <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
-    <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
-<blockquote>
-<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
-</blockquote>
-<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
       </tags>
   </entry>
   <entry>
@@ -162,12 +145,42 @@
       </tags>
   </entry>
   <entry>
+    <title>How to enable word wrap in VS Code</title>
+    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
+    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VS Code error - No source control providers registered</title>
     <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
     <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
 <p>Reference:</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
+    <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
+    <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
+<blockquote>
+<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
+</blockquote>
+<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -185,21 +198,6 @@
 ]]></content>
       <tags>
         <tag>Vagrant</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
-    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
-    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -221,6 +219,21 @@
       </tags>
   </entry>
   <entry>
+    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
+    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
+    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>配置 Flutter 国内镜像</title>
     <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
     <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
@@ -233,23 +246,6 @@
 ]]></content>
       <tags>
         <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>HTTP</tag>
       </tags>
   </entry>
   <entry>
@@ -287,16 +283,145 @@
       </tags>
   </entry>
   <entry>
-    <title>How to enable word wrap in VS Code</title>
-    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
-    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
-<p>Reference:</p>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Visual Studio Code</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
+    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
+    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>需要安装以下依赖来解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Puppeteer</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>.NET Core 覆盖率测试</title>
+    <url>/2020/04/18/dotnet-core-test-coverage-demo/</url>
+    <content><![CDATA[<h2 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h2><p>首先执行命令 <code>dotnet new classlib --name App</code> 来创建一个类库程序作为测试的对象，该类库只包含一个 <code>SumService</code> 类：</p>
+<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumService</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">Sum</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">int</span> b</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> a + b;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后创建一个基于 <code>xunit</code> 的单元测试项目来编写测试用例，并将 <code>App</code> 类库项目作为项目引用加入到 <code>App.Tests</code> 项目中：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet new xunit --name App.Tests</span><br><span class="line">dotnet add .\App.Tests\App.Tests.csproj reference .\App\App.csproj</span><br></pre></td></tr></table></figure>
+
+<p>并编写一个测试用例 <code>SumServiceTest</code>：</p>
+<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> Xunit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App.Tests</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumServiceTest</span></span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="meta">Fact</span>]</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShouldReturn5</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Assert.Equal(<span class="number">5</span>, SumService.Sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着创建一个解决方案，并将 <code>App</code> 和 <code>App.Tests</code> 项目加入到该解决方案中：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet new sln --name App</span><br><span class="line">dotnet sln add .\App\App.csproj .\App.Tests\App.Tests.csproj</span><br></pre></td></tr></table></figure>
+
+<p>最后项目结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── App</span><br><span class="line">│   └── App.csproj</span><br><span class="line">│   └── SumService.cs</span><br><span class="line">├── App.Tests</span><br><span class="line">│   └── App.Tests.csproj</span><br><span class="line">│   └── SumServiceTest.cs</span><br><span class="line">├── App.sln</span><br></pre></td></tr></table></figure>
+
+<h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br></pre></td></tr></table></figure>
+
+<p>执行成功后会在 <code>App.Tests/TestResults/&#123;random-string&#125;</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
+<p>但是，自动创建的单元测试项目默认添加的 <code>coverlet</code> 依赖是 <code>coverlet.collector</code>，目前还不支持在控制台中打印测试覆盖率报告：</p>
+<blockquote>
+<p>At the moment VSTest integration doesn’t support all features of msbuild and .NET tool, for instance show result on console, report merging and threshold validation. We’re working to fill the gaps.</p>
+</blockquote>
+<p>如果希望在控制台中打印测试覆盖率报告可将 <code>coverlet.collector</code> 依赖改为 <code>coverlet.msbuild</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet remove .\App.Tests package coverlet.collector</span><br><span class="line">dotnet add .\App.Tests\ package coverlet.msbuild</span><br></pre></td></tr></table></figure>
+
+<p>然后执行测试命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test &#x2F;p:CollectCoverage&#x3D;true</span><br></pre></td></tr></table></figure>
+
+<p>即可在控制台打印测试覆盖率报告：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Calculating coverage result...</span><br><span class="line">  Generating report &#39;D:\WorkSpace\dotnet-core-coverlet-msbuild-demo\App.Tests\coverage.json&#39;</span><br><span class="line"></span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| Module | Line | Branch | Method |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| App    | 100% | 100%   | 100%   |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line"></span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">|         | Line | Branch | Method |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Total   | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Average | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br></pre></td></tr></table></figure>
+
+<h2 id="集成-codecov"><a href="#集成-codecov" class="headerlink" title="集成 codecov"></a>集成 codecov</h2><h3 id="coverlet-msbuild"><a href="#coverlet-msbuild" class="headerlink" title="coverlet.msbuild"></a>coverlet.msbuild</h3><p>集成 <code>codecov</code> 需要指定测试覆盖率报告文件的路径，暂不支持 <code>coverlet.msbuild</code> 默认生成的 <code>json</code> 格式的文件，可以在执行测试时添加 <code>/p:CoverletOutputFormat=opencover</code> 参数来生成 <code>opencover</code> 格式的文件，相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test &#x2F;p:CollectCoverage&#x3D;true &#x2F;p:CoverletOutputFormat&#x3D;opencover</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;coverage.opencover.xml</span><br></pre></td></tr></table></figure>
+
+<h3 id="coverlet-collector"><a href="#coverlet-collector" class="headerlink" title="coverlet.collector"></a>coverlet.collector</h3><p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
+<figure class="highlight ps"><table><tr><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">&quot;./App.Tests/TestResults&quot;</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">&quot;coverage.cobertura.xml&quot;</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Recurse</span> <span class="literal">-Path</span> <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="operator">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> <span class="literal">-Destination</span> <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
+
+<p>相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf">Code Coverage in .NET Core Projects</a></li>
+<li><a href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
+<li><a href="https://github.com/codecov/codecov-exe">codecov-exe</a></li>
+<li><a href="https://superuser.com/questions/149537/windows-file-copy-move-with-filename-regular-expressions">Windows: File copy/move with filename regular expressions?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>.NET Core</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
+    <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
+    <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
+
+<h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
+<h4 id="Remote-branch-alpha-not-found-in-upstream-origin"><a href="#Remote-branch-alpha-not-found-in-upstream-origin" class="headerlink" title="Remote branch alpha not found in upstream origin"></a>Remote branch alpha not found in upstream origin</h4><p>这个错误发生在下载 <code>Flutter</code> 代码的阶段，原文中的配置会下载 <code>Flutter</code> 的 <code>alpha</code> 分支代码，但是目前 <code>Flutter</code> 的仓库已经没有 <code>alpha</code> 分支，切换到 <code>stable</code> 分支即可，即：<code>git clone https://github.com/flutter/flutter.git -b stable --depth 1</code>。</p>
+<h4 id="Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted"><a href="#Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted" class="headerlink" title="Failed to install the following Android SDK packages as some licences have not been accepted"></a>Failed to install the following Android SDK packages as some licences have not been accepted</h4><p>详细错误信息如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[        ] &gt; Failed to install the following Android SDK packages as some</span><br><span class="line"></span><br><span class="line">licences have not been accepted.</span><br><span class="line"></span><br><span class="line">[        ]      build-tools;28.0.3 Android SDK Build-Tools 28.0.3</span><br><span class="line"></span><br><span class="line">[        ]      platforms;android-29 Android SDK Platform 29</span><br><span class="line"></span><br><span class="line">[        ]   To build this project, accept the SDK license agreements and</span><br><span class="line"></span><br><span class="line">install the missing components using the Android Studio SDK Manager.</span><br></pre></td></tr></table></figure>
+
+<p>这个错误是由于没有同意 <code>Android SDK</code> 的许可证协议，在 <code>before_script</code> 中加入如下配置即可：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><h4 id="pip-command-not-found"><a href="#pip-command-not-found" class="headerlink" title="pip: command not found"></a>pip: command not found</h4><p>这个错误在执行 <code>pip install six</code> 时遇到，经过实际验证构建 <code>iOS</code> 应用时并不需要此行配置，所以删掉即可。</p>
+<h4 id="Xcode-11-0-or-greater-is-required-to-develop-for-iOS"><a href="#Xcode-11-0-or-greater-is-required-to-develop-for-iOS" class="headerlink" title="Xcode 11.0 or greater is required to develop for iOS"></a>Xcode 11.0 or greater is required to develop for iOS</h4><p>原文中的配置使用的是 <code>Xcode 8.3</code>，最后打包时会提示此错误，将 <code>osx_image</code> 设置为 <code>xcode11</code> 即可。</p>
+<p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
+<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
+<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -426,100 +551,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
-    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
-    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
-
-<p>需要安装以下依赖来解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>Puppeteer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>.NET Core 覆盖率测试</title>
-    <url>/2020/04/18/dotnet-core-test-coverage-demo/</url>
-    <content><![CDATA[<h2 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h2><p>首先执行命令 <code>dotnet new classlib --name App</code> 来创建一个类库程序作为测试的对象，该类库只包含一个 <code>SumService</code> 类：</p>
-<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumService</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">Sum</span>(<span class="params"><span class="keyword">int</span> a, <span class="keyword">int</span> b</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> a + b;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后创建一个基于 <code>xunit</code> 的单元测试项目来编写测试用例，并将 <code>App</code> 类库项目作为项目引用加入到 <code>App.Tests</code> 项目中：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet new xunit --name App.Tests</span><br><span class="line">dotnet add .\App.Tests\App.Tests.csproj reference .\App\App.csproj</span><br></pre></td></tr></table></figure>
-
-<p>并编写一个测试用例 <code>SumServiceTest</code>：</p>
-<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> Xunit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App.Tests</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumServiceTest</span></span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="meta">Fact</span>]</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShouldReturn5</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Assert.Equal(<span class="number">5</span>, SumService.Sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>接着创建一个解决方案，并将 <code>App</code> 和 <code>App.Tests</code> 项目加入到该解决方案中：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet new sln --name App</span><br><span class="line">dotnet sln add .\App\App.csproj .\App.Tests\App.Tests.csproj</span><br></pre></td></tr></table></figure>
-
-<p>最后项目结构如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── App</span><br><span class="line">│   └── App.csproj</span><br><span class="line">│   └── SumService.cs</span><br><span class="line">├── App.Tests</span><br><span class="line">│   └── App.Tests.csproj</span><br><span class="line">│   └── SumServiceTest.cs</span><br><span class="line">├── App.sln</span><br></pre></td></tr></table></figure>
-
-<h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br></pre></td></tr></table></figure>
-
-<p>执行成功后会在 <code>App.Tests/TestResults/&#123;random-string&#125;</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
-<p>但是，自动创建的单元测试项目默认添加的 <code>coverlet</code> 依赖是 <code>coverlet.collector</code>，目前还不支持在控制台中打印测试覆盖率报告：</p>
-<blockquote>
-<p>At the moment VSTest integration doesn’t support all features of msbuild and .NET tool, for instance show result on console, report merging and threshold validation. We’re working to fill the gaps.</p>
-</blockquote>
-<p>如果希望在控制台中打印测试覆盖率报告可将 <code>coverlet.collector</code> 依赖改为 <code>coverlet.msbuild</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet remove .\App.Tests package coverlet.collector</span><br><span class="line">dotnet add .\App.Tests\ package coverlet.msbuild</span><br></pre></td></tr></table></figure>
-
-<p>然后执行测试命令：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test &#x2F;p:CollectCoverage&#x3D;true</span><br></pre></td></tr></table></figure>
-
-<p>即可在控制台打印测试覆盖率报告：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Calculating coverage result...</span><br><span class="line">  Generating report &#39;D:\WorkSpace\dotnet-core-coverlet-msbuild-demo\App.Tests\coverage.json&#39;</span><br><span class="line"></span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| Module | Line | Branch | Method |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| App    | 100% | 100%   | 100%   |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line"></span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">|         | Line | Branch | Method |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Total   | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Average | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br></pre></td></tr></table></figure>
-
-<h2 id="集成-codecov"><a href="#集成-codecov" class="headerlink" title="集成 codecov"></a>集成 codecov</h2><h3 id="coverlet-msbuild"><a href="#coverlet-msbuild" class="headerlink" title="coverlet.msbuild"></a>coverlet.msbuild</h3><p>集成 <code>codecov</code> 需要指定测试覆盖率报告文件的路径，暂不支持 <code>coverlet.msbuild</code> 默认生成的 <code>json</code> 格式的文件，可以在执行测试时添加 <code>/p:CoverletOutputFormat=opencover</code> 参数来生成 <code>opencover</code> 格式的文件，相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test &#x2F;p:CollectCoverage&#x3D;true &#x2F;p:CoverletOutputFormat&#x3D;opencover</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;coverage.opencover.xml</span><br></pre></td></tr></table></figure>
-
-<h3 id="coverlet-collector"><a href="#coverlet-collector" class="headerlink" title="coverlet.collector"></a>coverlet.collector</h3><p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
-<figure class="highlight ps"><table><tr><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">&quot;./App.Tests/TestResults&quot;</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">&quot;coverage.cobertura.xml&quot;</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Recurse</span> <span class="literal">-Path</span> <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="operator">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> <span class="literal">-Destination</span> <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
-
-<p>相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf">Code Coverage in .NET Core Projects</a></li>
-<li><a href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
-<li><a href="https://github.com/codecov/codecov-exe">codecov-exe</a></li>
-<li><a href="https://superuser.com/questions/149537/windows-file-copy-move-with-filename-regular-expressions">Windows: File copy/move with filename regular expressions?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>.NET Core</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SSH 连接服务器时指定私钥的路径</title>
     <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
     <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
@@ -533,37 +564,6 @@
       <tags>
         <tag>Visual Studio Code</tag>
         <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
-    <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
-    <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
-
-<h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
-<h4 id="Remote-branch-alpha-not-found-in-upstream-origin"><a href="#Remote-branch-alpha-not-found-in-upstream-origin" class="headerlink" title="Remote branch alpha not found in upstream origin"></a>Remote branch alpha not found in upstream origin</h4><p>这个错误发生在下载 <code>Flutter</code> 代码的阶段，原文中的配置会下载 <code>Flutter</code> 的 <code>alpha</code> 分支代码，但是目前 <code>Flutter</code> 的仓库已经没有 <code>alpha</code> 分支，切换到 <code>stable</code> 分支即可，即：<code>git clone https://github.com/flutter/flutter.git -b stable --depth 1</code>。</p>
-<h4 id="Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted"><a href="#Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted" class="headerlink" title="Failed to install the following Android SDK packages as some licences have not been accepted"></a>Failed to install the following Android SDK packages as some licences have not been accepted</h4><p>详细错误信息如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[        ] &gt; Failed to install the following Android SDK packages as some</span><br><span class="line"></span><br><span class="line">licences have not been accepted.</span><br><span class="line"></span><br><span class="line">[        ]      build-tools;28.0.3 Android SDK Build-Tools 28.0.3</span><br><span class="line"></span><br><span class="line">[        ]      platforms;android-29 Android SDK Platform 29</span><br><span class="line"></span><br><span class="line">[        ]   To build this project, accept the SDK license agreements and</span><br><span class="line"></span><br><span class="line">install the missing components using the Android Studio SDK Manager.</span><br></pre></td></tr></table></figure>
-
-<p>这个错误是由于没有同意 <code>Android SDK</code> 的许可证协议，在 <code>before_script</code> 中加入如下配置即可：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><h4 id="pip-command-not-found"><a href="#pip-command-not-found" class="headerlink" title="pip: command not found"></a>pip: command not found</h4><p>这个错误在执行 <code>pip install six</code> 时遇到，经过实际验证构建 <code>iOS</code> 应用时并不需要此行配置，所以删掉即可。</p>
-<h4 id="Xcode-11-0-or-greater-is-required-to-develop-for-iOS"><a href="#Xcode-11-0-or-greater-is-required-to-develop-for-iOS" class="headerlink" title="Xcode 11.0 or greater is required to develop for iOS"></a>Xcode 11.0 or greater is required to develop for iOS</h4><p>原文中的配置使用的是 <code>Xcode 8.3</code>，最后打包时会提示此错误，将 <code>osx_image</code> 设置为 <code>xcode11</code> 即可。</p>
-<p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
-<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
-<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -583,13 +583,6 @@
       </tags>
   </entry>
   <entry>
-    <title>【分享】隐私政策生成器</title>
-    <url>/2020/05/04/share-privacy-policy-generator/</url>
-    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
     <title>野生 NHK NEWS EASY 客户端</title>
     <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
     <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
@@ -599,6 +592,13 @@
 </ul>
 <p><img src="/images/nhk-1.png" alt="alt"></p>
 <p><img src="/images/nhk-2.png" alt="alt"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>【分享】隐私政策生成器</title>
+    <url>/2020/05/04/share-privacy-policy-generator/</url>
+    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -651,6 +651,31 @@
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
+    <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
+    <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
+<ol>
+<li>在开发阶段，<code>A</code> 拉了个 <code>some.package</code> 的分支，更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务</li>
+<li><code>B</code> 也拉了个 <code>some.package</code> 的分支，同样更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，并增加了一个新的枚举值到 <code>SomeEnum</code>，同样将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务，此时任务构建失败，提示编译错误：<code>An enum switch case label must be the unqualified name of an enumeration constant</code></li>
+</ol>
+<p>出现这样的原因是 <code>Jenkins</code> 执行构建任务时执行的编译命令是 <code>mvn compile</code>，在 <code>A</code> 提交任务时，构建服务器下载了 <code>some.package</code> 的 <code>a.b-SNAPSHOT</code> 版本，由于是 <code>SNAPSHOT</code> 版本，在 <code>B</code> 提交任务时，构建服务器没有重新下载 <code>some.package</code>，导致服务器中的 <code>some.package</code> 没有 <code>B</code> 新增的修改，从而出现编译错误，解决方法是在编译时增加 <code>-U</code> 参数来强制更新 <code>SNAPSHOT</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>Maven</tag>
       </tags>
   </entry>
   <entry>
@@ -729,28 +754,32 @@
       </tags>
   </entry>
   <entry>
-    <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
-    <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
-    <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <title>如何使用 JUnit 测试异步代码</title>
+    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
-<ol>
-<li>在开发阶段，<code>A</code> 拉了个 <code>some.package</code> 的分支，更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务</li>
-<li><code>B</code> 也拉了个 <code>some.package</code> 的分支，同样更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，并增加了一个新的枚举值到 <code>SomeEnum</code>，同样将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务，此时任务构建失败，提示编译错误：<code>An enum switch case label must be the unqualified name of an enumeration constant</code></li>
-</ol>
-<p>出现这样的原因是 <code>Jenkins</code> 执行构建任务时执行的编译命令是 <code>mvn compile</code>，在 <code>A</code> 提交任务时，构建服务器下载了 <code>some.package</code> 的 <code>a.b-SNAPSHOT</code> 版本，由于是 <code>SNAPSHOT</code> 版本，在 <code>B</code> 提交任务时，构建服务器没有重新下载 <code>some.package</code>，导致服务器中的 <code>some.package</code> 没有 <code>B</code> 新增的修改，从而出现编译错误，解决方法是在编译时增加 <code>-U</code> 参数来强制更新 <code>SNAPSHOT</code>。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
+<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
 </ul>
 ]]></content>
       <tags>
         <tag>Java</tag>
-        <tag>Maven</tag>
+        <tag>JUnit</tag>
       </tags>
   </entry>
 </search>
