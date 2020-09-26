@@ -113,19 +113,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何在 FileLocator Pro 中排除子文件夹</title>
-    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
-    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>FileLocator Pro</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
     <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
     <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
@@ -140,6 +127,19 @@
 ]]></content>
       <tags>
         <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在 FileLocator Pro 中排除子文件夹</title>
+    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
+    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>FileLocator Pro</tag>
       </tags>
   </entry>
   <entry>
@@ -263,6 +263,40 @@
 ]]></content>
       <tags>
         <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
+    <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
+    <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── product-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── sum-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── app</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── pom.xml</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>product-service</code> 和 <code>sum-service</code> 表示功能代码，<code>app</code> 负责测试用例的整合。<code>product-service</code> 和 <code>sum-service</code> 分别包含一个 <code>ProductService</code> 类和 <code>SumService</code> 类，具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ProductService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">product</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x * y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// SumService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x + y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>app</code> 内的测试用例如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldCalculateCorrectSumAndProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Assert.assertEquals(<span class="number">10</span>, <span class="keyword">new</span> ProductService().product(<span class="number">2</span>, <span class="number">5</span>));</span><br><span class="line">        Assert.assertEquals(<span class="number">5</span>, <span class="keyword">new</span> SumService().sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后在 <code>root</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>最后在 <code>app</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.22.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">argLine</span>&gt;</span>$&#123;argLine&#125; -Xms256m -Xmx2048m<span class="tag">&lt;/<span class="name">argLine</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">forkCount</span>&gt;</span>1<span class="tag">&lt;/<span class="name">forkCount</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">runOrder</span>&gt;</span>random<span class="tag">&lt;/<span class="name">runOrder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>test<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时在 <code>root</code> 模块下执行 <code>mvn test</code>，执行成功后在 <code>app/target/site/jacoco-aggregate</code> 目录下就会生成各个模块的覆盖测试报告：</p>
+<p><img src="/images/jacoco-multiple-modules-demo.png" alt="alt"></p>
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp">Jacoco report aggregation for code coverage</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JaCoCo</tag>
+        <tag>Maven</tag>
       </tags>
   </entry>
   <entry>
@@ -390,40 +424,6 @@
 <li><a href="http://imrannazar.com/GameBoy-Emulation-in-JavaScript">GameBoy Emulation in JavaScript</a></li>
 </ul>
 ]]></content>
-  </entry>
-  <entry>
-    <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
-    <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
-    <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── product-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── sum-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── app</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── pom.xml</span><br></pre></td></tr></table></figure>
-
-<p>其中 <code>product-service</code> 和 <code>sum-service</code> 表示功能代码，<code>app</code> 负责测试用例的整合。<code>product-service</code> 和 <code>sum-service</code> 分别包含一个 <code>ProductService</code> 类和 <code>SumService</code> 类，具体代码如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ProductService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">product</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x * y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// SumService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x + y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>app</code> 内的测试用例如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldCalculateCorrectSumAndProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Assert.assertEquals(<span class="number">10</span>, <span class="keyword">new</span> ProductService().product(<span class="number">2</span>, <span class="number">5</span>));</span><br><span class="line">        Assert.assertEquals(<span class="number">5</span>, <span class="keyword">new</span> SumService().sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后在 <code>root</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>最后在 <code>app</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.22.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">argLine</span>&gt;</span>$&#123;argLine&#125; -Xms256m -Xmx2048m<span class="tag">&lt;/<span class="name">argLine</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">forkCount</span>&gt;</span>1<span class="tag">&lt;/<span class="name">forkCount</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">runOrder</span>&gt;</span>random<span class="tag">&lt;/<span class="name">runOrder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>test<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>此时在 <code>root</code> 模块下执行 <code>mvn test</code>，执行成功后在 <code>app/target/site/jacoco-aggregate</code> 目录下就会生成各个模块的覆盖测试报告：</p>
-<p><img src="/images/jacoco-multiple-modules-demo.png" alt="alt"></p>
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp">Jacoco report aggregation for code coverage</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JaCoCo</tag>
-        <tag>Maven</tag>
-      </tags>
   </entry>
   <entry>
     <title>如何在 Dockerfile 中定义变量</title>
@@ -664,21 +664,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决 ModuleNotFoundError: No module named &#39;distutils.util&#39; 错误</title>
-    <url>/2020/08/02/how-to-fix-no-module-named-distutils.util/</url>
-    <content><![CDATA[<p><code>Ubuntu</code> 下安装 <code>pip</code> 时遇到 <code>ModuleNotFoundError: No module named &#39;distutils.util&#39;</code> 错误，执行以下命令即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install python3-distutils</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://github.com/pypa/get-pip/issues/43">Issue with “python3 get-pip.py –user” with python 3.6.7</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何解决 add-apt-repository: not found 错误</title>
     <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
     <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
@@ -691,6 +676,21 @@
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决 ModuleNotFoundError: No module named &#39;distutils.util&#39; 错误</title>
+    <url>/2020/08/02/how-to-fix-no-module-named-distutils.util/</url>
+    <content><![CDATA[<p><code>Ubuntu</code> 下安装 <code>pip</code> 时遇到 <code>ModuleNotFoundError: No module named &#39;distutils.util&#39;</code> 错误，执行以下命令即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install python3-distutils</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/pypa/get-pip/issues/43">Issue with “python3 get-pip.py –user” with python 3.6.7</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -775,6 +775,33 @@
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异常信息</title>
+    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
+    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
+<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
 </ul>
 ]]></content>
       <tags>
