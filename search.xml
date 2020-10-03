@@ -113,6 +113,19 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 FileLocator Pro 中排除子文件夹</title>
+    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
+    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>FileLocator Pro</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
     <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
     <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
@@ -127,19 +140,6 @@
 ]]></content>
       <tags>
         <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 FileLocator Pro 中排除子文件夹</title>
-    <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
-    <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://qa.mythicsoft.com/13603/there-tell-agent-ransack-ignore-particular-subfolder-search">Is there a way to tell Agent Ransack to ignore a particular subfolder in the path of its search?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>FileLocator Pro</tag>
       </tags>
   </entry>
   <entry>
