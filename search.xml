@@ -85,6 +85,19 @@
       </tags>
   </entry>
   <entry>
+    <title>How to get access to other drives in Ubuntu on Windows 10</title>
+    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
+    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
     <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
     <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
@@ -97,19 +110,6 @@
 ]]></content>
       <tags>
         <tag>Gradle</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>How to get access to other drives in Ubuntu on Windows 10</title>
-    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
-    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -807,6 +807,19 @@
       <tags>
         <tag>Java</tag>
         <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何修改 AppVeyor 的 JDK 版本</title>
+    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
+    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>AppVeyor</tag>
       </tags>
   </entry>
 </search>
