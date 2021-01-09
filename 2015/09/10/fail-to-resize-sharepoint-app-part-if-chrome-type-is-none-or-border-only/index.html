@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.2.0">
+<meta name="generator" content="Hexo 5.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -239,18 +239,14 @@
       
         <h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">&quot;&lt;Message senderId=&quot;</span> + senderId + <span class="string">&quot;&gt;&quot;</span> + <span class="string">&quot;resize(&quot;</span> + width + <span class="string">&quot;,&quot;</span> + height + <span class="string">&quot;)&lt;/Message&gt;&quot;</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
-
 <p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">&#x27;style&#x27;</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
-
 <p>Then I located the code in my web part page which throws the error:</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
 <h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a target="_blank" rel="noopener" href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">here</a>, you can install a <a target="_blank" rel="noopener" href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx">patch</a> to fix this bug.</p>
 <p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>Hope it’s helpful.</p>
 <p>Reference:</p>
 <ul>
@@ -387,7 +383,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

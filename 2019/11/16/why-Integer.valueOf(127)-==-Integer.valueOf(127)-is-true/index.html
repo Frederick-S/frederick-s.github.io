@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.2.0">
+<meta name="generator" content="Hexo 5.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -240,7 +240,6 @@
         <p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
 <p>不过，整型缓存只适用于自动装箱的情况，不适用于通过构造函数创建的 <code>Integer</code> 对象间的比较，在下述代码中，最终的输出结果是 <code>integer1 == integer2</code> 和 <code>integer3 != integer4</code>。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Integer integer1 = <span class="number">3</span>;</span><br><span class="line">Integer integer2 = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer1 == integer2) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 == integer2&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 != integer2&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Integer integer3 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line">Integer integer4 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer3 == integer4) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 == integer4&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 != integer4&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p><code>Integer integer1 = 3</code> 发生了自动装箱，编译器会将其等价转换为 <code>Integer integer1 = Integer.valueOf(3)</code>，所以 <code>integer1 == integer2</code>。而通过构造函数创建的 <code>Integer</code> 对象属于不同的对象，指向不同的内存地址，所以 <code>integer3 != integer4</code>。</p>
 <p>另外，可以通过增加虚拟机的参数 <code>-XX:AutoBoxCacheMax=size</code> 来设置整型缓存的最大值，如 <code>-XX:AutoBoxCacheMax=500</code> 表示-128到500的整型会被缓存。</p>
 <p>参考：</p>
@@ -378,7 +377,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
