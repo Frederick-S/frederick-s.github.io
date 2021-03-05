@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 5.4.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -240,8 +240,10 @@
       
         <p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
 <ol>
 <li>在开发阶段，<code>A</code> 拉了个 <code>some.package</code> 的分支，更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务</li>

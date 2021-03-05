@@ -6,16 +6,48 @@
     <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
 <h2 id="Add-property-to-web"><a href="#Add-property-to-web" class="headerlink" title="Add property to web"></a>Add property to web</h2><p>Adding custom property to web is easy. Let’s just see the code:</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a new property</span></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">props.set_item(<span class="string">&quot;MyProperty&quot;</span>, <span class="string">&quot;My property value&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply change to web</span></span><br><span class="line">web.update();</span><br><span class="line">context.load(web);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Success.&quot;</span>);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
 <p>How do we know “MyProperty” is really added to web? We can check it here: <code>http://your_web/_api/web/AllProperties?$select=MyProperty</code>. The result looks like this:</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">entry</span> <span class="attr">xml:base</span>=<span class="string">&quot;http://your_web/test/_api/&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2005/Atom&quot;</span> <span class="attr">xmlns:d</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices&quot;</span> <span class="attr">xmlns:m</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span> <span class="attr">xmlns:georss</span>=<span class="string">&quot;http://www.georss.org/georss&quot;</span> <span class="attr">xmlns:gml</span>=<span class="string">&quot;http://www.opengis.net/gml&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>http://your_web/_api/web/AllProperties<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">term</span>=<span class="string">&quot;SP.PropertyValues&quot;</span> <span class="attr">scheme</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;edit&quot;</span> <span class="attr">href</span>=<span class="string">&quot;web/AllProperties&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">updated</span>&gt;</span>2013-12-04T04:37:07Z<span class="tag">&lt;/<span class="name">updated</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span> /&gt;</span>;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">content</span> <span class="attr">type</span>=<span class="string">&quot;application/xml&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">m:properties</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">d:myproperty</span>&gt;</span>My property value<span class="tag">&lt;/<span class="name">d:myproperty</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">m:properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <h2 id="Read-property-from-web"><a href="#Read-property-from-web" class="headerlink" title="Read property from web"></a>Read property from web</h2><p>We have two approaches to read properties from web: <code>props.get_item(&quot;PropertyKey&quot;)</code> or <code>REST API</code>.</p>
 <h3 id="The-get-item-method"><a href="#The-get-item-method" class="headerlink" title="The get_item method"></a>The get_item method</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">context.load(props);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prop = props.get_item(<span class="string">&quot;MyProperty&quot;</span>);</span><br><span class="line">    alert(prop);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
 <h3 id="The-REST-API"><a href="#The-REST-API" class="headerlink" title="The REST API"></a>The REST API</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> executor = <span class="keyword">new</span> SP.RequestExecutor(<span class="string">&#x27;http://your_web&#x27;</span>);</span><br><span class="line">executor.executeAsync(&#123;</span><br><span class="line">    url: <span class="string">&#x27;http://your_web/_api/web/AllProperties?$select=MyProperty&#x27;</span>,</span><br><span class="line">    method: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">    headers: &#123; <span class="string">&quot;Accept&quot;</span>: <span class="string">&quot;application/json; odata=verbose&quot;</span> &#125;,</span><br><span class="line">    success: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="built_in">JSON</span>.parse(response.body);</span><br><span class="line">        alert(obj.d.MyProperty);</span><br><span class="line">    &#125;,</span><br><span class="line">    error: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        alert(response.body);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
 <p>And here is the json query result, very straightforward:</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;d&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;__metadata&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;uri&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;SP.PropertyValues&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;MyProperty&quot;</span>: <span class="string">&quot;My property value&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>Reference:</p>
 <ul>
 <li><a href="http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx">HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
+    <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
+    <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">&quot;&lt;Message senderId=&quot;</span> + senderId + <span class="string">&quot;&gt;&quot;</span> + <span class="string">&quot;resize(&quot;</span> + width + <span class="string">&quot;,&quot;</span> + height + <span class="string">&quot;)&lt;/Message&gt;&quot;</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
+
+<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">&#x27;style&#x27;</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+
+<p>Then I located the code in my web part page which throws the error:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
+<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">here</a>, you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx">patch</a> to fix this bug.</p>
+<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -29,6 +61,7 @@
 <p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
 <p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>And it works. Hope it’s helpful.</p>
 <p>Reference:</p>
 <ul>
@@ -44,47 +77,11 @@
     <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
     <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+
 <p>The regular expression shows that it doesn’t allow float numbers.</p>
 ]]></content>
       <tags>
         <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
-    <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
-    <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> message = <span class="string">&quot;&lt;Message senderId=&quot;</span> + senderId + <span class="string">&quot;&gt;&quot;</span> + <span class="string">&quot;resize(&quot;</span> + width + <span class="string">&quot;,&quot;</span> + height + <span class="string">&quot;)&lt;/Message&gt;&quot;</span>;</span><br><span class="line"><span class="built_in">window</span>.parent.postMessage(message, hostUrl);</span><br></pre></td></tr></table></figure>
-<p>It fails to work if I set <code>Chrome Type</code> to <code>None</code> or <code>Border Only</code>. And I found an error message in console:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">Uncaught <span class="built_in">TypeError</span>: Cannot read property <span class="string">&#x27;style&#x27;</span> <span class="keyword">of</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
-<p>Then I located the code in my web part page which throws the error:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>).style.cssText = widthCssText;</span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>It tries to find the title element and resize it. But <code>document.getElementById(webPartDivId + &#39;_ChromeTitle&#39;)</code> returns null if <code>Chrome Type</code> is <code>None</code> or <code>Border Only</code>!<br>Because the app part doesn’t have a title under these 2 modes. Of course it will throw exception.</p>
-<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><p>This bug is described <a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">here</a>, you can install a <a href="http://blogs.technet.com/b/stefan_gossner/archive/2013/03/21/march-public-update-for-sharepoint-2013-available-and-mandatory.aspx">patch</a> to fix this bug.</p>
-<p>After the patch is installed, you can find that the original code is changed, it will resize the element only if it’s not null:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (resizeWidth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> webPartChromeTitle = <span class="built_in">document</span>.getElementById(webPartDivId + <span class="string">&#x27;_ChromeTitle&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> != webPartChromeTitle)</span><br><span class="line">    &#123;</span><br><span class="line">        webPartChromeTitle.style.cssText = widthCssText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cssText = <span class="string">&#x27;width:100% !important;&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
-    <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
-    <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">test</span> &#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = <span class="string">&#x27;full&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html">Gradle Goodness: Show More Information About Failed Tests</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Gradle</tag>
       </tags>
   </entry>
   <entry>
@@ -101,6 +98,21 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
+    <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
+    <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">test</span> &#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = <span class="string">&#x27;full&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html">Gradle Goodness: Show More Information About Failed Tests</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Gradle</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 FileLocator Pro 中排除子文件夹</title>
     <url>/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/</url>
     <content><![CDATA[<p>在搜索路径后加上 <code>-yourFolderName</code>，文件夹间以 <code>;</code> 分隔。</p>
@@ -111,24 +123,6 @@
 ]]></content>
       <tags>
         <tag>FileLocator Pro</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True</title>
-    <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
-    <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
-<p>不过，整型缓存只适用于自动装箱的情况，不适用于通过构造函数创建的 <code>Integer</code> 对象间的比较，在下述代码中，最终的输出结果是 <code>integer1 == integer2</code> 和 <code>integer3 != integer4</code>。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Integer integer1 = <span class="number">3</span>;</span><br><span class="line">Integer integer2 = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer1 == integer2) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 == integer2&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 != integer2&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Integer integer3 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line">Integer integer4 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer3 == integer4) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 == integer4&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 != integer4&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>Integer integer1 = 3</code> 发生了自动装箱，编译器会将其等价转换为 <code>Integer integer1 = Integer.valueOf(3)</code>，所以 <code>integer1 == integer2</code>。而通过构造函数创建的 <code>Integer</code> 对象属于不同的对象，指向不同的内存地址，所以 <code>integer3 != integer4</code>。</p>
-<p>另外，可以通过增加虚拟机的参数 <code>-XX:AutoBoxCacheMax=size</code> 来设置整型缓存的最大值，如 <code>-XX:AutoBoxCacheMax=500</code> 表示-128到500的整型会被缓存。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@njnareshjoshi/java-integer-cache-why-integer-valueof-127-integer-valueof-127-is-true-e5076824a3d5">Java Integer Cache — Why Integer.valueOf(127) == Integer.valueOf(127) Is True</a></li>
-<li><a href="https://javapapers.com/java/java-integer-cache/">Java Integer Cache</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -149,12 +143,44 @@
       </tags>
   </entry>
   <entry>
+    <title>为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True</title>
+    <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
+    <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
+<p>不过，整型缓存只适用于自动装箱的情况，不适用于通过构造函数创建的 <code>Integer</code> 对象间的比较，在下述代码中，最终的输出结果是 <code>integer1 == integer2</code> 和 <code>integer3 != integer4</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Integer integer1 = <span class="number">3</span>;</span><br><span class="line">Integer integer2 = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer1 == integer2) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 == integer2&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer1 != integer2&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Integer integer3 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line">Integer integer4 = <span class="keyword">new</span> Integer(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (integer3 == integer4) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 == integer4&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;integer3 != integer4&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Integer integer1 = 3</code> 发生了自动装箱，编译器会将其等价转换为 <code>Integer integer1 = Integer.valueOf(3)</code>，所以 <code>integer1 == integer2</code>。而通过构造函数创建的 <code>Integer</code> 对象属于不同的对象，指向不同的内存地址，所以 <code>integer3 != integer4</code>。</p>
+<p>另外，可以通过增加虚拟机的参数 <code>-XX:AutoBoxCacheMax=size</code> 来设置整型缓存的最大值，如 <code>-XX:AutoBoxCacheMax=500</code> 表示-128到500的整型会被缓存。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@njnareshjoshi/java-integer-cache-why-integer-valueof-127-integer-valueof-127-is-true-e5076824a3d5">Java Integer Cache — Why Integer.valueOf(127) == Integer.valueOf(127) Is True</a></li>
+<li><a href="https://javapapers.com/java/java-integer-cache/">Java Integer Cache</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VS Code error - No source control providers registered</title>
     <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
     <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
 <p>Reference:</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How to enable word wrap in VS Code</title>
+    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
+    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -175,26 +201,14 @@
       </tags>
   </entry>
   <entry>
-    <title>配置 Flutter 国内镜像</title>
-    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
-    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 TypeScript 中定义属性名未知的对象类型</title>
     <url>/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/</url>
     <content><![CDATA[<p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&#x27;Alice&#x27;</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">&#x27;Bob&#x27;</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>而在 <code>TypeScript</code> 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这种情况下可以借助 <a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#indexable-types">Indexable Types</a> 解决，以上述的例子为例：</p>
 <figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">interface</span> CarOwners &#123;</span><br><span class="line">    [key: <span class="built_in">string</span>]: Car;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> carOwners: CarOwners = &#123;</span><br><span class="line">    <span class="string">&#x27;Alice&#x27;</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">&#x27;Bob&#x27;</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>参考：</p>
 <ul>
 <li><a href="https://github.com/Microsoft/TypeScript/issues/7803">Type annotation for object with unknown properties but known property types?</a></li>
@@ -205,23 +219,11 @@
       </tags>
   </entry>
   <entry>
-    <title>How to enable word wrap in VS Code</title>
-    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
-    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
     <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
     <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
+
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
@@ -232,19 +234,57 @@
       </tags>
   </entry>
   <entry>
+    <title>配置 Flutter 国内镜像</title>
+    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
+    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
     <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
     <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── product-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── sum-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── app</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── pom.xml</span><br></pre></td></tr></table></figure>
+
 <p>其中 <code>product-service</code> 和 <code>sum-service</code> 表示功能代码，<code>app</code> 负责测试用例的整合。<code>product-service</code> 和 <code>sum-service</code> 分别包含一个 <code>ProductService</code> 类和 <code>SumService</code> 类，具体代码如下：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ProductService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">product</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x * y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// SumService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x + y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p><code>app</code> 内的测试用例如下：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldCalculateCorrectSumAndProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Assert.assertEquals(<span class="number">10</span>, <span class="keyword">new</span> ProductService().product(<span class="number">2</span>, <span class="number">5</span>));</span><br><span class="line">        Assert.assertEquals(<span class="number">5</span>, <span class="keyword">new</span> SumService().sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>然后在 <code>root</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>最后在 <code>app</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
 <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.22.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">argLine</span>&gt;</span>$&#123;argLine&#125; -Xms256m -Xmx2048m<span class="tag">&lt;/<span class="name">argLine</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">forkCount</span>&gt;</span>1<span class="tag">&lt;/<span class="name">forkCount</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">runOrder</span>&gt;</span>random<span class="tag">&lt;/<span class="name">runOrder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>test<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>此时在 <code>root</code> 模块下执行 <code>mvn test</code>，执行成功后在 <code>app/target/site/jacoco-aggregate</code> 目录下就会生成各个模块的覆盖测试报告：</p>
 <p><img src="/images/jacoco-multiple-modules-demo.png" alt="alt"></p>
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo">GitHub</a>。</p>
@@ -257,22 +297,6 @@
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>HTTP</tag>
       </tags>
   </entry>
   <entry>
@@ -402,20 +426,79 @@
 ]]></content>
   </entry>
   <entry>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSH 连接服务器时指定私钥的路径</title>
+    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
+    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+        <tag>SSH</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
+    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
+    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>需要安装以下依赖来解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Puppeteer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>.NET Core 覆盖率测试</title>
     <url>/2020/04/18/dotnet-core-test-coverage-demo/</url>
     <content><![CDATA[<h2 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h2><p>首先执行命令 <code>dotnet new classlib --name App</code> 来创建一个类库程序作为测试的对象，该类库只包含一个 <code>SumService</code> 类：</p>
 <figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumService</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">Sum</span>(<span class="params"><span class="built_in">int</span> a, <span class="built_in">int</span> b</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> a + b;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>然后创建一个基于 <code>xunit</code> 的单元测试项目来编写测试用例，并将 <code>App</code> 类库项目作为项目引用加入到 <code>App.Tests</code> 项目中：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet new xunit --name App.Tests</span><br><span class="line">dotnet add .\App.Tests\App.Tests.csproj reference .\App\App.csproj</span><br></pre></td></tr></table></figure>
+
 <p>并编写一个测试用例 <code>SumServiceTest</code>：</p>
 <figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> Xunit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App.Tests</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumServiceTest</span></span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="meta">Fact</span>]</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShouldReturn5</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Assert.Equal(<span class="number">5</span>, SumService.Sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>接着创建一个解决方案，并将 <code>App</code> 和 <code>App.Tests</code> 项目加入到该解决方案中：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet new sln --name App</span><br><span class="line">dotnet sln add .\App\App.csproj .\App.Tests\App.Tests.csproj</span><br></pre></td></tr></table></figure>
+
 <p>最后项目结构如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── App</span><br><span class="line">│   └── App.csproj</span><br><span class="line">│   └── SumService.cs</span><br><span class="line">├── App.Tests</span><br><span class="line">│   └── App.Tests.csproj</span><br><span class="line">│   └── SumServiceTest.cs</span><br><span class="line">├── App.sln</span><br></pre></td></tr></table></figure>
+
 <h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br></pre></td></tr></table></figure>
+
 <p>执行成功后会在 <code>App.Tests/TestResults/&#123;random-string&#125;</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
 <p>但是，自动创建的单元测试项目默认添加的 <code>coverlet</code> 依赖是 <code>coverlet.collector</code>，目前还不支持在控制台中打印测试覆盖率报告：</p>
 <blockquote>
@@ -423,16 +506,22 @@
 </blockquote>
 <p>如果希望在控制台中打印测试覆盖率报告可将 <code>coverlet.collector</code> 依赖改为 <code>coverlet.msbuild</code>：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet remove .\App.Tests package coverlet.collector</span><br><span class="line">dotnet add .\App.Tests\ package coverlet.msbuild</span><br></pre></td></tr></table></figure>
+
 <p>然后执行测试命令：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dotnet test &#x2F;p:CollectCoverage&#x3D;true</span><br></pre></td></tr></table></figure>
+
 <p>即可在控制台打印测试覆盖率报告：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Calculating coverage result...</span><br><span class="line">  Generating report &#39;D:\WorkSpace\dotnet-core-coverlet-msbuild-demo\App.Tests\coverage.json&#39;</span><br><span class="line"></span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| Module | Line | Branch | Method |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| App    | 100% | 100%   | 100%   |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line"></span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">|         | Line | Branch | Method |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Total   | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Average | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br></pre></td></tr></table></figure>
+
 <h2 id="集成-codecov"><a href="#集成-codecov" class="headerlink" title="集成 codecov"></a>集成 codecov</h2><h3 id="coverlet-msbuild"><a href="#coverlet-msbuild" class="headerlink" title="coverlet.msbuild"></a>coverlet.msbuild</h3><p>集成 <code>codecov</code> 需要指定测试覆盖率报告文件的路径，暂不支持 <code>coverlet.msbuild</code> 默认生成的 <code>json</code> 格式的文件，可以在执行测试时添加 <code>/p:CoverletOutputFormat=opencover</code> 参数来生成 <code>opencover</code> 格式的文件，相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test &#x2F;p:CollectCoverage&#x3D;true &#x2F;p:CoverletOutputFormat&#x3D;opencover</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;coverage.opencover.xml</span><br></pre></td></tr></table></figure>
+
 <h3 id="coverlet-collector"><a href="#coverlet-collector" class="headerlink" title="coverlet.collector"></a>coverlet.collector</h3><p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
 <figure class="highlight ps"><table><tr><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">&quot;./App.Tests/TestResults&quot;</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">&quot;coverage.cobertura.xml&quot;</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Recurse</span> <span class="literal">-Path</span> <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="operator">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> <span class="literal">-Destination</span> <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
+
 <p>相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
+
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
 <p>参考：</p>
 <ul>
@@ -447,51 +536,24 @@
       </tags>
   </entry>
   <entry>
-    <title>SSH 连接服务器时指定私钥的路径</title>
-    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
-    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-        <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
     <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
     <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
+
 <h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
 <h4 id="Remote-branch-alpha-not-found-in-upstream-origin"><a href="#Remote-branch-alpha-not-found-in-upstream-origin" class="headerlink" title="Remote branch alpha not found in upstream origin"></a>Remote branch alpha not found in upstream origin</h4><p>这个错误发生在下载 <code>Flutter</code> 代码的阶段，原文中的配置会下载 <code>Flutter</code> 的 <code>alpha</code> 分支代码，但是目前 <code>Flutter</code> 的仓库已经没有 <code>alpha</code> 分支，切换到 <code>stable</code> 分支即可，即：<code>git clone https://github.com/flutter/flutter.git -b stable --depth 1</code>。</p>
 <h4 id="Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted"><a href="#Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted" class="headerlink" title="Failed to install the following Android SDK packages as some licences have not been accepted"></a>Failed to install the following Android SDK packages as some licences have not been accepted</h4><p>详细错误信息如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[        ] &gt; Failed to install the following Android SDK packages as some</span><br><span class="line"></span><br><span class="line">licences have not been accepted.</span><br><span class="line"></span><br><span class="line">[        ]      build-tools;28.0.3 Android SDK Build-Tools 28.0.3</span><br><span class="line"></span><br><span class="line">[        ]      platforms;android-29 Android SDK Platform 29</span><br><span class="line"></span><br><span class="line">[        ]   To build this project, accept the SDK license agreements and</span><br><span class="line"></span><br><span class="line">install the missing components using the Android Studio SDK Manager.</span><br></pre></td></tr></table></figure>
+
 <p>这个错误是由于没有同意 <code>Android SDK</code> 的许可证协议，在 <code>before_script</code> 中加入如下配置即可：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br></pre></td></tr></table></figure>
+
 <h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><h4 id="pip-command-not-found"><a href="#pip-command-not-found" class="headerlink" title="pip: command not found"></a>pip: command not found</h4><p>这个错误在执行 <code>pip install six</code> 时遇到，经过实际验证构建 <code>iOS</code> 应用时并不需要此行配置，所以删掉即可。</p>
 <h4 id="Xcode-11-0-or-greater-is-required-to-develop-for-iOS"><a href="#Xcode-11-0-or-greater-is-required-to-develop-for-iOS" class="headerlink" title="Xcode 11.0 or greater is required to develop for iOS"></a>Xcode 11.0 or greater is required to develop for iOS</h4><p>原文中的配置使用的是 <code>Xcode 8.3</code>，最后打包时会提示此错误，将 <code>osx_image</code> 设置为 <code>xcode11</code> 即可。</p>
 <p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
+
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
 <h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
 <p>参考：</p>
@@ -509,6 +571,7 @@
     <url>/2020/05/04/flutter-error-linked-and-embedded-framework-app.framework-was-built-for-ios/</url>
     <content><![CDATA[<p><code>Flutter</code> 项目打包 <code>iOS</code> 应用的时候遇到个错误：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Building for iOS Simulator, but the linked and embedded framework &#39;App.framework&#39; was built for iOS. (in target &#39;Runner&#39; from project &#39;Runner&#39;)</span><br></pre></td></tr></table></figure>
+
 <p>这个问题在 <code>Flutter</code> 的 <code>GitHub</code> 仓库中也有人提到，解决方法也比较简单，删除 <code>App.framework</code> 文件夹即可，即 <code>rm -rf ios/Flutter/App.framework</code>。</p>
 <p>参考：</p>
 <ul>
@@ -520,50 +583,23 @@
       </tags>
   </entry>
   <entry>
-    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
-    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
-    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
-<p>需要安装以下依赖来解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>Puppeteer</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【分享】隐私政策生成器</title>
     <url>/2020/05/04/share-privacy-policy-generator/</url>
     <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>]]></content>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
+]]></content>
   </entry>
   <entry>
-    <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
-    <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
-    <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
-<ol>
-<li>在开发阶段，<code>A</code> 拉了个 <code>some.package</code> 的分支，更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务</li>
-<li><code>B</code> 也拉了个 <code>some.package</code> 的分支，同样更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，并增加了一个新的枚举值到 <code>SomeEnum</code>，同样将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务，此时任务构建失败，提示编译错误：<code>An enum switch case label must be the unqualified name of an enumeration constant</code></li>
-</ol>
-<p>出现这样的原因是 <code>Jenkins</code> 执行构建任务时执行的编译命令是 <code>mvn compile</code>，在 <code>A</code> 提交任务时，构建服务器下载了 <code>some.package</code> 的 <code>a.b-SNAPSHOT</code> 版本，由于是 <code>SNAPSHOT</code> 版本，在 <code>B</code> 提交任务时，构建服务器没有重新下载 <code>some.package</code>，导致服务器中的 <code>some.package</code> 没有 <code>B</code> 新增的修改，从而出现编译错误，解决方法是在编译时增加 <code>-U</code> 参数来强制更新 <code>SNAPSHOT</code>。</p>
-<p>参考：</p>
+    <title>野生 NHK NEWS EASY 客户端</title>
+    <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
+    <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
+<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy">Google Play</a></li>
+<li><a href="https://github.com/Frederick-S/nhk-easy-mobile">GitHub</a></li>
 </ul>
+<p><img src="/images/nhk-1.png" alt="alt"></p>
+<p><img src="/images/nhk-2.png" alt="alt"></p>
 ]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>Maven</tag>
-      </tags>
   </entry>
   <entry>
     <title>如何使用 rsync 同步数据到其他服务器</title>
@@ -586,6 +622,31 @@
       </tags>
   </entry>
   <entry>
+    <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
+    <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
+    <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="comment">// 编译错误，直接使用 SPRING 即可</span></span><br><span class="line">    <span class="keyword">case</span> Season.SPRING:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> Season.SUMMER:</span><br><span class="line">        System.out.println(<span class="string">&quot;summer&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然而，如果某个枚举值不存在，也会提示一样的错误，例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Season season = Season.SPRING;</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (season) &#123;</span><br><span class="line">    <span class="keyword">case</span> SOME_VALUE_DOES_NOT_EXIST:</span><br><span class="line">        System.out.println(<span class="string">&quot;spring&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种情况下的错误提示容易让人摸不着头脑，<code>IntelliJ IDEA</code> 的错误提示则较为友好：<code>Cannot resolve symbol &#39;SOME_VALUE_DOES_NOT_EXIST&#39;</code>。对于这种错误场景，实际工作中遇到一个例子：</p>
+<ol>
+<li>在开发阶段，<code>A</code> 拉了个 <code>some.package</code> 的分支，更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务</li>
+<li><code>B</code> 也拉了个 <code>some.package</code> 的分支，同样更新版本号为 <code>a.b-SNAPSHOT</code> 并发布，并增加了一个新的枚举值到 <code>SomeEnum</code>，同样将其引入 <code>some.app</code>，推送代码后触发了 <code>some.app</code> 的 <code>Jenkins</code> 构建任务，此时任务构建失败，提示编译错误：<code>An enum switch case label must be the unqualified name of an enumeration constant</code></li>
+</ol>
+<p>出现这样的原因是 <code>Jenkins</code> 执行构建任务时执行的编译命令是 <code>mvn compile</code>，在 <code>A</code> 提交任务时，构建服务器下载了 <code>some.package</code> 的 <code>a.b-SNAPSHOT</code> 版本，由于是 <code>SNAPSHOT</code> 版本，在 <code>B</code> 提交任务时，构建服务器没有重新下载 <code>some.package</code>，导致服务器中的 <code>some.package</code> 没有 <code>B</code> 新增的修改，从而出现编译错误，解决方法是在编译时增加 <code>-U</code> 参数来强制更新 <code>SNAPSHOT</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/54708788/error-an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration/54708876">error: an enum switch case label must be the unqualified name of an enumeration constant</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>Maven</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 Finder 中显示隐藏文件</title>
     <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
     <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
@@ -603,22 +664,11 @@
       </tags>
   </entry>
   <entry>
-    <title>野生 NHK NEWS EASY 客户端</title>
-    <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
-    <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
-<ul>
-<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy">Google Play</a></li>
-<li><a href="https://github.com/Frederick-S/nhk-easy-mobile">GitHub</a></li>
-</ul>
-<p><img src="/images/nhk-1.png" alt="alt"></p>
-<p><img src="/images/nhk-2.png" alt="alt"></p>
-]]></content>
-  </entry>
-  <entry>
     <title>如何解决 add-apt-repository: not found 错误</title>
     <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
     <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
+
 <p>参考：</p>
 <ul>
 <li><a href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
@@ -629,39 +679,70 @@
       </tags>
   </entry>
   <entry>
+    <title>如何解决 ModuleNotFoundError: No module named &#39;distutils.util&#39; 错误</title>
+    <url>/2020/08/02/how-to-fix-no-module-named-distutils.util/</url>
+    <content><![CDATA[<p><code>Ubuntu</code> 下安装 <code>pip</code> 时遇到 <code>ModuleNotFoundError: No module named &#39;distutils.util&#39;</code> 错误，执行以下命令即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install python3-distutils</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/pypa/get-pip/issues/43">Issue with “python3 get-pip.py –user” with python 3.6.7</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何减小 Docker 镜像的大小</title>
     <url>/2020/08/04/how-to-reduce-docker-image-size/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>首先来看一个例子，构建一个 <code>C</code> 语言版的 <code>hello world</code> 镜像：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* hello.c */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>对应的 <code>Dockerfile</code> 为：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
 <p>然后执行 <code>docker build -t hello-world .</code> 构建一个名为 <code>hello-world</code> 的镜像，然而以这种方式构建的镜像的大小竟然有1.19 GB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              b11e170bd1d2        6 minutes ago       1.19GB</span><br></pre></td></tr></table></figure>
+
 <p>因为这种构建方式生成的镜像会同时包含 <code>gcc</code> 镜像的内容，查看 <code>gcc</code> 镜像大小发现达到了1.19 GB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">gcc                 latest              21f378ba43ec        11 days ago         1.19GB</span><br></pre></td></tr></table></figure>
+
 <p>如果我们把基础镜像换成 <code>Ubuntu</code> 并安装 <code>gcc</code> 编译 <code>hello.c</code> 重新构建镜像，最后的镜像大小为213 MB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM ubuntu</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install gcc -y</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE</span><br><span class="line">hello-world         latest              42f17d1d12a5        About a minute ago   213MB</span><br></pre></td></tr></table></figure>
+
 <p>虽然新镜像相比1.19 GB有大幅减少，但相比于 <code>hello-world</code> 程序本身的大小（17k）来说，213 MB依然是个庞大的数字：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ls hello -hl</span><br><span class="line">-rwxr-xr-x 1 root root 17K Aug  4 13:54 hello</span><br></pre></td></tr></table></figure>
+
 <h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="Multi-stage"><a href="#Multi-stage" class="headerlink" title="Multi-stage"></a>Multi-stage</h3><p>对于 <code>hello-world</code> 这个镜像来说，我们真正需要的只是最终的可执行程序，而并不关心中间的编译过程，如果能将编译阶段作为一个临时阶段而并不包含在最终的镜像中，则可有效减少最终的镜像大小。针对此，<code>Docker</code> 在 17.05 版本开始提供了名为 <code>multi-stage</code> 构建的功能。我们将原来的 <code>Dockerfile</code> 稍作修改，将原来的编译阶段抽取为一个 <code>stage</code>，然后将编译好的可执行文件复制到最终的 <code>stage</code> 中：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM ubuntu</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
 <p>最终的镜像大小只有73.9 MB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              7dd2b51c53b2        7 minutes ago       73.9MB</span><br></pre></td></tr></table></figure>
+
 <h3 id="FROM-scratch"><a href="#FROM-scratch" class="headerlink" title="FROM scratch"></a><code>FROM scratch</code></h3><p>在上一步中，我们使用 <code>Ubuntu</code> 作为基础镜像来运行 <code>hello-world</code>，相比于一个可执行程序，<code>Ubuntu</code> 依然过于庞大，有没有比 <code>Ubuntu</code> 更轻量的镜像呢？有，那就是 <code>scratch</code>，这表示一个空的镜像，继续将 <code>Dockerfile</code> 稍作修改：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM scratch</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
 <p>最终的镜像大小只有16.4 KB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              676253b0e9c4        31 minutes ago      16.4kB</span><br></pre></td></tr></table></figure>
+
 <p>不过在运行该镜像时却提示错误：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">standard_init_linux.go:211: exec user process caused &quot;no such file or directory&quot;</span><br></pre></td></tr></table></figure>
+
 <p>这是因为这种方式构建出的镜像缺少 <code>hello-world</code> 运行时依赖的库。我们可以在编译 <code>hello-world</code> 时通过指定 <code>-static</code> 参数将依赖的库包含到最后的可执行文件中来解决这个问题：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c -static</span><br><span class="line">FROM scratch</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
 <p>不过包含了依赖的库后最终镜像的大小也上涨为945 KB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e6a1fccc2de7        9 seconds ago       945kB</span><br></pre></td></tr></table></figure>
+
 <p>另外，如果不想将依赖的库包含到最终的镜像中，可以使用 <code>busybox:glibc</code> 这个基础镜像，该镜像包含了 <code>C</code> 语言的标准库，有了这个镜像在编译 <code>hello-world</code> 时则无需指定 <code>-static</code> 参数：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM busybox:glibc</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
+
 <p>不过由于该镜像本身有一定大小，最终镜像的大小达到了5.22 MB：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e2f2c0544800        7 seconds ago       5.22MB</span><br></pre></td></tr></table></figure>
+
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过 <code>multi-stage</code> 构建可以有效的减少 <code>Docker</code> 镜像的大小，而基础镜像的选择则要具体情况分析，在满足需求的情况下选择合理的基础镜像。</p>
 <p>参考：</p>
 <ul>
@@ -673,32 +754,23 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决 ModuleNotFoundError: No module named &#39;distutils.util&#39; 错误</title>
-    <url>/2020/08/02/how-to-fix-no-module-named-distutils.util/</url>
-    <content><![CDATA[<p><code>Ubuntu</code> 下安装 <code>pip</code> 时遇到 <code>ModuleNotFoundError: No module named &#39;distutils.util&#39;</code> 错误，执行以下命令即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install python3-distutils</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://github.com/pypa/get-pip/issues/43">Issue with “python3 get-pip.py –user” with python 3.6.7</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何使用 JUnit 测试异步代码</title>
     <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
 <p>参考：</p>
 <ul>
@@ -715,13 +787,17 @@
     <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
     <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
 <h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
 <p>参考：</p>
 <ul>
@@ -738,6 +814,7 @@
     <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
     <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
 ]]></content>
       <tags>
@@ -750,8 +827,10 @@
     <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
     <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;file:$&#123;java.home&#125;&#x2F;lib&#x2F;tools.jar&quot; &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>然而，从 <code>JDK 9</code> 开始，<code>tools.jar</code> 已被移除，需要将 <code>policy</code> 文件的内容修改为：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;jrt:&#x2F;jdk.jstatd&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">grant codebase &quot;jrt:&#x2F;jdk.internal.jvmstat&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/51032095/starting-jstatd-in-java-9">Starting jstatd in Java 9+</a></li>
