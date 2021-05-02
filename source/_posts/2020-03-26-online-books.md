@@ -51,6 +51,9 @@ title: 一些在线书籍（不定期更新）
 - [Mostly Adequate Guide to Functional Programming](https://mostly-adequate.gitbooks.io/mostly-adequate-guide/)
 
 ## Programming Languages
+### C
+- [Beej's Guide to C Programming](https://beej.us/guide/bgc/)
+
 ### Java
 - [SEI CERT Oracle Coding Standard for Java](https://wiki.sei.cmu.edu/confluence/display/java/SEI+CERT+Oracle+Coding+Standard+for+Java)
 - [JVM Anatomy Quarks](https://shipilev.net/jvm/anatomy-quarks/)
@@ -123,3 +126,4 @@ title: 一些在线书籍（不定期更新）
 - [Lessons In Electric Circuits](http://www.ibiblio.org/kuphaldt/electricCircuits/)
 - [A Graduate Course in Applied Cryptography](https://toc.cryptobook.us/)
 - [GameBoy Emulation in JavaScript](http://imrannazar.com/GameBoy-Emulation-in-JavaScript)
+- [Learn LaTeX](https://www.learnlatex.org/en/)
