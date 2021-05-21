@@ -22,6 +22,7 @@ title: 一些在线书籍（不定期更新）
 - [Crafting Interpreters](http://craftinginterpreters.com/)
 - [Build Your Own Lisp](http://www.buildyourownlisp.com/)
 - [A Compiler Writing Journey](https://github.com/DoctorWkt/acwj)
+- [Resources for Amateur Compiler Writers](https://c9x.me/compile/bib/)
 
 ## Operating Systems
 - [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/)
@@ -65,6 +66,7 @@ title: 一些在线书籍（不定期更新）
 - [The Modern JavaScript Tutorial](https://javascript.info/)
 - [JavaScript Garden](https://bonsaiden.github.io/JavaScript-Garden/)
 - [Robust Client-Side JavaScript](https://molily.de/robust-javascript/)
+- [JavaScript for Data Science](http://js4ds.org/)
 
 ### TypeScript
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
