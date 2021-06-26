@@ -6,6 +6,7 @@ title: 一些在线书籍（不定期更新）
 - [Interactive Linear Algebra](http://textbooks.math.gatech.edu/ila/index.html)
 - [Mathematics for Machine Learning](https://mml-book.github.io/)
 - [Probabilistic Programming & Bayesian Methods for Hackers](https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/)
+- [Elementary Calculus: An Infinitesimal Approach](https://people.math.wisc.edu/~keisler/calc.html)
 
 ## Computer Science
 - [CS for All](https://www.cs.hmc.edu/twiki/bin/view/CSforAll/)
@@ -67,6 +68,7 @@ title: 一些在线书籍（不定期更新）
 - [JavaScript Garden](https://bonsaiden.github.io/JavaScript-Garden/)
 - [Robust Client-Side JavaScript](https://molily.de/robust-javascript/)
 - [JavaScript for Data Science](http://js4ds.org/)
+- [Deep JavaScript](https://exploringjs.com/deep-js/toc.html)
 
 ### TypeScript
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
