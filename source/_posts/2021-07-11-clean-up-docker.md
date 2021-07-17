@@ -57,7 +57,29 @@ CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS  
 3d9f62acc483   4cdc5dd7eaad   "/docker-entrypoint.…"   11 minutes ago   Exited (0) 11 minutes ago             sleepy_babbage
 ```
 
-要删除一个容器必须要先停止该容器（`docker container stop <name_or_id>`），然后通过 `docker container rm <name_or_id>` 删除。
+要删除一个容器必须要先停止该容器（`docker container stop <name_or_id>`），然后通过 `docker container rm <name_or_id>` 删除，同样的，和删除镜像类似，该命令支持批量删除多个容器，多个容器 `id` 之间使用空格分隔。
+
+## 网络清理
+`Docker` 网络用于容器间的通信，它们都是一些配置文件，并不会占用多大空间，可以通过 `docker network ls` 查看所有的网络：
+
+```
+NETWORK ID     NAME      DRIVER    SCOPE
+b96312481a51   bridge    bridge    local
+85a64f881d4d   host      host      local
+e6808b80f888   none      null      local
+```
+
+可以通过 `docker network rm <name_or_id>` 来删除一个网络。
+
+## 数据卷清理
+`Docker` 数据卷用于持久化容器运行时保存的数据，例如通过 `Docker` 运行 `MySQL` 时指定数据卷，从而对 `MySQL` 的数据进行备份，可以通过 `docker volume ls` 查看所有的数据卷：
+
+```
+DRIVER    VOLUME NAME
+local     test-volume
+```
+
+同样的，可以通过 `docker volume rm <name>` 来删除指定的数据卷，或者使用 `docker volume prune` 来删除所有未和运行中的容器关联的数据卷，以及通过 `docker volume prune -a` 删除所有的数据卷。
 
 参考：
 
