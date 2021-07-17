@@ -15,6 +15,7 @@ Build Cache     0         0         0B        0B
 
 其中 `Images` 表示镜像，`Containers` 表示容器，`Local Volumes` 表示本地卷，`Build Cache` 表示构建缓存。
 
+## 整体清理
 可以通过 `docker system prune` 进行一次空间清理：
 
 ```
@@ -30,6 +31,23 @@ Are you sure you want to continue? [y/N]
 该操作会删除所有停止的容器，所有未被至少一个容器使用的网络，所有的 `dangling` 镜像（在构建镜像时产生的 `tag` 为 `none` 的镜像，没有和任何其他有 `tag` 的镜像有关联），所有的 `dangling` 构建缓存（和 `dangling` 镜像同理）。
 
 更激进一点，还可以执行 `docker system prune -a`，该操作还会删除没有和运行中的容器有关联的镜像。
+
+## 镜像清理
+`Docker` 镜像是某个应用（如数据库、某个程序语言的运行时）的磁盘快照，可以通过 `docker image ls -a` 查看所有的镜像（活跃的以及 `dangling` 的镜像）：
+
+```
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+hello-world   latest    d1165f221234   4 months ago   13.3kB
+```
+
+可以通过 `docker image rm <name_or_id>` 来删除某个镜像，支持批量删除多个镜像，多个镜像 `id` 之间使用空格分隔即可。不过，删除镜像要求该镜像没有被某个容器所使用，否则会提示下述类似错误：
+
+```
+Error response from daemon: conflict: unable to delete 4cdc5dd7eaad (must be forced) - image is being used by stopped container 3d9f62acc483
+Error response from daemon: conflict: unable to delete d1165f221234 (must be forced) - image is being used by stopped container 57027ba35bdd
+```
+
+可以通过在执行时增加 `-f` 来强制删除镜像。
 
 参考：
 
