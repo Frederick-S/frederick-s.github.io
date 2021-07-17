@@ -49,6 +49,16 @@ Error response from daemon: conflict: unable to delete d1165f221234 (must be for
 
 可以通过在执行时增加 `-f` 来强制删除镜像。
 
+## 容器清理
+容器是某个镜像的一个运行实例，可以通过 `docker container ls -a` 查看所有的容器：
+
+```
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS                      PORTS     NAMES
+3d9f62acc483   4cdc5dd7eaad   "/docker-entrypoint.…"   11 minutes ago   Exited (0) 11 minutes ago             sleepy_babbage
+```
+
+要删除一个容器必须要先停止该容器（`docker container stop <name_or_id>`），然后通过 `docker container rm <name_or_id>` 删除。
+
 参考：
 
 - [How to clean your Docker data](https://dockerwebdev.com/tutorials/clean-up-docker/)
