@@ -29,7 +29,7 @@ Are you sure you want to continue? [y/N]
 
 该操作会删除所有停止的容器，所有未被至少一个容器使用的网络，所有的 `dangling` 镜像（在构建镜像时产生的 `tag` 为 `none` 的镜像，没有和任何其他有 `tag` 的镜像有关联），所有的 `dangling` 构建缓存（和 `dangling` 镜像同理）。
 
-更激进一点，还可以执行 `docker system prune -a`，该操作还会删除没有被运行中的容器使用的镜像。
+更激进一点，还可以执行 `docker system prune -a`，该操作还会删除没有和运行中的容器有关联的镜像。
 
 参考：
 
