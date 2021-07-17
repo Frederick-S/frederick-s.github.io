@@ -81,6 +81,8 @@ local     test-volume
 
 同样的，可以通过 `docker volume rm <name>` 来删除指定的数据卷，或者使用 `docker volume prune` 来删除所有未和运行中的容器关联的数据卷，以及通过 `docker volume prune -a` 删除所有的数据卷。
 
+最后，`docker system prune -a --volumes` 是在 `docker system prune -a` 的基础上删除所有未使用的卷。
+
 参考：
 
 - [How to clean your Docker data](https://dockerwebdev.com/tutorials/clean-up-docker/)
