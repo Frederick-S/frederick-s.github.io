@@ -21,6 +21,29 @@ if __name__ == '__main__':
   print(top_k([5, 4, 3, 2, 1], 3)) # [4, 3, 2]
 ```
 
+## 实现自定义比较器
+当放入堆中的是自定义类时，可以通过实现 `__lt__` 方法来比较元素大小。假设有一个自定义类为 `Node`，它包含一个 `value` 属性，现在问题改为给定一个 `Node` 的数组，返回前 `k` 小的 `Node` 的值，可通过实现 `__lt__` 方法求解。
+
+```py
+import heapq
+
+class Node:
+  def __init__(self, value):
+    self.value = value
+
+  def __lt__(self, other):
+    return self.value < other.value
+
+def top_k(nodes, k):
+  heap = [node for node in nodes]
+  heapq.heapify(heap)
+
+  return list(map(lambda x: heapq.heappop(heap).value, range(k)))
+
+if __name__ == '__main__':
+  print(top_k([Node(5), Node(4), Node(3), Node(2), Node(1)], 3)) # [1, 2, 3]
+```
+
 参考：
 
 - [heapq with custom compare predicate](https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823)
