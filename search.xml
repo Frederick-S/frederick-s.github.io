@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Add property to web with JavaScript in SharePoint 2013 App</title>
+    <url>/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/</url>
+    <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
+<h2 id="Add-property-to-web"><a href="#Add-property-to-web" class="headerlink" title="Add property to web"></a>Add property to web</h2><p>Adding custom property to web is easy. Let’s just see the code:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a new property</span></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">props.set_item(<span class="string">&quot;MyProperty&quot;</span>, <span class="string">&quot;My property value&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply change to web</span></span><br><span class="line">web.update();</span><br><span class="line">context.load(web);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Success.&quot;</span>);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>How do we know “MyProperty” is really added to web? We can check it here: <code>http://your_web/_api/web/AllProperties?$select=MyProperty</code>. The result looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">entry</span> <span class="attr">xml:base</span>=<span class="string">&quot;http://your_web/test/_api/&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2005/Atom&quot;</span> <span class="attr">xmlns:d</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices&quot;</span> <span class="attr">xmlns:m</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span> <span class="attr">xmlns:georss</span>=<span class="string">&quot;http://www.georss.org/georss&quot;</span> <span class="attr">xmlns:gml</span>=<span class="string">&quot;http://www.opengis.net/gml&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>http://your_web/_api/web/AllProperties<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">term</span>=<span class="string">&quot;SP.PropertyValues&quot;</span> <span class="attr">scheme</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;edit&quot;</span> <span class="attr">href</span>=<span class="string">&quot;web/AllProperties&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">updated</span>&gt;</span>2013-12-04T04:37:07Z<span class="tag">&lt;/<span class="name">updated</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span> /&gt;</span>;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">content</span> <span class="attr">type</span>=<span class="string">&quot;application/xml&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">m:properties</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">d:myproperty</span>&gt;</span>My property value<span class="tag">&lt;/<span class="name">d:myproperty</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">m:properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Read-property-from-web"><a href="#Read-property-from-web" class="headerlink" title="Read property from web"></a>Read property from web</h2><p>We have two approaches to read properties from web: <code>props.get_item(&quot;PropertyKey&quot;)</code> or <code>REST API</code>.</p>
+<h3 id="The-get-item-method"><a href="#The-get-item-method" class="headerlink" title="The get_item method"></a>The get_item method</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">context.load(props);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prop = props.get_item(<span class="string">&quot;MyProperty&quot;</span>);</span><br><span class="line">    alert(prop);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="The-REST-API"><a href="#The-REST-API" class="headerlink" title="The REST API"></a>The REST API</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> executor = <span class="keyword">new</span> SP.RequestExecutor(<span class="string">&#x27;http://your_web&#x27;</span>);</span><br><span class="line">executor.executeAsync(&#123;</span><br><span class="line">    url: <span class="string">&#x27;http://your_web/_api/web/AllProperties?$select=MyProperty&#x27;</span>,</span><br><span class="line">    method: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">    headers: &#123; <span class="string">&quot;Accept&quot;</span>: <span class="string">&quot;application/json; odata=verbose&quot;</span> &#125;,</span><br><span class="line">    success: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="built_in">JSON</span>.parse(response.body);</span><br><span class="line">        alert(obj.d.MyProperty);</span><br><span class="line">    &#125;,</span><br><span class="line">    error: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        alert(response.body);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>And here is the json query result, very straightforward:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;d&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;__metadata&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;uri&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;SP.PropertyValues&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;MyProperty&quot;</span>: <span class="string">&quot;My property value&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Reference:</p>
+<ul>
+<li><a href="http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx">HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
     <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
     <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
@@ -46,27 +73,12 @@
       </tags>
   </entry>
   <entry>
-    <title>Add property to web with JavaScript in SharePoint 2013 App</title>
-    <url>/2015/06/07/add-property-to-web-with-javascript-in-sharepoint-2013-app/</url>
-    <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><code>SharePoint App Model</code> provides a new approach to SharePoint development. And here is the question: where to save app data? There are several ways to save data in an app, you can create a list or connect to a database in Windows Azure or set custom properties in <code>AppManifest.xml</code>. But we can also save data to the property bag of a SharePoint web.</p>
-<h2 id="Add-property-to-web"><a href="#Add-property-to-web" class="headerlink" title="Add property to web"></a>Add property to web</h2><p>Adding custom property to web is easy. Let’s just see the code:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add a new property</span></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">props.set_item(<span class="string">&quot;MyProperty&quot;</span>, <span class="string">&quot;My property value&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Apply change to web</span></span><br><span class="line">web.update();</span><br><span class="line">context.load(web);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Success.&quot;</span>);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
+    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
+    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
 
-<p>How do we know “MyProperty” is really added to web? We can check it here: <code>http://your_web/_api/web/AllProperties?$select=MyProperty</code>. The result looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">entry</span> <span class="attr">xml:base</span>=<span class="string">&quot;http://your_web/test/_api/&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.w3.org/2005/Atom&quot;</span> <span class="attr">xmlns:d</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices&quot;</span> <span class="attr">xmlns:m</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span> <span class="attr">xmlns:georss</span>=<span class="string">&quot;http://www.georss.org/georss&quot;</span> <span class="attr">xmlns:gml</span>=<span class="string">&quot;http://www.opengis.net/gml&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>http://your_web/_api/web/AllProperties<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">term</span>=<span class="string">&quot;SP.PropertyValues&quot;</span> <span class="attr">scheme</span>=<span class="string">&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;edit&quot;</span> <span class="attr">href</span>=<span class="string">&quot;web/AllProperties&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">updated</span>&gt;</span>2013-12-04T04:37:07Z<span class="tag">&lt;/<span class="name">updated</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">author</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span> /&gt;</span>;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">content</span> <span class="attr">type</span>=<span class="string">&quot;application/xml&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">m:properties</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">d:myproperty</span>&gt;</span>My property value<span class="tag">&lt;/<span class="name">d:myproperty</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">m:properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="Read-property-from-web"><a href="#Read-property-from-web" class="headerlink" title="Read property from web"></a>Read property from web</h2><p>We have two approaches to read properties from web: <code>props.get_item(&quot;PropertyKey&quot;)</code> or <code>REST API</code>.</p>
-<h3 id="The-get-item-method"><a href="#The-get-item-method" class="headerlink" title="The get_item method"></a>The get_item method</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> context = SP.ClientContext.get_current();</span><br><span class="line"><span class="keyword">var</span> web = context.get_web();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> props = web.get_allProperties();</span><br><span class="line">context.load(props);</span><br><span class="line"></span><br><span class="line">context.executeQueryAsync(<span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prop = props.get_item(<span class="string">&quot;MyProperty&quot;</span>);</span><br><span class="line">    alert(prop);</span><br><span class="line">&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">sender, args</span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;Request failed.&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="The-REST-API"><a href="#The-REST-API" class="headerlink" title="The REST API"></a>The REST API</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> executor = <span class="keyword">new</span> SP.RequestExecutor(<span class="string">&#x27;http://your_web&#x27;</span>);</span><br><span class="line">executor.executeAsync(&#123;</span><br><span class="line">    url: <span class="string">&#x27;http://your_web/_api/web/AllProperties?$select=MyProperty&#x27;</span>,</span><br><span class="line">    method: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">    headers: &#123; <span class="string">&quot;Accept&quot;</span>: <span class="string">&quot;application/json; odata=verbose&quot;</span> &#125;,</span><br><span class="line">    success: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="built_in">JSON</span>.parse(response.body);</span><br><span class="line">        alert(obj.d.MyProperty);</span><br><span class="line">    &#125;,</span><br><span class="line">    error: <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">        alert(response.body);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>And here is the json query result, very straightforward:</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;d&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;__metadata&quot;</span>: &#123;</span><br><span class="line">            <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;uri&quot;</span>: <span class="string">&quot;http://your_web/_api/web/AllProperties&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span>: <span class="string">&quot;SP.PropertyValues&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">&quot;MyProperty&quot;</span>: <span class="string">&quot;My property value&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Reference:</p>
-<ul>
-<li><a href="http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx">HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013</a></li>
-</ul>
+<p>The regular expression shows that it doesn’t allow float numbers.</p>
 ]]></content>
       <tags>
         <tag>SharePoint Add-in</tag>
@@ -83,18 +95,6 @@
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
-    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
-    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
-
-<p>The regular expression shows that it doesn’t allow float numbers.</p>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
       </tags>
   </entry>
   <entry>
@@ -175,19 +175,6 @@
       </tags>
   </entry>
   <entry>
-    <title>How to enable word wrap in VS Code</title>
-    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
-    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vagrant 镜像下载加速</title>
     <url>/2019/12/18/vagrant-box-speed-up/</url>
     <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
@@ -198,6 +185,19 @@
 ]]></content>
       <tags>
         <tag>Vagrant</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How to enable word wrap in VS Code</title>
+    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
+    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
       </tags>
   </entry>
   <entry>
@@ -763,6 +763,35 @@
       </tags>
   </entry>
   <entry>
+    <title>如何使用 JUnit 测试异步代码</title>
+    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何使用 JUnit 测试异常信息</title>
     <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
     <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
@@ -803,6 +832,25 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 JDK 11 中建立 jstatd 连接</title>
+    <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
+    <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;file:$&#123;java.home&#125;&#x2F;lib&#x2F;tools.jar&quot; &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然而，从 <code>JDK 9</code> 开始，<code>tools.jar</code> 已被移除，需要将 <code>policy</code> 文件的内容修改为：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;jrt:&#x2F;jdk.jstatd&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">grant codebase &quot;jrt:&#x2F;jdk.internal.jvmstat&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/51032095/starting-jstatd-in-java-9">Starting jstatd in Java 9+</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>VisualVM</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>为什么1不是质数</title>
     <url>/2021/07/04/why-is-1-not-a-prime/</url>
     <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
@@ -821,35 +869,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何使用 JUnit 测试异步代码</title>
-    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Permissions 0644 for &#39;xxx.pem&#39; are too open</title>
     <url>/2021/07/10/permissions-0644-for-xx-are-too-open/</url>
     <content><![CDATA[<p>使用 <code>SSH</code> 连接到 <code>Azure</code> 的虚拟机时遇到错误：</p>
@@ -865,25 +884,6 @@
 ]]></content>
       <tags>
         <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 JDK 11 中建立 jstatd 连接</title>
-    <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
-    <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;file:$&#123;java.home&#125;&#x2F;lib&#x2F;tools.jar&quot; &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>然而，从 <code>JDK 9</code> 开始，<code>tools.jar</code> 已被移除，需要将 <code>policy</code> 文件的内容修改为：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;jrt:&#x2F;jdk.jstatd&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">grant codebase &quot;jrt:&#x2F;jdk.internal.jvmstat&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/51032095/starting-jstatd-in-java-9">Starting jstatd in Java 9+</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>VisualVM</tag>
       </tags>
   </entry>
   <entry>
@@ -956,7 +956,7 @@
 <p>借助 <code>for/while else</code> 可改写成：</p>
 <figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
-<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说无法一眼看穿代码的意图。</p>
+<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
