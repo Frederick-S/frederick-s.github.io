@@ -1,4 +1,4 @@
-title: 'MapReduce: Simplified Data Processing on Large Clusters'
+title: 'MIT 6.824 Lab 1 (1) - MapReduce: Simplified Data Processing on Large Clusters'
 tags:
 - Paper
 - MIT 6.824
