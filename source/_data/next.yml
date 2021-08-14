@@ -30,3 +30,9 @@ local_search:
   unescape: false
   # Preload the search data when the page loads.
   preload: false
+
+creative_commons:
+  license: by-nc-sa
+  sidebar: false
+  post: true
+  language: 
