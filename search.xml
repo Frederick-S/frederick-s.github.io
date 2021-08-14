@@ -85,6 +85,19 @@
       </tags>
   </entry>
   <entry>
+    <title>How to get access to other drives in Ubuntu on Windows 10</title>
+    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
+    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
     <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
     <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
@@ -97,19 +110,6 @@
 ]]></content>
       <tags>
         <tag>Gradle</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>How to get access to other drives in Ubuntu on Windows 10</title>
-    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
-    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -488,29 +488,6 @@
       </tags>
   </entry>
   <entry>
-    <title>【分享】隐私政策生成器</title>
-    <url>/2020/05/04/share-privacy-policy-generator/</url>
-    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
-    <title>Flutter error - Building for iOS Simulator, but the linked and embedded framework &#39;App.framework&#39; was built for iOS</title>
-    <url>/2020/05/04/flutter-error-linked-and-embedded-framework-app.framework-was-built-for-ios/</url>
-    <content><![CDATA[<p><code>Flutter</code> 项目打包 <code>iOS</code> 应用的时候遇到个错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Building for iOS Simulator, but the linked and embedded framework &#39;App.framework&#39; was built for iOS. (in target &#39;Runner&#39; from project &#39;Runner&#39;)</span><br></pre></td></tr></table></figure>
-
-<p>这个问题在 <code>Flutter</code> 的 <code>GitHub</code> 仓库中也有人提到，解决方法也比较简单，删除 <code>App.framework</code> 文件夹即可，即 <code>rm -rf ios/Flutter/App.framework</code>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://github.com/flutter/flutter/issues/50568">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>.NET Core 覆盖率测试</title>
     <url>/2020/04/18/dotnet-core-test-coverage-demo/</url>
     <content><![CDATA[<h2 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h2><p>首先执行命令 <code>dotnet new classlib --name App</code> 来创建一个类库程序作为测试的对象，该类库只包含一个 <code>SumService</code> 类：</p>
@@ -599,6 +576,29 @@
       </tags>
   </entry>
   <entry>
+    <title>Flutter error - Building for iOS Simulator, but the linked and embedded framework &#39;App.framework&#39; was built for iOS</title>
+    <url>/2020/05/04/flutter-error-linked-and-embedded-framework-app.framework-was-built-for-ios/</url>
+    <content><![CDATA[<p><code>Flutter</code> 项目打包 <code>iOS</code> 应用的时候遇到个错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Building for iOS Simulator, but the linked and embedded framework &#39;App.framework&#39; was built for iOS. (in target &#39;Runner&#39; from project &#39;Runner&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>这个问题在 <code>Flutter</code> 的 <code>GitHub</code> 仓库中也有人提到，解决方法也比较简单，删除 <code>App.framework</code> 文件夹即可，即 <code>rm -rf ios/Flutter/App.framework</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/flutter/flutter/issues/50568">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>【分享】隐私政策生成器</title>
+    <url>/2020/05/04/share-privacy-policy-generator/</url>
+    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
+]]></content>
+  </entry>
+  <entry>
     <title>野生 NHK NEWS EASY 客户端</title>
     <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
     <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
@@ -656,21 +656,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决 add-apt-repository: not found 错误</title>
-    <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
-    <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 Finder 中显示隐藏文件</title>
     <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
     <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
@@ -688,6 +673,21 @@
       </tags>
   </entry>
   <entry>
+    <title>如何解决 add-apt-repository: not found 错误</title>
+    <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
+    <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何解决 ModuleNotFoundError: No module named &#39;distutils.util&#39; 错误</title>
     <url>/2020/08/02/how-to-fix-no-module-named-distutils.util/</url>
     <content><![CDATA[<p><code>Ubuntu</code> 下安装 <code>pip</code> 时遇到 <code>ModuleNotFoundError: No module named &#39;distutils.util&#39;</code> 错误，执行以下命令即可：</p>
@@ -700,6 +700,62 @@
 ]]></content>
       <tags>
         <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异步代码</title>
+    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异常信息</title>
+    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
+    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
+<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
       </tags>
   </entry>
   <entry>
@@ -760,62 +816,6 @@
 ]]></content>
       <tags>
         <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何使用 JUnit 测试异步代码</title>
-    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何使用 JUnit 测试异常信息</title>
-    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
-    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
-<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
       </tags>
   </entry>
   <entry>
