@@ -101,3 +101,9 @@ deploy:
   type: git
   repo: git@github.com:Frederick-S/frederick-s.github.io.git
   branch: master
+
+feed:
+  enable: true
+  type: atom
+  path: atom.xml
+  limit: 20

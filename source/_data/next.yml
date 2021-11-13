@@ -1,12 +1,13 @@
 menu:
-  home: / || home
-  tags: /tags/ || tags
+  home: / || fas fa-home
+  tags: /tags/ || fas fa-tags
   # categories: /categories/ || th
-  archives: /archives/ || archive
+  archives: /archives/ || fas fa-archive
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
   #commonweal: /404/ || heartbeat
-  about: /about/ || user
+  about: /about/ || fas fa-user
+  RSS: atom.xml || fas fa-rss
 
 github_banner:
   enable: true
