@@ -234,6 +234,21 @@
       </tags>
   </entry>
   <entry>
+    <title>配置 Flutter 国内镜像</title>
+    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
+    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
     <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
     <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
@@ -248,21 +263,6 @@
 ]]></content>
       <tags>
         <tag>HTTP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>配置 Flutter 国内镜像</title>
-    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
-    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -929,25 +929,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Python for/while else</title>
-    <url>/2021/08/08/python-for-while-else/</url>
-    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>借助 <code>for/while else</code> 可改写成：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Python heapq 自定义比较器</title>
     <url>/2021/07/31/python-heapq-custom-comparator/</url>
     <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
@@ -960,6 +941,25 @@
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python for/while else</title>
+    <url>/2021/08/08/python-for-while-else/</url>
+    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>借助 <code>for/while else</code> 可改写成：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
 </ul>
 ]]></content>
       <tags>
