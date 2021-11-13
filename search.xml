@@ -234,21 +234,6 @@
       </tags>
   </entry>
   <entry>
-    <title>配置 Flutter 国内镜像</title>
-    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
-    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
     <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
     <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
@@ -263,6 +248,21 @@
 ]]></content>
       <tags>
         <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>配置 Flutter 国内镜像</title>
+    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
+    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -703,62 +703,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何使用 JUnit 测试异步代码</title>
-    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何使用 JUnit 测试异常信息</title>
-    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
-    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
-<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何减小 Docker 镜像的大小</title>
     <url>/2020/08/04/how-to-reduce-docker-image-size/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>首先来看一个例子，构建一个 <code>C</code> 语言版的 <code>hello world</code> 镜像：</p>
@@ -816,6 +760,62 @@
 ]]></content>
       <tags>
         <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异步代码</title>
+    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异常信息</title>
+    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
+    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
+<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
       </tags>
   </entry>
   <entry>
@@ -929,25 +929,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Python heapq 自定义比较器</title>
-    <url>/2021/07/31/python-heapq-custom-comparator/</url>
-    <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
-<h2 id="使用元组"><a href="#使用元组" class="headerlink" title="使用元组"></a>使用元组</h2><p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">numbers, k</span>):</span></span><br><span class="line">  heap = [(n, i) <span class="keyword">for</span> i, n <span class="keyword">in</span> <span class="built_in">enumerate</span>(numbers)]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap)[<span class="number">1</span>], <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>], <span class="number">3</span>)) <span class="comment"># [4, 3, 2]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="实现自定义比较器"><a href="#实现自定义比较器" class="headerlink" title="实现自定义比较器"></a>实现自定义比较器</h2><p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">    self.value = value</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">nodes, k</span>):</span></span><br><span class="line">  heap = [node <span class="keyword">for</span> node <span class="keyword">in</span> nodes]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap).value, <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([Node(<span class="number">5</span>), Node(<span class="number">4</span>), Node(<span class="number">3</span>), Node(<span class="number">2</span>), Node(<span class="number">1</span>)], <span class="number">3</span>)) <span class="comment"># [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Python for/while else</title>
     <url>/2021/08/08/python-for-while-else/</url>
     <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
@@ -960,6 +941,25 @@
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python heapq 自定义比较器</title>
+    <url>/2021/07/31/python-heapq-custom-comparator/</url>
+    <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
+<h2 id="使用元组"><a href="#使用元组" class="headerlink" title="使用元组"></a>使用元组</h2><p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">numbers, k</span>):</span></span><br><span class="line">  heap = [(n, i) <span class="keyword">for</span> i, n <span class="keyword">in</span> <span class="built_in">enumerate</span>(numbers)]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap)[<span class="number">1</span>], <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>], <span class="number">3</span>)) <span class="comment"># [4, 3, 2]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="实现自定义比较器"><a href="#实现自定义比较器" class="headerlink" title="实现自定义比较器"></a>实现自定义比较器</h2><p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">    self.value = value</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">nodes, k</span>):</span></span><br><span class="line">  heap = [node <span class="keyword">for</span> node <span class="keyword">in</span> nodes]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap).value, <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([Node(<span class="number">5</span>), Node(<span class="number">4</span>), Node(<span class="number">3</span>), Node(<span class="number">2</span>), Node(<span class="number">1</span>)], <span class="number">3</span>)) <span class="comment"># [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
 </ul>
 ]]></content>
       <tags>
