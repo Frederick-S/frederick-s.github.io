@@ -25,7 +25,7 @@ tags:
 3. 如何处理异常：重新执行某个节点上失败的 `Map` 或 `Reduce` 任务作为首要的容错手段
 
 ## 编程模型
-假设需要统计一组文档中每个单词出现的次数，在 `MapReduce` 框架下用户需要编写 `map` 和 `reduce` 函数：
+假设需要统计一组文档中每个单词出现的次数，在 `MapReduce` 框架下用户需要编写 `map` 和 `reduce` 函数，近似的伪代码表示如下：
 
 ```
 map(String key, String value):
