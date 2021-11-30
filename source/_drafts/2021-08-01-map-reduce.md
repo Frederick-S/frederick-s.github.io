@@ -43,6 +43,16 @@ reduce(String key, Iterator values):
     Emit(AsString(result));
 ```
 
+假设有两个文档 `hello.txt` 和 `world.txt`，其内容分别为：
+
+```
+hello.txt:
+It was the best of times
+
+world.txt:
+it was the worst of times
+```
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
