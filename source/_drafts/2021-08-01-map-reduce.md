@@ -53,6 +53,13 @@ world.txt:
 it was the worst of times
 ```
 
+对上述 `map` 和 `reduce` 函数来说，`map` 函数每次处理一个文档，`key` 为文档的名称，`value` 为文档的内容，即：
+
+```
+map("hello.txt", "It was the best of times")
+map("world.txt", "it was the worst of times")
+```
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
