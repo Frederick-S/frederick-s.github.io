@@ -60,6 +60,38 @@ map("hello.txt", "It was the best of times")
 map("world.txt", "it was the worst of times")
 ```
 
+`map` 函数执行时会遍历文档的内容，对每个单词输出中间结果键值对（作为示例，这里省去了将文档内容拆分为单词的过程，同时也忽略了标点符号、大小写等与示例无关的内容），键为单词，值为1，所有 `map` 函数执行完成后生成的中间结果为：
+
+```
+hello.txt:
+it 1
+was 1
+the 1
+best 1
+of 1
+times 1
+
+world.txt:
+it 1
+was 1
+the 1
+worst 1
+of 1
+times 1
+```
+
+然后，`MapReduce` 框架对所有中间结果按照相同的键进行聚合，即：
+
+```
+it [1, 1]
+was [1, 1]
+the [1, 1]
+best [1]
+worst [1]
+of [1, 1]
+times [1, 1]
+```
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
