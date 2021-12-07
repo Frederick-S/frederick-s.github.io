@@ -104,6 +104,18 @@ reduce("of", ["1", "1"])
 reduce("times", ["1", "1"])
 ```
 
+`reduce` 函数执行时会遍历 `values`，对当前单词出现的次数进行累加，然后作为 `reduce` 的结果返回，最终得到所有单词出现的次数：
+
+```
+it 2
+was 2
+the 2
+best 1
+worst 1
+of 2
+times 2
+```
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
