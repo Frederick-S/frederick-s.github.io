@@ -118,6 +118,13 @@ times 2
 
 实际执行 `reduce` 函数时，并不会将 `values` 一次性传给某个 `reduce` 节点，因为有可能数据量太大无法完全载入内存，所以 `values` 在实现时是个迭代器，`reduce` 函数能以流式的形式获取值。
 
+
+
+
+
+
+TODO: real word implementation, combiner_class?
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
