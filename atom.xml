@@ -23,7 +23,7 @@
     <published>2021-12-22T16:00:00.000Z</published>
     <updated>2021-12-22T16:00:00.000Z</updated>
     
-    <content type="html"><![CDATA[<p><code>Commodity Hardware</code> 指较为廉价的硬件设备，它具有如下特点：</p><ol><li>价格相对低廉</li><li>易采购</li><li>和同类型的硬件可相互替换</li></ol><p>由此相关的一个概念叫 <code>commodity computing</code>，即使用大量的廉价硬件来实现低成本、高性能的并行计算，与之相对的则是高成本的超级计算机。</p><p>参考：</p><ul><li><a href="https://www.suse.com/suse-defines/definition/commodity-hardware/">Commodity Hardware</a></li><li><a href="https://en.wikipedia.org/wiki/Commodity_computing">Commodity computing</a></li></ul>]]></content>
+    <content type="html"><![CDATA[<p><code>Commodity Hardware</code> 指较为廉价的硬件设备，它具有如下特点：</p><ol><li>价格相对低廉</li><li>易采购</li><li>和同类型的硬件可相互替换</li></ol><p>由此相关的一个概念叫 <code>commodity computing</code>，即使用大量的廉价硬件来实现低成本、高性能的并行计算，与之相对的则是使用较少数高成本的超级计算机。</p><p>参考：</p><ul><li><a href="https://www.suse.com/suse-defines/definition/commodity-hardware/">Commodity Hardware</a></li><li><a href="https://en.wikipedia.org/wiki/Commodity_computing">Commodity computing</a></li></ul>]]></content>
     
     
       
