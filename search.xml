@@ -55,6 +55,18 @@
       </tags>
   </entry>
   <entry>
+    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
+    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
+    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+
+<p>The regular expression shows that it doesn’t allow float numbers.</p>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Add new list field in SharePoint App upgrade</title>
     <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
     <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
@@ -83,18 +95,6 @@
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
-    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
-    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
-
-<p>The regular expression shows that it doesn’t allow float numbers.</p>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
       </tags>
   </entry>
   <entry>
@@ -201,21 +201,6 @@
       </tags>
   </entry>
   <entry>
-    <title>配置 Flutter 国内镜像</title>
-    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
-    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 TypeScript 中定义属性名未知的对象类型</title>
     <url>/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/</url>
     <content><![CDATA[<p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
@@ -231,6 +216,36 @@
 ]]></content>
       <tags>
         <tag>TypeScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
+    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
+    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>配置 Flutter 国内镜像</title>
+    <url>/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/</url>
+    <content><![CDATA[<p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -282,6 +297,24 @@
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -420,39 +453,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
-    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
-    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SSH 连接服务器时指定私钥的路径</title>
     <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
     <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
@@ -466,6 +466,25 @@
       <tags>
         <tag>Visual Studio Code</tag>
         <tag>SSH</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
+    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
+    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>需要安装以下依赖来解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Puppeteer</tag>
       </tags>
   </entry>
   <entry>
@@ -523,25 +542,6 @@
 ]]></content>
       <tags>
         <tag>.NET Core</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
-    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
-    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
-
-<p>需要安装以下依赖来解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>Puppeteer</tag>
       </tags>
   </entry>
   <entry>
@@ -631,23 +631,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何在 Finder 中显示隐藏文件</title>
-    <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
-    <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
-<ol>
-<li>在终端中输入 <code>defaults write com.apple.finder AppleShowAllFiles YES</code>，然后重启 <code>Finder</code></li>
-<li>在 <code>Finder</code> 中使用快捷键 <code>Shift + Command + &quot;.&quot;</code></li>
-</ol>
-<p>参考：</p>
-<ul>
-<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Mac</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
     <url>/2020/07/18/an-enum-switch-case-label-must-be-the-unqualified-name-of-an-enumeration-constant/</url>
     <content><![CDATA[<p><code>An enum switch case label must be the unqualified name of an enumeration constant</code> 是 <code>Java</code> 中常见的编译错误，基本上 <code>Google</code> 搜索出来的错误场景都是因为在 <code>switch</code> 中使用枚举时搭配了类名造成，例如：</p>
@@ -673,18 +656,20 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决 add-apt-repository: not found 错误</title>
-    <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
-    <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
-
+    <title>如何在 Finder 中显示隐藏文件</title>
+    <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
+    <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
+<ol>
+<li>在终端中输入 <code>defaults write com.apple.finder AppleShowAllFiles YES</code>，然后重启 <code>Finder</code></li>
+<li>在 <code>Finder</code> 中使用快捷键 <code>Shift + Command + &quot;.&quot;</code></li>
+</ol>
 <p>参考：</p>
 <ul>
-<li><a href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
+<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Ubuntu</tag>
+        <tag>Mac</tag>
       </tags>
   </entry>
   <entry>
@@ -700,6 +685,21 @@
 ]]></content>
       <tags>
         <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决 add-apt-repository: not found 错误</title>
+    <url>/2020/08/01/how-to-fix-add-apt-repository-not-found-error/</url>
+    <content><![CDATA[<p><code>Ubuntu</code> 下执行 <code>add-apt-repository</code> 添加第三方仓库时遇到 <code>add-apt-repository: not found</code> 错误，执行以下命令即可：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install software-properties-common</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu">How To Fix ‘Add-Apt-Repository Command Not Found’ On Ubuntu &amp; Debian</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -763,35 +763,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何使用 JUnit 测试异步代码</title>
-    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何使用 JUnit 测试异常信息</title>
     <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
     <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
@@ -819,19 +790,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何修改 AppVeyor 的 JDK 版本</title>
-    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
-    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>AppVeyor</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 JDK 11 中建立 jstatd 连接</title>
     <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
     <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
@@ -848,6 +806,48 @@
       <tags>
         <tag>Java</tag>
         <tag>VisualVM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何修改 AppVeyor 的 JDK 版本</title>
+    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
+    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>AppVeyor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异步代码</title>
+    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
       </tags>
   </entry>
   <entry>
@@ -929,6 +929,25 @@
       </tags>
   </entry>
   <entry>
+    <title>Python for/while else</title>
+    <url>/2021/08/08/python-for-while-else/</url>
+    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>借助 <code>for/while else</code> 可改写成：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Python heapq 自定义比较器</title>
     <url>/2021/07/31/python-heapq-custom-comparator/</url>
     <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
@@ -964,25 +983,6 @@
 ]]></content>
       <tags>
         <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Python for/while else</title>
-    <url>/2021/08/08/python-for-while-else/</url>
-    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>借助 <code>for/while else</code> 可改写成：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
