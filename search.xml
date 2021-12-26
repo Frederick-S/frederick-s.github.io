@@ -85,19 +85,6 @@
       </tags>
   </entry>
   <entry>
-    <title>How to get access to other drives in Ubuntu on Windows 10</title>
-    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
-    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
     <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
     <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
@@ -110,6 +97,19 @@
 ]]></content>
       <tags>
         <tag>Gradle</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How to get access to other drives in Ubuntu on Windows 10</title>
+    <url>/2018/12/02/how-to-get-access-to-other-drives-in-ubuntu-on-windows/</url>
+    <content><![CDATA[<p>Run <code>cd /mnt/xx</code>, where <code>xx</code> is the drive name.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://superuser.com/questions/1118546/how-do-i-change-drive-with-bash-on-windows">How do I change Drive with bash on windows?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
       </tags>
   </entry>
   <entry>
@@ -162,12 +162,12 @@
       </tags>
   </entry>
   <entry>
-    <title>VS Code error - No source control providers registered</title>
-    <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
-    <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
+    <title>How to enable word wrap in VS Code</title>
+    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
+    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -175,12 +175,12 @@
       </tags>
   </entry>
   <entry>
-    <title>How to enable word wrap in VS Code</title>
-    <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
-    <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
+    <title>VS Code error - No source control providers registered</title>
+    <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
+    <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
 <p>Reference:</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/31025502/how-to-switch-word-wrap-on-and-off-in-vscode">How to switch word wrap on and off in VSCode?</a></li>
+<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -249,6 +249,23 @@
       </tags>
   </entry>
   <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
     <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
     <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
@@ -280,41 +297,6 @@
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>HTTP</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -453,6 +435,24 @@
 ]]></content>
   </entry>
   <entry>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SSH 连接服务器时指定私钥的路径</title>
     <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
     <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
@@ -466,25 +466,6 @@
       <tags>
         <tag>Visual Studio Code</tag>
         <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
-    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
-    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
-
-<p>需要安装以下依赖来解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>Puppeteer</tag>
       </tags>
   </entry>
   <entry>
@@ -592,6 +573,25 @@
       </tags>
   </entry>
   <entry>
+    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
+    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
+    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>需要安装以下依赖来解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Puppeteer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【分享】隐私政策生成器</title>
     <url>/2020/05/04/share-privacy-policy-generator/</url>
     <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
@@ -609,6 +609,26 @@
 <p><img src="/images/nhk-1.png" alt="alt"></p>
 <p><img src="/images/nhk-2.png" alt="alt"></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>如何使用 rsync 同步数据到其他服务器</title>
+    <url>/2020/06/26/how-to-sync-data-to-remote-vps-with-rsync/</url>
+    <content><![CDATA[<p>假设我们希望将 <code>server1</code> 下的 <code>/data1</code> 目录中的数据同步到 <code>server2</code> 下的 <code>/data2</code> 目录，首先需要建立 <code>server1</code> 和 <code>server2</code> 的免密登陆，在 <code>server1</code> 上执行 <code>ssh-keygen</code>，默认情况会在 <code>~/.ssh</code> 目录下生成 <code>id_rsa</code> 和 <code>id_rsa.pub</code> 两个文件，然后将 <code>~/.ssh/id_rsa.pub</code> 文件的内容复制到 <code>server2</code> 的 <code>~/.ssh/authorized_keys</code> 文件中即可。</p>
+<p>接着，就可以使用 <code>rsync</code> 进行数据同步，具体命令为 <code>rsync -az --delete /data1/ server2-user@server2-ip:/data2</code>，其中 <code>-a</code> 表示递归同步 <code>/data1</code> 下的子文件夹及保留文件的权限、组、软连接等信息，如果不需要这些额外的文件信息而只想要递归同步可以使用 <code>-r</code> 来代替 <code>-a</code>；<code>-z</code> 表示开启文件压缩来减少网络传输；<code>--delete</code> 表示在 <code>/data1</code> 中删除的文件在 <code>/data2</code> 中也会同步删除。最后需要注意命令中 <code>/data1/</code> 末尾的 <code>/</code>，加了 <code>/</code> 表示将 <code>/data1</code> 下的所有文件同步到 <code>/data2</code>，没有 <code>/</code> 则表示将 <code>/data1</code> 这个文件夹同步到 <code>/data2</code> 下，假设 <code>/data1</code> 下有 <code>a</code>、<code>b</code>、<code>c</code> 三个文件，两种写法最后的同步区别为：</p>
+<ul>
+<li><code>/data1/</code>：<code>/data2/a,b,c</code></li>
+<li><code>/data1</code>：<code>/data2/data1/a,b,c</code></li>
+</ul>
+<p>最后，我们需要将 <code>rsync</code> 加入到定时任务中进行自动备份。执行 <code>crontab -e</code>，将定时任务添加到文件中，如每小时执行一次：<code>0 * * * * rsync -az --delete /data1/ server2-user@server2-ip:/data2</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps">How To Use Rsync to Sync Local and Remote Directories on a VPS</a></li>
+<li><a href="https://www.howtogeek.com/135533/how-to-use-rsync-to-backup-your-data-on-linux/">How to Use rsync to Backup Your Data on Linux</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>rsync</tag>
+      </tags>
   </entry>
   <entry>
     <title>An enum switch case label must be the unqualified name of an enumeration constant</title>
@@ -633,26 +653,6 @@
       <tags>
         <tag>Java</tag>
         <tag>Maven</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何使用 rsync 同步数据到其他服务器</title>
-    <url>/2020/06/26/how-to-sync-data-to-remote-vps-with-rsync/</url>
-    <content><![CDATA[<p>假设我们希望将 <code>server1</code> 下的 <code>/data1</code> 目录中的数据同步到 <code>server2</code> 下的 <code>/data2</code> 目录，首先需要建立 <code>server1</code> 和 <code>server2</code> 的免密登陆，在 <code>server1</code> 上执行 <code>ssh-keygen</code>，默认情况会在 <code>~/.ssh</code> 目录下生成 <code>id_rsa</code> 和 <code>id_rsa.pub</code> 两个文件，然后将 <code>~/.ssh/id_rsa.pub</code> 文件的内容复制到 <code>server2</code> 的 <code>~/.ssh/authorized_keys</code> 文件中即可。</p>
-<p>接着，就可以使用 <code>rsync</code> 进行数据同步，具体命令为 <code>rsync -az --delete /data1/ server2-user@server2-ip:/data2</code>，其中 <code>-a</code> 表示递归同步 <code>/data1</code> 下的子文件夹及保留文件的权限、组、软连接等信息，如果不需要这些额外的文件信息而只想要递归同步可以使用 <code>-r</code> 来代替 <code>-a</code>；<code>-z</code> 表示开启文件压缩来减少网络传输；<code>--delete</code> 表示在 <code>/data1</code> 中删除的文件在 <code>/data2</code> 中也会同步删除。最后需要注意命令中 <code>/data1/</code> 末尾的 <code>/</code>，加了 <code>/</code> 表示将 <code>/data1</code> 下的所有文件同步到 <code>/data2</code>，没有 <code>/</code> 则表示将 <code>/data1</code> 这个文件夹同步到 <code>/data2</code> 下，假设 <code>/data1</code> 下有 <code>a</code>、<code>b</code>、<code>c</code> 三个文件，两种写法最后的同步区别为：</p>
-<ul>
-<li><code>/data1/</code>：<code>/data2/a,b,c</code></li>
-<li><code>/data1</code>：<code>/data2/data1/a,b,c</code></li>
-</ul>
-<p>最后，我们需要将 <code>rsync</code> 加入到定时任务中进行自动备份。执行 <code>crontab -e</code>，将定时任务添加到文件中，如每小时执行一次：<code>0 * * * * rsync -az --delete /data1/ server2-user@server2-ip:/data2</code>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories-on-a-vps">How To Use Rsync to Sync Local and Remote Directories on a VPS</a></li>
-<li><a href="https://www.howtogeek.com/135533/how-to-use-rsync-to-backup-your-data-on-linux/">How to Use rsync to Backup Your Data on Linux</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>rsync</tag>
       </tags>
   </entry>
   <entry>
@@ -832,6 +832,24 @@
       </tags>
   </entry>
   <entry>
+    <title>为什么1不是质数</title>
+    <url>/2021/07/04/why-is-1-not-a-prime/</url>
+    <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
+<blockquote>
+<p>任何一个大于1的自然数都可以唯一分解成有限个质数的乘积。</p>
+</blockquote>
+<p>如果把1列为质数，就会破坏这种唯一性，因为在这种情况下每个自然数都有无限种分解方式，即在原有分解的基础上再乘以任意个数的1，所以1不作为质数。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://math.stackexchange.com/questions/120/why-is-1-not-a-prime-number">Why is 1 not a prime number?</a></li>
+<li><a href="https://primes.utm.edu/notes/faq/one.html">FAQ: Why is the number one not prime?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Math</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 JDK 11 中建立 jstatd 连接</title>
     <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
     <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
@@ -848,24 +866,6 @@
       <tags>
         <tag>Java</tag>
         <tag>VisualVM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>为什么1不是质数</title>
-    <url>/2021/07/04/why-is-1-not-a-prime/</url>
-    <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
-<blockquote>
-<p>任何一个大于1的自然数都可以唯一分解成有限个质数的乘积。</p>
-</blockquote>
-<p>如果把1列为质数，就会破坏这种唯一性，因为在这种情况下每个自然数都有无限种分解方式，即在原有分解的基础上再乘以任意个数的1，所以1不作为质数。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://math.stackexchange.com/questions/120/why-is-1-not-a-prime-number">Why is 1 not a prime number?</a></li>
-<li><a href="https://primes.utm.edu/notes/faq/one.html">FAQ: Why is the number one not prime?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Math</tag>
       </tags>
   </entry>
   <entry>
@@ -1035,8 +1035,8 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">name: ci</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - &#39;master&#39;</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  docker:</span><br><span class="line">    runs-on: ubuntu-latest</span><br><span class="line">    steps:</span><br><span class="line">      -</span><br><span class="line">        name: Set up QEMU</span><br><span class="line">        uses: docker&#x2F;setup-qemu-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Set up Docker Buildx</span><br><span class="line">        uses: docker&#x2F;setup-buildx-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Login to DockerHub</span><br><span class="line">        uses: docker&#x2F;login-action@v1 </span><br><span class="line">        with:</span><br><span class="line">          username: $&#123;&#123; secrets.DOCKERHUB_USERNAME &#125;&#125;</span><br><span class="line">          password: $&#123;&#123; secrets.DOCKERHUB_TOKEN &#125;&#125;</span><br><span class="line">      -</span><br><span class="line">        name: Build and push</span><br><span class="line">        id: docker_build</span><br><span class="line">        uses: docker&#x2F;build-push-action@v2</span><br><span class="line">        with:</span><br><span class="line">          push: true</span><br><span class="line">          tags: user&#x2F;app:latest</span><br></pre></td></tr></table></figure>
 
 <p>一共有三处要注意，第一开头的 <code>branches</code> 下对于新建的仓库需要填写 <code>main</code> 而不是 <code>master</code>。</p>
-<p>第二需要为 <code>Login to DockerHub</code> 阶段设置 <code>Docker</code> 的 <code>Access Token</code>，<code>Access Token</code> 通过 <code>Docker Hub</code> 的 <code>Account Settings -&gt; Security -&gt; New Access Token</code> 创建，然后通过 <code>GitHub</code> 仓库的 <code>Settings -&gt; Secrets -&gt; New repository secret</code> 分别创建 <code>DOCKERHUB_USERNAME</code> 和 <code>DOCKERHUB_TOKEN</code>。</p>
-<p>第三最后的 <code>tags: user/app:latest</code> 需要改为实际的用户名和镜像名。</p>
+<p>第二需要为 <code>Login to DockerHub</code> 阶段设置 <code>Docker</code> 的 <code>Access Token</code>，<code>Access Token</code> 可以通过 <code>Docker Hub</code> 的 <code>Account Settings -&gt; Security -&gt; New Access Token</code> 创建，然后通过 <code>GitHub</code> 仓库的 <code>Settings -&gt; Secrets -&gt; New repository secret</code> 分别创建 <code>DOCKERHUB_USERNAME</code> 和 <code>DOCKERHUB_TOKEN</code>。</p>
+<p>第三最后的 <code>tags: user/app:latest</code> 中的 <code>user</code> 和 <code>app</code> 需要修改为实际的用户名和镜像名。</p>
 <p>参考：</p>
 <ul>
 <li><a href="https://stackoverflow.com/questions/61989951/github-action-workflow-not-running">GitHub Action workflow not running</a></li>
