@@ -20,20 +20,21 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="在某些场景下，编写 Dockerfile 时需要定义变量来避免重复出现的值，例如下面的例子中，Gradle 的版本号出现了三次，如果未来需要更新 Gradle 的版本号，则需要修改三次。 123RUN wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-6.3-bin.zipRUN unzip gradle-6.3-bin.zipRUN gr">
+  <meta name="description" content="Docker Hub 的免费账户已不再支持关联 GitHub 仓库并自动构建镜像的功能，不过可以通过 GitHub Action 来自动构建和推送镜像。实现方式非常简单，Docker 官方已给出了示例（Build and push Docker images）： 123456789101112131415161718192021222324252627282930name: cion:  push">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何在 Dockerfile 中定义变量">
-<meta property="og:url" content="https://frederick-s.github.io/2020/03/28/how-to-define-a-variable-in-dockerfile/index.html">
+<meta property="og:title" content="使用 GitHub Action 自动构建和推送 Docker 镜像到 Docker Hub">
+<meta property="og:url" content="https://frederick-s.github.io/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-action/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="在某些场景下，编写 Dockerfile 时需要定义变量来避免重复出现的值，例如下面的例子中，Gradle 的版本号出现了三次，如果未来需要更新 Gradle 的版本号，则需要修改三次。 123RUN wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-6.3-bin.zipRUN unzip gradle-6.3-bin.zipRUN gr">
+<meta property="og:description" content="Docker Hub 的免费账户已不再支持关联 GitHub 仓库并自动构建镜像的功能，不过可以通过 GitHub Action 来自动构建和推送镜像。实现方式非常简单，Docker 官方已给出了示例（Build and push Docker images）： 123456789101112131415161718192021222324252627282930name: cion:  push">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-03-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-03-27T16:00:00.000Z">
+<meta property="article:published_time" content="2021-12-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-25T16:00:00.000Z">
 <meta property="article:author" content="Xiaodan Mao">
 <meta property="article:tag" content="Docker">
+<meta property="article:tag" content="GitHub Action">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://frederick-s.github.io/2020/03/28/how-to-define-a-variable-in-dockerfile/">
+<link rel="canonical" href="https://frederick-s.github.io/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-action/">
 
 
 <script id="page-configurations">
@@ -46,7 +47,7 @@
   };
 </script>
 
-  <title>如何在 Dockerfile 中定义变量 | Übung macht den Meister</title>
+  <title>使用 GitHub Action 自动构建和推送 Docker 镜像到 Docker Hub | Übung macht den Meister</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46794791-3"></script>
     <script>
@@ -206,7 +207,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/03/28/how-to-define-a-variable-in-dockerfile/">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-action/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -219,7 +220,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          如何在 Dockerfile 中定义变量
+          使用 GitHub Action 自动构建和推送 Docker 镜像到 Docker Hub
         </h1>
 
         <div class="post-meta">
@@ -229,7 +230,7 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2020-03-28 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-28T00:00:00+08:00">2020-03-28</time>
+              <time title="Created: 2021-12-26 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-26T00:00:00+08:00">2021-12-26</time>
             </span>
 
           
@@ -243,15 +244,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+        <p><code>Docker Hub</code> 的免费账户已不再支持关联 <code>GitHub</code> 仓库并自动构建镜像的功能，不过可以通过 <code>GitHub Action</code> 来自动构建和推送镜像。实现方式非常简单，<code>Docker</code> 官方已给出了示例（<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/build-and-push-docker-images">Build and push Docker images</a>）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">name: ci</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - &#39;master&#39;</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  docker:</span><br><span class="line">    runs-on: ubuntu-latest</span><br><span class="line">    steps:</span><br><span class="line">      -</span><br><span class="line">        name: Set up QEMU</span><br><span class="line">        uses: docker&#x2F;setup-qemu-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Set up Docker Buildx</span><br><span class="line">        uses: docker&#x2F;setup-buildx-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Login to DockerHub</span><br><span class="line">        uses: docker&#x2F;login-action@v1 </span><br><span class="line">        with:</span><br><span class="line">          username: $&#123;&#123; secrets.DOCKERHUB_USERNAME &#125;&#125;</span><br><span class="line">          password: $&#123;&#123; secrets.DOCKERHUB_TOKEN &#125;&#125;</span><br><span class="line">      -</span><br><span class="line">        name: Build and push</span><br><span class="line">        id: docker_build</span><br><span class="line">        uses: docker&#x2F;build-push-action@v2</span><br><span class="line">        with:</span><br><span class="line">          push: true</span><br><span class="line">          tags: user&#x2F;app:latest</span><br></pre></td></tr></table></figure>
 
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
+<p>一共有三处要注意，第一开头的 <code>branches</code> 下对于新建的仓库需要填写 <code>main</code> 而不是 <code>master</code>。</p>
+<p>第二需要为 <code>Login to DockerHub</code> 阶段设置 <code>Docker</code> 的 <code>Access Token</code>，<code>Access Token</code> 通过 <code>Docker Hub</code> 的 <code>Account Settings -&gt; Security -&gt; New Access Token</code> 创建，然后通过 <code>GitHub</code> 仓库的 <code>Settings -&gt; Secrets -&gt; New repository secret</code> 分别创建 <code>DOCKERHUB_USERNAME</code> 和 <code>DOCKERHUB_TOKEN</code>。</p>
+<p>第三最后的 <code>tags: user/app:latest</code> 需要改为实际的用户名和镜像名。</p>
 <p>参考：</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/61989951/github-action-workflow-not-running">GitHub Action workflow not running</a></li>
 </ul>
 
     </div>
@@ -268,7 +269,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>Post link: </strong>
-    <a href="https://frederick-s.github.io/2020/03/28/how-to-define-a-variable-in-dockerfile/" title="如何在 Dockerfile 中定义变量">https://frederick-s.github.io/2020/03/28/how-to-define-a-variable-in-dockerfile/</a>
+    <a href="https://frederick-s.github.io/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-action/" title="使用 GitHub Action 自动构建和推送 Docker 镜像到 Docker Hub">https://frederick-s.github.io/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-action/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -280,6 +281,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/GitHub-Action/" rel="tag"># GitHub Action</a>
           </div>
 
         
@@ -288,13 +290,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/26/online-books/" rel="prev" title="一些在线书籍（不定期更新）">
-      <i class="fa fa-chevron-left"></i> 一些在线书籍（不定期更新）
+    <a href="/2021/12/23/commodity-hardware/" rel="prev" title="Commodity Hardware">
+      <i class="fa fa-chevron-left"></i> Commodity Hardware
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/04/04/how-to-configure-ssh-key-path/" rel="next" title="SSH 连接服务器时指定私钥的路径">
-      SSH 连接服务器时指定私钥的路径 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
