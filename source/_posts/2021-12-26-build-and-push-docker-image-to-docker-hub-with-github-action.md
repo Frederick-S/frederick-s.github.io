@@ -41,9 +41,9 @@ jobs:
 
 一共有三处要注意，第一开头的 `branches` 下对于新建的仓库需要填写 `main` 而不是 `master`。
 
-第二需要为 `Login to DockerHub` 阶段设置 `Docker` 的 `Access Token`，`Access Token` 通过 `Docker Hub` 的 `Account Settings -> Security -> New Access Token` 创建，然后通过 `GitHub` 仓库的 `Settings -> Secrets -> New repository secret` 分别创建 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_TOKEN`。
+第二需要为 `Login to DockerHub` 阶段设置 `Docker` 的 `Access Token`，`Access Token` 可以通过 `Docker Hub` 的 `Account Settings -> Security -> New Access Token` 创建，然后通过 `GitHub` 仓库的 `Settings -> Secrets -> New repository secret` 分别创建 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_TOKEN`。
 
-第三最后的 `tags: user/app:latest` 需要改为实际的用户名和镜像名。
+第三最后的 `tags: user/app:latest` 中的 `user` 和 `app` 需要修改为实际的用户名和镜像名。
 
 参考：
 
