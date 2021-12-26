@@ -1,10 +1,10 @@
-title: 使用 GitHub Action 自动构建和推送 Docker 镜像到 Docker Hub
+title: 使用 GitHub Actions 自动构建和推送 Docker 镜像到 Docker Hub
 tags:
-- GitHub Action
+- GitHub Actions
 - Docker
 ---
 
-`Docker Hub` 的免费账户已不再支持关联 `GitHub` 仓库并自动构建镜像的功能，不过可以通过 `GitHub Action` 来自动构建和推送镜像。实现方式非常简单，`Docker` 官方已给出了示例（[Build and push Docker images](https://github.com/marketplace/actions/build-and-push-docker-images)）：
+`Docker Hub` 的免费账户已不再支持关联 `GitHub` 仓库并自动构建镜像的功能，不过可以通过 `GitHub Actions` 来自动构建和推送镜像。实现方式非常简单，`Docker` 官方已给出了示例（[Build and push Docker images](https://github.com/marketplace/actions/build-and-push-docker-images)）：
 
 ```
 name: ci
