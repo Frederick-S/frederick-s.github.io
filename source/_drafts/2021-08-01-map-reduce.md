@@ -132,8 +132,9 @@ reduce (k2, list(v2)) -> list(v2)
 `MapReduce` 的具体实现视硬件环境的不同而不同，论文中描述的实现是针对 `Google` 内部广泛使用的硬件环境，即通过交换以太网相连的大量廉价 `PC` 组成的集群：
 
 1. 每台机器的配置一般为双核 `x86` 处理器，2-4 `GB` 内存，运行 `Linux` 系统
-2. 
-
+2. 使用廉价网络硬件，带宽一般为 `100 Mbit/s` 或 `1 Gbit/s`，不过平均来说会小于 `bisection bandwidth`（`bisection bandwidth` 指当某个网络被分成两部分时，这两部分间的带宽）
+3. 一个集群一般由几百上千台机器组成，所以机器异常是家常便饭
+4. 
 
 
 TODO: real word implementation, combiner_class?
