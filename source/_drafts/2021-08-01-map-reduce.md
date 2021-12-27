@@ -141,3 +141,5 @@ TODO: real word implementation, combiner_class?
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
+- [Bisection bandwidth](https://en.wikipedia.org/wiki/Bisection_bandwidth)
+- [Understanding bisection bandwidth](https://networkengineering.stackexchange.com/questions/28894/understanding-bisection-bandwidth)
