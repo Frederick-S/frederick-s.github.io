@@ -140,6 +140,10 @@ reduce (k2, list(v2)) -> list(v2)
 ### 执行概览
 在 `Map` 执行阶段，框架会自动将输入数据分为 `M` 片，从而将 `Map` 任务分发到多台机器上并行执行，每台机器只处理某一片的数据。同样的，在 `Reduce` 阶段，框架首先将中间结果数据根据分片函数（例如 `hash(key) mod R`）拆分为 `R` 片，然后继续将 `Reduce` 任务分发执行，用户可自行指定 `R` 的值和实现具体的分片函数。
 
+下图展示了 `Google` 所实现的 `MapReduce` 框架的整体执行流程：
+
+![alt](/images/map-reduce.png)
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
