@@ -144,6 +144,12 @@ reduce (k2, list(v2)) -> list(v2)
 
 ![alt](/images/map-reduce.png)
 
+当用户提交 `MapReduce` 任务后，框架会执行以下一系列流程（下文中的序号和上图中的序号对应）：
+
+1. 首先 `MapReduce` 框架将输入数据分为 `M` 片，每片数据大小一般为 `16 MB` 至 `64 MB`（具体大小可由用户入参控制），然后将 `MapReduce` 程序复制到集群中的一批机器上运行。
+2. 在所有的程序拷贝中，某台机器上的程序会成为主节点（`Master`），其余称为工作节点（`Worker`），由主节点向工作节点分派任务，一共有 `M` 个 `Map` 任务和 `R` 个 `Reduce` 任务需要分派。主节点会选择空闲的工作节点分派 `Map` 或 `Reduce` 任务。
+3. 如果某个工作节点被分派了 `Map` 任务则会读取当前的数据分片，然后将输入数据解析为一组键值对后传递给用户自定义的 `Map` 函数执行。`Map` 函数产生的中间结果键值对会暂存在内存中。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
