@@ -157,6 +157,30 @@ reduce (k2, list(v2)) -> list(v2)
 当成功结束 `MapReduce` 任务后，其执行结果就保存在了 `R` 个文件中（每个文件对应一个 `Reduce` 节点的产出，文件的名字由用户所指定）。一般来说，用户不必将这 `R` 个输出文件合并成一个，它们通常会作为另一个 `MapReduce` 任务的输入，或交由其他分布式应用处理。
 
 ### Master 节点数据结构
+```
+// 任务状态，空闲、进行中、完成
+enum TaskState {
+    Idle,
+    InProgress,
+    Completed
+}
+
+class MapTask {
+    TaskState state;
+}
+
+class ReduceTask {
+    TaskState state;
+}
+
+class Worker {
+    int id;
+}
+
+class Master {
+
+}
+```
 
 参考：
 
