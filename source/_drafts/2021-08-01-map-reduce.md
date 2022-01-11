@@ -158,29 +158,70 @@ reduce (k2, list(v2)) -> list(v2)
 
 ### Master 节点数据结构
 ```
-// 任务状态，空闲、进行中、完成
+// 任务状态
 enum TaskState {
+    // 空闲
     Idle,
+
+    // 进行中
     InProgress,
+
+    // 完成
     Completed
 }
 
-class MapTask {
-    TaskState state;
+// Map 任务产生的中间结果文件
+class IntermediateFile {
+    // 文件地址
+    string location;
+
+    // 文件大小
+    long size;
 }
 
-class ReduceTask {
+// 一个 Map 或 Reduce 任务
+class Task {
+    // 任务状态
     TaskState state;
+
+    // 对应的工作节点 id
+    int workerId;
 }
 
+// 工作节点
 class Worker {
+    // 节点 id
     int id;
 }
 
-class Master {
+// Map 节点
+class MapWorker : Worker {
 
 }
+
+// Reduce 节点
+class ReduceWorker : Worker {
+    // 中间结果文件，Master 节点会不断发送中间结果文件给 Reduce 节点，当所有中间结果文件都收到后，Reduce 节点开始工作
+    IntermediateFile[] intermediateFiles;
+}
+
+// 主节点
+class Master {
+    // Map 任务
+    Task[] mapTasks;
+
+    // Reduce 任务
+    Task[] reduceTasks;
+
+    // 工作节点
+    Worker[] workers;
+
+    // 中间结果文件，Map 节点产生的中间结果文件后会通知 `Master` 节点，由 `Master` 节点转发给 `Reduce` 节点
+    IntermediateFile[] intermediateFiles;
+}
 ```
+
+### 容错
 
 参考：
 
