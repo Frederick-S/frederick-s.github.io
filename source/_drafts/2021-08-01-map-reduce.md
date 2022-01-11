@@ -156,6 +156,71 @@ reduce (k2, list(v2)) -> list(v2)
 
 当成功结束 `MapReduce` 任务后，其执行结果就保存在了 `R` 个文件中（每个文件对应一个 `Reduce` 节点的产出，文件的名字由用户所指定）。一般来说，用户不必将这 `R` 个输出文件合并成一个，它们通常会作为另一个 `MapReduce` 任务的输入，或交由其他分布式应用处理。
 
+基于上述流程，再来看在 `编程模型` 这节中的例子。假设有10个文档，分别是 `1.txt` 到 `10.txt`，每个文档中的内容为：
+
+```
+1.txt:
+It was the best of times
+
+2.txt:
+it was the worst of times
+
+3.txt:
+it was the age of wisdom
+
+4.txt:
+it was the age of foolishness
+
+5.txt:
+it was the epoch of belief
+
+6.txt:
+it was the epoch of incredulity
+
+7.txt:
+it was the season of light
+
+8.txt:
+it was the season of darkness
+
+9.txt:
+it was the spring of hope
+
+10.txt:
+it was the winter of despair
+```
+
+对应 `MapReduce` 执行流程为：
+
+1. 我们假设每两个文档的数据大小为 `16 MB`，则10个文档对应5片数据
+2. 由1所知一共有5个 `Map` 任务，不妨将 `Reduce` 任务也设为5个，并将10个文档按顺序依次分发给每个 `Map` 节点
+3. 每个 `Map` 节点处理的数据分片为两个文档，所产生的中间结果数据分别为：
+    ```
+    map worker 1:
+    it 1
+    was 1
+    the 1
+    best 1
+    of 1
+    times 1
+    it 1
+    was 1
+    the 1
+    worst 1
+    of 1
+    times 1
+
+    map worker 2:
+
+    map worker 3:
+
+    map worker 4:
+
+    map worker 5:
+
+    ```
+4. a
+
 ### Master 节点数据结构
 `Master` 节点需要维护当前所有的 `Map` 和 `Reduce` 任务，每个任务需区分不同的状态（空闲、进行中、完成），同时还需要知道每个任务对应的工作节点。作为 `Map` 节点和 `Reduce` 节点间中间结果数据的传输媒介，`Master` 节点需保存 `R` 个中间结果分区，当某个分区下新增了中间结果数据时，`Master` 节点需将其发送给 `Reduce` 节点。
 
