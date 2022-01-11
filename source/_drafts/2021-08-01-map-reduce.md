@@ -211,13 +211,60 @@ it was the winter of despair
     times 1
 
     map worker 2:
+    it 1
+    was 1
+    the 1
+    age 1
+    of 1
+    wisdom 1
+    it 1
+    was 1
+    the 1
+    age 1
+    of 1
+    foolishness 1
 
     map worker 3:
+    it 1
+    was 1
+    the 1
+    epoch 1
+    of 1
+    belief 1
+    it 1
+    was 1
+    the 1
+    epoch 1
+    of 1
+    incredulity 1
 
     map worker 4:
+    it 1
+    was 1
+    the 1
+    season 1
+    of 1
+    light 1
+    it 1
+    was 1
+    the 1
+    season 1
+    of 1
+    darkness 1
 
     map worker 5:
-
+    it 1
+    was 1
+    the 1
+    spring 1
+    of 1
+    hope 1
+    it 1
+    was 1
+    the 1
+    winter 1
+    of 1
+    despair 1
     ```
 4. a
 
