@@ -157,6 +157,10 @@ reduce (k2, list(v2)) -> list(v2)
 当成功结束 `MapReduce` 任务后，其执行结果就保存在了 `R` 个文件中（每个文件对应一个 `Reduce` 节点的产出，文件的名字由用户所指定）。一般来说，用户不必将这 `R` 个输出文件合并成一个，它们通常会作为另一个 `MapReduce` 任务的输入，或交由其他分布式应用处理。
 
 ### Master 节点数据结构
+`Master` 节点需要维护当前所有的 `Map` 和 `Reduce` 任务，每个任务需区分不同的状态（空闲、进行中、完成），同时还需要知道每个任务对应的工作节点。作为 `Map` 节点和 `Reduce` 节点间中间结果数据的传输媒介，`Master` 节点需保存 `R` 个中间结果分区，当某个分区下新增了中间结果数据时，`Master` 节点需将其发送给 `Reduce` 节点。
+
+对应数据结构简单示例如下：
+
 ```
 // 任务状态
 enum TaskState {
@@ -168,21 +172,6 @@ enum TaskState {
 
     // 完成
     Completed
-}
-
-// Map 任务产生的中间结果文件，一个 Map 任务一般会产生多个中间结果文件
-class IntermediateFile {
-    // 文件地址
-    string location;
-
-    // 文件大小
-    long size;
-}
-
-// 中间结果文件集，所有 `Map` 任务产生的中间结果文件会根据分片函数划分到 R 个区
-class IntermediateFileRegion {
-    // 中间结果文件
-    IntermediateFile[] intermediateFiles;
 }
 
 // 一个 Map 或 Reduce 任务
@@ -198,6 +187,21 @@ class Task {
 class Worker {
     // 节点 id
     int id;
+}
+
+// Map 任务产生的中间结果文件，一个 Map 任务一般会产生多个中间结果文件
+class IntermediateFile {
+    // 文件地址
+    string location;
+
+    // 文件大小
+    long size;
+}
+
+// 中间结果文件集，所有 `Map` 任务产生的中间结果文件会根据分片函数划分到 R 个区
+class IntermediateFileRegion {
+    // 中间结果文件
+    IntermediateFile[] intermediateFiles;
 }
 
 // Map 节点
