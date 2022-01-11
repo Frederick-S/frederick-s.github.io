@@ -219,7 +219,7 @@ class Master {
     // Reduce 任务，一共有 R 个
     Task[] reduceTasks;
 
-    // 工作节点
+    // 工作节点，最多有 M + R 个，一个工作节点并不是只负责 Map 或者 Reduce 任务，Master 节点会选择空闲节点分派 Map 或者 Reduce 任务
     Worker[] workers;
 
     // 中间结果文件集，一共有 R 个，Map 节点产生中间结果文件后会通知 Master 节点，由 Master 节点将某个区下的中间结果文件地址转发给 Reduce 节点
