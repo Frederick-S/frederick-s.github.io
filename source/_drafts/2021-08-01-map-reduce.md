@@ -170,13 +170,19 @@ enum TaskState {
     Completed
 }
 
-// Map 任务产生的中间结果文件
+// Map 任务产生的中间结果文件，一个 Map 任务一般会产生多个中间结果文件
 class IntermediateFile {
     // 文件地址
     string location;
 
     // 文件大小
     long size;
+}
+
+// 中间结果文件集，所有 `Map` 任务产生的中间结果文件会根据分片函数划分到 R 个区
+class IntermediateFileRegion {
+    // 中间结果文件
+    IntermediateFile[] intermediateFiles;
 }
 
 // 一个 Map 或 Reduce 任务
@@ -207,17 +213,17 @@ class ReduceWorker : Worker {
 
 // 主节点
 class Master {
-    // Map 任务
+    // Map 任务，一共有 M 个
     Task[] mapTasks;
 
-    // Reduce 任务
+    // Reduce 任务，一共有 R 个
     Task[] reduceTasks;
 
     // 工作节点
     Worker[] workers;
 
-    // 中间结果文件，Map 节点产生的中间结果文件后会通知 `Master` 节点，由 `Master` 节点转发给 `Reduce` 节点
-    IntermediateFile[] intermediateFiles;
+    // 中间结果文件集，一共有 R 个，Map 节点产生中间结果文件后会通知 Master 节点，由 Master 节点将某个区下的中间结果文件地址转发给 Reduce 节点
+    IntermediateFileRegion[] intermediateFileRegions;
 }
 ```
 
