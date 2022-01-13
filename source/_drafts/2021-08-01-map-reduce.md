@@ -149,7 +149,7 @@ reduce (k2, list(v2)) -> list(v2)
 1. 首先 `MapReduce` 框架将输入数据分为 `M` 片，每片数据大小一般为 `16 MB` 至 `64 MB`（具体大小可由用户入参控制），然后将 `MapReduce` 程序复制到集群中的一批机器上运行。
 2. 在所有的程序拷贝中，某台机器上的程序会成为主节点（`Master`），其余称为工作节点（`Worker`），由主节点向工作节点分派任务，一共有 `M` 个 `Map` 任务和 `R` 个 `Reduce` 任务需要分派。主节点会选择空闲的工作节点分派 `Map` 或 `Reduce` 任务。
 3. 如果某个工作节点被分派了 `Map` 任务则会读取当前的数据分片，然后将输入数据解析为一组键值对后传递给用户自定义的 `Map` 函数执行。`Map` 函数产生的中间结果键值对会暂存在内存中。
-4. 暂存在内存中的中间结果键值对会周期性的写入到本地磁盘中，注意前文提到这些磁盘上的数据由 `Google` 内部的分布式文件存储系统所管理，所以当前工作节点产生的中间结果键值对并不是直接写入到当前机器的磁盘上，而是会由某个分片函数将这些数据写入到文件存储系统下的 `R` 个区，这样所有键相同的中间结果数据最终会分发到相同的区中。同时，这些数据写入后的地址会回传给 `Master` 节点，`Master` 节点会将这些数据的地址发送给相应的 `Reduce` 节点。
+4. 暂存在内存中的中间结果键值对会周期性的写入到本地磁盘中，并根据某个分片函数将这些数据写入到本地磁盘下的 `R` 个区，这样相同键的中间结果数据在不同的 `Map` 节点下属于同一个区号。同时，这些数据写入后的地址会回传给 `Master` 节点，`Master` 节点会将这些数据的地址发送给相应的 `Reduce` 节点。
 5. 当 `Reduce` 节点接收到 `Master` 节点发送的中间结果数据地址通知后，将通过 `RPC` 请求根据数据地址读取 `Map` 节点生成的数据。在所有中间结果数据都读取完成后，`Reduce` 节点会先将所有中间结果数据按照键进行排序，这样所有键相同的数据就聚合在了一起。之所以要排序是因为一个 `Reduce` 节点会分发处理多个键下的中间结果数据。如果中间结果数据量太大不足以完全载入内存，则需要使用外部排序。
 6. `Reduce` 节点执行时会先遍历排序后的中间结果数据，每遇到一个新的键就会将该键及其对应的所有中间结果数据传递给用户自定义的 `Reduce` 函数执行。`Reduce` 函数执行的结果数据会追加到当前 `Reduce` 节点的最终输出文件里。
 7. 当所有 `Map` 任务和 `Reduce` 任务都执行完成后，`Master` 节点会唤醒用户程序，并将控制权交还给用户代码。
@@ -226,51 +226,66 @@ it was the epoch of incredulity
     of 1
     incredulity 1
     ```
-4. 将中间结果数据按照某个哈希函数分发到3个区，不妨为以下结果：
+4. 在每个 `Map` 节点上将中间结果数据按照某个哈希函数分发到3个区，不妨为以下结果：
     ```
-    region 1:
-    it 1
-    best 1
-    it 1
-    it 1
-    age 1
-    it 1
-    age 1
-    foolishness 1
-    it 1
-    epoch 1
-    belief 1
-    it 1
-    epoch 1
+    map worker 1:
+        region 1:
+        it 1
+        best 1
+        it 1
 
-    region 2:
-    was 1
-    of 1
-    was 1
-    of 1
-    worst 1
-    was 1
-    of 1
-    wisdom 1
-    was 1
-    of 1
-    was 1
-    of 1
-    was 1
-    of 1
+        region 2:
+        was 1
+        of 1
+        was 1
+        worst 1
+        of 1
 
-    region 3:
-    the 1
-    times 1
-    the 1
-    times 1
-    the 1
-    the 1
-    the 1
-    the 1
-    incredulity 1
+        region 3:
+        the 1
+        times 1
+        the 1
+        times 1
+
+    map worker 2:
+        region 1:
+        it 1
+        age 1
+        it 1
+        age 1
+        foolishness 1
+
+        region 2:
+        was 1
+        of 1
+        of 1
+        wisdom 1
+        was 1
+
+        region 3:
+        the 1
+        the 1
+
+    map worker 3:
+        region 1:
+        it 1
+        epoch 1
+        belief 1
+        it 1
+        epoch 1
+        
+        region 2:
+        was 1
+        of 1
+        was 1
+        of 1
+        
+        region 3:
+        the 1
+        the 1
+        incredulity 1
     ```
-5. `Reduce` 节点接收到所有中间结果数据后将其按照键排序：
+5. `Reduce` 节点按照数据分区接收到所有中间结果数据后将其按照键排序：
     ```
     reduce worker 1:
     age 1
@@ -379,7 +394,7 @@ class IntermediateFile {
     long size;
 }
 
-// 中间结果文件集，所有 `Map` 任务产生的中间结果文件会根据分片函数划分到 R 个区
+// 中间结果文件集，所有 `Map` 任务产生的中间结果文件会根据分片函数划分到本地磁盘下的 R 个区
 class IntermediateFileRegion {
     // 中间结果文件
     IntermediateFile[] intermediateFiles;
@@ -387,7 +402,8 @@ class IntermediateFileRegion {
 
 // Map 节点
 class MapWorker : Worker {
-
+    // 中间结果文件集
+    IntermediateFileRegion[] intermediateFileRegions;
 }
 
 // Reduce 节点
@@ -407,12 +423,18 @@ class Master {
     // 工作节点，最多有 M + R 个，一个工作节点并不是只负责 Map 或者 Reduce 任务，Master 节点会选择空闲节点分派 Map 或者 Reduce 任务
     Worker[] workers;
 
-    // 中间结果文件集，一共有 R 个，Map 节点产生中间结果文件后会通知 Master 节点，由 Master 节点将某个区下的中间结果文件地址转发给 Reduce 节点
+    // 中间结果文件集，一共有 R 个，由 Map 节点下的中间结果文件集聚合而来，Map 节点产生中间结果文件后会通知 Master 节点，由 Master 节点将某个区下的中间结果文件地址转发给 Reduce 节点
     IntermediateFileRegion[] intermediateFileRegions;
 }
 ```
 
 ### 容错
+因为 `MapReduce` 框架借助几百或几千台机器来处理海量数据，所以必须优雅的应对机器异常。
+
+#### 工作节点异常
+`Master` 节点会周期性的对工作节点进行探活。如果某个工作节点在一段时间内无响应，则 `Master` 节点会将该工作节点标记为异常。该工作节点完成的所有 `map` 任务的状态都会被重置为空闲，可重新被 `Master` 节点调度到其他工作节点上执行。类似的，该工作节点所有进行中的 `map` 或 `reduce` 任务也都会被重置为空闲，并重新接受调度。
+
+之所以这里已完成的 `map` 任务也需要重新执行是因为所产生的中间结果文件是保存在 `Map` 节点的本地磁盘上，当该节点无响应时同样无法通过 `RPC` 请求获取这些数据。而如果 `Reduce` 节点异常，它所完成的 `reduce` 任务不需要重新执行是因为 `Reduce` 节点产生的输出文件是保存在全局的文件系统上。
 
 参考：
 
