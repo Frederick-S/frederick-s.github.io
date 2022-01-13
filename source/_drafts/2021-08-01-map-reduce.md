@@ -402,7 +402,7 @@ class IntermediateFileRegion {
 
 // Map 节点
 class MapWorker : Worker {
-    // 中间结果文件集
+    // 中间结果文件集，一共有 R 个
     IntermediateFileRegion[] intermediateFileRegions;
 }
 
