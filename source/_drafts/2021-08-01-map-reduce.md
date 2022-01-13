@@ -270,7 +270,7 @@ it was the epoch of incredulity
     the 1
     incredulity 1
     ```
-5. `Reduce` 节点将中间结果数据按照键排序：
+5. `Reduce` 节点接收到所有中间结果数据后将其按照键排序：
     ```
     reduce worker 1:
     age 1
@@ -314,7 +314,28 @@ it was the epoch of incredulity
     times 1
     times 1
     ```
-6. a
+6. `Reduce` 节点调用用户自定义 `reduce` 函数计算单词出现次数，最终每个 `Reduce` 节点的输出文件为：
+    ```
+    reduce worker 1 output:
+    age 2
+    belief 1
+    best 1
+    epoch 2
+    foolishness 1
+    it 6
+
+    reduce worker 2 output:
+    of 6
+    was 6
+    wisdom 1
+    worst 1
+
+    reduce worker 3 output:
+    incredulity 1
+    the 6
+    times 2
+    ```
+7. 将代码控制权交还给用户代码
 
 ### Master 节点数据结构
 `Master` 节点需要维护当前所有的 `Map` 和 `Reduce` 任务，每个任务需区分不同的状态（空闲、进行中、完成），同时还需要知道每个任务对应的工作节点。作为 `Map` 节点和 `Reduce` 节点间中间结果数据的传输媒介，`Master` 节点需保存 `R` 个中间结果分区，当某个分区下新增了中间结果数据时，`Master` 节点需将其发送给 `Reduce` 节点。
