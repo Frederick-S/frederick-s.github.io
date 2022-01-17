@@ -436,6 +436,8 @@ class Master {
 
 之所以这里已完成的 `map` 任务也需要重新执行是因为所产生的中间结果文件是保存在 `Map` 节点的本地磁盘上，当该节点无响应时便认为无法与之连通从而认为无法通过 `RPC` 请求获取这些数据。而如果 `Reduce` 节点异常，它所完成的 `reduce` 任务不需要重新执行是因为 `Reduce` 节点执行成功后产生的输出文件是保存在全局的文件系统上。
 
+如果某个 `map` 任务一开始由工作节点 `A` 执行，之后由工作节点 `B` 执行（因为节点 `A` 发生了异常），则所有执行 `reduce` 任务的节点都会被通知，其中所有要从节点 `A` 读取数据但还未读取的 `reduce` 节点会转而从节点 `B` 读取数据。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
