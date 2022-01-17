@@ -438,6 +438,8 @@ class Master {
 
 如果某个 `map` 任务一开始由工作节点 `A` 执行，之后由工作节点 `B` 执行（因为节点 `A` 发生了异常），则所有执行 `reduce` 任务的节点都会被通知，其中所有要从节点 `A` 读取数据但还未读取的 `reduce` 节点会转而从节点 `B` 读取数据。
 
+`MapReduce` 框架能从容应对大量的节点异常。例如，在某次 `MapReduce` 任务中，由于对运行中的集群进行网络维护一次性造成了80台机器在几分钟内无法连通。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
