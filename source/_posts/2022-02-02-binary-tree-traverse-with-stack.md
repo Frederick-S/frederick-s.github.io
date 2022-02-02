@@ -124,6 +124,41 @@ class Solution:
         return values
 ```
 
+虽然前序遍历的非递归方案不适用于中序遍历，不过中序遍历的递归方案可略微修改适用于前序遍历，只需将 `values.append(current.val)` 放在不断入栈左子树的循环中即可：
+
+```py
+from typing import List
+
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+class Solution:
+    def preorderTraversal(self, root: TreeNode) -> List[int]:
+        values = []
+        stack = []
+        current = root
+
+        while current or stack:
+            while current:
+                values.append(current.val)
+                stack.append(current)
+                current = current.left
+
+            current = stack.pop()
+            current = current.right
+
+        return values
+```
+
+## 后序遍历
+a
+
 ## 通用模板
 a
 
