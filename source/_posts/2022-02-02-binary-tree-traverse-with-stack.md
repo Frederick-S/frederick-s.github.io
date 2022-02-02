@@ -197,7 +197,86 @@ class Solution:
 ```
 
 ## 通用模板
-a
+上述各非递归方案各不相同，是否存在和递归方案类似的通用模板方案？[这里](https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals) 给出了一种通用方案，首先需要额外引入一个数据结构来标记节点是否被访问过：
+
+```java
+private class Pair {
+    boolean visited;
+    TreeNode node;
+
+    Pair(TreeNode node, boolean visited) {
+        this.node = node;
+        this.visited = visited;
+    }
+}
+```
+
+在 `Python` 中，可简单通过元组来实现，对应模板代码为：
+
+```py
+from typing import List
+
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+class Solution:
+    def xxxTraversal(self, root: TreeNode) -> List[int]:
+        if not root:
+            return []
+        
+        stack = [(root, False)]
+        values = []
+        
+        while stack:
+            current, visited = stack.pop()
+            
+            if visited:
+                values.append(current.val)
+            else:
+                # 在这里处理左子树，右子树，根节点的入栈顺序
+                pass
+        
+        return values
+```
+
+对于三种遍历方式，上述模板方法仅在处理左子树，右子树，根节点的入栈顺序上不同，实际入栈顺序和遍历顺序相反：
+
+```py
+# 前序遍历
+if current.right:
+    stack.append((current.right, False))
+
+if current.left:
+    stack.append((current.left, False))
+
+stack.append((current, True))
+
+# 中序遍历
+if current.right:
+    stack.append((current.right, False))
+
+stack.append((current, True))
+
+if current.left:
+    stack.append((current.left, False))
+
+# 后序遍历
+stack.append((current, True))
+
+if current.right:
+    stack.append((current.right, False))
+
+if current.left:
+    stack.append((current.left, False))
+```
+
+从出栈的角度来说，上述方法和理论遍历顺序并不一致，每个节点会入栈两次，第二次入栈时才会设置 `visited` 为 `True`，但从 `visited` 的角度来说顺序是和理论遍历顺序一致的。
 
 参考：
 
