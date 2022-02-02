@@ -1,0 +1,99 @@
+title: 二叉树非递归遍历
+tags:
+- Data Structure
+- Algorithm
+---
+
+二叉树的遍历直观的解法是使用递归求解，不过同样也可使用非递归方式求解。
+
+## 前序遍历
+先来看前序遍历的递归求解：
+
+```py
+from typing import List
+
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+class Solution:
+    def preorderTraversal(self, root: TreeNode) -> List[int]:
+        values = []
+
+        self._preorder_traversal(root, values)
+
+        return values
+
+    def _preorder_traversal(self, root: TreeNode, values: List[int]) -> None:
+        if not root:
+            return
+
+        values.append(root.val)
+
+        self._preorder_traversal(root.left, values)
+        self._preorder_traversal(root.right, values)
+```
+
+对于如下的二叉树：
+
+![alt](/images/binary-tree.jpg)
+
+其调用链为：
+
+```
+_preorder_traversal(1)
+    _preorder_traversal(2)
+        _preorder_traversal(4)
+        _preorder_traversal(5)
+    _preorder_traversal(3)
+```
+
+可以看到越深的节点对应的函数调用越先返回，对应先进后出的模型，即栈。那么对于每个子树，可以先将根节点入栈，然后每次弹出栈顶的节点时，再讲左右子树的根节点入栈，由于左子树需要先于右子树被访问，所以右子树的根节点要先入栈，然后再入栈左子树的根节点：
+
+```py
+from typing import List
+
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+class Solution:
+    def preorderTraversal(self, root: TreeNode) -> List[int]:
+        if not root:
+            return []
+
+        values = []
+        stack = [root]
+
+        while stack:
+            current = stack.pop()
+            values.append(current.val)
+
+            if current.right:
+                stack.append(current.right)
+
+            if current.left:
+                stack.append(current.left)
+
+        return values
+```
+
+## 中序遍历
+
+## 通用模板
+a
+
+参考：
+
+- [[Java] This simple template can be used for 3 traversals](https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals)
+- [Preorder, Inorder, and Postorder Iteratively Summarization](https://leetcode.com/problems/binary-tree-postorder-traversal/discuss/45551/Preorder-Inorder-and-Postorder-Iteratively-Summarization)
