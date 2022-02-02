@@ -157,7 +157,44 @@ class Solution:
 ```
 
 ## 后序遍历
-a
+后序遍历和中序遍历相同，最先访问的都是最左下方的节点，所以对左子树不断入栈这段逻辑不变，不同的是当出栈时，当前出栈的节点有可能存在右子树，而右子树还还没有被访问，所以当前节点还不能出栈。因此，需要先判断栈顶的节点是否存在右子树，以及右子树是否被访问过，如果存在右子树且未被访问则转向右子树重复上述流程，否则可弹出栈顶节点。而判断栈顶的右子树是否被访问可通过比较栈顶的右子树和上一个被访问的节点来实现，如果两者相等，说明栈顶的右子树刚被访问过，否则未被访问过：
+
+```py
+from typing import List
+
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+class Solution:
+    def postorderTraversal(self, root: TreeNode) -> List[int]:
+        prev = None
+        current = root
+        stack = []
+        values = []
+
+        while current or stack:
+            while current:
+                stack.append(current)
+                current = current.left
+
+            top = stack[-1]
+
+            if top.right and prev != top.right:
+                current = top.right
+            else:
+                current = stack.pop()
+                values.append(current.val)
+                prev = current
+                current = None
+
+        return values
+```
 
 ## 通用模板
 a
