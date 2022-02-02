@@ -2,6 +2,7 @@ title: 二叉树非递归遍历
 tags:
 - Data Structure
 - Algorithm
+- Binary Tree
 ---
 
 二叉树的遍历直观的解法是使用递归求解，不过同样也可使用非递归方式求解。
