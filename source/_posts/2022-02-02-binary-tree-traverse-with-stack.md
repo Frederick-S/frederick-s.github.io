@@ -91,7 +91,38 @@ class Solution:
 ```
 
 ## 中序遍历
-在递归的方案下，前序遍历改为中序遍历只需改变下 `values.append(root.val)` 的执行位置即可，中序遍历下，最左下方的节点是最先被访问的，沿着左子树的根节点这条线，等同于一个单链表的倒序访问，单链表的倒序如果用栈来实现则是将单链表的所有节点从链表头开始遍历依次放入栈，然后再依次出栈，
+在递归的方案下，前序遍历改为中序遍历只需改变 `values.append(root.val)` 的执行位置即可，而在非递归方案下，并不能通过直接改变 `values.append(current.val)` 的执行位置来实现，因为不管放到哪个位置，都会提前访问到根节点。
+
+中序遍历下，最左下方的节点是最先被访问的，沿着左子树的根节点这条线，等同于一个单链表的倒序访问，单链表的倒序如果用栈来实现则是将单链表的所有节点从链表头开始遍历依次放入栈，然后再依次出栈，类似的，只要当前节点存在左子树，则持续将左子树的根节点压入栈，这样下次出栈时，就会先访问最左下方的节点。当某个节点出栈时，由于上述的操作，它必然是某个子树的最左下方的节点，此时需要转到该节点的右子树重复上述流程从而访问右子树的全部节点：
+
+```py
+from typing import List
+
+
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+
+class Solution:
+    def inorderTraversal(self, root: TreeNode) -> List[int]:
+        values = []
+        stack = []
+        current = root
+
+        while current or stack:
+            while current:
+                stack.append(current)
+                current = current.left
+
+            current = stack.pop()
+            values.append(current.val)
+            current = current.right
+
+        return values
+```
 
 ## 通用模板
 a
