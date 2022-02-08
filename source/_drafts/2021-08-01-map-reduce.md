@@ -2,6 +2,7 @@ title: 'MIT 6.824 Lab 1 (1) - MapReduce: Simplified Data Processing on Large Clu
 tags:
 - Paper
 - MIT 6.824
+- MapReduce
 ---
 
 ## 介绍
