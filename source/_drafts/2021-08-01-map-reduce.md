@@ -472,7 +472,7 @@ map(String key, String value):
     for each word w in value:
         r = Random(0, 1)
 
-        if r >= 0.5:
+        if r > 0.5:
             EmitIntermediate(w, "1");
         else:
             EmitIntermediate(w, "0");
@@ -490,7 +490,7 @@ reduce(String key, Iterator values):
     for each v in values:
         r = Random(0, 1)
 
-        if r >= 0.5:
+        if r > 0.5:
             result += ParseInt(v);
         else:
             result += 0;
@@ -505,6 +505,27 @@ reduce(String key, Iterator values):
 4. [0, 0]
 
 最后由 `reduce` 任务执行后的结果可能为0、1、2三种情况，而相同的输入由一个串行执行的程序来执行也是同样的结果，即不管是分布式的程序还是串行的程序最终结果都是相同的集合，所以认为两者是等价的，也是合理的。
+
+在确定性的函数下，相同的输入必然返回相同的输出，而在不确定性的函数下，不同的输入可能返回相同的输出或者相同的输入可能返回不同的输出。这就类似于知道 `x` 的定义域是 `{1, 2, 3}`，值域是 `{4, 5, 6}`，求 `f(x)`，显然 `f(x)` 存在不止唯一的解。
+
+记上述的 `map` 和 `reduce` 函数组成的串行程序为 `A`，假设有另一个串行程序 `B`，其中 `map` 函数不变，`reduce` 函数变为：
+
+```
+reduce(String key, Iterator values):
+    // key: a word
+    // values: a list of counts
+    int result = 0;
+    for each v in values:
+        r = Random(0, 1)
+
+        if r > 0.5:
+            result += 0;
+        else:
+            result += ParseInt(v);
+    Emit(AsString(result));
+```
+
+则对于单词 `was` 来说，由 `A` 或 `B` 执行的最终结果都属于集合 `{0, 1, 2}`。
 
 参考：
 
