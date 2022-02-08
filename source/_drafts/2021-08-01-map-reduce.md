@@ -497,7 +497,7 @@ reduce(String key, Iterator values):
     Emit(AsString(result));
 ```
 
-以单词 `it` 为例，经过 `map` 任务后，生成的中间结果键值对可能为以下四种情况：
+令 `R1` 为统计单词 `it` 的个数，经过 `map` 任务后，生成的中间结果键值对可能为以下四种情况：
 
 1. [0, 1]
 2. [1, 0]
@@ -525,7 +525,7 @@ reduce(String key, Iterator values):
     Emit(AsString(result));
 ```
 
-则对于单词 `was` 来说，由 `A` 或 `B` 执行的最终结果都属于集合 `{0, 1, 2}`。
+令 `R2` 为统计单词 `was` 的个数，由 `A` 或 `B` 执行的最终结果都属于集合 `{0, 1, 2}`，相比于确定性的函数，开发人员因此无法有效的审视所编写函数的行为。
 
 参考：
 
