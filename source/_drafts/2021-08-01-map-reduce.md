@@ -558,6 +558,9 @@ reduce(String key, Iterator values):
 
 在特定情况下，由于省去了大量的网络 `IO`，合并函数能显著的降低一次 `MapReduce` 任务执行的耗时。
 
+### 输入和输出类型
+`MapReduce` 框架支持从多个数据格式读取输入数据。例如，`text` 模式下将输入数据的每一行作为键值对，其中键通过文本中的偏移量来确定，而值就是当前行的内容。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
