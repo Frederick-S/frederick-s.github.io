@@ -561,6 +561,10 @@ reduce(String key, Iterator values):
 ### 输入和输出类型
 `MapReduce` 框架支持从多个数据格式读取输入数据。例如，`text` 模式下将输入数据的每一行作为键值对，其中键通过文本中的偏移量来确定，而值就是当前行的内容。另一种通用支持的格式是本身保存了已排好序的键值对。不管是哪种输入格式，`MapReduce` 都能从原始输入中准确切分出键值对供 `map` 任务使用（例如 `text` 模式保证以每一行的结束进行拆分）。用户也可实现自定义的 `reader` 接口来支持读取新的输入格式，不过大部分情况下内置的输入格式已经能满足需求。
 
+虽然前文描述过 `MapReduce` 的原始输入数据来源于文本文件，不过用户自定义的 `reader` 接口并不一定要从文本文件读取，例如还可以从数据库或内存中读取。
+
+类似的，`MapReduce` 框架也支持不同的最终输出数据的格式，用户也同样可实现支持自定义的输出格式。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
