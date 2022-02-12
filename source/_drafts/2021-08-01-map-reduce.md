@@ -573,6 +573,8 @@ reduce(String key, Iterator values):
 ### 忽略异常数据
 有时候由于用户编写的 `map` 或 `reduce` 函数存在 `bug`，导致处理某些数据时 `map` 或 `reduce` 函数必然发生异常，这就造成 `MapReduce` 任务无法正常完成。正常来说应当修复 `bug`，但有时候不可行，例如造成 `bug` 的代码可能是第三方库引入的。另一方面，有时候忽略这些造成异常的数据也是可以接受的，例如在对一个数据量非常庞大的数据集做统计分析时。因此，`MapReduce` 框架提供了一种可选的执行模式，当其检测到某些输入数据必然造成异常时，则会跳过这些数据从而使得执行流程能继续走下去。
 
+为了实现这个功能，首先每个工作节点上都安装了一个 `signal handler` 用于捕获段异常和总线异常。在执行 `map` 或 `reduce` 任务之前，`MapReduce` 框架首先将当前任务需要的参数所对应的序号保存在一个全局变量中，在执行 `map` 或 `reduce` 任务时，如果用户代码发生异常，此时 `signal handler` 能捕获到相应的异常信号，然后 `signal handler` 会发送一个 `UDP` 数据包给主节点，该数据包中包含了执行当次任务的参数序号。如果主节点发现某个数据对应的任务执行失败了多次，则会忽略该数据而不是重新执行 `map` 或 `reduce` 任务。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
