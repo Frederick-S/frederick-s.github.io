@@ -583,6 +583,24 @@ reduce(String key, Iterator values):
 
 此外，状态页面也显示了失败的工作节点，以及这些失败的工作节点对应的 `map` 或 `reduce` 任务。这有助于用户排查编写的代码中是否有 `bug`。
 
+### 计数器
+`MapReduce` 框架内部提供了一个计数器用于统计各个事件发生的次数。例如，用户可能希望统计一次任务中一共处理了多少个单词，或者有多少个德语文档建立了索引。
+
+如果要开启这个功能，用户需要编写一个命名计数器，然后在 `map` 或 `reduce` 函数中对计数器自增，例如：
+
+```
+Counter* uppercase;
+uppercase = GetCounter("uppercase);
+
+map(String name, String contents):
+    for each word w in contents:
+        if (IsCapitalized(w)):
+            uppsercase->Increment();
+        EmitIntermediate(w, "1");
+```
+
+每个工作节点上的计数器的值会周期性的发送给主节点（主节点会周期性的对工作节点进行心跳探测，工作节点会在响应结果中带上计数器的值）。主节点会对执行成功的 `map` 和 `reduce` 任务返回的计数器聚合，当整个 `MapReduce` 任务完成将控制权交还给用户代码时，用户代码可获取到创建的计数器的值。
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
