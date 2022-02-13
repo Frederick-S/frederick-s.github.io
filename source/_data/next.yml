@@ -1,6 +1,7 @@
 menu:
   home: / || fas fa-home
   tags: /tags/ || fas fa-tags
+  MIT-6.824: /mit-6.824/ || fas fa-archive
   # categories: /categories/ || th
   archives: /archives/ || fas fa-archive
   #schedule: /schedule/ || calendar
