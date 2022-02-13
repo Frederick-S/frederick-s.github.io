@@ -608,6 +608,13 @@ map(String name, String contents):
 ## 性能
 这一节主要描述 `MapReduce` 在 `Google` 内部环境下运行的性能情况，这里不再赘述。简单举例来说，在1800台机器上执行一个 `10T` 数据量的分布式 `grep` 搜索耗时约150秒。
 
+## 总结
+最后，来自 `Google` 的总结：
+
+1. 限制性的编程模型使得计算并行化变得容易，以及有着较好的容错性，这也体现了计算机领域的一个重要思想：抽象
+2. 对于大型系统来说，网络 `IO` 容易成为瓶颈
+3. 冗余执行可以作为有效降低成为性能短板的机器带来的影响的手段，另外冗余也是应对机器异常、数据丢失的方式
+
 参考：
 
 - [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/pub62/)
