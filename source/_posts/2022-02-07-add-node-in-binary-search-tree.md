@@ -7,15 +7,15 @@ tags:
 
 往一个二叉搜索树中插入一个节点后的结果并不唯一，例如对于下面的二叉搜索树：
 
-![alt](/images/bst-bst-1.png)
+![alt](/images/bst-add-1.png)
 
 如果要插入节点2，可以将2作为3的左子节点：
 
-![alt](/images/bst-bst-2.png)
+![alt](/images/bst-add-2.png)
 
 或者将2作为1的右子节点：
 
-![alt](/images/bst-bst-3.png)
+![alt](/images/bst-add-3.png)
 
 对于第一种方法，类似于往单链表的中间插入节点，既要更新前继节点的 `next` 指针，又要将新的节点的 `next` 指针指向下一个节点；而对于第二种方法，只需要将新节点挂载到目标节点的左子节点或右子节点即可，实现上较为简洁，可分为非递归和递归两种解法。
 
