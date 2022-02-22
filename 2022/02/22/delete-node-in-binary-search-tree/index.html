@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="二插搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：  第二，被删除的节点只有一个孩子节点：  第三，被删除的节点有两个孩子节点：  对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节">
+  <meta name="description" content="二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：  第二，被删除的节点只有一个孩子节点：  第三，被删除的节点有两个孩子节点：  对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节">
 <meta property="og:type" content="article">
 <meta property="og:title" content="二叉搜索树的删除">
 <meta property="og:url" content="https://frederick-s.github.io/2022/02/22/delete-node-in-binary-search-tree/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="二插搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：  第二，被删除的节点只有一个孩子节点：  第三，被删除的节点有两个孩子节点：  对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节">
+<meta property="og:description" content="二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：  第二，被删除的节点只有一个孩子节点：  第三，被删除的节点有两个孩子节点：  对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://frederick-s.github.io/images/bst-delete-1.png">
 <meta property="og:image" content="https://frederick-s.github.io/images/bst-delete-2.png">
@@ -254,7 +254,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>二插搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
+        <p>二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
 <p><img src="/images/bst-delete-1.png" alt="alt"></p>
 <p>第二，被删除的节点只有一个孩子节点：</p>
 <p><img src="/images/bst-delete-2.png" alt="alt"></p>

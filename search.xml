@@ -28,6 +28,24 @@
       </tags>
   </entry>
   <entry>
+    <title>Add new list field in SharePoint App upgrade</title>
+    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
+    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>And it works. Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
     <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
     <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
@@ -48,24 +66,6 @@
 <p>Reference:</p>
 <ul>
 <li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Add new list field in SharePoint App upgrade</title>
-    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
-    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
-<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>And it works. Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -143,6 +143,19 @@
       </tags>
   </entry>
   <entry>
+    <title>VS Code error - No source control providers registered</title>
+    <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
+    <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True</title>
     <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
     <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
@@ -162,19 +175,6 @@
       </tags>
   </entry>
   <entry>
-    <title>VS Code error - No source control providers registered</title>
-    <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
-    <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>How to enable word wrap in VS Code</title>
     <url>/2019/12/14/how-to-enable-word-wrap-in-vscode/</url>
     <content><![CDATA[<p>Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Editor: Word Wrap</code> setting, and select the desired behaviour.</p>
@@ -185,6 +185,19 @@
 ]]></content>
       <tags>
         <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vagrant 镜像下载加速</title>
+    <url>/2019/12/18/vagrant-box-speed-up/</url>
+    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Vagrant</tag>
       </tags>
   </entry>
   <entry>
@@ -203,19 +216,6 @@
 ]]></content>
       <tags>
         <tag>TypeScript</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Vagrant 镜像下载加速</title>
-    <url>/2019/12/18/vagrant-box-speed-up/</url>
-    <content><![CDATA[<p>可以使用<a href="https://mirrors.tuna.tsinghua.edu.cn/">清华大学开源软件镜像站</a>上的镜像。例如需要下载 <code>Ubuntu 18</code> 的镜像，先在站内找到对应镜像的地址（例如：<code>https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/bionic/20191211/bionic-server-cloudimg-amd64-vagrant.box</code>），然后在终端执行 <code>vagrant box add 镜像的地址 --name ubuntu/bionic</code>，下载完成后即可执行 <code>vagrant init ubuntu/bionic</code> 等操作。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://segmentfault.com/q/1010000011063709/a-1020000011064302">vagrant box国内有镜像地址可以下载吗？</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Vagrant</tag>
       </tags>
   </entry>
   <entry>
@@ -249,20 +249,21 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
 
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>HTTP</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -297,6 +298,23 @@
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
       </tags>
   </entry>
   <entry>
@@ -435,24 +453,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SSH 连接服务器时指定私钥的路径</title>
     <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
     <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
@@ -466,25 +466,6 @@
       <tags>
         <tag>Visual Studio Code</tag>
         <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
-    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
-    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
-
-<p>需要安装以下依赖来解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>Puppeteer</tag>
       </tags>
   </entry>
   <entry>
@@ -688,6 +669,25 @@
       </tags>
   </entry>
   <entry>
+    <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
+    <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
+    <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>需要安装以下依赖来解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>Puppeteer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何解决 ModuleNotFoundError: No module named &#39;distutils.util&#39; 错误</title>
     <url>/2020/08/02/how-to-fix-no-module-named-distutils.util/</url>
     <content><![CDATA[<p><code>Ubuntu</code> 下安装 <code>pip</code> 时遇到 <code>ModuleNotFoundError: No module named &#39;distutils.util&#39;</code> 错误，执行以下命令即可：</p>
@@ -700,6 +700,35 @@
 ]]></content>
       <tags>
         <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何使用 JUnit 测试异步代码</title>
+    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
+    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
       </tags>
   </entry>
   <entry>
@@ -763,35 +792,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何使用 JUnit 测试异步代码</title>
-    <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
-    <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompletableFuture&lt;String&gt; <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> CompletableFuture.supplyAsync(() -&gt; <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我们为其编写一个测试用例，并在 <code>CompletableFuture#whenComplete</code> 中判断返回值是否与预期相符，然而即使返回值与预期不符，该测试也不会抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionWontBeCaptured</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                Assert.assertEquals(<span class="string">&quot;wrongValue&quot;</span>, result);</span><br><span class="line">            &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="CompletableFuture-get"><a href="#CompletableFuture-get" class="headerlink" title="CompletableFuture#get()"></a>CompletableFuture#get()</h3><p>我们可以借助 <code>CompletableFuture#get()</code> 阻塞主线程等待结果的特点，将异步代码转成同步：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">blockMainThreadByGet</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, demoService.hello().get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><p>上述方案依赖了一个具体的异步类方法，如果实际的异步类不提供相应的同步方法，上述方案则不适合。针对这种情况，可以借助 <code>CountDownLatch</code>，初始化一个计数为1的 <code>CountDownLatch</code> 的实例，在测试方法中调用 <code>CountDownLatch#await()</code> 方法进行等待，当异步方法执行成功后在其回调中调用 <code>CountDownLatch#countDown()</code> 使计数器减1变为0，从而继续执行后续的测试判断：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">waitOnCountDown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">                countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    countDownLatch.await();</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Awaitility"><a href="#Awaitility" class="headerlink" title="Awaitility"></a>Awaitility</h3><p><a href="https://github.com/awaitility/awaitility">Awaitility</a> 让测试异步代码变得简单明了：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何使用 JUnit 测试异常信息</title>
     <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
     <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
@@ -819,6 +819,25 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 JDK 11 中建立 jstatd 连接</title>
+    <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
+    <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;file:$&#123;java.home&#125;&#x2F;lib&#x2F;tools.jar&quot; &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然而，从 <code>JDK 9</code> 开始，<code>tools.jar</code> 已被移除，需要将 <code>policy</code> 文件的内容修改为：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;jrt:&#x2F;jdk.jstatd&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">grant codebase &quot;jrt:&#x2F;jdk.internal.jvmstat&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/51032095/starting-jstatd-in-java-9">Starting jstatd in Java 9+</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>VisualVM</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何修改 AppVeyor 的 JDK 版本</title>
     <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
     <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
@@ -829,24 +848,6 @@
       <tags>
         <tag>Java</tag>
         <tag>AppVeyor</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>为什么1不是质数</title>
-    <url>/2021/07/04/why-is-1-not-a-prime/</url>
-    <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
-<blockquote>
-<p>任何一个大于1的自然数都可以唯一分解成有限个质数的乘积。</p>
-</blockquote>
-<p>如果把1列为质数，就会破坏这种唯一性，因为在这种情况下每个自然数都有无限种分解方式，即在原有分解的基础上再乘以任意个数的1，所以1不作为质数。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://math.stackexchange.com/questions/120/why-is-1-not-a-prime-number">Why is 1 not a prime number?</a></li>
-<li><a href="https://primes.utm.edu/notes/faq/one.html">FAQ: Why is the number one not prime?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Math</tag>
       </tags>
   </entry>
   <entry>
@@ -892,22 +893,58 @@
       </tags>
   </entry>
   <entry>
-    <title>如何在 JDK 11 中建立 jstatd 连接</title>
-    <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
-    <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;file:$&#123;java.home&#125;&#x2F;lib&#x2F;tools.jar&quot; &#123;</span><br><span class="line">   permission java.security.AllPermission;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>然而，从 <code>JDK 9</code> 开始，<code>tools.jar</code> 已被移除，需要将 <code>policy</code> 文件的内容修改为：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant codebase &quot;jrt:&#x2F;jdk.jstatd&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">grant codebase &quot;jrt:&#x2F;jdk.internal.jvmstat&quot; &#123;    </span><br><span class="line">   permission java.security.AllPermission;    </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
+    <title>为什么1不是质数</title>
+    <url>/2021/07/04/why-is-1-not-a-prime/</url>
+    <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
+<blockquote>
+<p>任何一个大于1的自然数都可以唯一分解成有限个质数的乘积。</p>
+</blockquote>
+<p>如果把1列为质数，就会破坏这种唯一性，因为在这种情况下每个自然数都有无限种分解方式，即在原有分解的基础上再乘以任意个数的1，所以1不作为质数。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/51032095/starting-jstatd-in-java-9">Starting jstatd in Java 9+</a></li>
+<li><a href="https://math.stackexchange.com/questions/120/why-is-1-not-a-prime-number">Why is 1 not a prime number?</a></li>
+<li><a href="https://primes.utm.edu/notes/faq/one.html">FAQ: Why is the number one not prime?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Java</tag>
-        <tag>VisualVM</tag>
+        <tag>Math</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Permissions 0644 for &#39;xxx.pem&#39; are too open</title>
+    <url>/2021/07/10/permissions-0644-for-xx-are-too-open/</url>
+    <content><![CDATA[<p>使用 <code>SSH</code> 连接到 <code>Azure</code> 的虚拟机时遇到错误：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">➜  ~ ssh -i &#x2F;path&#x2F;to&#x2F;some.pem xxx@x.x.x.x</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">Permissions 0644 for &#39;&#x2F;path&#x2F;to&#x2F;some.pem&#39; are too open.</span><br><span class="line">It is required that your private key files are NOT accessible by others.</span><br><span class="line">This private key will be ignored.</span><br><span class="line">Load key &quot;&#x2F;path&#x2F;to&#x2F;some.pem&quot;: bad permissions</span><br><span class="line">xxx@x.x.x.x: Permission denied (publickey).</span><br></pre></td></tr></table></figure>
+
+<p>这是因为创建虚拟机时从 <code>Azure</code> 下载的私钥默认权限太大，需要将其权限改为只读且仅当前用户可见：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">chmod 400 some.pem</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/8193768/trying-to-ssh-into-an-amazon-ec2-instance-permission-error">Trying to SSH into an Amazon Ec2 instance - permission error</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SSH</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python for/while else</title>
+    <url>/2021/08/08/python-for-while-else/</url>
+    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>借助 <code>for/while else</code> 可改写成：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -930,22 +967,22 @@
       </tags>
   </entry>
   <entry>
-    <title>Python for/while else</title>
-    <url>/2021/08/08/python-for-while-else/</url>
-    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+    <title>为什么 Java 方法重载不允许仅返回值类型不同</title>
+    <url>/2021/11/28/java-function-overload-return-different-type-only/</url>
+    <content><![CDATA[<p>在 <code>Java</code> 中，如果两个同名方法仅返回值类型不同，这是不允许的，即编译器不会认为这是方法重载，如下述类中的方法 <code>f</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>借助 <code>for/while else</code> 可改写成：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>编译器会提示 <code>&#39;f()&#39; is already defined in &#39;Demo&#39;</code>。假设编译器支持这种方式的方法重载，会有什么问题？在某些情况下，编译器无法区分调用的是哪个方法，例如当调用 <code>f()</code> 却忽略返回值时：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">f();</span><br></pre></td></tr></table></figure>
 
-<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
+<p>所以仅返回值类型不同不能作为方法重载的形式。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
+<li>Thinking in Java</li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Python</tag>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -972,40 +1009,23 @@
       </tags>
   </entry>
   <entry>
-    <title>为什么 Java 方法重载不允许仅返回值类型不同</title>
-    <url>/2021/11/28/java-function-overload-return-different-type-only/</url>
-    <content><![CDATA[<p>在 <code>Java</code> 中，如果两个同名方法仅返回值类型不同，这是不允许的，即编译器不会认为这是方法重载，如下述类中的方法 <code>f</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译器会提示 <code>&#39;f()&#39; is already defined in &#39;Demo&#39;</code>。假设编译器支持这种方式的方法重载，会有什么问题？在某些情况下，编译器无法区分调用的是哪个方法，例如当调用 <code>f()</code> 却忽略返回值时：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">f();</span><br></pre></td></tr></table></figure>
-
-<p>所以仅返回值类型不同不能作为方法重载的形式。</p>
+    <title>Commodity Hardware</title>
+    <url>/2021/12/23/commodity-hardware/</url>
+    <content><![CDATA[<p><code>Commodity Hardware</code> 指较为廉价的硬件设备，它具有如下特点：</p>
+<ol>
+<li>价格相对低廉</li>
+<li>易采购</li>
+<li>和同类型的硬件可相互替换</li>
+</ol>
+<p>由此相关的一个概念叫 <code>commodity computing</code>，即使用大量的廉价硬件来实现低成本、高性能的并行计算，与之相对的则是使用较少数高成本的超级计算机。</p>
 <p>参考：</p>
 <ul>
-<li>Thinking in Java</li>
+<li><a href="https://www.suse.com/suse-defines/definition/commodity-hardware/">Commodity Hardware</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Commodity_computing">Commodity computing</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Permissions 0644 for &#39;xxx.pem&#39; are too open</title>
-    <url>/2021/07/10/permissions-0644-for-xx-are-too-open/</url>
-    <content><![CDATA[<p>使用 <code>SSH</code> 连接到 <code>Azure</code> 的虚拟机时遇到错误：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">➜  ~ ssh -i &#x2F;path&#x2F;to&#x2F;some.pem xxx@x.x.x.x</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">Permissions 0644 for &#39;&#x2F;path&#x2F;to&#x2F;some.pem&#39; are too open.</span><br><span class="line">It is required that your private key files are NOT accessible by others.</span><br><span class="line">This private key will be ignored.</span><br><span class="line">Load key &quot;&#x2F;path&#x2F;to&#x2F;some.pem&quot;: bad permissions</span><br><span class="line">xxx@x.x.x.x: Permission denied (publickey).</span><br></pre></td></tr></table></figure>
-
-<p>这是因为创建虚拟机时从 <code>Azure</code> 下载的私钥默认权限太大，需要将其权限改为只读且仅当前用户可见：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">chmod 400 some.pem</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/8193768/trying-to-ssh-into-an-amazon-ec2-instance-permission-error">Trying to SSH into an Amazon Ec2 instance - permission error</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SSH</tag>
+        <tag>English</tag>
       </tags>
   </entry>
   <entry>
@@ -1025,26 +1045,6 @@
       <tags>
         <tag>Docker</tag>
         <tag>GitHub Actions</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Commodity Hardware</title>
-    <url>/2021/12/23/commodity-hardware/</url>
-    <content><![CDATA[<p><code>Commodity Hardware</code> 指较为廉价的硬件设备，它具有如下特点：</p>
-<ol>
-<li>价格相对低廉</li>
-<li>易采购</li>
-<li>和同类型的硬件可相互替换</li>
-</ol>
-<p>由此相关的一个概念叫 <code>commodity computing</code>，即使用大量的廉价硬件来实现低成本、高性能的并行计算，与之相对的则是使用较少数高成本的超级计算机。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://www.suse.com/suse-defines/definition/commodity-hardware/">Commodity Hardware</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Commodity_computing">Commodity computing</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>English</tag>
       </tags>
   </entry>
   <entry>
@@ -1133,7 +1133,7 @@
   <entry>
     <title>二叉搜索树的删除</title>
     <url>/2022/02/22/delete-node-in-binary-search-tree/</url>
-    <content><![CDATA[<p>二插搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
+    <content><![CDATA[<p>二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
 <p><img src="/images/bst-delete-1.png" alt="alt"></p>
 <p>第二，被删除的节点只有一个孩子节点：</p>
 <p><img src="/images/bst-delete-2.png" alt="alt"></p>
