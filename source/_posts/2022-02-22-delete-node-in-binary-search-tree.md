@@ -5,7 +5,7 @@ tags:
 - Binary Search Tree
 ---
 
-二插搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：
+二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：
 
 ![alt](/images/bst-delete-1.png)
 
