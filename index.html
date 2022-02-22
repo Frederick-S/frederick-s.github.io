@@ -205,6 +205,72 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/22/delete-node-in-binary-search-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/22/delete-node-in-binary-search-tree/" class="post-title-link" itemprop="url">二叉搜索树的删除</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-02-22 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-22T00:00:00+08:00">2022-02-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>二插搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
+<p><img src="/images/bst-delete-1.png" alt="alt"></p>
+<p>第二，被删除的节点只有一个孩子节点：</p>
+<p><img src="/images/bst-delete-2.png" alt="alt"></p>
+<p>第三，被删除的节点有两个孩子节点：</p>
+<p><img src="/images/bst-delete-3.png" alt="alt"></p>
+<p>对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节点，为了保持二叉搜索树的性质，我们可以使用左子树中的最大值或右子树的最小值来替代被删除的根节点。</p>
+<p>不过在实现时，考虑到实现的简便，对于第三种情况会通过直接修改当前节点的值来替代修改节点的指针指向，以上述例子来说，如果使用指针修改的方式，则需要修改节点5的左孩子指针，修改节点2的左孩子指针和右孩子指针（这里假设使用节点2来替代被删除的节点3），总共三处修改较为繁琐；而如果使用修改节点值的方式，只需要先将节点3的值改为2（这里假设使用节点2来替代被删除的节点3），然后就可以将问题转化为在余下的左子树中删除节点2。具体代码如下：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deleteNode</span>(<span class="params">self, root: TreeNode, key: <span class="built_in">int</span></span>) -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> root.val &lt; key:</span><br><span class="line">            root.right = self.deleteNode(root.right, key)</span><br><span class="line">        <span class="keyword">elif</span> root.val &gt; key:</span><br><span class="line">            root.left = self.deleteNode(root.left, key)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> root.left <span class="keyword">and</span> root.right:</span><br><span class="line">                root.val = self._find_min(root.right)</span><br><span class="line">                root.right = self.deleteNode(root.right, root.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> root.left <span class="keyword">or</span> root.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_find_min</span>(<span class="params">self, root</span>):</span></span><br><span class="line">        <span class="keyword">while</span> root.left:</span><br><span class="line">            root = root.left</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root.val</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/13/map-reduce/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -459,11 +525,11 @@
 
       
           <p>往一个二叉搜索树中插入一个节点后的结果并不唯一，例如对于下面的二叉搜索树：</p>
-<p><img src="/images/bst-bst-1.png" alt="alt"></p>
+<p><img src="/images/bst-add-1.png" alt="alt"></p>
 <p>如果要插入节点2，可以将2作为3的左子节点：</p>
-<p><img src="/images/bst-bst-2.png" alt="alt"></p>
+<p><img src="/images/bst-add-2.png" alt="alt"></p>
 <p>或者将2作为1的右子节点：</p>
-<p><img src="/images/bst-bst-3.png" alt="alt"></p>
+<p><img src="/images/bst-add-3.png" alt="alt"></p>
 <p>对于第一种方法，类似于往单链表的中间插入节点，既要更新前继节点的 <code>next</code> 指针，又要将新的节点的 <code>next</code> 指针指向下一个节点；而对于第二种方法，只需要将新节点挂载到目标节点的左子节点或右子节点即可，实现上较为简洁，可分为非递归和递归两种解法。</p>
 <h2 id="非递归"><a href="#非递归" class="headerlink" title="非递归"></a>非递归</h2><p>整体算法分为两步：</p>
 <ol>
@@ -1004,97 +1070,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/07/11/clean-up-docker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/07/11/clean-up-docker/" class="post-title-link" itemprop="url">Docker 磁盘占用清理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-07-11 00:00:00" itemprop="dateCreated datePublished" datetime="2021-07-11T00:00:00+08:00">2021-07-11</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>日常随着 <code>Docker</code> 的使用，<code>Docker</code> 会逐渐占用磁盘空间，通过 <code>docker system df</code> 可查看 <code>Docker</code> 所占用的空间：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE</span><br><span class="line">Images          20        14        22.21GB   17.07GB (76%)</span><br><span class="line">Containers      29        0         6.743GB   6.743GB (100%)</span><br><span class="line">Local Volumes   2         0         417MB     417MB (100%)</span><br><span class="line">Build Cache     0         0         0B        0B</span><br></pre></td></tr></table></figure>
-
-<p>其中 <code>Images</code> 表示镜像，<code>Containers</code> 表示容器，<code>Local Volumes</code> 表示本地卷，<code>Build Cache</code> 表示构建缓存。</p>
-<h2 id="整体清理"><a href="#整体清理" class="headerlink" title="整体清理"></a>整体清理</h2><p>可以通过 <code>docker system prune</code> 进行一次空间清理：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">WARNING! This will remove:</span><br><span class="line">  - all stopped containers</span><br><span class="line">  - all networks not used by at least one container</span><br><span class="line">  - all dangling images</span><br><span class="line">  - all dangling build cache</span><br><span class="line"></span><br><span class="line">Are you sure you want to continue? [y&#x2F;N]</span><br></pre></td></tr></table></figure>
-
-<p>该操作会删除所有停止的容器，所有未被至少一个容器使用的网络，所有的 <code>dangling</code> 镜像（在构建镜像时产生的 <code>tag</code> 为 <code>none</code> 的镜像，没有和任何其他有 <code>tag</code> 的镜像有关联），所有的 <code>dangling</code> 构建缓存（和 <code>dangling</code> 镜像同理）。</p>
-<p>更激进一点，还可以执行 <code>docker system prune -a</code>，该操作还会删除没有和运行中的容器有关联的镜像。</p>
-<h2 id="镜像清理"><a href="#镜像清理" class="headerlink" title="镜像清理"></a>镜像清理</h2><p><code>Docker</code> 镜像是某个应用（如数据库、某个程序语言的运行时）的磁盘快照，可以通过 <code>docker image ls -a</code> 查看所有的镜像（活跃的以及 <code>dangling</code> 的镜像）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY    TAG       IMAGE ID       CREATED        SIZE</span><br><span class="line">hello-world   latest    d1165f221234   4 months ago   13.3kB</span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>docker image rm &lt;name_or_id&gt;</code> 来删除某个镜像，支持批量删除多个镜像，多个镜像 <code>id</code> 之间使用空格分隔即可。不过，删除镜像要求该镜像没有被某个容器所使用，否则会提示下述类似错误：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error response from daemon: conflict: unable to delete 4cdc5dd7eaad (must be forced) - image is being used by stopped container 3d9f62acc483</span><br><span class="line">Error response from daemon: conflict: unable to delete d1165f221234 (must be forced) - image is being used by stopped container 57027ba35bdd</span><br></pre></td></tr></table></figure>
-
-<p>可以通过在执行时增加 <code>-f</code> 来强制删除镜像。</p>
-<h2 id="容器清理"><a href="#容器清理" class="headerlink" title="容器清理"></a>容器清理</h2><p>容器是某个镜像的一个运行实例，可以通过 <code>docker container ls -a</code> 查看所有的容器：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS                      PORTS     NAMES</span><br><span class="line">3d9f62acc483   4cdc5dd7eaad   &quot;&#x2F;docker-entrypoint.…&quot;   11 minutes ago   Exited (0) 11 minutes ago             sleepy_babbage</span><br></pre></td></tr></table></figure>
-
-<p>要删除一个容器必须要先停止该容器（<code>docker container stop &lt;name_or_id&gt;</code>），然后通过 <code>docker container rm &lt;name_or_id&gt;</code> 删除，同样的，和删除镜像类似，该命令支持批量删除多个容器，多个容器 <code>id</code> 之间使用空格分隔。</p>
-<h2 id="网络清理"><a href="#网络清理" class="headerlink" title="网络清理"></a>网络清理</h2><p><code>Docker</code> 网络用于容器间的通信，它们都是一些配置文件，并不会占用多大空间，可以通过 <code>docker network ls</code> 查看所有的网络：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NETWORK ID     NAME      DRIVER    SCOPE</span><br><span class="line">b96312481a51   bridge    bridge    local</span><br><span class="line">85a64f881d4d   host      host      local</span><br><span class="line">e6808b80f888   none      null      local</span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>docker network rm &lt;name_or_id&gt;</code> 来删除一个网络。</p>
-<h2 id="数据卷清理"><a href="#数据卷清理" class="headerlink" title="数据卷清理"></a>数据卷清理</h2><p><code>Docker</code> 数据卷用于持久化容器运行时保存的数据，例如通过 <code>Docker</code> 运行 <code>MySQL</code> 时指定数据卷，从而对 <code>MySQL</code> 的数据进行备份，可以通过 <code>docker volume ls</code> 查看所有的数据卷：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DRIVER    VOLUME NAME</span><br><span class="line">local     test-volume</span><br></pre></td></tr></table></figure>
-
-<p>同样的，可以通过 <code>docker volume rm &lt;name&gt;</code> 来删除指定的数据卷，或者使用 <code>docker volume prune</code> 来删除所有未和运行中的容器关联的数据卷，以及通过 <code>docker volume prune -a</code> 删除所有的数据卷。</p>
-<p>最后，<code>docker system prune -a --volumes</code> 是在 <code>docker system prune -a</code> 的基础上删除所有未使用的卷。</p>
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://dockerwebdev.com/tutorials/clean-up-docker/">How to clean your Docker data</a></li>
-<li><a target="_blank" rel="noopener" href="https://jinnabalu.medium.com/docker-frequently-used-commands-on-images-b812d76a4b8e">Dangling or Unused Images in Docker</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1164,7 +1139,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
