@@ -40,13 +40,42 @@ uid                      examplename <examplename@example.com>
 sub   rsa3072 2022-02-26 [E]
 ```
 
-其中 `E892F685E5EA9005E0A2DE31F0F732425A15D81D` 是秘钥的 `ID`，然后我们需要将公钥分发到公共的秘钥服务器上，这样 `Sonatype` 就可以通过这个公钥来验证我们所发布包的完整性：
+其中 `E892F685E5EA9005E0A2DE31F0F732425A15D81D` 是秘钥的 `ID`，然后我们需要将公钥分发到公共的秘钥服务器上，这样 `Sonatype` 就可以通过这个公钥来验证我们所发布包的签名是否正确：
 
 ```
 gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F732425A15D81D
 ```
 
 这里选择的公共秘钥服务器是 `keyserver.ubuntu.com`，也可以选择其他服务器，如 `keys.openpgp.org` 或者 `pgp.mit.edu`。
+
+## 配置 settings.xml
+为了将包发到 `Sonatype OSSRH`，需要在 `Maven` 的 `settings.xml` 中配置用户信息，即在 `servers` 下添加如下信息，这里的 `your-jira-id` 和 `your-jira-pwd` 对应第一步创建的账号和密码：
+
+```
+<server>
+    <id>ossrh</id>
+    <username>your-jira-id</username>
+    <password>your-jira-pwd</password>
+</server>
+```
+
+另外，为了在打包时对文件进行签名还需要在 `profiles` 下添加如下信息，这里的 `the_pass_phrase` 为生成 `GPG` 秘钥时设置的密码：
+
+```
+<profile>
+    <id>ossrh</id>
+    <activation>
+    <activeByDefault>true</activeByDefault>
+    </activation>
+    <properties>
+    <gpg.executable>gpg2</gpg.executable>
+    <gpg.passphrase>the_pass_phrase</gpg.passphrase>
+    </properties>
+</profile>
+```
+
+## 配置 pom.xml
+最后是配置 `pom.xml`，首先我们需要告诉 `Maven` 将包部署到 `Sonatype OSSRH`，
 
 参考：
 
