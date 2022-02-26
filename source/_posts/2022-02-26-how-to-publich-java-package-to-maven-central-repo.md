@@ -40,7 +40,16 @@ uid                      examplename <examplename@example.com>
 sub   rsa3072 2022-02-26 [E]
 ```
 
+其中 `E892F685E5EA9005E0A2DE31F0F732425A15D81D` 是秘钥的 `ID`，然后我们需要将公钥分发到公共的秘钥服务器上，这样 `Sonatype` 就可以通过这个公钥来验证我们所发布包的完整性：
+
+```
+gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F732425A15D81D
+```
+
+这里选择的秘钥服务器是 `keyserver.ubuntu.com`，也可以选择其他服务器，如 `keys.openpgp.org` 或者 `pgp.mit.edu`。
+
 参考：
 
 * [How to Publish Your Artifacts to Maven Central](https://dzone.com/articles/publish-your-artifacts-to-maven-central)
 * [Coordinates](https://central.sonatype.org/publish/requirements/coordinates/)
+* [GPG](https://central.sonatype.org/publish/requirements/gpg/)
