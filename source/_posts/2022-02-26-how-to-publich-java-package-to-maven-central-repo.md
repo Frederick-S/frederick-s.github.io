@@ -46,7 +46,7 @@ sub   rsa3072 2022-02-26 [E]
 gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F732425A15D81D
 ```
 
-这里选择的秘钥服务器是 `keyserver.ubuntu.com`，也可以选择其他服务器，如 `keys.openpgp.org` 或者 `pgp.mit.edu`。
+这里选择的公共秘钥服务器是 `keyserver.ubuntu.com`，也可以选择其他服务器，如 `keys.openpgp.org` 或者 `pgp.mit.edu`。
 
 参考：
 
