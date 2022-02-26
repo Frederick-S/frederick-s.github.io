@@ -2,6 +2,7 @@ title: 发布 JAR 包到 Maven 中央仓库
 tags:
 - Java
 - Maven
+- Kotlin
 ---
 
 `Sonatype OSSRH (OSS Repository Hosting)` 提供了 `JAR` 包发布服务，并支持自动将 `JAR` 包同步到 `Maven` 中央仓库，所以我们将 `JAR` 包发布到 `Sonatype OSSRH` 即可。
