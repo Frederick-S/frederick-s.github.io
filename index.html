@@ -205,6 +205,146 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/27/how-to-publich-java-package-to-maven-central-repo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/27/how-to-publich-java-package-to-maven-central-repo/" class="post-title-link" itemprop="url">发布 JAR 包到 Maven 中央仓库</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-02-27 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-27T00:00:00+08:00">2022-02-27</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><code>Sonatype OSSRH (OSS Repository Hosting)</code> 提供了 <code>JAR</code> 包发布服务，并支持自动将 <code>JAR</code> 包同步到 <code>Maven</code> 中央仓库，所以我们将 <code>JAR</code> 包发布到 <code>Sonatype OSSRH</code> 即可。</p>
+<h2 id="创建-Sonatype-工单"><a href="#创建-Sonatype-工单" class="headerlink" title="创建 Sonatype 工单"></a>创建 Sonatype 工单</h2><p>第一步在 <a target="_blank" rel="noopener" href="https://issues.sonatype.org/secure/Signup!default.jspa">Sonatype</a> 上注册一个账号，创建成功后在上面创建一个 <code>Issue</code>，<code>Project</code> 选择 <code>Community Support - Open Source Project Repository Hosting (OSSRH)</code>，<code>Issue Type</code> 选择 <code>New Project</code>：</p>
+<p><img src="/images/sonatype.png" alt="alt"></p>
+<p>这里要注意的是 <code>Group Id</code> 的填写，根据 <a target="_blank" rel="noopener" href="https://central.sonatype.org/publish/requirements/coordinates/">Coordinates</a> 的描述，这里分两种情况：</p>
+<ol>
+<li>你拥有某个域名，如 <code>example.com</code></li>
+<li>你没有域名，但是你的代码托管在了某个代码托管服务上，如 <code>GitHub</code></li>
+</ol>
+<p>对于第一种情况，你的 <code>Group Id</code> 可以是任何以 <code>com.example</code> 为前缀的字符串，如 <code>com.example.myawesomeproject</code>。不过，<code>Sonatype</code> 会要求你证明确实拥有 <code>example.com</code> 域名，你需要在你的域名注册商那创建一条 <code>TXT</code> 记录，其内容就是你创建的 <code>Issue</code> 的工单号，如 <code>OSSRH-12345</code>，具体步骤可参考 <a target="_blank" rel="noopener" href="https://central.sonatype.org/faq/how-to-set-txt-record/">How do I set the TXT record needed to prove ownership of my Web Domain?</a>。</p>
+<p>对于第二种情况，以 <code>GitHub</code> 为例，你的 <code>Group Id</code> 必须是 <code>io.github.myusername</code>，<code>myusername</code> 是你的 <code>GitHub</code> 账户名或者是组织名，类似的，为了证明你对 <code>myusername</code> 的所有权，你需要在 <code>myusername</code> 下创建一个公开的仓库，仓库名称为你所创建 <code>Issue</code> 的工单号，如 <code>OSSRH-12345</code>，认证完成之后你就可以删掉这个仓库。<code>Sonatype</code> 所支持的代码托管服务如下：</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Example groupId</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GitHub</td>
+<td>io.github.myusername</td>
+</tr>
+<tr>
+<td>GitLab</td>
+<td>io.gitlab.myusername</td>
+</tr>
+<tr>
+<td>Gitee</td>
+<td>io.gitee.myusername</td>
+</tr>
+<tr>
+<td>Bitbucket</td>
+<td>io.bitbucket.myusername</td>
+</tr>
+<tr>
+<td>SourceForge</td>
+<td>io.sourceforge.myusername</td>
+</tr>
+</tbody></table>
+<p>工单示例可参考 <a target="_blank" rel="noopener" href="https://issues.sonatype.org/browse/OSSRH-78488">Publish my open source java package</a>。</p>
+<h2 id="安装-GPG"><a href="#安装-GPG" class="headerlink" title="安装 GPG"></a>安装 GPG</h2><p><code>GPG</code> 用于对所发布的包进行签名，在 <a target="_blank" rel="noopener" href="https://www.gnupg.org/download/index.html">GnuPG</a> 根据自己的操作系统下载 <code>GPG</code> 安装包，安装完成后执行 <code>gpg --full-gen-key</code> 生成秘钥对，选择默认选项即可，生成秘钥对时会要求输入姓名、邮箱、注释和密码，其中密码在发布阶段会用到，秘钥生成信息类似如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pub   rsa3072 2022-02-26 [SC]</span><br><span class="line">      E892F685E5EA9005E0A2DE31F0F732425A15D81D</span><br><span class="line">uid                      examplename &lt;examplename@example.com&gt;</span><br><span class="line">sub   rsa3072 2022-02-26 [E]</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>E892F685E5EA9005E0A2DE31F0F732425A15D81D</code> 是秘钥的 <code>ID</code>，然后我们需要将公钥分发到公共的秘钥服务器上，这样 <code>Sonatype</code> 就可以通过这个公钥来验证我们所发布包的签名是否正确：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F732425A15D81D</span><br></pre></td></tr></table></figure>
+
+<p>这里选择的公共秘钥服务器是 <code>keyserver.ubuntu.com</code>，也可以选择其他服务器，如 <code>keys.openpgp.org</code> 或者 <code>pgp.mit.edu</code>。</p>
+<h2 id="配置-settings-xml"><a href="#配置-settings-xml" class="headerlink" title="配置 settings.xml"></a>配置 settings.xml</h2><p>为了将包发到 <code>Sonatype OSSRH</code>，需要在 <code>Maven</code> 的 <code>settings.xml</code> 中配置用户信息，即在 <code>servers</code> 下添加如下信息，这里的 <code>your-jira-id</code> 和 <code>your-jira-pwd</code> 对应第一步创建的账号和密码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;server&gt;</span><br><span class="line">    &lt;id&gt;ossrh&lt;&#x2F;id&gt;</span><br><span class="line">    &lt;username&gt;your-jira-id&lt;&#x2F;username&gt;</span><br><span class="line">    &lt;password&gt;your-jira-pwd&lt;&#x2F;password&gt;</span><br><span class="line">&lt;&#x2F;server&gt;</span><br></pre></td></tr></table></figure>
+
+<p>另外，为了在打包时对文件进行签名还需要在 <code>profiles</code> 下添加如下信息，这里的 <code>the_pass_phrase</code> 为生成 <code>GPG</code> 秘钥时设置的密码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;profile&gt;</span><br><span class="line">    &lt;id&gt;ossrh&lt;&#x2F;id&gt;</span><br><span class="line">    &lt;activation&gt;</span><br><span class="line">    &lt;activeByDefault&gt;true&lt;&#x2F;activeByDefault&gt;</span><br><span class="line">    &lt;&#x2F;activation&gt;</span><br><span class="line">    &lt;properties&gt;</span><br><span class="line">    &lt;gpg.executable&gt;gpg&lt;&#x2F;gpg.executable&gt;</span><br><span class="line">    &lt;gpg.passphrase&gt;the_pass_phrase&lt;&#x2F;gpg.passphrase&gt;</span><br><span class="line">    &lt;&#x2F;properties&gt;</span><br><span class="line">&lt;&#x2F;profile&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置-pom-xml"><a href="#配置-pom-xml" class="headerlink" title="配置 pom.xml"></a>配置 pom.xml</h2><p>最后是配置 <code>pom.xml</code>，首先我们需要告诉 <code>Maven</code> 将包部署到 <code>Sonatype OSSRH</code>，需要增加一个 <code>nexus-staging-maven-plugin</code> 插件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;distributionManagement&gt;</span><br><span class="line">  &lt;snapshotRepository&gt;</span><br><span class="line">    &lt;id&gt;ossrh&lt;&#x2F;id&gt;</span><br><span class="line">    &lt;url&gt;https:&#x2F;&#x2F;s01.oss.sonatype.org&#x2F;content&#x2F;repositories&#x2F;snapshots&lt;&#x2F;url&gt;</span><br><span class="line">  &lt;&#x2F;snapshotRepository&gt;</span><br><span class="line">&lt;&#x2F;distributionManagement&gt;</span><br><span class="line">&lt;build&gt;</span><br><span class="line">  &lt;plugins&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.sonatype.plugins&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;nexus-staging-maven-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;1.6.7&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;extensions&gt;true&lt;&#x2F;extensions&gt;</span><br><span class="line">      &lt;configuration&gt;</span><br><span class="line">        &lt;serverId&gt;ossrh&lt;&#x2F;serverId&gt;</span><br><span class="line">        &lt;nexusUrl&gt;https:&#x2F;&#x2F;s01.oss.sonatype.org&#x2F;&lt;&#x2F;nexusUrl&gt;</span><br><span class="line">        &lt;autoReleaseAfterClose&gt;true&lt;&#x2F;autoReleaseAfterClose&gt;</span><br><span class="line">      &lt;&#x2F;configuration&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">  &lt;&#x2F;plugins&gt;</span><br><span class="line">&lt;&#x2F;build&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然后是配置 <code>Javadoc</code> 和源码插件，如果最后的 <code>JAR</code> 包没有包含 <code>Javadoc</code> 和源码，<code>Sonatype</code> 会不允许通过：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">  &lt;plugins&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.apache.maven.plugins&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;maven-source-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;2.2.1&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;executions&gt;</span><br><span class="line">        &lt;execution&gt;</span><br><span class="line">          &lt;id&gt;attach-sources&lt;&#x2F;id&gt;</span><br><span class="line">          &lt;goals&gt;</span><br><span class="line">            &lt;goal&gt;jar-no-fork&lt;&#x2F;goal&gt;</span><br><span class="line">          &lt;&#x2F;goals&gt;</span><br><span class="line">        &lt;&#x2F;execution&gt;</span><br><span class="line">      &lt;&#x2F;executions&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.apache.maven.plugins&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;maven-javadoc-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;2.9.1&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;executions&gt;</span><br><span class="line">        &lt;execution&gt;</span><br><span class="line">          &lt;id&gt;attach-javadocs&lt;&#x2F;id&gt;</span><br><span class="line">          &lt;goals&gt;</span><br><span class="line">            &lt;goal&gt;jar&lt;&#x2F;goal&gt;</span><br><span class="line">          &lt;&#x2F;goals&gt;</span><br><span class="line">        &lt;&#x2F;execution&gt;</span><br><span class="line">      &lt;&#x2F;executions&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">  &lt;&#x2F;plugins&gt;</span><br><span class="line">&lt;&#x2F;build&gt;</span><br></pre></td></tr></table></figure>
+
+<p>不过上述配置不适合 <code>Kotlin</code> 项目，会提示 <code>Missing: no javadoc jar found in folder &#39;/com/example/username/awesomeproject&#39;</code>，需要将 <code>maven-javadoc-plugin</code> 替换为 <code>dokka-maven-plugin</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">  &lt;plugins&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">        &lt;groupId&gt;org.jetbrains.dokka&lt;&#x2F;groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;dokka-maven-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">            &lt;execution&gt;</span><br><span class="line">                &lt;phase&gt;package&lt;&#x2F;phase&gt;</span><br><span class="line">                &lt;id&gt;attach-javadocs-dokka&lt;&#x2F;id&gt;</span><br><span class="line">                &lt;goals&gt;</span><br><span class="line">                    &lt;goal&gt;javadocJar&lt;&#x2F;goal&gt;</span><br><span class="line">                &lt;&#x2F;goals&gt;</span><br><span class="line">            &lt;&#x2F;execution&gt;</span><br><span class="line">        &lt;&#x2F;executions&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">  &lt;&#x2F;plugins&gt;</span><br><span class="line">&lt;&#x2F;build&gt;</span><br></pre></td></tr></table></figure>
+
+<p>最后，剩下补充一些元数据，这个也是必填项，包括：</p>
+<ul>
+<li>项目名称，描述和地址</li>
+<li>许可证信息</li>
+<li>开发者信息</li>
+<li>源码地址</li>
+</ul>
+<p>完整的示例可参考：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;project xmlns&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0&quot;</span><br><span class="line">xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0 http:&#x2F;&#x2F;maven.apache.org&#x2F;maven-v4_0_0.xsd&quot;&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;&#x2F;modelVersion&gt;</span><br><span class="line"></span><br><span class="line">  &lt;groupId&gt;com.simpligility.training&lt;&#x2F;groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;ossrh-demo&lt;&#x2F;artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.0&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;packaging&gt;jar&lt;&#x2F;packaging&gt;</span><br><span class="line"></span><br><span class="line">  &lt;name&gt;ossrh-demo&lt;&#x2F;name&gt;</span><br><span class="line">  &lt;description&gt;A demo for deployment to the Central Repository via OSSRH&lt;&#x2F;description&gt;</span><br><span class="line">  &lt;url&gt;http:&#x2F;&#x2F;github.com&#x2F;simpligility&#x2F;ossrh-demo&lt;&#x2F;url&gt;</span><br><span class="line"></span><br><span class="line">  &lt;licenses&gt;</span><br><span class="line">    &lt;license&gt;</span><br><span class="line">      &lt;name&gt;The Apache Software License, Version 2.0&lt;&#x2F;name&gt;</span><br><span class="line">      &lt;url&gt;http:&#x2F;&#x2F;www.apache.org&#x2F;licenses&#x2F;LICENSE-2.0.txt&lt;&#x2F;url&gt;</span><br><span class="line">    &lt;&#x2F;license&gt;</span><br><span class="line">  &lt;&#x2F;licenses&gt;</span><br><span class="line"></span><br><span class="line">  &lt;developers&gt;</span><br><span class="line">    &lt;developer&gt;</span><br><span class="line">      &lt;name&gt;Manfred Moser&lt;&#x2F;name&gt;</span><br><span class="line">      &lt;email&gt;manfred@sonatype.com&lt;&#x2F;email&gt;</span><br><span class="line">      &lt;organization&gt;Sonatype&lt;&#x2F;organization&gt;</span><br><span class="line">      &lt;organizationUrl&gt;http:&#x2F;&#x2F;www.sonatype.com&lt;&#x2F;organizationUrl&gt;</span><br><span class="line">    &lt;&#x2F;developer&gt;</span><br><span class="line">  &lt;&#x2F;developers&gt;</span><br><span class="line"></span><br><span class="line">  &lt;scm&gt;</span><br><span class="line">    &lt;connection&gt;scm:git:git:&#x2F;&#x2F;github.com&#x2F;simpligility&#x2F;ossrh-demo.git&lt;&#x2F;connection&gt;</span><br><span class="line">    &lt;developerConnection&gt;scm:git:ssh:&#x2F;&#x2F;github.com:simpligility&#x2F;ossrh-demo.git&lt;&#x2F;developerConnection&gt;</span><br><span class="line">    &lt;url&gt;http:&#x2F;&#x2F;github.com&#x2F;simpligility&#x2F;ossrh-demo&#x2F;tree&#x2F;master&lt;&#x2F;url&gt;</span><br><span class="line">  &lt;&#x2F;scm&gt;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;project&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="发包"><a href="#发包" class="headerlink" title="发包"></a>发包</h2><p>执行 <code>mvn clean deploy</code> 即可发包，如果执行成功，在提交的工单中会自动增加一条回复：</p>
+<blockquote>
+<p>Central sync is activated for com.example.awesomeproject. After you successfully release, your component will be available to the public on Central <a target="_blank" rel="noopener" href="https://repo1.maven.org/maven2/">https://repo1.maven.org/maven2/</a>, typically within 30 minutes, though updates to <a target="_blank" rel="noopener" href="https://search.maven.org/">https://search.maven.org</a> can take up to four hours.</p>
+</blockquote>
+<p>也就是30分钟内即可从 <code>Maven</code> 中央仓库下载 <code>JAR</code> 包，不过要想能在 <code>search.maven.org</code> 搜索到你的 <code>JAR</code> 包，需要等待至多4个小时。</p>
+<p>另外，因为配置 <code>nexus-staging-maven-plugin</code> 时指定了 <code>autoReleaseAfterClose</code> 为 <code>true</code>，所以发包后不需要去 <code>https://oss.sonatype.org/#stagingRepositories</code> 手动执行 <code>close</code> 和 <code>release</code> 操作。</p>
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://dzone.com/articles/publish-your-artifacts-to-maven-central">How to Publish Your Artifacts to Maven Central</a></li>
+<li><a target="_blank" rel="noopener" href="https://central.sonatype.org/publish/requirements/coordinates/">Coordinates</a></li>
+<li><a target="_blank" rel="noopener" href="https://central.sonatype.org/publish/requirements/gpg/">GPG</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/22/delete-node-in-binary-search-tree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1002,74 +1142,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/07/31/python-heapq-custom-comparator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/07/31/python-heapq-custom-comparator/" class="post-title-link" itemprop="url">Python heapq 自定义比较器</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-07-31 00:00:00" itemprop="dateCreated datePublished" datetime="2021-07-31T00:00:00+08:00">2021-07-31</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
-<h2 id="使用元组"><a href="#使用元组" class="headerlink" title="使用元组"></a>使用元组</h2><p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">numbers, k</span>):</span></span><br><span class="line">  heap = [(n, i) <span class="keyword">for</span> i, n <span class="keyword">in</span> <span class="built_in">enumerate</span>(numbers)]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap)[<span class="number">1</span>], <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>], <span class="number">3</span>)) <span class="comment"># [4, 3, 2]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="实现自定义比较器"><a href="#实现自定义比较器" class="headerlink" title="实现自定义比较器"></a>实现自定义比较器</h2><p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">    self.value = value</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">nodes, k</span>):</span></span><br><span class="line">  heap = [node <span class="keyword">for</span> node <span class="keyword">in</span> nodes]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap).value, <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([Node(<span class="number">5</span>), Node(<span class="number">4</span>), Node(<span class="number">3</span>), Node(<span class="number">2</span>), Node(<span class="number">1</span>)], <span class="number">3</span>)) <span class="comment"># [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1139,7 +1211,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
