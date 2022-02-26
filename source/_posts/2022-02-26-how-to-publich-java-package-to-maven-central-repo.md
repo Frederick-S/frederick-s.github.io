@@ -18,6 +18,16 @@ tags:
 
 对于第一种情况，你的 `Group Id` 可以是任何以 `com.example` 为前缀的字符串，如 `com.example.myawesomeproject`。不过，`Sonatype` 会要求你证明确实拥有 `example.com` 域名，你需要在你的域名注册商那创建一条 `TXT` 记录，其内容就是你创建的 `Issue` 的工单号，如 `OSSRH-12345`，具体步骤可参考 [How do I set the TXT record needed to prove ownership of my Web Domain?](https://central.sonatype.org/faq/how-to-set-txt-record/)。
 
+对于第二种情况，以 `GitHub` 为例，你的 `Group Id` 必须是 `io.github.myusername`，`myusername` 是你的 `GitHub` 账户名或者是组织名，类似的，为了证明你对 `myusername` 的所有权，你需要在 `myusername` 下创建一个公开的仓库，仓库名称为你所创建 `Issue` 的工单号，如 `OSSRH-12345`。`Sonatype` 所支持的代码托管服务如下：
+
+|Service   |Example groupId   |
+|---|---|
+|GitHub   | 	io.github.myusername   |
+|GitLab   | 	io.gitlab.myusername   |
+|Gitee   | 	io.gitee.myusername   |
+|Bitbucket   | 	io.bitbucket.myusername   |
+|SourceForge   |io.sourceforge.myusername   |
+
 参考：
 
 * [How to Publish Your Artifacts to Maven Central](https://dzone.com/articles/publish-your-artifacts-to-maven-central)
