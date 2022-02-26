@@ -158,7 +158,7 @@ gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F7324
 </build>
 ```
 
-最后，剩下补充一些元数据，包括：
+最后，剩下补充一些元数据，这个也是必填项，包括：
 
 * 项目名称，描述和地址
 * 许可证信息
@@ -216,6 +216,8 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 > Central sync is activated for com.example.awesomeproject. After you successfully release, your component will be available to the public on Central https://repo1.maven.org/maven2/, typically within 30 minutes, though updates to https://search.maven.org can take up to four hours.
 
 也就是30分钟内即可从 `Maven` 中央仓库下载 `JAR` 包，不过要想能在 `search.maven.org` 搜索到你的 `JAR` 包，需要等待至多4个小时。
+
+另外，因为配置 `nexus-staging-maven-plugin` 时指定了 `autoReleaseAfterClose` 为 `true`，所以发包后不需要去 `https://oss.sonatype.org/#stagingRepositories` 手动执行 `close` 和 `release` 操作。
 
 参考：
 
