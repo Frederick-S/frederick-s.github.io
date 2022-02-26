@@ -68,7 +68,7 @@ gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F7324
     <activeByDefault>true</activeByDefault>
     </activation>
     <properties>
-    <gpg.executable>gpg2</gpg.executable>
+    <gpg.executable>gpg</gpg.executable>
     <gpg.passphrase>the_pass_phrase</gpg.passphrase>
     </properties>
 </profile>
