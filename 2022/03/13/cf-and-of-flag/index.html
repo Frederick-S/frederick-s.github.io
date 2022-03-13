@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="看汇编语言时看到，标志寄存器中 CF 标志位表示无符号数运算时是否向最高有效位外的更高位产生进位或借位，而 OF 标志位表示有符号数运算时是否产生溢出。这里存在两个疑问：  对于 CPU 来说，它并不区分处理的是无符号数还是有符号数，那什么时候设置 CF，什么时候设置 OF 呢 CF 表示进位时也是一种溢出，能否和 OF 共用一个  CF首先来看 CF 进位的例子，这里我们以8位无符号数为例，其最">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CF 和 OF 标志位">
+<meta property="og:url" content="https://frederick-s.github.io/2022/03/13/cf-and-of-flag/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="看汇编语言时看到，标志寄存器中 CF 标志位表示无符号数运算时是否向最高有效位外的更高位产生进位或借位，而 OF 标志位表示有符号数运算时是否产生溢出。这里存在两个疑问：  对于 CPU 来说，它并不区分处理的是无符号数还是有符号数，那什么时候设置 CF，什么时候设置 OF 呢 CF 表示进位时也是一种溢出，能否和 OF 共用一个  CF首先来看 CF 进位的例子，这里我们以8位无符号数为例，其最">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-1.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-2.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-3.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-4.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-5.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-6.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-7.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/cf-of-8.png">
+<meta property="article:published_time" content="2022-03-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-12T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="CPU">
+<meta property="article:tag" content="Assembly Language">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frederick-s.github.io/images/cf-of-1.png">
+
+<link rel="canonical" href="https://frederick-s.github.io/2022/03/13/cf-and-of-flag/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>CF 和 OF 标志位 | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46794791-3"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-46794791-3');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Übung macht den Meister</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-mit-6.824">
+
+    <a href="/mit-6.824/" rel="section"><i class="fas fa-landmark fa-fw"></i>MIT 6.824</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/03/13/cf-and-of-flag/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CF 和 OF 标志位
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-03-13 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-13T00:00:00+08:00">2022-03-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>看汇编语言时看到，标志寄存器中 <code>CF</code> 标志位表示无符号数运算时是否向最高有效位外的更高位产生进位或借位，而 <code>OF</code> 标志位表示有符号数运算时是否产生溢出。这里存在两个疑问：</p>
+<ol>
+<li>对于 <code>CPU</code> 来说，它并不区分处理的是无符号数还是有符号数，那什么时候设置 <code>CF</code>，什么时候设置 <code>OF</code> 呢</li>
+<li><code>CF</code> 表示进位时也是一种溢出，能否和 <code>OF</code> 共用一个</li>
+</ol>
+<h2 id="CF"><a href="#CF" class="headerlink" title="CF"></a>CF</h2><p>首先来看 <code>CF</code> 进位的例子，这里我们以8位无符号数为例，其最大值为255，那么计算 <code>255 + 1</code> 则会产生进位。可以通过一段简单的汇编代码进行验证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $255, %al</span><br><span class="line">    add $1, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，<code>al</code> 是一个8位寄存器，是 <code>eax</code> 寄存器的低8位，这里首先将255放到 <code>al</code> 寄存器内，然后对 <code>al</code> 寄存器中的值加1并放回到 <code>al</code> 寄存器中，即实现 <code>255 +1</code> 的运算。</p>
+<p>最后的 <code>int $0x80</code> 中的 <code>int</code> 表示 <code>interrupt</code>，即中断，当发生一个中断时会有一个与之对应的中断处理程序来处理，这里的 <code>$0x80</code> 就是声明由哪个中断处理程序处理，在 <code>Linux</code> 中，<code>$0x80</code> 对应的是操作系统内核，用于发起一个系统调用，而具体发起哪个系统调用则由 <code>eax</code> 中的值决定，这就是 <code>movl $1, %eax</code> 的作用，1对应的系统调用是 <code>exit</code>，用于退出程序，而程序退出时会伴有一个状态码，这个状态码的值来自于 <code>ebx</code>，也就是 <code>movl $0, %ebx</code> 的作用，这里使用0来表示程序正常退出。</p>
+<p>接下来我们借助 <code>gdb</code> 来观察程序运行时 <code>CF</code> 的值的变化。首先将上述代码保存为 <code>demo.s</code> 后进行编译：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">as demo.s -o demo.o -gstabs+</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>-gstabs+</code> 表示生成机器码时同时生成调试信息，如果没有这个选项后续 <code>gdb</code> 加载时会提示 <code>(No debugging symbols found in ./demo)</code>。</p>
+<p>然后进行链接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ld demo.o -o demo</span><br></pre></td></tr></table></figure>
+
+<p>这个时候就可以通过 <code>gdb</code> 加载生成的可执行文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb .&#x2F;demo</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/cf-of-1.png" alt="alt"></p>
+<p>然后输入 <code>break 4</code> 在代码第四行设置一个断点，即 <code>mov $255, %al</code> 处，最后输入 <code>run</code> 开始调试执行：</p>
+<p><img src="/images/cf-of-2.png" alt="alt"></p>
+<p>此时可输入 <code>layout reg</code> 来观察各寄存器内的值，我们需要关注的是 <code>eflags</code> 寄存器，它展示了哪些标志位生效了：</p>
+<p><img src="/images/cf-of-3.png" alt="alt"></p>
+<p>或者通过执行 <code>info registers eflags</code> 来查看 <code>eflags</code> 的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info registers eflags</span><br><span class="line">eflags         0x202               [ IF ]</span><br></pre></td></tr></table></figure>
+
+<p>目前只有一个 <code>IF</code> 标志位，它用于表示是否响应中断。</p>
+<p>接着，输入 <code>next</code> 来执行当前断点所在处的指令，可以看到，执行后 <code>rax</code> 寄存器内的值变成了255（<code>rax</code> 是64位 <code>CPU</code> 下的一个通用寄存器，32位 <code>CPU</code> 下对应为 <code>eax</code>）：</p>
+<p><img src="/images/cf-of-4.png" alt="alt"></p>
+<p>再输入一次 <code>next</code> 来执行加法运算，此时 <code>rax</code> 中的值变为了0（实际的二进制结果应该是100000000，因为 <code>al</code> 寄存器最多只能表示8位，所以最高位的1无法表示，最终结果为0），<code>eflags</code> 中出现了 <code>CF</code> 标志位，说明发生了进位：</p>
+<p><img src="/images/cf-of-5.png" alt="alt"></p>
+<p><code>rax</code> 中的值为0也说明了加法运算后产生的进位并不会体现在比参与运算的寄存器位数更多的寄存器中，否则 <code>rax</code> 中的值应该是256。</p>
+<p>再来看借位，将程序稍加修改执行一个 <code>1 - 2</code> 的运算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $1, %al</span><br><span class="line">    sub $2, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>最后 <code>rax</code> 中的值为255（存在高位借位的情况下最后的二进制结果为11111111，解释为无符号数为255），<code>eflags</code> 中同样出现了 <code>CF</code> 标志位。</p>
+<p><img src="/images/cf-of-6.png" alt="alt"></p>
+<p>所以，<code>CF</code> 的标记取决于两个二进制数的运算是否产生进位或借位。</p>
+<h2 id="OF"><a href="#OF" class="headerlink" title="OF"></a>OF</h2><p>有符号数的溢出分两种情况，一种是运算结果应该是正数却返回负数，另一种是运算结果应该是负数却返回正数。</p>
+<p>首先来看两个正数运算得到负数的例子，同样对代码稍加修改实现 <code>127 + 1</code> 的运算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $127, %al</span><br><span class="line">    add $1, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>最后 <code>rax</code> 中的值为128（对应二进制表示为10000000，以有符号数的角度来看，其值为-128，即两个正数相加得到一个负数），<code>eflags</code> 中出现了 <code>OF</code> 标志位，说明发生了溢出：</p>
+<p><img src="/images/cf-of-7.png" alt="alt"></p>
+<p>从有符号数的角度来看，参与运算的两个数的符号位都是0，相加后符号位却是1，所以 <code>OF</code> 设置为1。</p>
+<p>再来看两个负数运算得到正数的例子，再次对代码稍加修改实现 <code>-128 - 1</code> 的运算，-128的二进制补码表示为10000000，即无符号数角度下的128，-1的二进制补码表示为11111111，即无符号数角度下的255：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $128, %al</span><br><span class="line">    add $255, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>最后 <code>rax</code> 中的值为127（对应二进制表示为01111111，以有符号数的角度来看，其值为127，即两个负数相加得到一个正数），<code>eflags</code> 中出现了 <code>OF</code> 标志位，说明发生了溢出：</p>
+<p><img src="/images/cf-of-8.png" alt="alt"></p>
+<p>从有符号数的角度来看，参与运算的两个数的符号位都是1，相加后符号位却是0，所以 <code>OF</code> 设置为1。</p>
+<p>所以，<code>OF</code> 的标记取决于运算结果的符号位是否发生变化，这里的变化指的是两个相同符号位的数的运算结果是一个不同符号位的数。</p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>注意到前面有符号数 <code>-128 - 1</code> 运算的例子中，最后 <code>CF</code> 和 <code>OF</code> 都被设置为了1，说明 <code>CF</code> 和 <code>OF</code> 并不是互斥的关系，在这个例子中即发生了进位又发生了符号位的变更，也就是说如果满足了设置 <code>CF</code> 的条件，那么 <code>CF</code> 就是1，如果满足了设置 <code>OF</code> 的条件，那么 <code>OF</code> 就是1。因此，回到文章开头的问题，<code>CPU</code> 并不是去判断该设置 <code>CF</code> 还是 <code>OF</code>，而是只要条件满足就会设置对应的标志位，而具体应该关注哪个标志位，则交由编译器去判断，因为对 <code>CPU</code> 而言它处理的只是比特运算，只有编译器知道当前的运算数是无符号数还是有符号数。</p>
+<p>另外，<code>CF</code> 和 <code>OF</code> 也不能合二为一，无法相互替代，例如两个无符号数相加 <code>CF</code> 有可能是0，但是 <code>OF</code> 却是1，如 <code>127 + 1</code>；两个有符号数相加 <code>OF</code> 有可能是0，但是 <code>CF</code> 却是1，如 <code>-1 - 1</code>。也有可能 <code>CF</code> 和 <code>OF</code> 都是1，如有符号数运算 <code>-128 - 1</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt">The CARRY flag and OVERFLOW flag in binary arithmetic</a></li>
+<li><a target="_blank" rel="noopener" href="https://niranjanmr.wordpress.com/2016/01/20/eflags-registers/">Eflags Registers</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1817577/what-does-int-0x80-mean-in-assembly-code">What does “int 0x80” mean in assembly code?</a></li>
+<li>汇编语言（第4版），王爽</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://frederick-s.github.io/2022/03/13/cf-and-of-flag/" title="CF 和 OF 标志位">https://frederick-s.github.io/2022/03/13/cf-and-of-flag/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CPU/" rel="tag"># CPU</a>
+              <a href="/tags/Assembly-Language/" rel="tag"># Assembly Language</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/02/27/how-to-publich-java-package-to-maven-central-repo/" rel="prev" title="发布 JAR 包到 Maven 中央仓库">
+      <i class="fa fa-chevron-left"></i> 发布 JAR 包到 Maven 中央仓库
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CF"><span class="nav-number">1.</span> <span class="nav-text">CF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OF"><span class="nav-number">2.</span> <span class="nav-text">OF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83"><span class="nav-number">3.</span> <span class="nav-text">比较</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

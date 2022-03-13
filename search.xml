@@ -28,24 +28,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Add new list field in SharePoint App upgrade</title>
-    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
-    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
-<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>And it works. Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
     <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
     <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
@@ -66,6 +48,24 @@
 <p>Reference:</p>
 <ul>
 <li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Add new list field in SharePoint App upgrade</title>
+    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
+    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>And it works. Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -126,6 +126,23 @@
       </tags>
   </entry>
   <entry>
+    <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
+    <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
+    <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
+<blockquote>
+<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
+</blockquote>
+<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True</title>
     <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
     <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
@@ -142,23 +159,6 @@
 ]]></content>
       <tags>
         <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
-    <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
-    <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
-<blockquote>
-<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
-</blockquote>
-<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
       </tags>
   </entry>
   <entry>
@@ -201,21 +201,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
-    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
-    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 TypeScript 中定义属性名未知的对象类型</title>
     <url>/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/</url>
     <content><![CDATA[<p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
@@ -242,6 +227,21 @@
 <p>参考：</p>
 <ul>
 <li><a href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
+    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
+    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -948,25 +948,6 @@
       </tags>
   </entry>
   <entry>
-    <title>为什么 Java 方法重载不允许仅返回值类型不同</title>
-    <url>/2021/11/28/java-function-overload-return-different-type-only/</url>
-    <content><![CDATA[<p>在 <code>Java</code> 中，如果两个同名方法仅返回值类型不同，这是不允许的，即编译器不会认为这是方法重载，如下述类中的方法 <code>f</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译器会提示 <code>&#39;f()&#39; is already defined in &#39;Demo&#39;</code>。假设编译器支持这种方式的方法重载，会有什么问题？在某些情况下，编译器无法区分调用的是哪个方法，例如当调用 <code>f()</code> 却忽略返回值时：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">f();</span><br></pre></td></tr></table></figure>
-
-<p>所以仅返回值类型不同不能作为方法重载的形式。</p>
-<p>参考：</p>
-<ul>
-<li>Thinking in Java</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Python for/while else</title>
     <url>/2021/08/08/python-for-while-else/</url>
     <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
@@ -983,6 +964,25 @@
 ]]></content>
       <tags>
         <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>为什么 Java 方法重载不允许仅返回值类型不同</title>
+    <url>/2021/11/28/java-function-overload-return-different-type-only/</url>
+    <content><![CDATA[<p>在 <code>Java</code> 中，如果两个同名方法仅返回值类型不同，这是不允许的，即编译器不会认为这是方法重载，如下述类中的方法 <code>f</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译器会提示 <code>&#39;f()&#39; is already defined in &#39;Demo&#39;</code>。假设编译器支持这种方式的方法重载，会有什么问题？在某些情况下，编译器无法区分调用的是哪个方法，例如当调用 <code>f()</code> 却忽略返回值时：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">f();</span><br></pre></td></tr></table></figure>
+
+<p>所以仅返回值类型不同不能作为方法重载的形式。</p>
+<p>参考：</p>
+<ul>
+<li>Thinking in Java</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -1240,6 +1240,78 @@
         <tag>Java</tag>
         <tag>Maven</tag>
         <tag>Kotlin</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CF 和 OF 标志位</title>
+    <url>/2022/03/13/cf-and-of-flag/</url>
+    <content><![CDATA[<p>看汇编语言时看到，标志寄存器中 <code>CF</code> 标志位表示无符号数运算时是否向最高有效位外的更高位产生进位或借位，而 <code>OF</code> 标志位表示有符号数运算时是否产生溢出。这里存在两个疑问：</p>
+<ol>
+<li>对于 <code>CPU</code> 来说，它并不区分处理的是无符号数还是有符号数，那什么时候设置 <code>CF</code>，什么时候设置 <code>OF</code> 呢</li>
+<li><code>CF</code> 表示进位时也是一种溢出，能否和 <code>OF</code> 共用一个</li>
+</ol>
+<h2 id="CF"><a href="#CF" class="headerlink" title="CF"></a>CF</h2><p>首先来看 <code>CF</code> 进位的例子，这里我们以8位无符号数为例，其最大值为255，那么计算 <code>255 + 1</code> 则会产生进位。可以通过一段简单的汇编代码进行验证：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $255, %al</span><br><span class="line">    add $1, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，<code>al</code> 是一个8位寄存器，是 <code>eax</code> 寄存器的低8位，这里首先将255放到 <code>al</code> 寄存器内，然后对 <code>al</code> 寄存器中的值加1并放回到 <code>al</code> 寄存器中，即实现 <code>255 +1</code> 的运算。</p>
+<p>最后的 <code>int $0x80</code> 中的 <code>int</code> 表示 <code>interrupt</code>，即中断，当发生一个中断时会有一个与之对应的中断处理程序来处理，这里的 <code>$0x80</code> 就是声明由哪个中断处理程序处理，在 <code>Linux</code> 中，<code>$0x80</code> 对应的是操作系统内核，用于发起一个系统调用，而具体发起哪个系统调用则由 <code>eax</code> 中的值决定，这就是 <code>movl $1, %eax</code> 的作用，1对应的系统调用是 <code>exit</code>，用于退出程序，而程序退出时会伴有一个状态码，这个状态码的值来自于 <code>ebx</code>，也就是 <code>movl $0, %ebx</code> 的作用，这里使用0来表示程序正常退出。</p>
+<p>接下来我们借助 <code>gdb</code> 来观察程序运行时 <code>CF</code> 的值的变化。首先将上述代码保存为 <code>demo.s</code> 后进行编译：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">as demo.s -o demo.o -gstabs+</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>-gstabs+</code> 表示生成机器码时同时生成调试信息，如果没有这个选项后续 <code>gdb</code> 加载时会提示 <code>(No debugging symbols found in ./demo)</code>。</p>
+<p>然后进行链接：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ld demo.o -o demo</span><br></pre></td></tr></table></figure>
+
+<p>这个时候就可以通过 <code>gdb</code> 加载生成的可执行文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gdb .&#x2F;demo</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/cf-of-1.png" alt="alt"></p>
+<p>然后输入 <code>break 4</code> 在代码第四行设置一个断点，即 <code>mov $255, %al</code> 处，最后输入 <code>run</code> 开始调试执行：</p>
+<p><img src="/images/cf-of-2.png" alt="alt"></p>
+<p>此时可输入 <code>layout reg</code> 来观察各寄存器内的值，我们需要关注的是 <code>eflags</code> 寄存器，它展示了哪些标志位生效了：</p>
+<p><img src="/images/cf-of-3.png" alt="alt"></p>
+<p>或者通过执行 <code>info registers eflags</code> 来查看 <code>eflags</code> 的值：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(gdb) info registers eflags</span><br><span class="line">eflags         0x202               [ IF ]</span><br></pre></td></tr></table></figure>
+
+<p>目前只有一个 <code>IF</code> 标志位，它用于表示是否响应中断。</p>
+<p>接着，输入 <code>next</code> 来执行当前断点所在处的指令，可以看到，执行后 <code>rax</code> 寄存器内的值变成了255（<code>rax</code> 是64位 <code>CPU</code> 下的一个通用寄存器，32位 <code>CPU</code> 下对应为 <code>eax</code>）：</p>
+<p><img src="/images/cf-of-4.png" alt="alt"></p>
+<p>再输入一次 <code>next</code> 来执行加法运算，此时 <code>rax</code> 中的值变为了0（实际的二进制结果应该是100000000，因为 <code>al</code> 寄存器最多只能表示8位，所以最高位的1无法表示，最终结果为0），<code>eflags</code> 中出现了 <code>CF</code> 标志位，说明发生了进位：</p>
+<p><img src="/images/cf-of-5.png" alt="alt"></p>
+<p><code>rax</code> 中的值为0也说明了加法运算后产生的进位并不会体现在比参与运算的寄存器位数更多的寄存器中，否则 <code>rax</code> 中的值应该是256。</p>
+<p>再来看借位，将程序稍加修改执行一个 <code>1 - 2</code> 的运算：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $1, %al</span><br><span class="line">    sub $2, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>最后 <code>rax</code> 中的值为255（存在高位借位的情况下最后的二进制结果为11111111，解释为无符号数为255），<code>eflags</code> 中同样出现了 <code>CF</code> 标志位。</p>
+<p><img src="/images/cf-of-6.png" alt="alt"></p>
+<p>所以，<code>CF</code> 的标记取决于两个二进制数的运算是否产生进位或借位。</p>
+<h2 id="OF"><a href="#OF" class="headerlink" title="OF"></a>OF</h2><p>有符号数的溢出分两种情况，一种是运算结果应该是正数却返回负数，另一种是运算结果应该是负数却返回正数。</p>
+<p>首先来看两个正数运算得到负数的例子，同样对代码稍加修改实现 <code>127 + 1</code> 的运算：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $127, %al</span><br><span class="line">    add $1, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>最后 <code>rax</code> 中的值为128（对应二进制表示为10000000，以有符号数的角度来看，其值为-128，即两个正数相加得到一个负数），<code>eflags</code> 中出现了 <code>OF</code> 标志位，说明发生了溢出：</p>
+<p><img src="/images/cf-of-7.png" alt="alt"></p>
+<p>从有符号数的角度来看，参与运算的两个数的符号位都是0，相加后符号位却是1，所以 <code>OF</code> 设置为1。</p>
+<p>再来看两个负数运算得到正数的例子，再次对代码稍加修改实现 <code>-128 - 1</code> 的运算，-128的二进制补码表示为10000000，即无符号数角度下的128，-1的二进制补码表示为11111111，即无符号数角度下的255：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $128, %al</span><br><span class="line">    add $255, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+
+<p>最后 <code>rax</code> 中的值为127（对应二进制表示为01111111，以有符号数的角度来看，其值为127，即两个负数相加得到一个正数），<code>eflags</code> 中出现了 <code>OF</code> 标志位，说明发生了溢出：</p>
+<p><img src="/images/cf-of-8.png" alt="alt"></p>
+<p>从有符号数的角度来看，参与运算的两个数的符号位都是1，相加后符号位却是0，所以 <code>OF</code> 设置为1。</p>
+<p>所以，<code>OF</code> 的标记取决于运算结果的符号位是否发生变化，这里的变化指的是两个相同符号位的数的运算结果是一个不同符号位的数。</p>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>注意到前面有符号数 <code>-128 - 1</code> 运算的例子中，最后 <code>CF</code> 和 <code>OF</code> 都被设置为了1，说明 <code>CF</code> 和 <code>OF</code> 并不是互斥的关系，在这个例子中即发生了进位又发生了符号位的变更，也就是说如果满足了设置 <code>CF</code> 的条件，那么 <code>CF</code> 就是1，如果满足了设置 <code>OF</code> 的条件，那么 <code>OF</code> 就是1。因此，回到文章开头的问题，<code>CPU</code> 并不是去判断该设置 <code>CF</code> 还是 <code>OF</code>，而是只要条件满足就会设置对应的标志位，而具体应该关注哪个标志位，则交由编译器去判断，因为对 <code>CPU</code> 而言它处理的只是比特运算，只有编译器知道当前的运算数是无符号数还是有符号数。</p>
+<p>另外，<code>CF</code> 和 <code>OF</code> 也不能合二为一，无法相互替代，例如两个无符号数相加 <code>CF</code> 有可能是0，但是 <code>OF</code> 却是1，如 <code>127 + 1</code>；两个有符号数相加 <code>OF</code> 有可能是0，但是 <code>CF</code> 却是1，如 <code>-1 - 1</code>。也有可能 <code>CF</code> 和 <code>OF</code> 都是1，如有符号数运算 <code>-128 - 1</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt">The CARRY flag and OVERFLOW flag in binary arithmetic</a></li>
+<li><a href="https://niranjanmr.wordpress.com/2016/01/20/eflags-registers/">Eflags Registers</a></li>
+<li><a href="https://stackoverflow.com/questions/1817577/what-does-int-0x80-mean-in-assembly-code">What does “int 0x80” mean in assembly code?</a></li>
+<li>汇编语言（第4版），王爽</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>CPU</tag>
+        <tag>Assembly Language</tag>
       </tags>
   </entry>
   <entry>
