@@ -74,7 +74,24 @@ eflags         0x202               [ IF ]
 
 ![alt](/images/cf-of-5.png)
 
-`rax` 中的值为0也说明了 `al` 寄存器加法运算后产生的进位并不会体现在比它位数更多的寄存器中，否则 `rax` 中的值应该是256。
+`rax` 中的值为0也说明了加法运算后产生的进位并不会体现在比参与运算的寄存器位数更多的寄存器中，否则 `rax` 中的值应该是256。
+
+再来看借位，将程序稍加修改执行一个 `1 - 2` 的运算：
+
+```
+.section .text
+.globl _start
+_start:
+    mov $1, %al
+    sub $2, %al
+    movl $1, %eax
+    movl $0, %ebx
+    int $0x80
+```
+
+最后 `rax` 中的值为255，`eflags` 中同样出现了 `CF` 标志位。
+
+![alt](/images/cf-of-6.png)
 
 参考：
 
