@@ -47,6 +47,25 @@ ld demo.o -o demo
 gdb ./demo
 ```
 
+![alt](/images/cf-of-1.png)
+
+然后输入 `break 4` 在代码第四行设置一个断点，即 `mov $255, %al` 处，最后输入 `run` 开始调试执行：
+
+![alt](/images/cf-of-2.png)
+
+此时可输入 `layout reg` 来观察各寄存器内的值，我们需要关注的是 `eflags` 的值，如果显示了 `CF` 则表示触发了进位：
+
+![alt](/images/cf-of-3.png)
+
+或者通过执行 `info registers eflags` 来查看 `eflags` 的值：
+
+```
+(gdb) info registers eflags
+eflags         0x202               [ IF ]
+```
+
+目前只有一个 `IF` 标志寄存器，它用于表示是否响应中断。
+
 参考：
 
 * [The CARRY flag and OVERFLOW flag in binary arithmetic](http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt)
