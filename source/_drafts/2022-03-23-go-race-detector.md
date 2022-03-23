@@ -32,6 +32,48 @@ func main() {
 go run -race racy.go
 ```
 
+会输出类似如下内容：
+
+```
+Hello, world
+==================
+WARNING: DATA RACE
+Write at 0x00c00007e180 by goroutine 7:
+  runtime.mapassign_faststr()
+      /usr/local/go/src/runtime/map_faststr.go:203 +0x0
+  main.main.func1()
+      /path/to/racy.go:10 +0x50
+
+Previous read at 0x00c00007e180 by main goroutine:
+  runtime.mapaccess1_faststr()
+      /usr/local/go/src/runtime/map_faststr.go:13 +0x0
+  main.main()
+      /path/to/racy.go:13 +0x16b
+
+Goroutine 7 (running) created at:
+  main.main()
+      /path/to/racy.go:9 +0x14e
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c000114088 by goroutine 7:
+  main.main.func1()
+      /path/to/racy.go:10 +0x5c
+
+Previous read at 0x00c000114088 by main goroutine:
+  main.main()
+      /path/to/racy.go:13 +0x175
+
+Goroutine 7 (running) created at:
+  main.main()
+      /path/to/racy.go:9 +0x14e
+==================
+Found 2 data race(s)
+exit status 66
+```
+
+竞争检测会提示第13行和第10行存在数据竞争。
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
