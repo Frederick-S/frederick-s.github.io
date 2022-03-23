@@ -125,6 +125,48 @@ func main() {
 }
 ```
 
+### 意外地共享变量
+在日常开发中，我们可能不经意间在多个 `goroutine` 间共享了某个变量。在下面的例子中，首先 `f1, err := os.Create("file1")` 会创建一个 `err` 变量，接着在第一个 `goroutine` 中对 `file1` 写入时会对 `err` 进行更新：`_, err = f1.Write(data)`，然而在主 `goroutine` 中创建 `file2` 时同样会对 `err` 进行更新：`f2, err := os.Create("file2")`，这就产生了数据竞争：
+
+```go
+package main
+
+import "os"
+
+// ParallelWrite writes data to file1 and file2, returns the errors.
+func ParallelWrite(data []byte) chan error {
+	res := make(chan error, 2)
+	f1, err := os.Create("file1")
+	if err != nil {
+		res <- err
+	} else {
+		go func() {
+			// This err is shared with the main goroutine,
+			// so the write races with the write below.
+			_, err = f1.Write(data)
+			res <- err
+			f1.Close()
+		}()
+	}
+	f2, err := os.Create("file2") // The second conflicting write to err.
+	if err != nil {
+		res <- err
+	} else {
+		go func() {
+			_, err = f2.Write(data)
+			res <- err
+			f2.Close()
+		}()
+	}
+	return res
+}
+
+func main() {
+	err := ParallelWrite([]byte("Hello, world!"))
+	<-err
+}
+```
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
