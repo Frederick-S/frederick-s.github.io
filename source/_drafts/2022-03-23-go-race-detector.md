@@ -126,7 +126,7 @@ func main() {
 ```
 
 ### 意外地共享变量
-在日常开发中，我们可能不经意间在多个 `goroutine` 间共享了某个变量。在下面的例子中，首先 `f1, err := os.Create("file1")` 会创建一个 `err` 变量，接着在第一个 `goroutine` 中对 `file1` 写入时会对 `err` 进行更新：`_, err = f1.Write(data)`，然而在主 `goroutine` 中创建 `file2` 时同样会对 `err` 进行更新：`f2, err := os.Create("file2")`，这就产生了数据竞争：
+在日常开发中，我们可能不经意间在多个 `goroutine` 间共享了某个变量。在下面的例子中，首先 `f1, err := os.Create("file1")` 会创建一个 `err` 变量，接着在第一个 `goroutine` 中对 `file1` 写入时会对 `err` 进行更新（`_, err = f1.Write(data)`），然而在主 `goroutine` 中创建 `file2` 时同样会对 `err` 进行更新（`f2, err := os.Create("file2")`，这里虽然用的是 `:=`，不过 `err` 并不是一个新的变量，在同一个作用域下是不允许重复对某个变量使用 `:=` 创建的，因为 `f2` 是一个新的变量，所以这里可用 `:=`），这就产生了数据竞争：
 
 ```go
 package main
