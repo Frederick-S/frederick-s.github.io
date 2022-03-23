@@ -102,6 +102,29 @@ func main() {
 
 我们想要的结果是能输出 `01234` 这5个值（实际顺序并不一定是 `01234`），但由于主 `goroutine` 对 `i` 的更新和被创建的 `goroutine` 对 `i` 的读取之间存在数据竞争，最终的输出结果可能是 `55555` 也可能是其他值。
 
+如果要修复这个问题，每次创建 `goroutine` 时复制一份 `i` 再传给 `goroutine` 即可：
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	wg.Add(5)
+	for i := 0; i < 5; i++ {
+		go func(j int) {
+			fmt.Println(j) // Good. Read local copy of the loop counter.
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+}
+```
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
