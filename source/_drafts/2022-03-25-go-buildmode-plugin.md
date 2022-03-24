@@ -24,7 +24,7 @@ go build -buildmode=plugin sum.go
 
 会生成一个 `sum.so` 文件。
 
-接着，可以通过 `plugin.Open` 取读取 `sum.so`：
+接着，在 `main.go` 中就可以通过 `plugin.Open` 取读取 `sum.so`：
 
 ```go
 package main
@@ -55,7 +55,7 @@ func main() {
 }
 ```
 
-通过 `Lookup` 根据方法名找到 `Sum` 方法，按照指定方法签名转换后即可进行调用。
+然后通过 `Lookup` 根据方法名找到 `Sum` 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 `Sum` 的实现，则无需重新编译 `main.go`。
 
 参考：
 
