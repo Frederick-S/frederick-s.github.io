@@ -6,4 +6,57 @@ tags:
 
 `Lab 1` 中遇到的第一个命令是 `go build -race -buildmode=plugin ../mrapps/wc.go`，其中 `-buildmode=plugin` 表示以插件的形式打包源文件，这里的 `wc.go` 是用户实现的 `map` 和 `reduce` 方法，这体现了面向接口编程的思想，只要用户编写的 `map` 和 `reduce` 方法遵循统一的签名，则可以在不重新编译 `MapReduce` 框架代码的情况下，实时替换运行不同的用户应用。
 
+假设有个 `sum.go` 文件，里面只有一个 `Sum` 方法：
+
+```go
+package main
+
+func Sum(a int, b int) int {
+	return a + b
+}
+```
+
+对 `sum.go` 以插件形式编译：
+
+```
+go build -buildmode=plugin sum.go
+```
+
+会生成一个 `sum.so` 文件。
+
+接着，可以通过 `plugin.Open` 取读取 `sum.so`：
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"plugin"
+)
+
+func main() {
+	fileName := "sum.so"
+	p, err := plugin.Open(fileName)
+
+	if err != nil {
+		log.Fatalf("cannot load plugin %v", fileName)
+	}
+
+	sumSymbol, err := p.Lookup("Sum")
+
+	if err != nil {
+		log.Fatalf("cannot find Map in %v", fileName)
+	}
+
+	sum := sumSymbol.(func(int, int) int)
+
+	fmt.Println("1 + 2 is", sum(1, 2))
+}
+```
+
+通过 `Lookup` 根据方法名找到 `Sum` 方法，按照指定方法签名转换后即可进行调用。
+
 参考：
+
+* [Build modes](https://pkg.go.dev/cmd/go#hdr-Build_modes)
