@@ -354,6 +354,37 @@ func main() {
 }
 ```
 
+### 未同步的 send 和 close 操作
+虽然对一个 `channel` 的发送和相应的读取完成之间存在 `happens-before` 的关系，但是对 `channel` 的发送和关闭间并没有 `happens-before` 的保证，依然存在数据竞争：
+
+```go
+package main
+
+func main() {
+	c := make(chan struct{}) // or buffered channel
+
+	// The race detector cannot derive the happens before relation
+	// for the following send and close operations. These two operations
+	// are unsynchronized and happen concurrently.
+	go func() { c <- struct{}{} }()
+	close(c)
+}
+```
+
+所以在关闭 `channel` 前，增加对 `channel` 的读取操作来保证数据发送完成：
+
+```go
+package main
+
+func main() {
+	c := make(chan struct{}) // or buffered channel
+
+	go func() { c <- struct{}{} }()
+	<-c
+	close(c)
+}
+```
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
