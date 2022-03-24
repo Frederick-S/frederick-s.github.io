@@ -208,6 +208,75 @@ func main() {
 }
 ```
 
+### 未受保护的全局变量
+某个包下对外暴露了 `RegisterService` 和 `LookupService` 两个方法，而这两个方法会对同一个 `map` 变量进行读写，客户端调用时有可能多个 `goroutine` 并发调用，从而存在数据竞争：
+
+```go
+package main
+
+import (
+	"fmt"
+	"net"
+)
+
+var service map[string]net.Addr = make(map[string]net.Addr)
+
+func RegisterService(name string, addr net.Addr) {
+	service[name] = addr
+}
+
+func LookupService(name string) net.Addr {
+	return service[name]
+}
+
+func main() {
+	go func() {
+		RegisterService("hello", &net.IPAddr{IP: net.ParseIP("127.0.0.1")})
+	}()
+	go func() {
+		fmt.Println(LookupService("hello"))
+	}()
+}
+```
+
+可以通过 `sync.Mutex` 来保证可见性：
+
+```go
+package main
+
+import (
+	"fmt"
+	"net"
+	"sync"
+)
+
+var (
+	service   map[string]net.Addr = make(map[string]net.Addr)
+	serviceMu sync.Mutex
+)
+
+func RegisterService(name string, addr net.Addr) {
+	serviceMu.Lock()
+	defer serviceMu.Unlock()
+	service[name] = addr
+}
+
+func LookupService(name string) net.Addr {
+	serviceMu.Lock()
+	defer serviceMu.Unlock()
+	return service[name]
+}
+
+func main() {
+	go func() {
+		RegisterService("hello", &net.IPAddr{IP: net.ParseIP("127.0.0.1")})
+	}()
+	go func() {
+		fmt.Println(LookupService("hello"))
+	}()
+}
+```
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
