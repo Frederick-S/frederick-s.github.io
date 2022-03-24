@@ -277,6 +277,83 @@ func main() {
 }
 ```
 
+### 未受保护的基本类型变量
+除了 `map` 这样的复杂数据类型外，基本类型变量同样会存在数据竞争，如 `bool`，`int`，`int64`。例如在下面的例子中，主 `goroutine` 对 `w.last` 的更新和创建的 `goroutine` 中对 `w.last` 的读取间存在数据竞争：
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"time"
+)
+
+type Watchdog struct{ last int64 }
+
+func (w *Watchdog) KeepAlive() {
+	w.last = time.Now().UnixNano() // First conflicting access.
+}
+
+func (w *Watchdog) Start() {
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			// Second conflicting access.
+			if w.last < time.Now().Add(-10*time.Second).UnixNano() {
+				fmt.Println("No keepalives for 10 seconds. Dying.")
+				os.Exit(1)
+			}
+		}
+	}()
+}
+
+func main() {
+	watchdog := &Watchdog{}
+	watchdog.Start()
+	watchdog.KeepAlive()
+	select {}
+}
+```
+
+我们依然可以借助 `channel` 或 `sync.Mutex` 来修复这个问题，不过类似于 `Java`，`Go` 中同样有相应的原子变量来处理基本类型的并发读写，上述例子就可以通过原子包下的 `atomic.StoreInt64` 和 `atomic.LoadInt64` 来解决：
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"sync/atomic"
+	"time"
+)
+
+type Watchdog struct{ last int64 }
+
+func (w *Watchdog) KeepAlive() {
+	atomic.StoreInt64(&w.last, time.Now().UnixNano())
+}
+
+func (w *Watchdog) Start() {
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			if atomic.LoadInt64(&w.last) < time.Now().Add(-10*time.Second).UnixNano() {
+				fmt.Println("No keepalives for 10 seconds. Dying.")
+				os.Exit(1)
+			}
+		}
+	}()
+}
+
+func main() {
+	watchdog := &Watchdog{}
+	watchdog.Start()
+	watchdog.KeepAlive()
+	select {}
+}
+```
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
