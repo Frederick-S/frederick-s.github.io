@@ -385,6 +385,9 @@ func main() {
 }
 ```
 
+## 竞争检测的开销
+在开启竞争检测的情况下，程序的内存使用可能会增加5到10倍，性能可能会增加2到20倍，所以一般建议在压力测试或集成测试阶段开启，或者线上集群选择某台机器单独开启。
+
 参考：
 
 * [Introducing the Go Race Detector](https://go.dev/blog/race-detector)
