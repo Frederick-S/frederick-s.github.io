@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Lab 1 中遇到的第一个命令是 go build -race -buildmode&#x3D;plugin ..&#x2F;mrapps&#x2F;wc.go，其中 -race 表示启用 Go 的竞争检测，在多线程编程时，数据竞争是必须要考虑的问题，而数据竞争的问题往往难以察觉和排查，所以 Go 内置了竞争检测的工具来帮助开发人员提前发现问题。另外，MIT 6.824 是一门分布式系统课程，必然会涉及多线程编程，所以竞争检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIT 6.824 Lab 1 (2) - Go Race Detector">
+<meta property="og:url" content="https://frederick-s.github.io/2022/03/24/mit-6.824-lab1-go-race-detector/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="Lab 1 中遇到的第一个命令是 go build -race -buildmode&#x3D;plugin ..&#x2F;mrapps&#x2F;wc.go，其中 -race 表示启用 Go 的竞争检测，在多线程编程时，数据竞争是必须要考虑的问题，而数据竞争的问题往往难以察觉和排查，所以 Go 内置了竞争检测的工具来帮助开发人员提前发现问题。另外，MIT 6.824 是一门分布式系统课程，必然会涉及多线程编程，所以竞争检测">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-03-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-23T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="MIT 6.824">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://frederick-s.github.io/2022/03/24/mit-6.824-lab1-go-race-detector/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MIT 6.824 Lab 1 (2) - Go Race Detector | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46794791-3"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-46794791-3');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Übung macht den Meister</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-mit-6.824">
+
+    <a href="/mit-6.824/" rel="section"><i class="fas fa-landmark fa-fw"></i>MIT 6.824</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/03/24/mit-6.824-lab1-go-race-detector/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MIT 6.824 Lab 1 (2) - Go Race Detector
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-03-24 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-24T00:00:00+08:00">2022-03-24</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-race</code> 表示启用 <code>Go</code> 的竞争检测，在多线程编程时，数据竞争是必须要考虑的问题，而数据竞争的问题往往难以察觉和排查，所以 <code>Go</code> 内置了竞争检测的工具来帮助开发人员提前发现问题。另外，<code>MIT 6.824</code> 是一门分布式系统课程，必然会涉及多线程编程，所以竞争检测也是校验 <code>Lab</code> 程序正确性的一种方式。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>Go</code> 借助 <code>goroutine</code> 来实现并发编程，所以数据竞争发生在多个 <code>goroutine</code> 并发读写同一个共享变量时，并且至少有一个 <code>goroutine</code> 存在写操作。来看一个简单的例子：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    done := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line">    m := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>)</span><br><span class="line">    m[<span class="string">&quot;name&quot;</span>] = <span class="string">&quot;world&quot;</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        m[<span class="string">&quot;name&quot;</span>] = <span class="string">&quot;data race&quot;</span></span><br><span class="line">        done &lt;- <span class="literal">true</span></span><br><span class="line">    &#125;()</span><br><span class="line">    fmt.Println(<span class="string">&quot;Hello,&quot;</span>, m[<span class="string">&quot;name&quot;</span>])</span><br><span class="line">    &lt;-done</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>m</code> 是一个共享变量，被两个 <code>goroutine</code> 并发读写，将上述代码保存为文件 <code>racy.go</code>，然后开启竞争检测执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go run -race racy.go</span><br></pre></td></tr></table></figure>
+
+<p>会输出类似如下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">Hello, world</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">WARNING: DATA RACE</span><br><span class="line">Write at 0x00c00007e180 by goroutine 7:</span><br><span class="line">  runtime.mapassign_faststr()</span><br><span class="line">      &#x2F;usr&#x2F;local&#x2F;go&#x2F;src&#x2F;runtime&#x2F;map_faststr.go:203 +0x0</span><br><span class="line">  main.main.func1()</span><br><span class="line">      &#x2F;path&#x2F;to&#x2F;racy.go:10 +0x50</span><br><span class="line"></span><br><span class="line">Previous read at 0x00c00007e180 by main goroutine:</span><br><span class="line">  runtime.mapaccess1_faststr()</span><br><span class="line">      &#x2F;usr&#x2F;local&#x2F;go&#x2F;src&#x2F;runtime&#x2F;map_faststr.go:13 +0x0</span><br><span class="line">  main.main()</span><br><span class="line">      &#x2F;path&#x2F;to&#x2F;racy.go:13 +0x16b</span><br><span class="line"></span><br><span class="line">Goroutine 7 (running) created at:</span><br><span class="line">  main.main()</span><br><span class="line">      &#x2F;path&#x2F;to&#x2F;racy.go:9 +0x14e</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">WARNING: DATA RACE</span><br><span class="line">Write at 0x00c000114088 by goroutine 7:</span><br><span class="line">  main.main.func1()</span><br><span class="line">      &#x2F;path&#x2F;to&#x2F;racy.go:10 +0x5c</span><br><span class="line"></span><br><span class="line">Previous read at 0x00c000114088 by main goroutine:</span><br><span class="line">  main.main()</span><br><span class="line">      &#x2F;path&#x2F;to&#x2F;racy.go:13 +0x175</span><br><span class="line"></span><br><span class="line">Goroutine 7 (running) created at:</span><br><span class="line">  main.main()</span><br><span class="line">      &#x2F;path&#x2F;to&#x2F;racy.go:9 +0x14e</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">Found 2 data race(s)</span><br><span class="line">exit status 66</span><br></pre></td></tr></table></figure>
+
+<p>竞争检测会提示第13行和第10行存在数据竞争，一共涉及两个 <code>goroutine</code>，一个是主 <code>goroutine</code>，另一个是手动创建的 <code>goroutine</code>。</p>
+<h2 id="典型数据竞争场景"><a href="#典型数据竞争场景" class="headerlink" title="典型数据竞争场景"></a>典型数据竞争场景</h2><h3 id="循环计数器竞争"><a href="#循环计数器竞争" class="headerlink" title="循环计数器竞争"></a>循环计数器竞争</h3><p>这个例子中每次循环时会创建一个 <code>goroutine</code>，每个 <code>goroutine</code> 会打印循环计数器 <code>i</code> 的值：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;sync&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">	wg.Add(<span class="number">5</span>)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			fmt.Println(i) <span class="comment">// Not the &#x27;i&#x27; you are looking for.</span></span><br><span class="line">			wg.Done()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们想要的结果是能输出 <code>01234</code> 这5个值（实际顺序并不一定是 <code>01234</code>），但由于主 <code>goroutine</code> 对 <code>i</code> 的更新和被创建的 <code>goroutine</code> 对 <code>i</code> 的读取之间存在数据竞争，最终的输出结果可能是 <code>55555</code> 也可能是其他值。</p>
+<p>如果要修复这个问题，每次创建 <code>goroutine</code> 时复制一份 <code>i</code> 再传给 <code>goroutine</code> 即可：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;sync&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">	wg.Add(<span class="number">5</span>)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(j <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">			fmt.Println(j) <span class="comment">// Good. Read local copy of the loop counter.</span></span><br><span class="line">			wg.Done()</span><br><span class="line">		&#125;(i)</span><br><span class="line">	&#125;</span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="意外地共享变量"><a href="#意外地共享变量" class="headerlink" title="意外地共享变量"></a>意外地共享变量</h3><p>在日常开发中，我们可能不经意间在多个 <code>goroutine</code> 间共享了某个变量。在下面的例子中，首先 <code>f1, err := os.Create(&quot;file1&quot;)</code> 会创建一个 <code>err</code> 变量，接着在第一个 <code>goroutine</code> 中对 <code>file1</code> 写入时会对 <code>err</code> 进行更新（<code>_, err = f1.Write(data)</code>），然而在主 <code>goroutine</code> 中创建 <code>file2</code> 时同样会对 <code>err</code> 进行更新（<code>f2, err := os.Create(&quot;file2&quot;)</code>，这里虽然用的是 <code>:=</code>，不过 <code>err</code> 并不是一个新的变量，在同一个作用域下是不允许重复对某个同名变量使用 <code>:=</code> 创建的，因为 <code>f2</code> 是一个新的变量，所以这里可用 <code>:=</code>），这就产生了数据竞争：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ParallelWrite writes data to file1 and file2, returns the errors.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ParallelWrite</span><span class="params">(data []<span class="keyword">byte</span>)</span> <span class="title">chan</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	res := <span class="built_in">make</span>(<span class="keyword">chan</span> error, <span class="number">2</span>)</span><br><span class="line">	f1, err := os.Create(<span class="string">&quot;file1&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res &lt;- err</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="comment">// This err is shared with the main goroutine,</span></span><br><span class="line">			<span class="comment">// so the write races with the write below.</span></span><br><span class="line">			_, err = f1.Write(data)</span><br><span class="line">			res &lt;- err</span><br><span class="line">			f1.Close()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	f2, err := os.Create(<span class="string">&quot;file2&quot;</span>) <span class="comment">// The second conflicting write to err.</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res &lt;- err</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			_, err = f2.Write(data)</span><br><span class="line">			res &lt;- err</span><br><span class="line">			f2.Close()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> res</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	err := ParallelWrite([]<span class="keyword">byte</span>(<span class="string">&quot;Hello, world!&quot;</span>))</span><br><span class="line">	&lt;-err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修复方法也很简单，在每个 <code>goroutine</code> 中使用 <code>:=</code> 创建 <code>err</code> 变量即可：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ParallelWrite writes data to file1 and file2, returns the errors.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ParallelWrite</span><span class="params">(data []<span class="keyword">byte</span>)</span> <span class="title">chan</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	res := <span class="built_in">make</span>(<span class="keyword">chan</span> error, <span class="number">2</span>)</span><br><span class="line">	f1, err := os.Create(<span class="string">&quot;file1&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res &lt;- err</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="comment">// This err is shared with the main goroutine,</span></span><br><span class="line">			<span class="comment">// so the write races with the write below.</span></span><br><span class="line">			_, err := f1.Write(data)</span><br><span class="line">			res &lt;- err</span><br><span class="line">			f1.Close()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	f2, err := os.Create(<span class="string">&quot;file2&quot;</span>) <span class="comment">// The second conflicting write to err.</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res &lt;- err</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			_, err := f2.Write(data)</span><br><span class="line">			res &lt;- err</span><br><span class="line">			f2.Close()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> res</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	err := ParallelWrite([]<span class="keyword">byte</span>(<span class="string">&quot;Hello, world!&quot;</span>))</span><br><span class="line">	&lt;-err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="未受保护的全局变量"><a href="#未受保护的全局变量" class="headerlink" title="未受保护的全局变量"></a>未受保护的全局变量</h3><p>某个包下对外暴露了 <code>RegisterService</code> 和 <code>LookupService</code> 两个方法，而这两个方法会对同一个 <code>map</code> 变量进行读写，客户端调用时有可能多个 <code>goroutine</code> 并发调用，从而存在数据竞争：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> service <span class="keyword">map</span>[<span class="keyword">string</span>]net.Addr = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]net.Addr)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RegisterService</span><span class="params">(name <span class="keyword">string</span>, addr net.Addr)</span></span> &#123;</span><br><span class="line">	service[name] = addr</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">LookupService</span><span class="params">(name <span class="keyword">string</span>)</span> <span class="title">net</span>.<span class="title">Addr</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> service[name]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		RegisterService(<span class="string">&quot;hello&quot;</span>, &amp;net.IPAddr&#123;IP: net.ParseIP(<span class="string">&quot;127.0.0.1&quot;</span>)&#125;)</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		fmt.Println(LookupService(<span class="string">&quot;hello&quot;</span>))</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>sync.Mutex</code> 来保证可见性：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">	<span class="string">&quot;sync&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	service   <span class="keyword">map</span>[<span class="keyword">string</span>]net.Addr = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]net.Addr)</span><br><span class="line">	serviceMu sync.Mutex</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RegisterService</span><span class="params">(name <span class="keyword">string</span>, addr net.Addr)</span></span> &#123;</span><br><span class="line">	serviceMu.Lock()</span><br><span class="line">	<span class="keyword">defer</span> serviceMu.Unlock()</span><br><span class="line">	service[name] = addr</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">LookupService</span><span class="params">(name <span class="keyword">string</span>)</span> <span class="title">net</span>.<span class="title">Addr</span></span> &#123;</span><br><span class="line">	serviceMu.Lock()</span><br><span class="line">	<span class="keyword">defer</span> serviceMu.Unlock()</span><br><span class="line">	<span class="keyword">return</span> service[name]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		RegisterService(<span class="string">&quot;hello&quot;</span>, &amp;net.IPAddr&#123;IP: net.ParseIP(<span class="string">&quot;127.0.0.1&quot;</span>)&#125;)</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		fmt.Println(LookupService(<span class="string">&quot;hello&quot;</span>))</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="未受保护的基本类型变量"><a href="#未受保护的基本类型变量" class="headerlink" title="未受保护的基本类型变量"></a>未受保护的基本类型变量</h3><p>除了 <code>map</code> 这样的复杂数据类型外，基本类型变量同样会存在数据竞争，如 <code>bool</code>，<code>int</code>，<code>int64</code>。例如在下面的例子中，主 <code>goroutine</code> 对 <code>w.last</code> 的更新和创建的 <code>goroutine</code> 中对 <code>w.last</code> 的读取间存在数据竞争：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Watchdog <span class="keyword">struct</span>&#123; last <span class="keyword">int64</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(w *Watchdog)</span> <span class="title">KeepAlive</span><span class="params">()</span></span> &#123;</span><br><span class="line">	w.last = time.Now().UnixNano() <span class="comment">// First conflicting access.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(w *Watchdog)</span> <span class="title">Start</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			time.Sleep(time.Second)</span><br><span class="line">			<span class="comment">// Second conflicting access.</span></span><br><span class="line">			<span class="keyword">if</span> w.last &lt; time.Now().Add(<span class="number">-10</span>*time.Second).UnixNano() &#123;</span><br><span class="line">				fmt.Println(<span class="string">&quot;No keepalives for 10 seconds. Dying.&quot;</span>)</span><br><span class="line">				os.Exit(<span class="number">1</span>)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	watchdog := &amp;Watchdog&#123;&#125;</span><br><span class="line">	watchdog.Start()</span><br><span class="line">	watchdog.KeepAlive()</span><br><span class="line">	<span class="keyword">select</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们依然可以借助 <code>channel</code> 或 <code>sync.Mutex</code> 来修复这个问题，不过类似于 <code>Java</code>，<code>Go</code> 中同样有相应的原子变量来处理基本类型的并发读写，上述例子就可以通过原子包下的 <code>atomic.StoreInt64</code> 和 <code>atomic.LoadInt64</code> 来解决：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;sync/atomic&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Watchdog <span class="keyword">struct</span>&#123; last <span class="keyword">int64</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(w *Watchdog)</span> <span class="title">KeepAlive</span><span class="params">()</span></span> &#123;</span><br><span class="line">	atomic.StoreInt64(&amp;w.last, time.Now().UnixNano())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(w *Watchdog)</span> <span class="title">Start</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			time.Sleep(time.Second)</span><br><span class="line">			<span class="keyword">if</span> atomic.LoadInt64(&amp;w.last) &lt; time.Now().Add(<span class="number">-10</span>*time.Second).UnixNano() &#123;</span><br><span class="line">				fmt.Println(<span class="string">&quot;No keepalives for 10 seconds. Dying.&quot;</span>)</span><br><span class="line">				os.Exit(<span class="number">1</span>)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	watchdog := &amp;Watchdog&#123;&#125;</span><br><span class="line">	watchdog.Start()</span><br><span class="line">	watchdog.KeepAlive()</span><br><span class="line">	<span class="keyword">select</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="未同步的-send-和-close-操作"><a href="#未同步的-send-和-close-操作" class="headerlink" title="未同步的 send 和 close 操作"></a>未同步的 send 和 close 操作</h3><p>虽然对一个 <code>channel</code> 的发送和相应的读取完成之间存在 <code>happens-before</code> 的关系，但是对 <code>channel</code> 的发送和关闭间并没有 <code>happens-before</code> 的保证，依然存在数据竞争：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;) <span class="comment">// or buffered channel</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// The race detector cannot derive the happens before relation</span></span><br><span class="line">	<span class="comment">// for the following send and close operations. These two operations</span></span><br><span class="line">	<span class="comment">// are unsynchronized and happen concurrently.</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; c &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125; &#125;()</span><br><span class="line">	<span class="built_in">close</span>(c)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以在关闭 <code>channel</code> 前，增加对 <code>channel</code> 的读取操作来保证数据发送完成：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;) <span class="comment">// or buffered channel</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; c &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125; &#125;()</span><br><span class="line">	&lt;-c</span><br><span class="line">	<span class="built_in">close</span>(c)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="竞争检测的开销"><a href="#竞争检测的开销" class="headerlink" title="竞争检测的开销"></a>竞争检测的开销</h2><p>在开启竞争检测的情况下，程序的内存使用可能会增加5到10倍，性能可能会增加2到20倍，所以一般建议在压力测试或集成测试阶段开启，或者线上集群选择某台机器单独开启。</p>
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://go.dev/blog/race-detector">Introducing the Go Race Detector</a></li>
+<li><a target="_blank" rel="noopener" href="https://go.dev/doc/articles/race_detector">Data Race Detector</a></li>
+<li><a target="_blank" rel="noopener" href="https://go.dev/ref/mem">The Go Memory Model</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://frederick-s.github.io/2022/03/24/mit-6.824-lab1-go-race-detector/" title="MIT 6.824 Lab 1 (2) - Go Race Detector">https://frederick-s.github.io/2022/03/24/mit-6.824-lab1-go-race-detector/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
+              <a href="/tags/Go/" rel="tag"># Go</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/13/cf-and-of-flag/" rel="prev" title="CF 和 OF 标志位">
+      <i class="fa fa-chevron-left"></i> CF 和 OF 标志位
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E6%95%B0%E6%8D%AE%E7%AB%9E%E4%BA%89%E5%9C%BA%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">典型数据竞争场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E8%AE%A1%E6%95%B0%E5%99%A8%E7%AB%9E%E4%BA%89"><span class="nav-number">2.1.</span> <span class="nav-text">循环计数器竞争</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%84%8F%E5%A4%96%E5%9C%B0%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F"><span class="nav-number">2.2.</span> <span class="nav-text">意外地共享变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E5%8F%97%E4%BF%9D%E6%8A%A4%E7%9A%84%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-number">2.3.</span> <span class="nav-text">未受保护的全局变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E5%8F%97%E4%BF%9D%E6%8A%A4%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E5%8F%98%E9%87%8F"><span class="nav-number">2.4.</span> <span class="nav-text">未受保护的基本类型变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E5%90%8C%E6%AD%A5%E7%9A%84-send-%E5%92%8C-close-%E6%93%8D%E4%BD%9C"><span class="nav-number">2.5.</span> <span class="nav-text">未同步的 send 和 close 操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%9E%E4%BA%89%E6%A3%80%E6%B5%8B%E7%9A%84%E5%BC%80%E9%94%80"><span class="nav-number">3.</span> <span class="nav-text">竞争检测的开销</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
