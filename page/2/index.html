@@ -205,6 +205,73 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-actions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-actions/" class="post-title-link" itemprop="url">使用 GitHub Actions 自动构建和推送 Docker 镜像到 Docker Hub</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-12-26 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-26T00:00:00+08:00">2021-12-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><code>Docker Hub</code> 的免费账户已不再支持关联 <code>GitHub</code> 仓库并自动构建镜像的功能，不过可以通过 <code>GitHub Actions</code> 来自动构建和推送镜像。实现方式非常简单，<code>Docker</code> 官方已给出了示例（<a target="_blank" rel="noopener" href="https://github.com/marketplace/actions/build-and-push-docker-images">Build and push Docker images</a>）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">name: ci</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - &#39;master&#39;</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  docker:</span><br><span class="line">    runs-on: ubuntu-latest</span><br><span class="line">    steps:</span><br><span class="line">      -</span><br><span class="line">        name: Set up QEMU</span><br><span class="line">        uses: docker&#x2F;setup-qemu-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Set up Docker Buildx</span><br><span class="line">        uses: docker&#x2F;setup-buildx-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Login to DockerHub</span><br><span class="line">        uses: docker&#x2F;login-action@v1 </span><br><span class="line">        with:</span><br><span class="line">          username: $&#123;&#123; secrets.DOCKERHUB_USERNAME &#125;&#125;</span><br><span class="line">          password: $&#123;&#123; secrets.DOCKERHUB_TOKEN &#125;&#125;</span><br><span class="line">      -</span><br><span class="line">        name: Build and push</span><br><span class="line">        id: docker_build</span><br><span class="line">        uses: docker&#x2F;build-push-action@v2</span><br><span class="line">        with:</span><br><span class="line">          push: true</span><br><span class="line">          tags: user&#x2F;app:latest</span><br></pre></td></tr></table></figure>
+
+<p>一共有三处要注意，第一开头的 <code>branches</code> 下对于新建的仓库需要填写 <code>main</code> 而不是 <code>master</code>。</p>
+<p>第二需要为 <code>Login to DockerHub</code> 阶段设置 <code>Docker</code> 的 <code>Access Token</code>，<code>Access Token</code> 可以通过 <code>Docker Hub</code> 的 <code>Account Settings -&gt; Security -&gt; New Access Token</code> 创建，然后通过 <code>GitHub</code> 仓库的 <code>Settings -&gt; Secrets -&gt; New repository secret</code> 分别创建 <code>DOCKERHUB_USERNAME</code> 和 <code>DOCKERHUB_TOKEN</code>。</p>
+<p>第三最后的 <code>tags: user/app:latest</code> 中的 <code>user</code> 和 <code>app</code> 需要修改为实际的用户名和镜像名。</p>
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/61989951/github-action-workflow-not-running">GitHub Action workflow not running</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/12/23/commodity-hardware/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -837,67 +904,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/10/24/how-to-change-jdk-version-in-appveyor/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/10/24/how-to-change-jdk-version-in-appveyor/" class="post-title-link" itemprop="url">如何修改 AppVeyor 的 JDK 版本</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-10-24 00:00:00" itemprop="dateCreated datePublished" datetime="2020-10-24T00:00:00+08:00">2020-10-24</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a target="_blank" rel="noopener" href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -967,7 +973,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-count">55</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

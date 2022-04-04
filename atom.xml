@@ -6,7 +6,7 @@
   <link href="https://frederick-s.github.io/atom.xml" rel="self"/>
   
   <link href="https://frederick-s.github.io/"/>
-  <updated>2022-03-26T16:00:00.000Z</updated>
+  <updated>2022-04-03T16:00:00.000Z</updated>
   <id>https://frederick-s.github.io/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MIT 6.824 Lab 1 (5) - Go RPC</title>
+    <link href="https://frederick-s.github.io/2022/04/04/mit-6.824-lab1-go-rpc/"/>
+    <id>https://frederick-s.github.io/2022/04/04/mit-6.824-lab1-go-rpc/</id>
+    <published>2022-04-03T16:00:00.000Z</published>
+    <updated>2022-04-03T16:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><code>Lab 1</code> 虽然是个单机器多线程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p><h2 id="定义请求体和响应体"><a href="#定义请求体和响应体" class="headerlink" title="定义请求体和响应体"></a>定义请求体和响应体</h2><p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> pb</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">A <span class="keyword">int</span></span><br><span class="line">B <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumReply <span class="keyword">struct</span> &#123;</span><br><span class="line">Result <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><p>首先定义服务类 <code>SumService</code> 和提供的方法：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SumService <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(sumService *SumService)</span> <span class="title">Sum</span><span class="params">(sumRequest *pb.SumRequest, sumReplay *pb.SumReply)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">sumReplay.Result = sumRequest.A + sumRequest.B</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><code>SumService</code> 只有一个 <code>Sum</code> 方法，接收 <code>SumRequest</code> 和 <code>SumReply</code> 两个参数，求和后将结果放回到 <code>SumReply</code> 中（<code>Sum</code> 的方法签名必须是这样的形式，即两个入参和一个 <code>error</code> 类型的出参，具体规则见下文描述）。</p><p>然后进行服务注册：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sumService := &amp;SumService&#123;&#125;</span><br><span class="line">rpc.Register(sumService)</span><br><span class="line">rpc.HandleHTTP()</span><br></pre></td></tr></table></figure><p>通过 <code>rpc.Register</code> 这个方法可以知道，一个服务类及其提供的方法必须满足以下条件才能注册成功：</p><ol><li>服务类必须是公共的</li><li>服务类提供的方法必须是公共的</li><li>服务类提供的方法入参必须是两个，一个表示请求，一个表示响应（从编码的角度来说方法入参是两个，但是实际代码是判断是否等于3个，因为在这种场景下定义的方法的第一个入参类似于 <code>Java</code> 中的 <code>this</code>）</li><li>服务类提供的方法的第一个参数类型必须是公共的或者是 <code>Go</code> 内置的数据类型</li><li>服务类提供的方法的第二个参数类型也必须是公共的或者是 <code>Go</code> 内置的数据类型，且必须是指针类型</li><li>服务类提供的方法的出参个数只能是1个</li><li>服务类提供的方法的出参类型必须是 <code>error</code></li></ol><p>而 <code>rpc.HandleHTTP()</code> 表示通过 <code>HTTP</code> 作为客户端和服务端间的通信协议，当客户端发起一个 <code>RPC</code> 调用时，本质上是将要调用的方法和参数包装成一个 <code>HTTP</code> 请求，服务端收到 <code>HTTP</code> 请求后，解码出要调用的本地方法名称和入参，然后调用本地方法，在本地方法调用完成后再将结果写入到 <code>HTTP</code> 响应中，客户端收到响应后，再解析出远程调用的结果。</p><p><code>rpc.HandleHTTP()</code> 本质上是个 <code>HTTP</code> 路由注册，实际上是调用 <code>Handle(pattern string, handler Handler)</code> 方法，当请求路由匹配 <code>pattern</code> 时，会调用对应的 <code>handler</code> 执行，对于 <code>Go RPC</code> 来说，固定路由路径是 <code>/_goRPC_</code>。</p><p>所以，在完成 <code>HTTP</code> 路由注册后，还需要配合开启一个 <code>HTTP</code> 服务，这样才能接受远程服务调用：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">listener, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">log.Fatal(<span class="string">&quot;listen error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Listening on port 1234&quot;</span>)</span><br><span class="line">http.Serve(listener, <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure><p><code>http.Serve</code> 方法中对于每一个客户端的连接，最终会分配一个 <code>goroutine</code> 来调用 <code>Handler</code> 的 <code>ServeHTTP(ResponseWriter, *Request)</code> 方法来处理，对于 <code>Go</code> 的 <code>RPC</code> 包来说，则可以实现该方法来处理 <code>RPC</code> 请求：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ServeHTTP implements an http.Handler that answers RPC requests.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(server *Server)</span> <span class="title">ServeHTTP</span><span class="params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line"><span class="keyword">if</span> req.Method != <span class="string">&quot;CONNECT&quot;</span> &#123;</span><br><span class="line">w.Header().Set(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;text/plain; charset=utf-8&quot;</span>)</span><br><span class="line">w.WriteHeader(http.StatusMethodNotAllowed)</span><br><span class="line">io.WriteString(w, <span class="string">&quot;405 must CONNECT\n&quot;</span>)</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line">conn, _, err := w.(http.Hijacker).Hijack()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">log.Print(<span class="string">&quot;rpc hijacking &quot;</span>, req.RemoteAddr, <span class="string">&quot;: &quot;</span>, err.Error())</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line">io.WriteString(conn, <span class="string">&quot;HTTP/1.0 &quot;</span>+connected+<span class="string">&quot;\n\n&quot;</span>)</span><br><span class="line">server.ServeConn(conn)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>对于客户端来说，发起远程方法调用前需要先和服务端建立连接：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">client, err := rpc.DialHTTP(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">log.Fatal(<span class="string">&quot;dialing:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">defer</span> client.Close()</span><br></pre></td></tr></table></figure><p>该方法同时返回了一个 <code>RPC</code> 客户端类，内部同时负责对 <code>RPC</code> 请求的编码和解码。</p><p>然后通过 <code>client.Call</code> 来发起远程调用：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sumRequest := &amp;pb.SumRequest&#123;</span><br><span class="line">A: <span class="number">1</span>,</span><br><span class="line">B: <span class="number">2</span>,</span><br><span class="line">&#125;</span><br><span class="line">sumReply := &amp;pb.SumReply&#123;&#125;</span><br><span class="line">err = client.Call(<span class="string">&quot;SumService.Sum&quot;</span>, sumRequest, sumReply)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">log.Fatal(<span class="string">&quot;call error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Result:&quot;</span>, sumReply.Result)</span><br></pre></td></tr></table></figure><p>这里的调用一共有三个参数，第一个是被调用的远程方法名，需要是 <code>类名.方法名</code> 的形式，后两个则是远程方法的约定入参。</p><p>完整的代码可参考 <a href="https://github.com/Frederick-S/go-rpc-demo">go-rpc-demo</a>。</p><p>参考：</p><ul><li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li></ul>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;code&gt;Lab 1&lt;/code&gt; 虽然是个单机器多线程的程序，但主节点和工作节点的交互依然通过 &lt;code&gt;RPC&lt;/code&gt; 实现，&lt;code&gt;Go&lt;/code&gt; 本身也提供了开箱即用的 &lt;code&gt;RPC&lt;/code&gt; 功能，下面将通过一个简单的求和服务来了解在 </summary>
+      
+    
+    
+    
+    
+    <category term="MIT 6.824" scheme="https://frederick-s.github.io/tags/MIT-6-824/"/>
+    
+    <category term="Go" scheme="https://frederick-s.github.io/tags/Go/"/>
+    
+  </entry>
   
   <entry>
     <title>MIT 6.824 Lab 1 (4) - 示例程序</title>
@@ -491,30 +515,6 @@
     <category term="Java" scheme="https://frederick-s.github.io/tags/Java/"/>
     
     <category term="VisualVM" scheme="https://frederick-s.github.io/tags/VisualVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何修改 AppVeyor 的 JDK 版本</title>
-    <link href="https://frederick-s.github.io/2020/10/24/how-to-change-jdk-version-in-appveyor/"/>
-    <id>https://frederick-s.github.io/2020/10/24/how-to-change-jdk-version-in-appveyor/</id>
-    <published>2020-10-23T16:00:00.000Z</published>
-    <updated>2020-10-23T16:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure><p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;使用 &lt;code&gt;AppVeyor&lt;/code&gt; 的&lt;code&gt;Visual Studio 2019&lt;/code&gt; 镜像构建 &lt;code&gt;Java&lt;/code&gt; 项目时默认使用的是 &lt;code&gt;JDK 1.8&lt;/code&gt;（&lt;a href=&quot;https://www.appv</summary>
-      
-    
-    
-    
-    
-    <category term="Java" scheme="https://frederick-s.github.io/tags/Java/"/>
-    
-    <category term="AppVeyor" scheme="https://frederick-s.github.io/tags/AppVeyor/"/>
     
   </entry>
   
