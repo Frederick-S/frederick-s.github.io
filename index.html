@@ -243,7 +243,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><code>Lab 1</code> 虽然是个单机器多线程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
+          <p><code>Lab 1</code> 虽然是个单机器多线程、多进程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
 <h2 id="定义请求体和响应体"><a href="#定义请求体和响应体" class="headerlink" title="定义请求体和响应体"></a>定义请求体和响应体</h2><p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> pb</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	A <span class="keyword">int</span></span><br><span class="line">	B <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumReply <span class="keyword">struct</span> &#123;</span><br><span class="line">	Result <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
