@@ -36,6 +36,8 @@
     
     <category term="MIT 6.824" scheme="https://frederick-s.github.io/tags/MIT-6-824/"/>
     
+    <category term="Paper" scheme="https://frederick-s.github.io/tags/Paper/"/>
+    
     <category term="GFS" scheme="https://frederick-s.github.io/tags/GFS/"/>
     
   </entry>
@@ -266,9 +268,9 @@
     
     <category term="MIT 6.824" scheme="https://frederick-s.github.io/tags/MIT-6-824/"/>
     
-    <category term="MapReduce" scheme="https://frederick-s.github.io/tags/MapReduce/"/>
-    
     <category term="Paper" scheme="https://frederick-s.github.io/tags/Paper/"/>
+    
+    <category term="MapReduce" scheme="https://frederick-s.github.io/tags/MapReduce/"/>
     
   </entry>
   
