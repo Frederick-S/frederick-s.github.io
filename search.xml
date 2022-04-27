@@ -126,6 +126,23 @@
       </tags>
   </entry>
   <entry>
+    <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
+    <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
+    <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
+<blockquote>
+<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
+</blockquote>
+<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True</title>
     <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
     <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
@@ -142,23 +159,6 @@
 ]]></content>
       <tags>
         <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VS Code remote development tool error - An SSH installation couldn&#39;t be found</title>
-    <url>/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/</url>
-    <content><![CDATA[<p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
-<blockquote>
-<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
-</blockquote>
-<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
       </tags>
   </entry>
   <entry>
@@ -266,21 +266,37 @@
       </tags>
   </entry>
   <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+    <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
+    <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
+    <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── product-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── sum-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── app</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── pom.xml</span><br></pre></td></tr></table></figure>
 
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+<p>其中 <code>product-service</code> 和 <code>sum-service</code> 表示功能代码，<code>app</code> 负责测试用例的整合。<code>product-service</code> 和 <code>sum-service</code> 分别包含一个 <code>ProductService</code> 类和 <code>SumService</code> 类，具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ProductService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">product</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x * y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// SumService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x + y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>app</code> 内的测试用例如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldCalculateCorrectSumAndProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Assert.assertEquals(<span class="number">10</span>, <span class="keyword">new</span> ProductService().product(<span class="number">2</span>, <span class="number">5</span>));</span><br><span class="line">        Assert.assertEquals(<span class="number">5</span>, <span class="keyword">new</span> SumService().sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后在 <code>root</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>最后在 <code>app</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.22.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">argLine</span>&gt;</span>$&#123;argLine&#125; -Xms256m -Xmx2048m<span class="tag">&lt;/<span class="name">argLine</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">forkCount</span>&gt;</span>1<span class="tag">&lt;/<span class="name">forkCount</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">runOrder</span>&gt;</span>random<span class="tag">&lt;/<span class="name">runOrder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>test<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时在 <code>root</code> 模块下执行 <code>mvn test</code>，执行成功后在 <code>app/target/site/jacoco-aggregate</code> 目录下就会生成各个模块的覆盖测试报告：</p>
+<p><img src="/images/jacoco-multiple-modules-demo.png" alt="alt"></p>
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo">GitHub</a>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+<li><a href="https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp">Jacoco report aggregation for code coverage</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Docker</tag>
+        <tag>Java</tag>
+        <tag>JaCoCo</tag>
+        <tag>Maven</tag>
       </tags>
   </entry>
   <entry>
@@ -419,37 +435,37 @@
 ]]></content>
   </entry>
   <entry>
-    <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
-    <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
-    <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">├── product-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── sum-service</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── app</span><br><span class="line">│   └── pom.xml</span><br><span class="line">├── pom.xml</span><br></pre></td></tr></table></figure>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
 
-<p>其中 <code>product-service</code> 和 <code>sum-service</code> 表示功能代码，<code>app</code> 负责测试用例的整合。<code>product-service</code> 和 <code>sum-service</code> 分别包含一个 <code>ProductService</code> 类和 <code>SumService</code> 类，具体代码如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ProductService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">product</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x * y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// SumService</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x + y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>app</code> 内的测试用例如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldCalculateCorrectSumAndProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Assert.assertEquals(<span class="number">10</span>, <span class="keyword">new</span> ProductService().product(<span class="number">2</span>, <span class="number">5</span>));</span><br><span class="line">        Assert.assertEquals(<span class="number">5</span>, <span class="keyword">new</span> SumService().sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后在 <code>root</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>prepare-agent<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>最后在 <code>app</code> 模块的 <code>pom.xml</code> 文件中配置 <code>JaCoCo</code> 插件：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.22.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">argLine</span>&gt;</span>$&#123;argLine&#125; -Xms256m -Xmx2048m<span class="tag">&lt;/<span class="name">argLine</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">forkCount</span>&gt;</span>1<span class="tag">&lt;/<span class="name">forkCount</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">runOrder</span>&gt;</span>random<span class="tag">&lt;/<span class="name">runOrder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jacoco<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jacoco-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.8.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>test<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>report-aggregate<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>此时在 <code>root</code> 模块下执行 <code>mvn test</code>，执行成功后在 <code>app/target/site/jacoco-aggregate</code> 目录下就会生成各个模块的覆盖测试报告：</p>
-<p><img src="/images/jacoco-multiple-modules-demo.png" alt="alt"></p>
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/jacoco-multiple-modules-demo">GitHub</a>。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://prismoskills.appspot.com/lessons/Maven/Chapter_06_-_Jacoco_report_aggregation.jsp">Jacoco report aggregation for code coverage</a></li>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Java</tag>
-        <tag>JaCoCo</tag>
-        <tag>Maven</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSH 连接服务器时指定私钥的路径</title>
+    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
+    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+        <tag>SSH</tag>
       </tags>
   </entry>
   <entry>
@@ -469,22 +485,6 @@
       <tags>
         <tag>Ubuntu</tag>
         <tag>Puppeteer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSH 连接服务器时指定私钥的路径</title>
-    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
-    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-        <tag>SSH</tag>
       </tags>
   </entry>
   <entry>
@@ -819,6 +819,19 @@
       </tags>
   </entry>
   <entry>
+    <title>如何修改 AppVeyor 的 JDK 版本</title>
+    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
+    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>AppVeyor</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 JDK 11 中建立 jstatd 连接</title>
     <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
     <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
@@ -835,19 +848,6 @@
       <tags>
         <tag>Java</tag>
         <tag>VisualVM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何修改 AppVeyor 的 JDK 版本</title>
-    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
-    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>AppVeyor</tag>
       </tags>
   </entry>
   <entry>
@@ -1691,15 +1691,15 @@
 </ol>
 <p>参考：</p>
 <ul>
-<li><a href="https://research.google/pubs/pub62/">MapReduce: Simplified Data Processing on Large Clusters</a></li>
+<li><a href="https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf">MapReduce: Simplified Data Processing on Large Clusters</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Bisection_bandwidth">Bisection bandwidth</a></li>
 <li><a href="https://networkengineering.stackexchange.com/questions/28894/understanding-bisection-bandwidth">Understanding bisection bandwidth</a></li>
 </ul>
 ]]></content>
       <tags>
         <tag>MIT 6.824</tag>
-        <tag>MapReduce</tag>
         <tag>Paper</tag>
+        <tag>MapReduce</tag>
       </tags>
   </entry>
   <entry>
@@ -1958,7 +1958,7 @@
 <p>诊断日志带来的性能影响很小（在其带来的价值面前不值一提），因为采用了异步顺序的方式写入日志。同时，最近某段时间内的事件也会保存在内存中用于线上的持续监控。</p>
 <p>参考：</p>
 <ul>
-<li><a href="https://static.googleusercontent.com/media/research.google.com/en//archive/gfs-sosp2003.pdf">The Google File System</a></li>
+<li><a href="https://pdos.csail.mit.edu/6.824/papers/gfs.pdf">The Google File System</a></li>
 <li><a href="https://pdos.csail.mit.edu/6.824/notes/l-gfs.txt">6.824 2022 Lecture 3: GFS</a></li>
 <li><a href="https://www.zhihu.com/question/20485173">GFS，一致性模型里，“已定义”和“不一致”具体表示的什么含义？</a></li>
 </ul>
