@@ -10,3 +10,4 @@ date: 2022-02-13 15:39:40
 * [MIT 6.824 Lab 1 (6) - 实现](/2022/04/10/mit-6.824-lab1-implementation/)
 * [MIT 6.824 - GFS](/2022/04/19/mit-6.824-gfs/)
 * [MIT 6.824 - The Design of a Practical System for Fault-Tolerant Virtual Machines](/2022/04/24/mit-6.824-vm-ft/)
+* [MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version)](/2022/05/01/mit-6.824-raft/)
