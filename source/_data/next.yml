@@ -38,3 +38,8 @@ creative_commons:
   sidebar: false
   post: true
   language: 
+
+symbols_count_time:
+  separated_meta: true
+  item_text_post: true
+  item_text_total: false
