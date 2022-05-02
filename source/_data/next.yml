@@ -40,6 +40,6 @@ creative_commons:
   language: 
 
 symbols_count_time:
-  separated_meta: true
-  item_text_post: true
+  separated_meta: false
+  item_text_post: false
   item_text_total: false
