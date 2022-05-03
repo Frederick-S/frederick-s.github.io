@@ -36,6 +36,7 @@
 <meta property="article:author" content="Xiaodan Mao">
 <meta property="article:tag" content="MIT 6.824">
 <meta property="article:tag" content="Paper">
+<meta property="article:tag" content="Distributed Systems">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://frederick-s.github.io/images/vm-ft-1.png">
 
@@ -244,6 +245,18 @@
             </span>
 
           
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>20 mins.</span>
+            </span>
 
         </div>
       </header>
@@ -273,7 +286,7 @@
 <p>另外，<code>x86</code> 处理器中很多复杂的操作往往伴有副作用，因此也是非确定性的操作，如何捕捉到这些非确定性的操作并正确的在从虚拟机上重放也是一个挑战。</p>
 <p><code>VMware vSphere</code> 平台为 <code>x86</code> 虚拟机提供了上述的重放功能。确定性重放技术会将主虚拟机的所有输入和所有可能的非确定性操作写入到日志中。从虚拟机就可以读取日志并执行和主虚拟机一样的操作。对于非确定性的操作来说，系统会写入一些额外的信息来保证重放时生成相同的虚拟机状态和输出。对于非确定性的事件例如计时器或者 <code>IO</code> 完成中断，在事件发生时所执行的指令也会记录在日志中。在重放时，事件会和指令一同出现在指令流中。借助联合 <code>AMD</code> 和 <code>Intel</code> 开发的 <code>hardware performance counter</code>（一组特殊寄存器用来记录硬件相关事件发生的次数）和其他技术，<code>VMware</code> 确定性重放技术能高效的记录和重放非确定性的事件。</p>
 <p><code>Bressound</code> 和 <code>Schneider</code> 在其实现中提到将虚拟机的执行以 <code>epoch</code> 为单位进行切分，其中所有的非确定性操作例如中断都放在 <code>epoch</code> 的最后。这个想法是出于批量处理的考虑，因为单独将每一个中断和中断发生时对应的指令重放执行代价较大。不过 <code>VMware</code> 的实现足够高效使得不需要借助 <code>epoch</code> 来实现确定性重放，每一个中断都能被准确的记录并伴随着发生中断时的指令一起执行。</p>
-<h3 id="FT-协议"><a href="#FT-协议" class="headerlink" title="FT 协议"></a><code>FT</code> 协议</h3><p><code>VMware FT</code> 使用确定性重放技术将主虚拟机的执行流记录到日志中，不过主虚拟机并不是将日志写入到磁盘上，而是通过 <code>logging channel</code> 将日志发送给从虚拟机。从虚拟机能实时的读取日志并将其重放，从而执行和主虚拟机一样的操作。然而，双方在 <code>logging channel</code> 的通信必须遵循 <code>FT</code> 协议来保证容错。其中一条基本的要求是：</p>
+<h3 id="FT-协议"><a href="#FT-协议" class="headerlink" title="FT 协议"></a>FT 协议</h3><p><code>VMware FT</code> 使用确定性重放技术将主虚拟机的执行流记录到日志中，不过主虚拟机并不是将日志写入到磁盘上，而是通过 <code>logging channel</code> 将日志发送给从虚拟机。从虚拟机能实时的读取日志并将其重放，从而执行和主虚拟机一样的操作。然而，双方在 <code>logging channel</code> 的通信必须遵循 <code>FT</code> 协议来保证容错。其中一条基本的要求是：</p>
 <blockquote>
 <p><code>Output Requirement</code>：当主虚拟机异常，从虚拟机接管执行时，从虚拟机的输出必须和先前主虚拟机已经发送给客户端的输出一致。</p>
 </blockquote>
@@ -292,24 +305,24 @@
 <p>有很多种方式来监测主虚拟机和从虚拟机的异常。<code>VMware FT</code> 通过 <code>UDP</code> 心跳来监测启用了容错的虚拟机是否发生了异常。另外，<code>VMware FT</code> 还会监控 <code>logging channel</code> 中的流量，包括主虚拟机发送给从虚拟机的日志，以及从虚拟机的消息确认回执。因为操作系统本身存在时钟中断，所以理论上来说 <code>logging channel</code> 中的流量应该是连续不断的。因此，如果监测到 <code>logging channel</code> 中没有流量了，那么就可以推断出某台虚拟机发生了异常。如果没有心跳或者 <code>logging channel</code> 中没有流量超过一段指定的时间（近似几秒钟），那么系统就会声明这台虚拟机发生了异常。</p>
 <p>然而，这种异常监测机制可能会引发脑裂问题。如果从虚拟机不再接收到来自主虚拟机的心跳，那么有可能说明主虚拟机发生了异常，但也有可能只是双方间的网络断开。如果此时从虚拟机进入 <code>go live</code> 模式，由于此时主虚拟机依然存活，就有可能给客户端造成数据损坏或其他问题。因此，当监测到异常时必须保证只有一台主虚拟机或者从虚拟机进入 <code>go live</code> 模式。为了解决脑裂问题，<code>VMware FT</code> 借助了虚拟机所连接的共享存储。当主虚拟机或者从虚拟机希望进入 <code>go live</code> 模式时，它会向共享存储发起一个原子性的 <code>test-and-set</code> 操作。如果操作成功，那么当前虚拟机可以进入 <code>go live</code> 模式，如果操作失败，说明已经有其他虚拟机先进入了 <code>go live</code> 模式，所以当前虚拟机就将自己挂起。如果虚拟机访问共享存储失败，那么它会一直等待直到访问成功。如果共享存储由于网络问题造成无法访问，那么虚拟机本身也做不了什么因为它的虚拟磁盘就挂载在共享存储上。所以使用共享存储来解决脑裂问题不会带来其他可用性问题。</p>
 <p>最后一个设计的点是如果虚拟机发生了异常，使得某台虚拟机进入了 <code>go live</code> 模式，那么 <code>VMware FT</code> 会自动在其他物理机上启动一台新的备份虚拟机。</p>
-<h2 id="FT-的实际实现"><a href="#FT-的实际实现" class="headerlink" title="FT 的实际实现"></a><code>FT</code> 的实际实现</h2><p>上节主要描述了 <code>FT</code> 的基础设计和协议。然而，为了构建一个可用，健壮和自动化的系统，还需要设计和实现很多其他的组件。</p>
-<h3 id="启动和重启-FT-虚拟机"><a href="#启动和重启-FT-虚拟机" class="headerlink" title="启动和重启 FT 虚拟机"></a>启动和重启 <code>FT</code> 虚拟机</h3><p>其中一个至关重要的组件是如何启动一台有着和主虚拟机一模一样状态的备份虚拟机。这个同时也会在当某台虚拟机异常需要重新启动一台备份虚拟机时用到。因此，这个组件必须能够在主虚拟机处于任意状态的时候复制一台一模一样的备份虚拟机（而不仅仅是初始状态）。另外，这个启动操作还不能影响到主虚拟机的执行，因为这有可能影响到当前所有连接着的客户端。</p>
+<h2 id="FT-的实际实现"><a href="#FT-的实际实现" class="headerlink" title="FT 的实际实现"></a>FT 的实际实现</h2><p>上节主要描述了 <code>FT</code> 的基础设计和协议。然而，为了构建一个可用，健壮和自动化的系统，还需要设计和实现很多其他的组件。</p>
+<h3 id="启动和重启-FT-虚拟机"><a href="#启动和重启-FT-虚拟机" class="headerlink" title="启动和重启 FT 虚拟机"></a>启动和重启 FT 虚拟机</h3><p>其中一个至关重要的组件是如何启动一台有着和主虚拟机一模一样状态的备份虚拟机。这个同时也会在当某台虚拟机异常需要重新启动一台备份虚拟机时用到。因此，这个组件必须能够在主虚拟机处于任意状态的时候复制一台一模一样的备份虚拟机（而不仅仅是初始状态）。另外，这个启动操作还不能影响到主虚拟机的执行，因为这有可能影响到当前所有连接着的客户端。</p>
 <p>对于 <code>VMware FT</code> 来说，它借用了 <code>VMware vSphere</code> 平台已有的 <code>VMotion</code> 的功能。<code>VMware VMotion</code> 能以极小的代价将一台运行中的虚拟机迁移到另一台机器上——虚拟机的暂停时间一般在一秒内。<code>VMware FT</code> 对 <code>VMotion</code> 做了些改动使得在不销毁当前虚拟机的情况下，在远程服务器上复制一台和当前虚拟机一模一样的虚拟机。即修改版的 <code>FT VMotion</code> 做的是虚拟机的复制而不是迁移。<code>FT VMotion</code> 也会同时建立一条 <code>logging channel</code>，源虚拟机作为主虚拟机就会将执行日志写入到 <code>logging channel</code>，而复制后的虚拟机作为从虚拟机就会读取日志开始重放执行。和常规的 <code>VMotion</code> 一样，<code>FT VMotion</code> 也能将对主虚拟机的暂停控制在一秒以内。因此，对某台运行中的虚拟机开启 <code>FT</code> 功能非常简单，且没有破坏性。</p>
 <p>另一个启动一台备份虚拟机要考虑的点是选择在哪台物理机上启动。支持容错的虚拟机运行在某个可访问共享存储的集群中，所以本质上虚拟机可以运行在任意一台机器上。这个灵活性使得 <code>VMware vSphere</code> 可以轻易的为一台或多台异常的虚拟机启动新的备份虚拟机。<code>VMware vSphere</code> 实现了一套集群服务来管理集群中的资源。当虚拟机发生异常主虚拟机需要一台新的虚拟机来维持容错时，主虚拟机会通知集群服务需要一台新的备份虚拟机。此时集群服务会根据资源利用率和其他条件来决定在哪台机器上重启新的备份虚拟机，然后会由 <code>FT VMotion</code> 创建一台新的备份虚拟机。一般来说，<code>VMware FT</code> 可以在发生异常的几分钟内恢复某台虚拟机的冗余功能，而不会造成任何中断。</p>
-<h3 id="管理-Logging-Channel"><a href="#管理-Logging-Channel" class="headerlink" title="管理 Logging Channel"></a>管理 <code>Logging Channel</code></h3><p>在管理 <code>logging channel</code> 的流量上有很多有趣的实现细节。在 <code>VMware</code> 的实现里，<code>hypervisor</code> 为主虚拟机和从虚拟机维护了一大块日志缓冲区。在主虚拟机执行时，它将执行日志发送到日志缓冲区中，类似的，从虚拟机从日志缓冲区中消费日志。每当主虚拟机的日志缓冲区中有数据，系统就会将其发送到 <code>logging channel</code> 中，相应的在另一边则会将其放入到从虚拟机的日志缓冲区中。当从虚拟机从 <code>logging channel</code> 中读取到日志并将其放入日志缓冲区后，它就会向主虚拟机发送一个已读消息的回执。<code>VMare FT</code> 就可以根据这个已读回执决定哪些输出操作可以执行了。下图展示了这个过程：</p>
+<h3 id="管理-Logging-Channel"><a href="#管理-Logging-Channel" class="headerlink" title="管理 Logging Channel"></a>管理 Logging Channel</h3><p>在管理 <code>logging channel</code> 的流量上有很多有趣的实现细节。在 <code>VMware</code> 的实现里，<code>hypervisor</code> 为主虚拟机和从虚拟机维护了一大块日志缓冲区。在主虚拟机执行时，它将执行日志发送到日志缓冲区中，类似的，从虚拟机从日志缓冲区中消费日志。每当主虚拟机的日志缓冲区中有数据，系统就会将其发送到 <code>logging channel</code> 中，相应的在另一边则会将其放入到从虚拟机的日志缓冲区中。当从虚拟机从 <code>logging channel</code> 中读取到日志并将其放入日志缓冲区后，它就会向主虚拟机发送一个已读消息的回执。<code>VMare FT</code> 就可以根据这个已读回执决定哪些输出操作可以执行了。下图展示了这个过程：</p>
 <p><img src="/images/vm-ft-3.png" alt="alt"></p>
 <p>当从虚拟机从日志缓冲区读取不到任何日志时（日志缓冲区为空），它就会暂停执行直到下一条日志到达。因为从虚拟机不和外界交互，这个暂停对客户端没有任何影响。类似的，如果主虚拟机往日志缓冲区中写日志发现日志缓冲区满时，它必须停止执行直到日志缓冲区被消费。这个暂停保证了主虚拟机以一个可控的速度生产执行日志。不过，这个暂停会影响客户端的响应，直到主虚拟机可以继续写日志并恢复执行。所以，在实现时必须考虑如何尽量避免主虚拟机的日志缓冲区写满。</p>
 <p>其中一个原因造成主虚拟机的日志缓冲区写满是因为从虚拟机执行的太慢从而造成消费日志太慢。一般来说，从虚拟机必须以和主虚拟机记录执行日志一样的速度来执行重放。幸运的是，在 <code>VMware FT</code> 的实现下，记录执行日志和重放所需要的时间基本是相同的。不过，如果从虚拟机所在的机器存在和其他虚拟机资源竞争（资源超卖），不管 <code>hypervisor</code> 的虚拟机调度多么高效，从虚拟机都有可能得不到足够的 <code>CPU</code> 和内存资源来保证和主虚拟机一样的速度执行重放。</p>
 <p>除了主虚拟机日志缓冲区满造成的不可控暂停外，还有一个原因也要求主从虚拟机间的状态不能差太远。当主虚拟机异常时，从虚拟机必须尽快的将所有的执行日志进行重放，达到和主虚拟机一样的状态，然后接管主虚拟机向客户端提供服务。结束重放的时间基本上等于异常发生时从虚拟机落后主虚拟机的时间，所以从虚拟机进入 <code>go live</code> 模式需要的时间就基本上等于检测出异常的时间加上当前从虚拟机落后的时间。因此，从虚拟机不能落后主虚拟机太多（大于一秒），否则这会大大增加故障切换的时间。</p>
 <p>因此，<code>VMware FT</code> 有另一套机制来保证从虚拟机不会落后主虚拟机太多。在主从虚拟机间的通信协议里，还会发送额外的信息来计算两者间的执行时间差。一般来说这个时间差在100毫秒以内。如果从虚拟机开始明显落后主虚拟机（例如大于1秒），那么 <code>VMware FT</code> 会通知调度器降低主虚拟机的 <code>CPU</code> 资源配额（初始减少几个百分点）来延缓主虚拟机的执行。<code>VMware FT</code> 会根据从虚拟机返回的落后时间来不断调整主虚拟机的 <code>CPU</code> 资源配额，如果从虚拟机一直落后，那么 <code>VMware FT</code> 会逐渐减少主虚拟机的 <code>CPU</code> 资源配额。相反的，如果从虚拟机开始赶上了主虚拟机的执行速度，那么 <code>VMware FT</code> 会逐渐增加主虚拟机的 <code>CPU</code> 资源配额，直到两者的执行时间差到达一个合理的值。</p>
 <p>不过在实际场景中减慢主虚拟机执行的速度非常少见，一般只会发生在系统承受极大负载的情况下。</p>
-<h3 id="FT-虚拟机上的操作"><a href="#FT-虚拟机上的操作" class="headerlink" title="FT 虚拟机上的操作"></a><code>FT</code> 虚拟机上的操作</h3><p>另一个实际中要考虑的问题是处理针对主虚拟机的一系列控制操作。例如，如果主虚拟机主动关机了，从虚拟机也需要同步关机，而不是进入 <code>go live</code> 模式。另外，所有对主虚拟机的资源修改（例如增加 <code>CPU</code> 资源配额）都必须应用到从虚拟机上。针对这些操作，系统会将其转化为特殊的执行日志发送到 <code>logging channel</code>，从虚拟机收到后也会将其正确的重放。</p>
+<h3 id="FT-虚拟机上的操作"><a href="#FT-虚拟机上的操作" class="headerlink" title="FT 虚拟机上的操作"></a>FT 虚拟机上的操作</h3><p>另一个实际中要考虑的问题是处理针对主虚拟机的一系列控制操作。例如，如果主虚拟机主动关机了，从虚拟机也需要同步关机，而不是进入 <code>go live</code> 模式。另外，所有对主虚拟机的资源修改（例如增加 <code>CPU</code> 资源配额）都必须应用到从虚拟机上。针对这些操作，系统会将其转化为特殊的执行日志发送到 <code>logging channel</code>，从虚拟机收到后也会将其正确的重放。</p>
 <p>一般来说，大部分对虚拟机的操作都只应该在主虚拟机上发起。然后 <code>VMware FT</code> 会将其转化为日志发送给从虚拟机来进行重放。唯一可以独立的在主虚拟机和从虚拟机上执行的操作是 <code>VMotion</code>。即主虚拟机和从虚拟机都可以独立的被复制到其他机器上。<code>VMware FT</code> 保证了在复制虚拟机时不会将其复制到一台已经运行了其他虚拟机的机器上，因为这无法提供有效的容错保证。</p>
 <p>复制一台主虚拟机要比迁移一台普通的虚拟机复杂些，因为从虚拟机需要先和主虚拟机断开连接，然后之后在合适的时间和新的主虚拟机建立连接。从虚拟机的复制有类似的问题，不过也略微复杂些。对于普通的虚拟机迁移来说，系统会要求当前所有进行中的磁盘 <code>IO</code> 在切换前执行完成。对于主虚拟机来说，它可以等待所有进行中的磁盘 <code>IO</code> 的完成通知。而对于从虚拟机来说，它不能简单的在某个时间让所有的磁盘 <code>IO</code> 都结束，因为从虚拟机还在执行重放，也需要等待重放涉及的磁盘 <code>IO</code> 完成。而另一方面，主虚拟机在执行时有可能一直伴有磁盘 <code>IO</code>。<code>VMware FT</code> 有一个特有的方法来解决这个问题，当从虚拟机在执行切换前，会通过 <code>logging channel</code> 向主虚拟机发送请求要求暂时结束所有的磁盘 <code>IO</code>，主虚拟机收到请求后会天然的将其转化为执行日志发送到 <code>logging channel</code>，从虚拟机的磁盘 <code>IO</code> 也因此会伴随着重放而终止。</p>
-<h3 id="磁盘-IO-的实现问题"><a href="#磁盘-IO-的实现问题" class="headerlink" title="磁盘 IO 的实现问题"></a>磁盘 <code>IO</code> 的实现问题</h3><p><code>VMware</code> 在实现时遇到了一些和磁盘 <code>IO</code> 相关的问题。首先，因为磁盘操作是非阻塞的所以可以并行执行，同一时间访问同一块磁盘区域就会导致非确定性结果。另外，磁盘 <code>IO</code> 会通过 <code>DMA</code>（<code>Direct memory access</code>） 来直接访问虚拟机的内存，因此同一时间的磁盘操作如果访问到了同一块内存页也会导致非确定性结果。<code>VMware</code> 通过监测这样的 <code>IO</code> 竞争（实际场景中极少）并强制让其在主虚拟机和从虚拟机中串行执行来解决这个问题。</p>
+<h3 id="磁盘-IO-的实现问题"><a href="#磁盘-IO-的实现问题" class="headerlink" title="磁盘 IO 的实现问题"></a>磁盘 IO 的实现问题</h3><p><code>VMware</code> 在实现时遇到了一些和磁盘 <code>IO</code> 相关的问题。首先，因为磁盘操作是非阻塞的所以可以并行执行，同一时间访问同一块磁盘区域就会导致非确定性结果。另外，磁盘 <code>IO</code> 会通过 <code>DMA</code>（<code>Direct memory access</code>） 来直接访问虚拟机的内存，因此同一时间的磁盘操作如果访问到了同一块内存页也会导致非确定性结果。<code>VMware</code> 通过监测这样的 <code>IO</code> 竞争（实际场景中极少）并强制让其在主虚拟机和从虚拟机中串行执行来解决这个问题。</p>
 <p>第二，磁盘操作访问内存可能和应用程序访问内存产生竞争，因为磁盘操作可以通过 <code>DMA</code> 直接访问内存。例如，如果应用程序正在访问某个内存块，而此时磁盘也在写入这个内存块，则会发生非确定性的结果。虽然这种情况同样很少，但也仍然需要能够监测并解决。其中一种解决方案是当磁盘正在访问某个内存页时暂时对该页设置页保护。当应用程序尝试访问页保护的内存页时，会触发一个陷阱（<code>trap</code>）使得操作系统能够暂停执行直到磁盘操作完成。不过，修改 <code>MMU</code>（<code>Memory management unit</code>）的页保护机制代价较大，<code>VMware</code> 借助 <code>bounce buffer</code> 来解决这个问题。<code>bounce buffer</code> 是一块和磁盘操作正在访问的内存一样大小的临时缓冲区。磁盘的读操作被修改为磁盘先将数据复制到 <code>bounce buffer</code> 中，然后虚拟机读取 <code>bounce buffer</code> 中的数据，而且只有在磁盘 <code>IO</code> 完成后才会将 <code>bounce buffer</code> 中的数据复制到虚拟机内存中。类似的，对于磁盘写操作，数据会先写到 <code>bounce buffer</code> 中，磁盘再将数据从 <code>bounce buffer</code> 中复制到磁盘上。使用 <code>bounce buffer</code> 的情况下会降低磁盘的吞吐，不过实际中还没有发现造成可见的性能损耗。</p>
 <p>第三，还有些问题发生于主虚拟机正在执行某些磁盘 <code>IO</code>（未完成），然后主虚拟机异常，从虚拟机接管执行。对于从虚拟机来说，它并不知道这些磁盘 <code>IO</code> 是否已发送给磁盘或者已成功执行。另外，由于这些磁盘 <code>IO</code> 还没有在从虚拟机上发起过，所以也不会相应的 <code>IO</code> 完成的通知，但是在操作系统的角度指令已经发出了，但是从虚拟机上的操作系统也收不到 <code>IO</code> 完成的通知，最终会终止或者重置这个过程。在这种情况下，系统会为每一个 <code>IO</code> 操作发送一个失败的通知，即使某个 <code>IO</code> 操作实际成功了而返回失败也是可以接受的。然而，由于从虚拟机上的操作系统可能不能很好的响应 <code>IO</code> 失败的通知，所以在从虚拟机 <code>go live</code> 阶段会重新发起这些 <code>IO</code> 请求。因为系统已经消除了并发 <code>IO</code> 间的竞争，所以这些 <code>IO</code> 操作可以重新发起即使它们之前已经成功执行了（操作是幂等的）。</p>
-<h3 id="网络-IO-的实现问题"><a href="#网络-IO-的实现问题" class="headerlink" title="网络 IO 的实现问题"></a>网络 <code>IO</code> 的实现问题</h3><p><code>VMware vSphere</code> 为虚拟机的网络提供了很多的性能优化。部分优化基于 <code>hypervisor</code> 能异步更新虚拟机的网络设备的状态。例如，在虚拟机还在执行时 <code>hypervisor</code> 就可以直接更新接收缓冲区。不过，这种异步更新同样也带来了非确定性。除非能保证在异步更新的时间点在主虚拟机上执行的指令能严格一致的在从虚拟机上重放，否则从虚拟机的状态就会和主虚拟机不一致。</p>
+<h3 id="网络-IO-的实现问题"><a href="#网络-IO-的实现问题" class="headerlink" title="网络 IO 的实现问题"></a>网络 IO 的实现问题</h3><p><code>VMware vSphere</code> 为虚拟机的网络提供了很多的性能优化。部分优化基于 <code>hypervisor</code> 能异步更新虚拟机的网络设备的状态。例如，在虚拟机还在执行时 <code>hypervisor</code> 就可以直接更新接收缓冲区。不过，这种异步更新同样也带来了非确定性。除非能保证在异步更新的时间点在主虚拟机上执行的指令能严格一致的在从虚拟机上重放，否则从虚拟机的状态就会和主虚拟机不一致。</p>
 <p><code>FT</code> 中对网络代码改动最大的一块就是禁止了异步网络更新优化。从原先的异步更新缓冲区修改为强制陷入到陷阱（<code>trap</code>）中，<code>hypervisor</code> 响应后将更新记录到日志中，然后再将其应用到虚拟机上。类似的，异步从缓冲区中拉取数据包也同样被禁止了，同样由 <code>hypervisor</code> 托管执行。</p>
 <p>消除了异步的网络设备状态更新以及前面所提到的 <code>Output Rule</code> 带来的延迟输出，为网络性能优化又提出了挑战。<code>VMware</code> 通过两个方面来优化网络性能。第一，实现了集群优化来减少虚拟机的陷阱和中断。当虚拟机在接收网络包时，<code>hypervisor</code> 可以在一个陷阱、中断内处理多组数据包来减少陷阱和中断的次数。</p>
 <p>第二个网络优化是降低数据包延迟发送的时间。前面提到，只有当从虚拟机确认收到所有输出操作的日志后，主虚拟机才能执行输出操作。所以减少数据包延迟发送的时间等价于减少日志发送和确认的时间。这里主要的优化点是发送和接受消息回执的过程中确保不会触发线程切换。另外，当主虚拟机将某个数据包加入发送队列时，系统会强制刷新主虚拟机的日志缓冲区到 <code>logging channel</code> 中。</p>
@@ -360,6 +373,7 @@
           <div class="post-tags">
               <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
               <a href="/tags/Paper/" rel="tag"># Paper</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
           </div>
 
         
@@ -371,7 +385,10 @@
     <a href="/2022/04/19/mit-6.824-gfs/" rel="prev" title="MIT 6.824 - GFS">
       <i class="fa fa-chevron-left"></i> MIT 6.824 - GFS
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/03/mit-6.824-raft/" rel="next" title="MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version)">
+      MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version) <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -444,14 +461,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-count">59</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

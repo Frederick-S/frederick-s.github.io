@@ -34,6 +34,7 @@
 <meta property="article:author" content="Xiaodan Mao">
 <meta property="article:tag" content="MIT 6.824">
 <meta property="article:tag" content="Paper">
+<meta property="article:tag" content="Distributed Systems">
 <meta property="article:tag" content="GFS">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://frederick-s.github.io/images/gfs-1.png">
@@ -243,6 +244,18 @@
             </span>
 
           
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>23k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>38 mins.</span>
+            </span>
 
         </div>
       </header>
@@ -286,7 +299,7 @@
 <li>客户端将 <code>chunk handle</code> 和想要读取的文件内容偏移范围发给其中一台 <code>chunkserver</code>，一般来说，客户端会选择距离最近的 <code>chunkserver</code>，由于缓存了 <code>chunkserver</code> 列表信息，后续对同一个 <code>chunk</code> 的读请求就不需要再次和主节点通信，直到缓存过期或者文件被再次打开。</li>
 <li>一般来说，客户端和主节点通信时会在一次请求中要求多个 <code>chunk</code> 的信息，主节点同样也可在一次响应中返回多个 <code>chunk</code> 的信息，这也有利于减少客户端和主节点的通信次数。</li>
 </ol>
-<h3 id="chunk-大小"><a href="#chunk-大小" class="headerlink" title="chunk 大小"></a><code>chunk</code> 大小</h3><p>每个 <code>chunk</code> 的大小是一个关键的设计选择。<code>GFS</code> 的 <code>chunk</code> 大小为 <code>64 MB</code>，远大于一般文件系统的数据块的大小。每个 <code>chunk</code> 以 <code>Linux</code> 文件的形式保存在 <code>chunkserver</code> 上，但其实际占用的大小是动态增长的，从而避免了大量的文件碎片（例如实际只需要十几K的文件却固定分配了 <code>64 MB</code> 的大小）。</p>
+<h3 id="chunk-大小"><a href="#chunk-大小" class="headerlink" title="chunk 大小"></a>chunk 大小</h3><p>每个 <code>chunk</code> 的大小是一个关键的设计选择。<code>GFS</code> 的 <code>chunk</code> 大小为 <code>64 MB</code>，远大于一般文件系统的数据块的大小。每个 <code>chunk</code> 以 <code>Linux</code> 文件的形式保存在 <code>chunkserver</code> 上，但其实际占用的大小是动态增长的，从而避免了大量的文件碎片（例如实际只需要十几K的文件却固定分配了 <code>64 MB</code> 的大小）。</p>
 <p>那么，<code>GFS</code> 为什么要选择 <code>64 MB</code> 这样较大的数呢？主要是因为：</p>
 <ol>
 <li><code>chunk</code> 的大小越大，每个文件拆分成的 <code>chunk</code> 的数量就越少，客户端需要读取或写入的 <code>chunk</code> 数量也就越少，和主节点通信的次数也就越少。对于 <code>Google</code> 的数据应用来说，大部分都是顺序读写，客户端和主节点交互的次数是线性的时间复杂度，减少 <code>chunk</code> 的总个数有助于降低整个的时间复杂度。即使是对于少数的随机写，由于 <code>chunk</code> 大小足够大，客户端也能够将TB级别的数据对应的所有 <code>chunk</code> 的信息缓存起来。</li>
@@ -451,6 +464,7 @@
           <div class="post-tags">
               <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
               <a href="/tags/Paper/" rel="tag"># Paper</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
               <a href="/tags/GFS/" rel="tag"># GFS</a>
           </div>
 
@@ -539,14 +553,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-count">59</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
