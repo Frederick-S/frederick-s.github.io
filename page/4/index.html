@@ -741,8 +741,7 @@
 
 <p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
 <h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a target="_blank" rel="noopener" href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
 </ul>
@@ -857,8 +856,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
 
 <p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf">Code Coverage in .NET Core Projects</a></li>
 <li><a target="_blank" rel="noopener" href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
 <li><a target="_blank" rel="noopener" href="https://github.com/codecov/codecov-exe">codecov-exe</a></li>

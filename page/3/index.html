@@ -284,8 +284,7 @@
 
 <p>同样的，可以通过 <code>docker volume rm &lt;name&gt;</code> 来删除指定的数据卷，或者使用 <code>docker volume prune</code> 来删除所有未和运行中的容器关联的数据卷，以及通过 <code>docker volume prune -a</code> 删除所有的数据卷。</p>
 <p>最后，<code>docker system prune -a --volumes</code> 是在 <code>docker system prune -a</code> 的基础上删除所有未使用的卷。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://dockerwebdev.com/tutorials/clean-up-docker/">How to clean your Docker data</a></li>
 <li><a target="_blank" rel="noopener" href="https://jinnabalu.medium.com/docker-frequently-used-commands-on-images-b812d76a4b8e">Dangling or Unused Images in Docker</a></li>
 </ul>
@@ -771,8 +770,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">poweredByAwaitility</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DemoService demoService = <span class="keyword">new</span> DemoService();</span><br><span class="line">    AtomicReference&lt;String&gt; actualValue = <span class="keyword">new</span> AtomicReference&lt;&gt;(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    demoService.hello()</span><br><span class="line">            .whenComplete((result, e) -&gt; &#123;</span><br><span class="line">                actualValue.set(result);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">    await().atMost(<span class="number">5</span>, SECONDS).untilAsserted(() -&gt; &#123;</span><br><span class="line">        Assert.assertEquals(<span class="string">&quot;hello&quot;</span>, actualValue.get());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/test-async-code-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes">How to use JUnit to test asynchronous processes</a></li>
 </ul>
 
@@ -892,8 +890,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e2f2c0544800        7 seconds ago       5.22MB</span><br></pre></td></tr></table></figure>
 
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过 <code>multi-stage</code> 构建可以有效的减少 <code>Docker</code> 镜像的大小，而基础镜像的选择则要具体情况分析，在满足需求的情况下选择合理的基础镜像。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://www.ardanlabs.com/blog/2020/02/docker-images-part1-reducing-image-size.html">Docker Images : Part I - Reducing Image Size</a></li>
 </ul>
 

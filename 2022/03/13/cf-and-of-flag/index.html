@@ -326,8 +326,7 @@
 <p>所以，<code>OF</code> 的标记取决于运算结果的符号位是否发生变化，这里的变化指的是两个相同符号位的数的运算结果是一个不同符号位的数。</p>
 <h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p>注意到前面有符号数 <code>-128 - 1</code> 运算的例子中，最后 <code>CF</code> 和 <code>OF</code> 都被设置为了1，说明 <code>CF</code> 和 <code>OF</code> 并不是互斥的关系，在这个例子中即发生了进位又发生了符号位的变更，也就是说如果满足了设置 <code>CF</code> 的条件，那么 <code>CF</code> 就是1，如果满足了设置 <code>OF</code> 的条件，那么 <code>OF</code> 就是1。因此，回到文章开头的问题，<code>CPU</code> 并不是去判断该设置 <code>CF</code> 还是 <code>OF</code>，而是只要条件满足就会设置对应的标志位，而具体应该关注哪个标志位，则交由编译器去判断，因为对 <code>CPU</code> 而言它处理的只是比特运算，只有编译器知道当前的运算数是无符号数还是有符号数。</p>
 <p>另外，<code>CF</code> 和 <code>OF</code> 也不能合二为一，无法相互替代，例如两个无符号数相加 <code>CF</code> 有可能是0，但是 <code>OF</code> 却是1，如 <code>127 + 1</code>；两个有符号数相加 <code>OF</code> 有可能是0，但是 <code>CF</code> 却是1，如 <code>-1 - 1</code>。也有可能 <code>CF</code> 和 <code>OF</code> 都是1，如有符号数运算 <code>-128 - 1</code>。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a target="_blank" rel="noopener" href="http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt">The CARRY flag and OVERFLOW flag in binary arithmetic</a></li>
 <li><a target="_blank" rel="noopener" href="https://niranjanmr.wordpress.com/2016/01/20/eflags-registers/">Eflags Registers</a></li>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1817577/what-does-int-0x80-mean-in-assembly-code">What does “int 0x80” mean in assembly code?</a></li>
@@ -434,7 +433,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CF"><span class="nav-number">1.</span> <span class="nav-text">CF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OF"><span class="nav-number">2.</span> <span class="nav-text">OF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83"><span class="nav-number">3.</span> <span class="nav-text">比较</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CF"><span class="nav-number">1.</span> <span class="nav-text">CF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OF"><span class="nav-number">2.</span> <span class="nav-text">OF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83"><span class="nav-number">3.</span> <span class="nav-text">比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
