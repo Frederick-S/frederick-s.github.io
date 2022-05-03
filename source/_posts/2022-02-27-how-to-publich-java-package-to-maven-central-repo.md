@@ -220,7 +220,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 
 另外，因为配置 `nexus-staging-maven-plugin` 时指定了 `autoReleaseAfterClose` 为 `true`，所以发包后不需要去 `https://oss.sonatype.org/#stagingRepositories` 手动执行 `close` 和 `release` 操作。
 
-参考：
+## 参考
 
 * [How to Publish Your Artifacts to Maven Central](https://dzone.com/articles/publish-your-artifacts-to-maven-central)
 * [Coordinates](https://central.sonatype.org/publish/requirements/coordinates/)

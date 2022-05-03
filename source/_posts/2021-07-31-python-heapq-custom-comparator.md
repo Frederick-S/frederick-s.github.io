@@ -44,6 +44,6 @@ if __name__ == '__main__':
   print(top_k([Node(5), Node(4), Node(3), Node(2), Node(1)], 3)) # [1, 2, 3]
 ```
 
-参考：
+## 参考
 
 - [heapq with custom compare predicate](https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823)

@@ -86,6 +86,6 @@ public void poweredByAwaitility() {
 
 完整的代码可参考 [GitHub](https://github.com/Frederick-S/test-async-code-with-junit-demo)。
 
-参考：
+## 参考
 
 - [How to use JUnit to test asynchronous processes](https://stackoverflow.com/questions/631598/how-to-use-junit-to-test-asynchronous-processes)

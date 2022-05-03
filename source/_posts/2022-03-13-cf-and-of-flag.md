@@ -143,7 +143,7 @@ _start:
 
 另外，`CF` 和 `OF` 也不能合二为一，无法相互替代，例如两个无符号数相加 `CF` 有可能是0，但是 `OF` 却是1，如 `127 + 1`；两个有符号数相加 `OF` 有可能是0，但是 `CF` 却是1，如 `-1 - 1`。也有可能 `CF` 和 `OF` 都是1，如有符号数运算 `-128 - 1`。
 
-参考：
+## 参考
 
 * [The CARRY flag and OVERFLOW flag in binary arithmetic](http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt)
 * [Eflags Registers](https://niranjanmr.wordpress.com/2016/01/20/eflags-registers/)

@@ -83,7 +83,7 @@ local     test-volume
 
 最后，`docker system prune -a --volumes` 是在 `docker system prune -a` 的基础上删除所有未使用的卷。
 
-参考：
+## 参考
 
 - [How to clean your Docker data](https://dockerwebdev.com/tutorials/clean-up-docker/)
 - [Dangling or Unused Images in Docker](https://jinnabalu.medium.com/docker-frequently-used-commands-on-images-b812d76a4b8e)

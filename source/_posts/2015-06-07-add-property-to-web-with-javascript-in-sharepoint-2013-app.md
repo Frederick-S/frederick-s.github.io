@@ -105,6 +105,6 @@ And here is the json query result, very straightforward:
 }
 ```
 
-Reference:
+## Reference
 
 - [HOW TO: Add properties to SPWeb property bag using JSOM in SharePoint 2013](http://blogs.technet.com/b/sharepointdevelopersupport/archive/2013/05/06/how-to-add-properties-to-spweb-property-bag-using-jsom-in-sharepoint-2013.aspx)

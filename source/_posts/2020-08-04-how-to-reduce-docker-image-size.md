@@ -143,6 +143,6 @@ hello-world         latest              e2f2c0544800        7 seconds ago       
 ## 总结
 通过 `multi-stage` 构建可以有效的减少 `Docker` 镜像的大小，而基础镜像的选择则要具体情况分析，在满足需求的情况下选择合理的基础镜像。
 
-参考：
+## 参考
 
 - [Docker Images : Part I - Reducing Image Size](https://www.ardanlabs.com/blog/2020/02/docker-images-part1-reducing-image-size.html)

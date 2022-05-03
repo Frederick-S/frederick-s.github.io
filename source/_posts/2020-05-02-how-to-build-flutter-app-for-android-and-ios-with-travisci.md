@@ -164,7 +164,7 @@ cache:
 ## Codemagic
 最后推荐 [Codemagic](https://codemagic.io/) 这个服务，提供云端打包 `Flutter` 应用的功能，省去了 `Travis CI` 配置的步骤，免费用户每月有500分钟的额度来执行构建。
 
-参考：
+## 参考
 
 - [Building Flutter APKs and IPAs on Travis](https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4)
 - [Failed to install the following Android SDK packages as some licences have not been accepted in jitpack](https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b)

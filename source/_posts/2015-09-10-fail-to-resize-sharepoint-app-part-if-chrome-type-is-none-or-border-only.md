@@ -52,6 +52,6 @@ if (resizeWidth)
 
 Hope it's helpful.
 
-Reference:
+## Reference
 
 - [Dynamic Width and Height for iFrame (App Part)](http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint)

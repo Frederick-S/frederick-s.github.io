@@ -152,7 +152,7 @@ test_script:
 
 完整的代码可参考 [dotnet-core-coverlet-msbuild-demo](https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo) 及 [dotnet-core-coverlet-collector-demo](https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo)。
 
-参考：
+## 参考
 
 - [Code Coverage in .NET Core Projects](https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf)
 - [Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)](https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md)

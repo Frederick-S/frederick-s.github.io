@@ -279,7 +279,7 @@ if current.left:
 
 从出栈的角度来说，上述方法和理论遍历顺序并不一致，每个节点会入栈两次，第二次入栈时才会设置 `visited` 为 `True`，但从 `visited` 的角度来说顺序是和理论遍历顺序一致的。
 
-参考：
+## 参考
 
 - [[Java] This simple template can be used for 3 traversals](https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals)
 - [Preorder, Inorder, and Postorder Iteratively Summarization](https://leetcode.com/problems/binary-tree-postorder-traversal/discuss/45551/Preorder-Inorder-and-Postorder-Iteratively-Summarization)
