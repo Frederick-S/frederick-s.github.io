@@ -53,6 +53,18 @@
       </tags>
   </entry>
   <entry>
+    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
+    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
+    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+
+<p>The regular expression shows that it doesn’t allow float numbers.</p>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Add new list field in SharePoint App upgrade</title>
     <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
     <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
@@ -65,18 +77,6 @@
 <ul>
 <li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
-    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
-    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
-
-<p>The regular expression shows that it doesn’t allow float numbers.</p>
 ]]></content>
       <tags>
         <tag>SharePoint Add-in</tag>
@@ -433,6 +433,22 @@
 ]]></content>
   </entry>
   <entry>
+    <title>SSH 连接服务器时指定私钥的路径</title>
+    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
+    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+        <tag>SSH</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 Dockerfile 中定义变量</title>
     <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
     <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
@@ -448,22 +464,6 @@
 ]]></content>
       <tags>
         <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSH 连接服务器时指定私钥的路径</title>
-    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
-    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-        <tag>SSH</tag>
       </tags>
   </entry>
   <entry>
@@ -1122,25 +1122,6 @@
       </tags>
   </entry>
   <entry>
-    <title>二叉搜索树的删除</title>
-    <url>/2022/02/22/delete-node-in-binary-search-tree/</url>
-    <content><![CDATA[<p>二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
-<p><img src="/images/bst-delete-1.png" alt="alt"></p>
-<p>第二，被删除的节点只有一个孩子节点：</p>
-<p><img src="/images/bst-delete-2.png" alt="alt"></p>
-<p>第三，被删除的节点有两个孩子节点：</p>
-<p><img src="/images/bst-delete-3.png" alt="alt"></p>
-<p>对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节点，为了保持二叉搜索树的性质，我们可以使用左子树中的最大值或右子树的最小值来替代被删除的根节点。</p>
-<p>不过在实现时，考虑到实现的简便，对于第三种情况会通过直接修改当前节点的值来替代修改节点的指针指向，以上述例子来说，如果使用指针修改的方式，则需要修改节点5的左孩子指针，修改节点2的左孩子指针和右孩子指针（这里假设使用节点2来替代被删除的节点3），总共三处修改较为繁琐；而如果使用修改节点值的方式，只需要先将节点3的值改为2（这里假设使用节点2来替代被删除的节点3），然后就可以将问题转化为在余下的左子树中删除节点2。具体代码如下：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deleteNode</span>(<span class="params">self, root: TreeNode, key: <span class="built_in">int</span></span>) -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> root.val &lt; key:</span><br><span class="line">            root.right = self.deleteNode(root.right, key)</span><br><span class="line">        <span class="keyword">elif</span> root.val &gt; key:</span><br><span class="line">            root.left = self.deleteNode(root.left, key)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> root.left <span class="keyword">and</span> root.right:</span><br><span class="line">                root.val = self._find_min(root.right)</span><br><span class="line">                root.right = self.deleteNode(root.right, root.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> root.left <span class="keyword">or</span> root.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_find_min</span>(<span class="params">self, root</span>):</span></span><br><span class="line">        <span class="keyword">while</span> root.left:</span><br><span class="line">            root = root.left</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root.val</span><br></pre></td></tr></table></figure>
-]]></content>
-      <tags>
-        <tag>Data Structure</tag>
-        <tag>Algorithm</tag>
-        <tag>Binary Search Tree</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>发布 JAR 包到 Maven 中央仓库</title>
     <url>/2022/02/27/how-to-publich-java-package-to-maven-central-repo/</url>
     <content><![CDATA[<p><code>Sonatype OSSRH (OSS Repository Hosting)</code> 提供了 <code>JAR</code> 包发布服务，并支持自动将 <code>JAR</code> 包同步到 <code>Maven</code> 中央仓库，所以我们将 <code>JAR</code> 包发布到 <code>Sonatype OSSRH</code> 即可。</p>
@@ -1304,7 +1285,7 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (2) - Go Race Detector</title>
+    <title>MIT 6.824 Lab 1 (1) - Go Race Detector</title>
     <url>/2022/03/24/mit-6.824-lab1-go-race-detector/</url>
     <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-race</code> 表示启用 <code>Go</code> 的竞争检测，在多线程编程时，数据竞争是必须要考虑的问题，而数据竞争的问题往往难以察觉和排查，所以 <code>Go</code> 内置了竞争检测的工具来帮助开发人员提前发现问题。另外，<code>MIT 6.824</code> 是一门分布式系统课程，必然会涉及多线程编程，所以竞争检测也是校验 <code>Lab</code> 程序正确性的一种方式。</p>
 <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>Go</code> 借助 <code>goroutine</code> 来实现并发编程，所以数据竞争发生在多个 <code>goroutine</code> 并发读写同一个共享变量时，并且至少有一个 <code>goroutine</code> 存在写操作。来看一个简单的例子：</p>
@@ -1361,66 +1342,26 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (3) - Go buildmode</title>
-    <url>/2022/03/26/mit-6.824-lab1-go-buildmode-plugin/</url>
-    <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
-<p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对 <code>sum.go</code> 以插件形式编译：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
-
-<p>会生成一个 <code>sum.so</code> 文件。</p>
-<p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://pkg.go.dev/cmd/go#hdr-Build_modes">Build modes</a></li>
-</ul>
+    <title>二叉搜索树的删除</title>
+    <url>/2022/02/22/delete-node-in-binary-search-tree/</url>
+    <content><![CDATA[<p>二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
+<p><img src="/images/bst-delete-1.png" alt="alt"></p>
+<p>第二，被删除的节点只有一个孩子节点：</p>
+<p><img src="/images/bst-delete-2.png" alt="alt"></p>
+<p>第三，被删除的节点有两个孩子节点：</p>
+<p><img src="/images/bst-delete-3.png" alt="alt"></p>
+<p>对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节点，为了保持二叉搜索树的性质，我们可以使用左子树中的最大值或右子树的最小值来替代被删除的根节点。</p>
+<p>不过在实现时，考虑到实现的简便，对于第三种情况会通过直接修改当前节点的值来替代修改节点的指针指向，以上述例子来说，如果使用指针修改的方式，则需要修改节点5的左孩子指针，修改节点2的左孩子指针和右孩子指针（这里假设使用节点2来替代被删除的节点3），总共三处修改较为繁琐；而如果使用修改节点值的方式，只需要先将节点3的值改为2（这里假设使用节点2来替代被删除的节点3），然后就可以将问题转化为在余下的左子树中删除节点2。具体代码如下：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deleteNode</span>(<span class="params">self, root: TreeNode, key: <span class="built_in">int</span></span>) -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> root.val &lt; key:</span><br><span class="line">            root.right = self.deleteNode(root.right, key)</span><br><span class="line">        <span class="keyword">elif</span> root.val &gt; key:</span><br><span class="line">            root.left = self.deleteNode(root.left, key)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> root.left <span class="keyword">and</span> root.right:</span><br><span class="line">                root.val = self._find_min(root.right)</span><br><span class="line">                root.right = self.deleteNode(root.right, root.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> root.left <span class="keyword">or</span> root.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_find_min</span>(<span class="params">self, root</span>):</span></span><br><span class="line">        <span class="keyword">while</span> root.left:</span><br><span class="line">            root = root.left</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root.val</span><br></pre></td></tr></table></figure>
 ]]></content>
       <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Go</tag>
+        <tag>Data Structure</tag>
+        <tag>Algorithm</tag>
+        <tag>Binary Search Tree</tag>
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (4) - 示例程序</title>
-    <url>/2022/03/27/mit-6.824-lab1-sequential-mapreduce/</url>
-    <content><![CDATA[<p><code>Lab 1</code> 提供了一个串行化的示例 <code>MapReduce</code> 程序，整体分两部分，第一部分是用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，第二部分是框架代码。</p>
-<h2 id="用户自定义-map-和-reduce-函数"><a href="#用户自定义-map-和-reduce-函数" class="headerlink" title="用户自定义 map 和 reduce 函数"></a>用户自定义 map 和 reduce 函数</h2><p>以单词计数应用 <code>wc.go</code> 为例，对于 <code>map</code> 函数来说，它的输入键值对类型为 <code>&lt;string, string&gt;</code>，中间结果数据类型为框架定义的 <code>KeyValue</code> 类型，本质上也是个 <code>&lt;string, string&gt;</code> 类型。<code>map</code> 函数首先将文件内容拆分为单词，然后遍历每个单词，输出对应中间结果数据 <code>&lt;w, &quot;1&quot;&gt;</code>：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The map function is called once for each file of input. The first</span></span><br><span class="line"><span class="comment">// argument is the name of the input file, and the second is the</span></span><br><span class="line"><span class="comment">// file&#x27;s complete contents. You should ignore the input file name,</span></span><br><span class="line"><span class="comment">// and look only at the contents argument. The return value is a slice</span></span><br><span class="line"><span class="comment">// of key/value pairs.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Map</span><span class="params">(filename <span class="keyword">string</span>, contents <span class="keyword">string</span>)</span> []<span class="title">mr</span>.<span class="title">KeyValue</span></span> &#123;</span><br><span class="line">	<span class="comment">// function to detect word separators.</span></span><br><span class="line">	ff := <span class="function"><span class="keyword">func</span><span class="params">(r <span class="keyword">rune</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> !unicode.IsLetter(r) &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// split contents into an array of words.</span></span><br><span class="line">	words := strings.FieldsFunc(contents, ff)</span><br><span class="line"></span><br><span class="line">	kva := []mr.KeyValue&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> words &#123;</span><br><span class="line">		kv := mr.KeyValue&#123;w, <span class="string">&quot;1&quot;</span>&#125;</span><br><span class="line">		kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> kva</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>reduce</code> 函数的输出类型为 <code>string</code>，其逻辑较为简单，中间结果数组的长度就是单词的个数：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The reduce function is called once for each key generated by the</span></span><br><span class="line"><span class="comment">// map tasks, with a list of all the values created for that key by</span></span><br><span class="line"><span class="comment">// any map task.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Reduce</span><span class="params">(key <span class="keyword">string</span>, values []<span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="comment">// return the number of occurrences of this word.</span></span><br><span class="line">	<span class="keyword">return</span> strconv.Itoa(<span class="built_in">len</span>(values))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="框架代码"><a href="#框架代码" class="headerlink" title="框架代码"></a>框架代码</h2><p>我们可以通过 <code>go run -race mrsequential.go wc.so pg*.txt</code> 来运行串行化的 <code>MapReduce</code> 程序，这里的 <code>wc.so</code> 内包含了用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，<code>pg*.txt</code> 则是本次 <code>MapReduce</code> 程序的原始输入数据。</p>
-<p>首先，根据入参提供的插件找到用户自定义的 <code>map</code> 和 <code>reduce</code> 函数：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mapf, reducef := loadPlugin(os.Args[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
-
-<p>接着，依次读取输入文件的内容，并调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// read each input file,</span></span><br><span class="line"><span class="comment">// pass it to Map,</span></span><br><span class="line"><span class="comment">// accumulate the intermediate Map output.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">intermediate := []mr.KeyValue&#123;&#125;</span><br><span class="line"><span class="keyword">for</span> _, filename := <span class="keyword">range</span> os.Args[<span class="number">2</span>:] &#123;</span><br><span class="line">	file, err := os.Open(filename)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot open %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot read %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	file.Close()</span><br><span class="line">	kva := mapf(filename, <span class="keyword">string</span>(content))</span><br><span class="line">	intermediate = <span class="built_in">append</span>(intermediate, kva...)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后，对所有中间结果数据按照键进行排序，而在 <code>MapReduce</code> 论文中，中间结果数据会经过分片函数分发给不同的 <code>reduce</code> 节点，由 <code>reduce</code> 节点自行排序处理：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// a big difference from real MapReduce is that all the</span></span><br><span class="line"><span class="comment">// intermediate data is in one place, intermediate[],</span></span><br><span class="line"><span class="comment">// rather than being partitioned into NxM buckets.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line">sort.Sort(ByKey(intermediate))</span><br></pre></td></tr></table></figure>
-
-<p>最后，遍历所有中间结果数据，对同键的中间结果数据调用用户自定义的 <code>reduce</code> 函数，并将结果写入到最终输出文件中，同样的，这里也只有一个最终输出文件而不是多个：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">oname := <span class="string">&quot;mr-out-0&quot;</span></span><br><span class="line">ofile, _ := os.Create(oname)</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// call Reduce on each distinct key in intermediate[],</span></span><br><span class="line"><span class="comment">// and print the result to mr-out-0.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">i := <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i &lt; <span class="built_in">len</span>(intermediate) &#123;</span><br><span class="line">	j := i + <span class="number">1</span></span><br><span class="line">	<span class="keyword">for</span> j &lt; <span class="built_in">len</span>(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key &#123;</span><br><span class="line">		j++</span><br><span class="line">	&#125;</span><br><span class="line">	values := []<span class="keyword">string</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> k := i; k &lt; j; k++ &#123;</span><br><span class="line">		values = <span class="built_in">append</span>(values, intermediate[k].Value)</span><br><span class="line">	&#125;</span><br><span class="line">	output := reducef(intermediate[i].Key, values)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// this is the correct format for each line of Reduce output.</span></span><br><span class="line">	fmt.Fprintf(ofile, <span class="string">&quot;%v %v\n&quot;</span>, intermediate[i].Key, output)</span><br><span class="line"></span><br><span class="line">	i = j</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ofile.Close()</span><br></pre></td></tr></table></figure>
-
-<p>至此，一个串行化的 <code>MapReduce</code> 程序就完成了。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Go</tag>
-        <tag>MapReduce</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MIT 6.824 Lab 1 (5) - Go RPC</title>
+    <title>MIT 6.824 Lab 1 (4) - Go RPC</title>
     <url>/2022/04/04/mit-6.824-lab1-go-rpc/</url>
     <content><![CDATA[<p><code>Lab 1</code> 虽然是个单机器多线程、多进程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
 <h2 id="定义请求体和响应体"><a href="#定义请求体和响应体" class="headerlink" title="定义请求体和响应体"></a>定义请求体和响应体</h2><p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p>
@@ -1470,7 +1411,7 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (6) - 实现</title>
+    <title>MIT 6.824 Lab 1 (5) - 实现</title>
     <url>/2022/04/10/mit-6.824-lab1-implementation/</url>
     <content><![CDATA[<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
 <h2 id="主节点"><a href="#主节点" class="headerlink" title="主节点"></a>主节点</h2><p>主节点的入口是 <code>mrcoordinator.go</code>，通过 <code>go run mrcoordinator.go pg*.txt</code> 可运行一个主节点程序，其中 <code>pg*.txt</code> 是本次 <code>MapReduce</code> 程序的输入数据。同时，主节点和工作节点间通过 <code>RPC</code> 进行交互，本实验需要我们实现以下 <code>RPC</code> 接口：</p>
@@ -1520,8 +1461,67 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (1) - MapReduce: Simplified Data Processing on Large Clusters</title>
-    <url>/2022/02/13/mit-6.824-lab1-map-reduce/</url>
+    <title>MIT 6.824 Lab 1 (2) - Go buildmode</title>
+    <url>/2022/03/26/mit-6.824-lab1-go-buildmode-plugin/</url>
+    <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
+<p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对 <code>sum.go</code> 以插件形式编译：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
+
+<p>会生成一个 <code>sum.so</code> 文件。</p>
+<p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://pkg.go.dev/cmd/go#hdr-Build_modes">Build modes</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 Lab 1 (3) - 示例程序</title>
+    <url>/2022/03/27/mit-6.824-lab1-sequential-mapreduce/</url>
+    <content><![CDATA[<p><code>Lab 1</code> 提供了一个串行化的示例 <code>MapReduce</code> 程序，整体分两部分，第一部分是用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，第二部分是框架代码。</p>
+<h2 id="用户自定义-map-和-reduce-函数"><a href="#用户自定义-map-和-reduce-函数" class="headerlink" title="用户自定义 map 和 reduce 函数"></a>用户自定义 map 和 reduce 函数</h2><p>以单词计数应用 <code>wc.go</code> 为例，对于 <code>map</code> 函数来说，它的输入键值对类型为 <code>&lt;string, string&gt;</code>，中间结果数据类型为框架定义的 <code>KeyValue</code> 类型，本质上也是个 <code>&lt;string, string&gt;</code> 类型。<code>map</code> 函数首先将文件内容拆分为单词，然后遍历每个单词，输出对应中间结果数据 <code>&lt;w, &quot;1&quot;&gt;</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The map function is called once for each file of input. The first</span></span><br><span class="line"><span class="comment">// argument is the name of the input file, and the second is the</span></span><br><span class="line"><span class="comment">// file&#x27;s complete contents. You should ignore the input file name,</span></span><br><span class="line"><span class="comment">// and look only at the contents argument. The return value is a slice</span></span><br><span class="line"><span class="comment">// of key/value pairs.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Map</span><span class="params">(filename <span class="keyword">string</span>, contents <span class="keyword">string</span>)</span> []<span class="title">mr</span>.<span class="title">KeyValue</span></span> &#123;</span><br><span class="line">	<span class="comment">// function to detect word separators.</span></span><br><span class="line">	ff := <span class="function"><span class="keyword">func</span><span class="params">(r <span class="keyword">rune</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> !unicode.IsLetter(r) &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// split contents into an array of words.</span></span><br><span class="line">	words := strings.FieldsFunc(contents, ff)</span><br><span class="line"></span><br><span class="line">	kva := []mr.KeyValue&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> words &#123;</span><br><span class="line">		kv := mr.KeyValue&#123;w, <span class="string">&quot;1&quot;</span>&#125;</span><br><span class="line">		kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> kva</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>reduce</code> 函数的输出类型为 <code>string</code>，其逻辑较为简单，中间结果数组的长度就是单词的个数：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The reduce function is called once for each key generated by the</span></span><br><span class="line"><span class="comment">// map tasks, with a list of all the values created for that key by</span></span><br><span class="line"><span class="comment">// any map task.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Reduce</span><span class="params">(key <span class="keyword">string</span>, values []<span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="comment">// return the number of occurrences of this word.</span></span><br><span class="line">	<span class="keyword">return</span> strconv.Itoa(<span class="built_in">len</span>(values))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="框架代码"><a href="#框架代码" class="headerlink" title="框架代码"></a>框架代码</h2><p>我们可以通过 <code>go run -race mrsequential.go wc.so pg*.txt</code> 来运行串行化的 <code>MapReduce</code> 程序，这里的 <code>wc.so</code> 内包含了用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，<code>pg*.txt</code> 则是本次 <code>MapReduce</code> 程序的原始输入数据。</p>
+<p>首先，根据入参提供的插件找到用户自定义的 <code>map</code> 和 <code>reduce</code> 函数：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mapf, reducef := loadPlugin(os.Args[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+
+<p>接着，依次读取输入文件的内容，并调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// read each input file,</span></span><br><span class="line"><span class="comment">// pass it to Map,</span></span><br><span class="line"><span class="comment">// accumulate the intermediate Map output.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">intermediate := []mr.KeyValue&#123;&#125;</span><br><span class="line"><span class="keyword">for</span> _, filename := <span class="keyword">range</span> os.Args[<span class="number">2</span>:] &#123;</span><br><span class="line">	file, err := os.Open(filename)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot open %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot read %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	file.Close()</span><br><span class="line">	kva := mapf(filename, <span class="keyword">string</span>(content))</span><br><span class="line">	intermediate = <span class="built_in">append</span>(intermediate, kva...)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，对所有中间结果数据按照键进行排序，而在 <code>MapReduce</code> 论文中，中间结果数据会经过分片函数分发给不同的 <code>reduce</code> 节点，由 <code>reduce</code> 节点自行排序处理：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// a big difference from real MapReduce is that all the</span></span><br><span class="line"><span class="comment">// intermediate data is in one place, intermediate[],</span></span><br><span class="line"><span class="comment">// rather than being partitioned into NxM buckets.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line">sort.Sort(ByKey(intermediate))</span><br></pre></td></tr></table></figure>
+
+<p>最后，遍历所有中间结果数据，对同键的中间结果数据调用用户自定义的 <code>reduce</code> 函数，并将结果写入到最终输出文件中，同样的，这里也只有一个最终输出文件而不是多个：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">oname := <span class="string">&quot;mr-out-0&quot;</span></span><br><span class="line">ofile, _ := os.Create(oname)</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// call Reduce on each distinct key in intermediate[],</span></span><br><span class="line"><span class="comment">// and print the result to mr-out-0.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">i := <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i &lt; <span class="built_in">len</span>(intermediate) &#123;</span><br><span class="line">	j := i + <span class="number">1</span></span><br><span class="line">	<span class="keyword">for</span> j &lt; <span class="built_in">len</span>(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key &#123;</span><br><span class="line">		j++</span><br><span class="line">	&#125;</span><br><span class="line">	values := []<span class="keyword">string</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> k := i; k &lt; j; k++ &#123;</span><br><span class="line">		values = <span class="built_in">append</span>(values, intermediate[k].Value)</span><br><span class="line">	&#125;</span><br><span class="line">	output := reducef(intermediate[i].Key, values)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// this is the correct format for each line of Reduce output.</span></span><br><span class="line">	fmt.Fprintf(ofile, <span class="string">&quot;%v %v\n&quot;</span>, intermediate[i].Key, output)</span><br><span class="line"></span><br><span class="line">	i = j</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ofile.Close()</span><br></pre></td></tr></table></figure>
+
+<p>至此，一个串行化的 <code>MapReduce</code> 程序就完成了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+        <tag>MapReduce</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - MapReduce: Simplified Data Processing on Large Clusters</title>
+    <url>/2022/02/13/mit-6.824-map-reduce/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>MapReduce: Simplified Data Processing on Large Clusters</code> 是 <a href="https://pdos.csail.mit.edu/6.824/">6.824: Distributed Systems</a> 中所介绍的第一篇论文。它提出了一种针对大数据处理的编程模型和实现，使得编程人员无需并行和分布式系统经验就可以轻松构建大数据处理应用。该模型将大数据处理问题拆解为两步，即 <code>map</code> 和 <code>reduce</code>，<code>map</code> 阶段将一组输入的键值对转化为中间结果键值对，<code>reduce</code> 阶段对中间结果键值对按照相同的键进行值的合并，从而得到最终的结果。</p>
 <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>对于 <code>Google</code> 来说，每天运行的系统会产生大量的原始数据，同时又要对这些原始数据进行加工产生各种衍生数据，虽然大部分数据加工的逻辑都较为简单，然而由于数据量过于庞大，为了在合理的时间内完成数据处理，通常需要将待处理的数据分发到几百或几千台机器上并行计算，这就存在几个问题：</p>
 <ol>
@@ -1775,7 +1775,7 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 - GFS</title>
+    <title>MIT 6.824 - The Google File System</title>
     <url>/2022/04/19/mit-6.824-gfs/</url>
     <content><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在 <a href="https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf">MapReduce: Simplified Data Processing on Large Clusters</a> 中提到，<code>MapReduce</code> 任务的输入输出构建在 <code>GFS</code> 之上，<code>GFS</code> 是 <code>Google</code> 内部开发的一个分布式文件系统，用于应对大型的数据密集型应用。在 <code>GFS</code> 之前，业界已经存在了一些分布式文件系统的实现，为什么 <code>Google</code> 还要再实现一套？因为基于 <code>Google</code> 内部应用的特点，有别于传统的分布式文件系统，除了考虑性能、可扩展性、可靠性和可用性之外，<code>GFS</code> 在设计时还考虑了以下三个方面：</p>
 <ol>
@@ -2271,9 +2271,9 @@
 ]]></content>
       <tags>
         <tag>MIT 6.824</tag>
+        <tag>Raft</tag>
         <tag>Paper</tag>
         <tag>Distributed Systems</tag>
-        <tag>Raft</tag>
       </tags>
   </entry>
 </search>
