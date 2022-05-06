@@ -11,4 +11,4 @@ date: 2022-02-13 15:39:40
 * [MIT 6.824 - The Google File System](/2022/04/19/mit-6.824-gfs/)
 * [MIT 6.824 - The Design of a Practical System for Fault-Tolerant Virtual Machines](/2022/04/24/mit-6.824-vm-ft/)
 * [MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version)](/2022/05/03/mit-6.824-raft/)
-* [MIT 6.824 - Lab 2 (1): Students' Guide to Raft](/2022/05/05/mit-6.824-lab2-students-guide-to-raft/)
+* [MIT 6.824 - Lab 2 (1): Students' Guide to Raft](/2022/05/06/mit-6.824-lab2-students-guide-to-raft/)
