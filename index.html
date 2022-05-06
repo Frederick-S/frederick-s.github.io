@@ -261,7 +261,7 @@
 <blockquote>
 <p>If election timeout elapses without receiving AppendEntries RPC from current leader or granting vote to candidate: convert to candidate.</p>
 </blockquote>
-<p>重置 <code>electino timeout</code> 有两个关键条件：<code>AppendEntries</code> 要求发送请求的主节点是当前任期的主节点；<code>RequestVote</code> 要求成功投出选票。</p>
+<p>重置 <code>election timeout</code> 有两个关键条件：<code>AppendEntries</code> 要求发送请求的主节点是当前任期的主节点；<code>RequestVote</code> 要求成功投出选票。</p>
 <p>先看第一个条件，假设当前任期的主节点异常，此时还有一个之前任期的主节点存活在不断发送 <code>AppendEntries</code> 请求，假设此时某个从节点马上要进入选主状态，但由于收到了 <code>AppendEntries</code> 请求又没有校验任期就重置了 <code>election timeout</code>，造成无主状态时间延长。这个场景下如果过期的主节点不实现下面的逻辑杀伤力倍增：</p>
 <blockquote>
 <p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower</p>
