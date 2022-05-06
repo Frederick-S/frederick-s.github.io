@@ -53,18 +53,6 @@
       </tags>
   </entry>
   <entry>
-    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
-    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
-    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
-
-<p>The regular expression shows that it doesn’t allow float numbers.</p>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Add new list field in SharePoint App upgrade</title>
     <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
     <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
@@ -108,6 +96,18 @@
 ]]></content>
       <tags>
         <tag>Gradle</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
+    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
+    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+
+<p>The regular expression shows that it doesn’t allow float numbers.</p>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
       </tags>
   </entry>
   <entry>
@@ -433,22 +433,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>SSH 连接服务器时指定私钥的路径</title>
-    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
-    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-        <tag>SSH</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 Dockerfile 中定义变量</title>
     <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
     <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
@@ -464,6 +448,22 @@
 ]]></content>
       <tags>
         <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSH 连接服务器时指定私钥的路径</title>
+    <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
+    <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Host your-host</span><br><span class="line">  HostName your-host-name</span><br><span class="line">  User your-host-user</span><br><span class="line">  ForwardAgent yes</span><br><span class="line">  IdentityFile path-to-private-key</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://superuser.com/questions/1276485/configure-ssh-key-path-to-use-for-a-specific-host">Configure ssh-key path to use for a specific host</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
+        <tag>SSH</tag>
       </tags>
   </entry>
   <entry>
@@ -758,6 +758,33 @@
       </tags>
   </entry>
   <entry>
+    <title>如何使用 JUnit 测试异常信息</title>
+    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
+    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
+<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何使用 JUnit 测试异步代码</title>
     <url>/2020/09/13/how-to-test-async-code-with-junit/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>对于以下的异步代码：</p>
@@ -786,46 +813,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何使用 JUnit 测试异常信息</title>
-    <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
-    <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (b &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;b must be positive&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当 <code>a</code> 或者 <code>b</code> 非正数时会抛出 <code>IllegalArgumentException</code> 异常，由于两者抛出的是同一个异常，所以无法直接使用 <code>expected = IllegalArgumentException.class</code> 进行区分测试，故需要测试具体的异常信息。</p>
-<h2 id="使用-try-catch"><a href="#使用-try-catch" class="headerlink" title="使用 try/catch"></a>使用 try/catch</h2><p>用一个 <code>try/catch</code> 包裹测试的方法，判断抛出的异常信息：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = </span><br><span class="line">            Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用-assertThrows"><a href="#使用-assertThrows" class="headerlink" title="使用 assertThrows"></a>使用 assertThrows</h2><p>借助 <code>Assert.assertThrows</code> 执行测试方法返回一个异常，然后判断返回的异常信息：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByAssertThrows</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    IllegalArgumentException illegalArgumentException = Assert.assertThrows(IllegalArgumentException.class, () -&gt; SumService.sum(<span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    Assert.assertEquals(<span class="string">&quot;a must be positive&quot;</span>, illegalArgumentException.getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="使用-ExpectedException"><a href="#使用-ExpectedException" class="headerlink" title="使用 ExpectedException"></a>使用 ExpectedException</h2><p>借助 <code>ExpectedException</code> 预先设定预期抛出的异常和异常信息，然后执行测试方法：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>JUnit</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何修改 AppVeyor 的 JDK 版本</title>
-    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
-    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>AppVeyor</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何在 JDK 11 中建立 jstatd 连接</title>
     <url>/2020/11/21/how-to-use-jstatd-with-jdk11/</url>
     <content><![CDATA[<p>使用 <code>VisualVM</code> 的 <code>Virsual GC</code> 插件需要先和服务器建立 <code>jstatd</code> 连接，在 <code>JDK 9</code> 之前需要首先创建一个 <code>policy</code> 文件并声明权限：</p>
@@ -842,6 +829,19 @@
       <tags>
         <tag>Java</tag>
         <tag>VisualVM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何修改 AppVeyor 的 JDK 版本</title>
+    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
+    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>AppVeyor</tag>
       </tags>
   </entry>
   <entry>
@@ -1122,6 +1122,25 @@
       </tags>
   </entry>
   <entry>
+    <title>二叉搜索树的删除</title>
+    <url>/2022/02/22/delete-node-in-binary-search-tree/</url>
+    <content><![CDATA[<p>二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
+<p><img src="/images/bst-delete-1.png" alt="alt"></p>
+<p>第二，被删除的节点只有一个孩子节点：</p>
+<p><img src="/images/bst-delete-2.png" alt="alt"></p>
+<p>第三，被删除的节点有两个孩子节点：</p>
+<p><img src="/images/bst-delete-3.png" alt="alt"></p>
+<p>对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节点，为了保持二叉搜索树的性质，我们可以使用左子树中的最大值或右子树的最小值来替代被删除的根节点。</p>
+<p>不过在实现时，考虑到实现的简便，对于第三种情况会通过直接修改当前节点的值来替代修改节点的指针指向，以上述例子来说，如果使用指针修改的方式，则需要修改节点5的左孩子指针，修改节点2的左孩子指针和右孩子指针（这里假设使用节点2来替代被删除的节点3），总共三处修改较为繁琐；而如果使用修改节点值的方式，只需要先将节点3的值改为2（这里假设使用节点2来替代被删除的节点3），然后就可以将问题转化为在余下的左子树中删除节点2。具体代码如下：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deleteNode</span>(<span class="params">self, root: TreeNode, key: <span class="built_in">int</span></span>) -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> root.val &lt; key:</span><br><span class="line">            root.right = self.deleteNode(root.right, key)</span><br><span class="line">        <span class="keyword">elif</span> root.val &gt; key:</span><br><span class="line">            root.left = self.deleteNode(root.left, key)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> root.left <span class="keyword">and</span> root.right:</span><br><span class="line">                root.val = self._find_min(root.right)</span><br><span class="line">                root.right = self.deleteNode(root.right, root.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> root.left <span class="keyword">or</span> root.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_find_min</span>(<span class="params">self, root</span>):</span></span><br><span class="line">        <span class="keyword">while</span> root.left:</span><br><span class="line">            root = root.left</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root.val</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>Data Structure</tag>
+        <tag>Algorithm</tag>
+        <tag>Binary Search Tree</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>发布 JAR 包到 Maven 中央仓库</title>
     <url>/2022/02/27/how-to-publich-java-package-to-maven-central-repo/</url>
     <content><![CDATA[<p><code>Sonatype OSSRH (OSS Repository Hosting)</code> 提供了 <code>JAR</code> 包发布服务，并支持自动将 <code>JAR</code> 包同步到 <code>Maven</code> 中央仓库，所以我们将 <code>JAR</code> 包发布到 <code>Sonatype OSSRH</code> 即可。</p>
@@ -1285,7 +1304,7 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (1) - Go Race Detector</title>
+    <title>MIT 6.824 - Lab 1 (1): Go Race Detector</title>
     <url>/2022/03/24/mit-6.824-lab1-go-race-detector/</url>
     <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-race</code> 表示启用 <code>Go</code> 的竞争检测，在多线程编程时，数据竞争是必须要考虑的问题，而数据竞争的问题往往难以察觉和排查，所以 <code>Go</code> 内置了竞争检测的工具来帮助开发人员提前发现问题。另外，<code>MIT 6.824</code> 是一门分布式系统课程，必然会涉及多线程编程，所以竞争检测也是校验 <code>Lab</code> 程序正确性的一种方式。</p>
 <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>Go</code> 借助 <code>goroutine</code> 来实现并发编程，所以数据竞争发生在多个 <code>goroutine</code> 并发读写同一个共享变量时，并且至少有一个 <code>goroutine</code> 存在写操作。来看一个简单的例子：</p>
@@ -1342,26 +1361,117 @@
       </tags>
   </entry>
   <entry>
-    <title>二叉搜索树的删除</title>
-    <url>/2022/02/22/delete-node-in-binary-search-tree/</url>
-    <content><![CDATA[<p>二叉搜索树的删除可以分为三种情况。第一，被删除的节点是叶子节点：</p>
-<p><img src="/images/bst-delete-1.png" alt="alt"></p>
-<p>第二，被删除的节点只有一个孩子节点：</p>
-<p><img src="/images/bst-delete-2.png" alt="alt"></p>
-<p>第三，被删除的节点有两个孩子节点：</p>
-<p><img src="/images/bst-delete-3.png" alt="alt"></p>
-<p>对于第一种情况，我们只需断开被删除的节点和其父节点的关联即可，即将节点3的左孩子节点指针置为空；对于第二种情况，我们可以用被删除的节点的孩子节点来替代被删除的节点，即将节点5的右孩子指针改为指向节点7；第三种情况是最为复杂的情况，相当于删除一个子树的根节点，为了保持二叉搜索树的性质，我们可以使用左子树中的最大值或右子树的最小值来替代被删除的根节点。</p>
-<p>不过在实现时，考虑到实现的简便，对于第三种情况会通过直接修改当前节点的值来替代修改节点的指针指向，以上述例子来说，如果使用指针修改的方式，则需要修改节点5的左孩子指针，修改节点2的左孩子指针和右孩子指针（这里假设使用节点2来替代被删除的节点3），总共三处修改较为繁琐；而如果使用修改节点值的方式，只需要先将节点3的值改为2（这里假设使用节点2来替代被删除的节点3），然后就可以将问题转化为在余下的左子树中删除节点2。具体代码如下：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deleteNode</span>(<span class="params">self, root: TreeNode, key: <span class="built_in">int</span></span>) -&gt; TreeNode:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> root.val &lt; key:</span><br><span class="line">            root.right = self.deleteNode(root.right, key)</span><br><span class="line">        <span class="keyword">elif</span> root.val &gt; key:</span><br><span class="line">            root.left = self.deleteNode(root.left, key)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> root.left <span class="keyword">and</span> root.right:</span><br><span class="line">                root.val = self._find_min(root.right)</span><br><span class="line">                root.right = self.deleteNode(root.right, root.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> root.left <span class="keyword">or</span> root.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_find_min</span>(<span class="params">self, root</span>):</span></span><br><span class="line">        <span class="keyword">while</span> root.left:</span><br><span class="line">            root = root.left</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root.val</span><br></pre></td></tr></table></figure>
+    <title>MIT 6.824 - Lab 1 (2): Go buildmode</title>
+    <url>/2022/03/26/mit-6.824-lab1-go-buildmode-plugin/</url>
+    <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
+<p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对 <code>sum.go</code> 以插件形式编译：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
+
+<p>会生成一个 <code>sum.so</code> 文件。</p>
+<p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://pkg.go.dev/cmd/go#hdr-Build_modes">Build modes</a></li>
+</ul>
 ]]></content>
       <tags>
-        <tag>Data Structure</tag>
-        <tag>Algorithm</tag>
-        <tag>Binary Search Tree</tag>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (4) - Go RPC</title>
+    <title>MIT 6.824 - Lab 1 (3): 示例程序</title>
+    <url>/2022/03/27/mit-6.824-lab1-sequential-mapreduce/</url>
+    <content><![CDATA[<p><code>Lab 1</code> 提供了一个串行化的示例 <code>MapReduce</code> 程序，整体分两部分，第一部分是用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，第二部分是框架代码。</p>
+<h2 id="用户自定义-map-和-reduce-函数"><a href="#用户自定义-map-和-reduce-函数" class="headerlink" title="用户自定义 map 和 reduce 函数"></a>用户自定义 map 和 reduce 函数</h2><p>以单词计数应用 <code>wc.go</code> 为例，对于 <code>map</code> 函数来说，它的输入键值对类型为 <code>&lt;string, string&gt;</code>，中间结果数据类型为框架定义的 <code>KeyValue</code> 类型，本质上也是个 <code>&lt;string, string&gt;</code> 类型。<code>map</code> 函数首先将文件内容拆分为单词，然后遍历每个单词，输出对应中间结果数据 <code>&lt;w, &quot;1&quot;&gt;</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The map function is called once for each file of input. The first</span></span><br><span class="line"><span class="comment">// argument is the name of the input file, and the second is the</span></span><br><span class="line"><span class="comment">// file&#x27;s complete contents. You should ignore the input file name,</span></span><br><span class="line"><span class="comment">// and look only at the contents argument. The return value is a slice</span></span><br><span class="line"><span class="comment">// of key/value pairs.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Map</span><span class="params">(filename <span class="keyword">string</span>, contents <span class="keyword">string</span>)</span> []<span class="title">mr</span>.<span class="title">KeyValue</span></span> &#123;</span><br><span class="line">	<span class="comment">// function to detect word separators.</span></span><br><span class="line">	ff := <span class="function"><span class="keyword">func</span><span class="params">(r <span class="keyword">rune</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> !unicode.IsLetter(r) &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// split contents into an array of words.</span></span><br><span class="line">	words := strings.FieldsFunc(contents, ff)</span><br><span class="line"></span><br><span class="line">	kva := []mr.KeyValue&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> words &#123;</span><br><span class="line">		kv := mr.KeyValue&#123;w, <span class="string">&quot;1&quot;</span>&#125;</span><br><span class="line">		kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> kva</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>reduce</code> 函数的输出类型为 <code>string</code>，其逻辑较为简单，中间结果数组的长度就是单词的个数：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The reduce function is called once for each key generated by the</span></span><br><span class="line"><span class="comment">// map tasks, with a list of all the values created for that key by</span></span><br><span class="line"><span class="comment">// any map task.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Reduce</span><span class="params">(key <span class="keyword">string</span>, values []<span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="comment">// return the number of occurrences of this word.</span></span><br><span class="line">	<span class="keyword">return</span> strconv.Itoa(<span class="built_in">len</span>(values))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="框架代码"><a href="#框架代码" class="headerlink" title="框架代码"></a>框架代码</h2><p>我们可以通过 <code>go run -race mrsequential.go wc.so pg*.txt</code> 来运行串行化的 <code>MapReduce</code> 程序，这里的 <code>wc.so</code> 内包含了用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，<code>pg*.txt</code> 则是本次 <code>MapReduce</code> 程序的原始输入数据。</p>
+<p>首先，根据入参提供的插件找到用户自定义的 <code>map</code> 和 <code>reduce</code> 函数：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mapf, reducef := loadPlugin(os.Args[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+
+<p>接着，依次读取输入文件的内容，并调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// read each input file,</span></span><br><span class="line"><span class="comment">// pass it to Map,</span></span><br><span class="line"><span class="comment">// accumulate the intermediate Map output.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">intermediate := []mr.KeyValue&#123;&#125;</span><br><span class="line"><span class="keyword">for</span> _, filename := <span class="keyword">range</span> os.Args[<span class="number">2</span>:] &#123;</span><br><span class="line">	file, err := os.Open(filename)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot open %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot read %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	file.Close()</span><br><span class="line">	kva := mapf(filename, <span class="keyword">string</span>(content))</span><br><span class="line">	intermediate = <span class="built_in">append</span>(intermediate, kva...)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，对所有中间结果数据按照键进行排序，而在 <code>MapReduce</code> 论文中，中间结果数据会经过分片函数分发给不同的 <code>reduce</code> 节点，由 <code>reduce</code> 节点自行排序处理：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// a big difference from real MapReduce is that all the</span></span><br><span class="line"><span class="comment">// intermediate data is in one place, intermediate[],</span></span><br><span class="line"><span class="comment">// rather than being partitioned into NxM buckets.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line">sort.Sort(ByKey(intermediate))</span><br></pre></td></tr></table></figure>
+
+<p>最后，遍历所有中间结果数据，对同键的中间结果数据调用用户自定义的 <code>reduce</code> 函数，并将结果写入到最终输出文件中，同样的，这里也只有一个最终输出文件而不是多个：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">oname := <span class="string">&quot;mr-out-0&quot;</span></span><br><span class="line">ofile, _ := os.Create(oname)</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// call Reduce on each distinct key in intermediate[],</span></span><br><span class="line"><span class="comment">// and print the result to mr-out-0.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">i := <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i &lt; <span class="built_in">len</span>(intermediate) &#123;</span><br><span class="line">	j := i + <span class="number">1</span></span><br><span class="line">	<span class="keyword">for</span> j &lt; <span class="built_in">len</span>(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key &#123;</span><br><span class="line">		j++</span><br><span class="line">	&#125;</span><br><span class="line">	values := []<span class="keyword">string</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> k := i; k &lt; j; k++ &#123;</span><br><span class="line">		values = <span class="built_in">append</span>(values, intermediate[k].Value)</span><br><span class="line">	&#125;</span><br><span class="line">	output := reducef(intermediate[i].Key, values)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// this is the correct format for each line of Reduce output.</span></span><br><span class="line">	fmt.Fprintf(ofile, <span class="string">&quot;%v %v\n&quot;</span>, intermediate[i].Key, output)</span><br><span class="line"></span><br><span class="line">	i = j</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ofile.Close()</span><br></pre></td></tr></table></figure>
+
+<p>至此，一个串行化的 <code>MapReduce</code> 程序就完成了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+        <tag>MapReduce</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - Lab 1 (5): 实现</title>
+    <url>/2022/04/10/mit-6.824-lab1-implementation/</url>
+    <content><![CDATA[<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
+<h2 id="主节点"><a href="#主节点" class="headerlink" title="主节点"></a>主节点</h2><p>主节点的入口是 <code>mrcoordinator.go</code>，通过 <code>go run mrcoordinator.go pg*.txt</code> 可运行一个主节点程序，其中 <code>pg*.txt</code> 是本次 <code>MapReduce</code> 程序的输入数据。同时，主节点和工作节点间通过 <code>RPC</code> 进行交互，本实验需要我们实现以下 <code>RPC</code> 接口：</p>
+<ol>
+<li>实验中主节点的任务分发采用的是拉模式，工作节点会定期向主节点请求一个任务，这个任务可以是 <code>map</code> 任务也可以是 <code>reduce</code> 任务，由主节点根据当前任务的状态决定应该推送 <code>map</code> 任务还是 <code>reduce</code> 任务。由于 <code>reduce</code> 任务会不间断的拉取中间结果数据，这里为了方便处理，当某个工作节点正在处理 <code>reduce</code> 任务时，在向主节点请求任务时可指明要求分发对应的 <code>reduce</code> 任务</li>
+<li><code>map</code> 任务完成后需要通知主节点生成的中间结果文件地址，主节点收到请求后需要将中间结果文件地址保存到内部数据结构中，供后续发送给对应 <code>reduce</code> 任务</li>
+<li><code>reduce</code> 任务完成后同样需要通知主节点任务完成，否则主节点无法知晓所有 <code>reduce</code> 任务是否已完成，从而无法退出主节点</li>
+</ol>
+<h3 id="任务管理"><a href="#任务管理" class="headerlink" title="任务管理"></a>任务管理</h3><p>主节点需要维护所有 <code>map</code> 任务和 <code>reduce</code> 任务的状态，由于工作节点有可能失败，所以主节点需要同时记录每个任务已执行了多久，如果超过一定时间还没有收到任务完成的通知，则认为执行这个任务的工作节点已失联，然后需要将该任务重新分配给其他工作节点，在本实验中主节点等待每个任务完成的时间为10秒。</p>
+<h2 id="工作节点"><a href="#工作节点" class="headerlink" title="工作节点"></a>工作节点</h2><p>工作节点的入口是 <code>mrworker.go</code>，通过 <code>go run mrworker.go wc.so</code> 可运行一个工作节点程序，其中 <code>wc.so</code> 是本次 <code>MapReduce</code> 程序用到的用户自定义 <code>map</code> 和 <code>reduce</code> 函数。工作节点只有一个 <code>Worker</code> 主方法，需要不断向主节点轮询请求任务，那么工作节点什么时候结束轮询？根据实验建议有两种方法，一种是当本次 <code>MapReduce</code> 任务完成后，主节点进程退出，当工作节点再次请求主节点任务时，<code>RPC</code> 请求必然失败，此时工作节点可认为本次任务已完成主节点已退出，从而结束轮询并退出；另一种是当主节点完成后，在一定时间内，在收到工作节点新的任务请求时，返回一个要求工作节点退出的标识（或者也可抽象为一种任务类型），工作节点收到 <code>RPC</code> 响应后退出，主节点在等待时间到了之后也进行退出。</p>
+<h3 id="空任务"><a href="#空任务" class="headerlink" title="空任务"></a>空任务</h3><p>当工作节点向主节点申请任务，而此时主节点没有可分发的任务时，主节点可返回一个自定义任务类型的任务，来表示空任务，工作节点收到响应后则直接睡眠等待下次唤醒。</p>
+<h3 id="map-任务"><a href="#map-任务" class="headerlink" title="map 任务"></a>map 任务</h3><p><code>map</code> 任务负责调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据，然后将中间结果数据保存为文件，实验建议的文件名是 <code>mr-X-Y</code>，其中 <code>X</code> 表示 <code>map</code> 任务的编号，<code>Y</code> 表示 <code>reduce</code> 任务的编号，<code>map</code> 任务编号的范围可简单使用 <code>[1, 输入文件的数量]</code> 来表示，<code>reduce</code> 任务编号的范围为 <code>[1, nReduce]</code>。每个 <code>map</code> 任务会生成 <code>R</code> 个中间结果文件，实验已提供了分片函数，对中间结果的每个键使用 <code>ihash(key) % nReduce</code> 来决定写入到哪个中间结果文件中。</p>
+<p>从数据结构角度来说，所有的中间结果数据是一个 <code>nReduce * nMap</code> 的二维矩阵，每一行对应一个 <code>reduce</code> 任务。</p>
+<p>由于 <code>map</code> 节点有可能执行失败，为避免 <code>reduce</code> 节点读取到的是未写入完成的中间结果文件，在写入中间结果文件时可以先写入一个临时文件，在写入完成后再重命名为最终的文件名。在本实验中，可以使用 <code>ioutil.TempFile</code> 来创建临时文件，以及使用 <code>os.Rename</code> 来原子性的重命名文件。</p>
+<p>在当前 <code>map</code> 任务的中间结果文件写入完成后，需要通过 <code>RPC</code> 请求通知主节点所有中间结果文件的文件地址。在本实验中，各个工作节点运行在同一台机器上，实验要求保存 <code>map</code> 任务的中间结果文件到当前文件夹，这样 <code>reduce</code> 任务就能通过中间结果文件的文件名读取中间结果数据。</p>
+<p>对中间结果数据的写文件可以借助 <code>Go</code> 的 <code>encoding/json</code> 模块，例如：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">enc := json.NewEncoder(file)</span><br><span class="line"><span class="keyword">for</span> _, kv := ... &#123;</span><br><span class="line">    err := enc.Encode(&amp;kv)</span><br></pre></td></tr></table></figure>
+
+<p>然后 <code>reduce</code> 任务读取文件：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">dec := json.NewDecoder(file)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> kv KeyValue</span><br><span class="line">    <span class="keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">    kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="reduce-任务"><a href="#reduce-任务" class="headerlink" title="reduce 任务"></a>reduce 任务</h3><p><code>reduce</code> 任务负责将所有中间结果数据按照键排序后应用用户自定义的 <code>reduce</code> 函数，并生成最终输出文件，文件格式为 <code>mr-out-X</code>，其中 <code>X</code> 表示 <code>reduce</code> 任务的编号。文件中的每一行对应一个 <code>reduce</code> 函数调用的结果，需要按照 <code>Go</code> 的 <code>%v %v</code> 形式对键值对进行格式化。</p>
+<p>在收到所有的中间结果数据之前，<code>reduce</code> 任务无法开始执行，所以在这个期间当工作节点请求 <code>reduce</code> 任务时，如果主节点暂时没有新的 <code>reduce</code> 任务可分发，则可返回一个空任务，工作节点收到响应后则暂时等待一段时间再重新请求任务。<code>reduce</code> 每次收到中间结果数据后会暂存在内存中，如果暂存的中间结果数据的数量等于 <code>map</code> 任务的数量（这个值可以放在 <code>RPC</code> 响应中），则说明所有中间结果数据已经接收完毕，可以开始执行 <code>reduce</code> 任务。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>mrworker.go</code> 中注释描述通过 <code>go run mrworker.go wc.so</code> 来运行工作节点，不过如果构建 <code>wc.so</code> 时开启了竞争检测（<code>-race</code>），则运行 <code>mrworker.go</code> 时也同样需要开启竞争检测，否则会提示 <code>cannot load plugin wc.so</code>，如果打印 <code>err</code> 则会显示 <code>plugin.Open(&quot;wc&quot;): plugin was built with a different version of package runtime</code>。</p>
+<p>同样的，如果使用 <code>GoLand</code> 调试程序，由于在调试模式下 <code>GoLand</code> 编译 <code>Go</code> 文件时会增加 <code>-gcflags=&quot;all=-N -l&quot;</code> 参数，所以也需要在打包 <code>wc.so</code> 时增加相同的参数。</p>
+<h2 id="活锁"><a href="#活锁" class="headerlink" title="活锁"></a>活锁</h2><p>在最后的 <code>crash test</code> 遇到个类似活锁的问题，在前文提到，如果某个工作节点开始了 <code>reduce</code> 任务但是还没有接收全部的中间结果数据，则该节点下次申请任务时会继续申请该 <code>reduce</code> 任务（普通工作节点对申请的任务类型没有要求）。在 <code>crash test</code> 下，工作节点在执行用户自定义的 <code>map</code> 或 <code>reduce</code> 函数时有一定概率结束进程，假设现在有4个工作节点，其中一个在执行 <code>map</code> 任务，另外三个各自在执行 <code>reduce</code> 任务（轮询获取中间结果数据），不幸的是<br>这个时候 <code>map</code> 节点挂了，此时 <code>test-mr.sh</code> 会自动再启动一个工作节点，然后更不幸的是挂掉的 <code>map</code> 任务在主节点看来还没有到超时时间，所以主节点此时不会分配 <code>map</code> 任务给新的节点（假设没有其他 <code>map</code> 任务），会再分配一个 <code>reduce</code> 任务给新的节点，至此所有工作节点都在执行 <code>reduce</code> 任务，又都在等待中间结果数据完成，却又不可能完成。</p>
+<p>造成这个问题的主要原因是任务分配顺序，上述问题下的任务分配顺序是：</p>
+<ol>
+<li>指定的 <code>reduce</code> 任务</li>
+<li>空闲或超时的 <code>map</code> 任务</li>
+<li>空闲或超时的 <code>reduce</code> 任务</li>
+</ol>
+<p>解决方法就是把前两个换下顺序即可，即：</p>
+<ol>
+<li>空闲或超时的 <code>map</code> 任务</li>
+<li>指定的 <code>reduce</code> 任务</li>
+<li>空闲或超时的 <code>reduce</code> 任务</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+        <tag>MapReduce</tag>
+        <tag>Distributed Systems</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - Lab 1 (4): Go RPC</title>
     <url>/2022/04/04/mit-6.824-lab1-go-rpc/</url>
     <content><![CDATA[<p><code>Lab 1</code> 虽然是个单机器多线程、多进程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
 <h2 id="定义请求体和响应体"><a href="#定义请求体和响应体" class="headerlink" title="定义请求体和响应体"></a>定义请求体和响应体</h2><p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p>
@@ -1411,112 +1521,88 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 Lab 1 (5) - 实现</title>
-    <url>/2022/04/10/mit-6.824-lab1-implementation/</url>
-    <content><![CDATA[<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
-<h2 id="主节点"><a href="#主节点" class="headerlink" title="主节点"></a>主节点</h2><p>主节点的入口是 <code>mrcoordinator.go</code>，通过 <code>go run mrcoordinator.go pg*.txt</code> 可运行一个主节点程序，其中 <code>pg*.txt</code> 是本次 <code>MapReduce</code> 程序的输入数据。同时，主节点和工作节点间通过 <code>RPC</code> 进行交互，本实验需要我们实现以下 <code>RPC</code> 接口：</p>
+    <title>MIT 6.824 - Lab 2 (1): Students&#39; Guide to Raft</title>
+    <url>/2022/05/06/mit-6.824-lab2-students-guide-to-raft/</url>
+    <content><![CDATA[<p><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。</p>
+<h2 id="实现-Raft"><a href="#实现-Raft" class="headerlink" title="实现 Raft"></a>实现 Raft</h2><p>论文中的 <code>Figure 2</code> 和 <code>Figure 13</code> 描述了实现 <code>Raft</code> 的主要接口，以及各节点需要维护的状态和响应接口时的行为逻辑，所以在做 <code>Lab 2</code> 之前需要先充分理解这部分的内容。文中的建议是<strong>必须</strong>严格落实图中的每一句话，而不是仅仅实现了功能，否则就有可能遇到奇怪的问题或不正确的系统行为。</p>
+<p>文中举了三个例子。第一，每次收到 <code>AppendEntries</code> 或 <code>RequestVote</code> 请求就重置 <code>election timeout</code>，因为收到这两个请求说明存在主节点或者正在选主。不过，图中还有描述：</p>
+<blockquote>
+<p>If election timeout elapses without receiving AppendEntries RPC from current leader or granting vote to candidate: convert to candidate.</p>
+</blockquote>
+<p>重置 <code>electino timeout</code> 有两个关键条件：<code>AppendEntries</code> 要求发送请求的主节点是当前任期的主节点；<code>RequestVote</code> 要求成功投出选票。</p>
+<p>先看第一个条件，假设当前任期的主节点异常，此时还有一个之前任期的主节点存活在不断发送 <code>AppendEntries</code> 请求，假设此时某个从节点马上要进入选主状态，但由于收到了 <code>AppendEntries</code> 请求又没有校验任期就重置了 <code>election timeout</code>，造成无主状态时间延长。这个场景下如果过期的主节点不实现下面的逻辑杀伤力倍增：</p>
+<blockquote>
+<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower</p>
+</blockquote>
+<p>如果不实现上面的逻辑，那么过期的主节点会一直是主节点，然后一直重置其他本来可以成为候选节点的从节点。</p>
+<p>再来看第二个条件，假设当前任期的主节点异常，各从节点准备进入选主状态，此时一个不可能成为主节点的从节点先变成了候选节点（该节点的日志相对于其他任何一个从节点来说都不够新，即最后一条日志的任期不够大，或者任期相同但是日志条数不够多），<code>RequestVote</code> 永远不会成功，如果各从节点一收到 <code>RequestVote</code> 就重置 <code>election timeout</code>，就会造成始终没有主节点的情况。</p>
+<p>第二个例子，从节点收到心跳 <code>AppendEntries</code> 后就直接返回 <code>success = true</code> 和重置 <code>election timeout</code>。重置 <code>election timeout</code> 的危害上面已经说过，充当心跳的 <code>AppendEntries</code> 是不带日志的请求，文中提到学生在实现时容易将心跳 <code>AppendEntries</code> 特殊对待，而不进行 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 的校验。从节点返回 <code>true</code> 时主节点就会认为从节点的日志和自己匹配，从而错误的认为某些日志已经复制到了从节点上，从而可以提交日志。不过看到这里可能会有疑问，为什么主节点会在心跳响应中提交日志？通过心跳更新 <code>nextIndex</code> 和 <code>matchIndex</code> 是合理的，如果过半数节点已复制的日志是之前任期的，论文中有描述这是不允许提交的；如果过半数节点已复制的日志是当前任期的，那么可能是之前带日志的 <code>AppendEntries</code> 请求中从节点实际已完成了日志的复制，但是主节点没有收到响应，所以在最新的心跳中提交日志。</p>
+<p>引申开来，假设系统中此时 <code>x = 1</code>，有个客户端发送了 <code>write x = 2</code> 的请求，主节点成功将日志复制到了过半数的节点上，但是还没有响应客户端就异常了。系统重新选主后，此时有个客户端发送请求 <code>read x</code>，<code>x</code> 应该返回多少？应该是2，因为在 <code>Raft</code> 层面，一条日志是否已提交只取决于是否在当前任期内复制到了过半数的节点上，而不是取决于客户端是否收到响应，而只要日志提交了就可以被应用到状态机。类似的场景可以想象一下平时填了某个表单，提交时提示系统异常，但是刷新页面后表单信息已更新。</p>
+<p>第三个例子，学生在实现 <code>AppendEntries</code> 时，可能将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志。同样的，图中也有描述：</p>
+<blockquote>
+<p>If an existing entry conflicts with a new one (same index but different terms), delete the existing entry and all that follow it.</p>
+</blockquote>
+<p>因为当前的 <code>AppendEntries</code> 可能是个过期的请求，假设请求中的日志只是当前从节点已提交的日志的某一段子集，那么如果从节点将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志就会丢失已提交的日志。</p>
+<h2 id="调试-Raft"><a href="#调试-Raft" class="headerlink" title="调试 Raft"></a>调试 Raft</h2><p>调试是实验中最花时间的一个部分，文中列举了四个常见的问题：活锁，不正确或不完整的 <code>RPC</code> 实现，没有遵循论文中的 <code>Rules for Servers</code> 以及任期混淆。</p>
+<h3 id="活锁"><a href="#活锁" class="headerlink" title="活锁"></a>活锁</h3><p>出现活锁时，等同于各节点都在做无用功。选主是最容易出现活锁的场景，例如始终无法选出一个主节点，或者某个候选节点获得了足够的选票后，马上有另外一个节点发起选主，使得刚成为主节点的节点重新退回到从节点（某个节点成为主节点后，还没来得及发送心跳，刚投了票的某个节点 <code>election timeout</code> 到期，发起新的选主，由于它的任期加了1比当前的主节点的任期大，主节点收到 <code>RequestVote</code> 后发现自己的任期小，从而转为从节点）。</p>
+<p>常见的原因有以下几种：</p>
+<p>第一，没有严格按照 <code>Figure 2</code> 的要求重置 <code>election timeout</code>。重置 <code>election timeout</code> 仅限于几种情况：</p>
 <ol>
-<li>实验中主节点的任务分发采用的是拉模式，工作节点会定期向主节点请求一个任务，这个任务可以是 <code>map</code> 任务也可以是 <code>reduce</code> 任务，由主节点根据当前任务的状态决定应该推送 <code>map</code> 任务还是 <code>reduce</code> 任务。由于 <code>reduce</code> 任务会不间断的拉取中间结果数据，这里为了方便处理，当某个工作节点正在处理 <code>reduce</code> 任务时，在向主节点请求任务时可指明要求分发对应的 <code>reduce</code> 任务</li>
-<li><code>map</code> 任务完成后需要通知主节点生成的中间结果文件地址，主节点收到请求后需要将中间结果文件地址保存到内部数据结构中，供后续发送给对应 <code>reduce</code> 任务</li>
-<li><code>reduce</code> 任务完成后同样需要通知主节点任务完成，否则主节点无法知晓所有 <code>reduce</code> 任务是否已完成，从而无法退出主节点</li>
+<li>收到当前任期的主节点的 <code>AppendEntries</code> 请求（如果 <code>AppendEntries</code> 中的任期比自身的任期小，则忽略该请求）。</li>
+<li>开启一轮新的选主，这个属于 <code>election timeout</code> 到期，选主的同时需要重置一个新的随机值。</li>
+<li>在某轮选举中，将票投给了某个候选节点。</li>
 </ol>
-<h3 id="任务管理"><a href="#任务管理" class="headerlink" title="任务管理"></a>任务管理</h3><p>主节点需要维护所有 <code>map</code> 任务和 <code>reduce</code> 任务的状态，由于工作节点有可能失败，所以主节点需要同时记录每个任务已执行了多久，如果超过一定时间还没有收到任务完成的通知，则认为执行这个任务的工作节点已失联，然后需要将该任务重新分配给其他工作节点，在本实验中主节点等待每个任务完成的时间为10秒。</p>
-<h2 id="工作节点"><a href="#工作节点" class="headerlink" title="工作节点"></a>工作节点</h2><p>工作节点的入口是 <code>mrworker.go</code>，通过 <code>go run mrworker.go wc.so</code> 可运行一个工作节点程序，其中 <code>wc.so</code> 是本次 <code>MapReduce</code> 程序用到的用户自定义 <code>map</code> 和 <code>reduce</code> 函数。工作节点只有一个 <code>Worker</code> 主方法，需要不断向主节点轮询请求任务，那么工作节点什么时候结束轮询？根据实验建议有两种方法，一种是当本次 <code>MapReduce</code> 任务完成后，主节点进程退出，当工作节点再次请求主节点任务时，<code>RPC</code> 请求必然失败，此时工作节点可认为本次任务已完成主节点已退出，从而结束轮询并退出；另一种是当主节点完成后，在一定时间内，在收到工作节点新的任务请求时，返回一个要求工作节点退出的标识（或者也可抽象为一种任务类型），工作节点收到 <code>RPC</code> 响应后退出，主节点在等待时间到了之后也进行退出。</p>
-<h3 id="空任务"><a href="#空任务" class="headerlink" title="空任务"></a>空任务</h3><p>当工作节点向主节点申请任务，而此时主节点没有可分发的任务时，主节点可返回一个自定义任务类型的任务，来表示空任务，工作节点收到响应后则直接睡眠等待下次唤醒。</p>
-<h3 id="map-任务"><a href="#map-任务" class="headerlink" title="map 任务"></a>map 任务</h3><p><code>map</code> 任务负责调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据，然后将中间结果数据保存为文件，实验建议的文件名是 <code>mr-X-Y</code>，其中 <code>X</code> 表示 <code>map</code> 任务的编号，<code>Y</code> 表示 <code>reduce</code> 任务的编号，<code>map</code> 任务编号的范围可简单使用 <code>[1, 输入文件的数量]</code> 来表示，<code>reduce</code> 任务编号的范围为 <code>[1, nReduce]</code>。每个 <code>map</code> 任务会生成 <code>R</code> 个中间结果文件，实验已提供了分片函数，对中间结果的每个键使用 <code>ihash(key) % nReduce</code> 来决定写入到哪个中间结果文件中。</p>
-<p>从数据结构角度来说，所有的中间结果数据是一个 <code>nReduce * nMap</code> 的二维矩阵，每一行对应一个 <code>reduce</code> 任务。</p>
-<p>由于 <code>map</code> 节点有可能执行失败，为避免 <code>reduce</code> 节点读取到的是未写入完成的中间结果文件，在写入中间结果文件时可以先写入一个临时文件，在写入完成后再重命名为最终的文件名。在本实验中，可以使用 <code>ioutil.TempFile</code> 来创建临时文件，以及使用 <code>os.Rename</code> 来原子性的重命名文件。</p>
-<p>在当前 <code>map</code> 任务的中间结果文件写入完成后，需要通过 <code>RPC</code> 请求通知主节点所有中间结果文件的文件地址。在本实验中，各个工作节点运行在同一台机器上，实验要求保存 <code>map</code> 任务的中间结果文件到当前文件夹，这样 <code>reduce</code> 任务就能通过中间结果文件的文件名读取中间结果数据。</p>
-<p>对中间结果数据的写文件可以借助 <code>Go</code> 的 <code>encoding/json</code> 模块，例如：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">enc := json.NewEncoder(file)</span><br><span class="line"><span class="keyword">for</span> _, kv := ... &#123;</span><br><span class="line">    err := enc.Encode(&amp;kv)</span><br></pre></td></tr></table></figure>
-
-<p>然后 <code>reduce</code> 任务读取文件：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">dec := json.NewDecoder(file)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> kv KeyValue</span><br><span class="line">    <span class="keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">    kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="reduce-任务"><a href="#reduce-任务" class="headerlink" title="reduce 任务"></a>reduce 任务</h3><p><code>reduce</code> 任务负责将所有中间结果数据按照键排序后应用用户自定义的 <code>reduce</code> 函数，并生成最终输出文件，文件格式为 <code>mr-out-X</code>，其中 <code>X</code> 表示 <code>reduce</code> 任务的编号。文件中的每一行对应一个 <code>reduce</code> 函数调用的结果，需要按照 <code>Go</code> 的 <code>%v %v</code> 形式对键值对进行格式化。</p>
-<p>在收到所有的中间结果数据之前，<code>reduce</code> 任务无法开始执行，所以在这个期间当工作节点请求 <code>reduce</code> 任务时，如果主节点暂时没有新的 <code>reduce</code> 任务可分发，则可返回一个空任务，工作节点收到响应后则暂时等待一段时间再重新请求任务。<code>reduce</code> 每次收到中间结果数据后会暂存在内存中，如果暂存的中间结果数据的数量等于 <code>map</code> 任务的数量（这个值可以放在 <code>RPC</code> 响应中），则说明所有中间结果数据已经接收完毕，可以开始执行 <code>reduce</code> 任务。</p>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>mrworker.go</code> 中注释描述通过 <code>go run mrworker.go wc.so</code> 来运行工作节点，不过如果构建 <code>wc.so</code> 时开启了竞争检测（<code>-race</code>），则运行 <code>mrworker.go</code> 时也同样需要开启竞争检测，否则会提示 <code>cannot load plugin wc.so</code>，如果打印 <code>err</code> 则会显示 <code>plugin.Open(&quot;wc&quot;): plugin was built with a different version of package runtime</code>。</p>
-<p>同样的，如果使用 <code>GoLand</code> 调试程序，由于在调试模式下 <code>GoLand</code> 编译 <code>Go</code> 文件时会增加 <code>-gcflags=&quot;all=-N -l&quot;</code> 参数，所以也需要在打包 <code>wc.so</code> 时增加相同的参数。</p>
-<h2 id="活锁"><a href="#活锁" class="headerlink" title="活锁"></a>活锁</h2><p>在最后的 <code>crash test</code> 遇到个类似活锁的问题，在前文提到，如果某个工作节点开始了 <code>reduce</code> 任务但是还没有接收全部的中间结果数据，则该节点下次申请任务时会继续申请该 <code>reduce</code> 任务（普通工作节点对申请的任务类型没有要求）。在 <code>crash test</code> 下，工作节点在执行用户自定义的 <code>map</code> 或 <code>reduce</code> 函数时有一定概率结束进程，假设现在有4个工作节点，其中一个在执行 <code>map</code> 任务，另外三个各自在执行 <code>reduce</code> 任务（轮询获取中间结果数据），不幸的是<br>这个时候 <code>map</code> 节点挂了，此时 <code>test-mr.sh</code> 会自动再启动一个工作节点，然后更不幸的是挂掉的 <code>map</code> 任务在主节点看来还没有到超时时间，所以主节点此时不会分配 <code>map</code> 任务给新的节点（假设没有其他 <code>map</code> 任务），会再分配一个 <code>reduce</code> 任务给新的节点，至此所有工作节点都在执行 <code>reduce</code> 任务，又都在等待中间结果数据完成，却又不可能完成。</p>
-<p>造成这个问题的主要原因是任务分配顺序，上述问题下的任务分配顺序是：</p>
-<ol>
-<li>指定的 <code>reduce</code> 任务</li>
-<li>空闲或超时的 <code>map</code> 任务</li>
-<li>空闲或超时的 <code>reduce</code> 任务</li>
-</ol>
-<p>解决方法就是把前两个换下顺序即可，即：</p>
-<ol>
-<li>空闲或超时的 <code>map</code> 任务</li>
-<li>指定的 <code>reduce</code> 任务</li>
-<li>空闲或超时的 <code>reduce</code> 任务</li>
-</ol>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Go</tag>
-        <tag>MapReduce</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MIT 6.824 Lab 1 (2) - Go buildmode</title>
-    <url>/2022/03/26/mit-6.824-lab1-go-buildmode-plugin/</url>
-    <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
-<p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对 <code>sum.go</code> 以插件形式编译：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
-
-<p>会生成一个 <code>sum.so</code> 文件。</p>
-<p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
-<p>参考：</p>
+<p>第二，没有按照 <code>Fiture 2</code> 的要求开启选主。特别的，如果当前节点是候选节点，但是 <code>election timeout</code> 到期了，那么需要开启新的一轮选主。</p>
+<p>第三，没有遵循 <code>Rules for Servers</code> 的第二条：</p>
+<blockquote>
+<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower (§5.1)</p>
+</blockquote>
+<p>例如，当前节点已投票，按照 <code>Raft</code> 的要求，一个从节点在一个任期内只能投票一次，此时又收到了一个 <code>RequestVote</code> 请求，请求中的任期大于自身的任期，那么就需要再次投票并更新自身的任期，避免新的候选节点拿不到足够的选票。</p>
+<h3 id="不正确的-RPC-实现"><a href="#不正确的-RPC-实现" class="headerlink" title="不正确的 RPC 实现"></a>不正确的 <code>RPC</code> 实现</h3><p>这里总结了学生们过往在实现 <code>RPC</code> 接口时容易犯错的点：</p>
 <ul>
-<li><a href="https://pkg.go.dev/cmd/go#hdr-Build_modes">Build modes</a></li>
+<li>如果某一步要求 <code>reply false</code>，那么这说明需要立即回复 <code>false</code> 并返回，不要再执行后续的步骤。</li>
+<li>如果收到了一条 <code>AppendEntries</code> 请求，但是请求中的 <code>prevLogIndex</code> 比当前日志的最后一条的索引还要大，也要返回 <code>false</code>，这也属于日志不匹配。</li>
+<li>如前面描述，即使 <code>AppendEntries</code> 没有包含任何日志，接收方也需要校验 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>。</li>
+<li><code>AppendEntries</code> 中的第五步的 <code>min</code> 是有必要的，而且是和新日志中的最后一条日志的索引相比较，而不是当前日志的最后一条索引。<ul>
+<li>首先来看 <code>leaderCommit &lt; index of last new entry</code> 的情况，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 4, 5]</code>，<code>leaderCommit</code> 为3（索引按从1开始算），<code>S2</code> 为从节点，日志为 <code>[1, 2]</code>，那么 <code>S1</code> 需要将 <code>[3, 4, 5]</code> 发给 <code>S2</code>，<code>S2</code> 收到后 <code>index of last new entry</code> 是5，但是 <code>commitIndex</code> 只能更新到 <code>3</code>，也就是 <code>leaderCommit</code>，因为 <code>[4, 5]</code> 还没有提交。</li>
+<li>然后来看 <code>leaderCommit &gt; index of last new entry</code> 的情况，乍看之下好像不可能，因为对于主节点来说，在添加一条新日志的那个时刻，<code>leaderCommit</code> 肯定小于新的日志的索引，复制日志到从节点时这个关系也不会变。这里只能想到的是，<code>leaderCommit</code> 被并发修改了，因为主节点不会删除日志，所以 <code>index of last new entry</code> 不会变，当主节点和从节点的日志不匹配时，主从节点需要来回的就 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 达成一致（或者单纯就是因为执行的慢），在这个期间，可能过半数的节点已经达成了完成日志复制，主节点就可以提交这条日志，并更新 <code>leaderCommit</code>，所以在原先的 <code>AppendEntries</code> 中，如果 <code>leaderCommit</code> 引用的是全局变量，而 <code>entries[]</code> 是固定的，就会造成 <code>leaderCommit</code> 的值比 <code>entries[]</code> 的最后一条日志的索引还要大，这个时候从节点的 <code>commitIndex</code> 就需要取 <code>index of last new entry</code>。文中举了个例子说明为什么这时候不能取 <code>leaderCommit</code>，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 6]</code>，<code>leaderCommit</code> 为3，<code>S2</code> 为从节点，日志为 <code>[1, 2, 3, 4, 5]</code>，那么 <code>S1</code> 需要将 <code>[6]</code> 发给 <code>S2</code>，注意这里 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 校验通过，而论文中只提到校验不通过时才删除从节点的日志，所以这里就不会删除 <code>S2</code> 的 <code>[4, 5]</code>，又假设此时 <code>S1</code> 通过其他节点的交互将日志成功提交到了 <code>[1, 2, 3, 6, 7]</code>，<code>leaderCommit</code> 变为了第5个位置，<code>S2</code> 收到的 <code>AppendEntries</code> 中 <code>leaderCommit = 5</code>，<code>entries = [6]</code>，如果按照最新的 <code>leaderCommit</code> 更新就会造成把 <code>S2</code> 日志中的5归为已提交。</li>
 </ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Go</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MIT 6.824 Lab 1 (3) - 示例程序</title>
-    <url>/2022/03/27/mit-6.824-lab1-sequential-mapreduce/</url>
-    <content><![CDATA[<p><code>Lab 1</code> 提供了一个串行化的示例 <code>MapReduce</code> 程序，整体分两部分，第一部分是用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，第二部分是框架代码。</p>
-<h2 id="用户自定义-map-和-reduce-函数"><a href="#用户自定义-map-和-reduce-函数" class="headerlink" title="用户自定义 map 和 reduce 函数"></a>用户自定义 map 和 reduce 函数</h2><p>以单词计数应用 <code>wc.go</code> 为例，对于 <code>map</code> 函数来说，它的输入键值对类型为 <code>&lt;string, string&gt;</code>，中间结果数据类型为框架定义的 <code>KeyValue</code> 类型，本质上也是个 <code>&lt;string, string&gt;</code> 类型。<code>map</code> 函数首先将文件内容拆分为单词，然后遍历每个单词，输出对应中间结果数据 <code>&lt;w, &quot;1&quot;&gt;</code>：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The map function is called once for each file of input. The first</span></span><br><span class="line"><span class="comment">// argument is the name of the input file, and the second is the</span></span><br><span class="line"><span class="comment">// file&#x27;s complete contents. You should ignore the input file name,</span></span><br><span class="line"><span class="comment">// and look only at the contents argument. The return value is a slice</span></span><br><span class="line"><span class="comment">// of key/value pairs.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Map</span><span class="params">(filename <span class="keyword">string</span>, contents <span class="keyword">string</span>)</span> []<span class="title">mr</span>.<span class="title">KeyValue</span></span> &#123;</span><br><span class="line">	<span class="comment">// function to detect word separators.</span></span><br><span class="line">	ff := <span class="function"><span class="keyword">func</span><span class="params">(r <span class="keyword">rune</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> !unicode.IsLetter(r) &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// split contents into an array of words.</span></span><br><span class="line">	words := strings.FieldsFunc(contents, ff)</span><br><span class="line"></span><br><span class="line">	kva := []mr.KeyValue&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> words &#123;</span><br><span class="line">		kv := mr.KeyValue&#123;w, <span class="string">&quot;1&quot;</span>&#125;</span><br><span class="line">		kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> kva</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>reduce</code> 函数的输出类型为 <code>string</code>，其逻辑较为简单，中间结果数组的长度就是单词的个数：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The reduce function is called once for each key generated by the</span></span><br><span class="line"><span class="comment">// map tasks, with a list of all the values created for that key by</span></span><br><span class="line"><span class="comment">// any map task.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Reduce</span><span class="params">(key <span class="keyword">string</span>, values []<span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="comment">// return the number of occurrences of this word.</span></span><br><span class="line">	<span class="keyword">return</span> strconv.Itoa(<span class="built_in">len</span>(values))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="框架代码"><a href="#框架代码" class="headerlink" title="框架代码"></a>框架代码</h2><p>我们可以通过 <code>go run -race mrsequential.go wc.so pg*.txt</code> 来运行串行化的 <code>MapReduce</code> 程序，这里的 <code>wc.so</code> 内包含了用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，<code>pg*.txt</code> 则是本次 <code>MapReduce</code> 程序的原始输入数据。</p>
-<p>首先，根据入参提供的插件找到用户自定义的 <code>map</code> 和 <code>reduce</code> 函数：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mapf, reducef := loadPlugin(os.Args[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
-
-<p>接着，依次读取输入文件的内容，并调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// read each input file,</span></span><br><span class="line"><span class="comment">// pass it to Map,</span></span><br><span class="line"><span class="comment">// accumulate the intermediate Map output.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">intermediate := []mr.KeyValue&#123;&#125;</span><br><span class="line"><span class="keyword">for</span> _, filename := <span class="keyword">range</span> os.Args[<span class="number">2</span>:] &#123;</span><br><span class="line">	file, err := os.Open(filename)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot open %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot read %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	file.Close()</span><br><span class="line">	kva := mapf(filename, <span class="keyword">string</span>(content))</span><br><span class="line">	intermediate = <span class="built_in">append</span>(intermediate, kva...)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后，对所有中间结果数据按照键进行排序，而在 <code>MapReduce</code> 论文中，中间结果数据会经过分片函数分发给不同的 <code>reduce</code> 节点，由 <code>reduce</code> 节点自行排序处理：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// a big difference from real MapReduce is that all the</span></span><br><span class="line"><span class="comment">// intermediate data is in one place, intermediate[],</span></span><br><span class="line"><span class="comment">// rather than being partitioned into NxM buckets.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line">sort.Sort(ByKey(intermediate))</span><br></pre></td></tr></table></figure>
-
-<p>最后，遍历所有中间结果数据，对同键的中间结果数据调用用户自定义的 <code>reduce</code> 函数，并将结果写入到最终输出文件中，同样的，这里也只有一个最终输出文件而不是多个：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">oname := <span class="string">&quot;mr-out-0&quot;</span></span><br><span class="line">ofile, _ := os.Create(oname)</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// call Reduce on each distinct key in intermediate[],</span></span><br><span class="line"><span class="comment">// and print the result to mr-out-0.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">i := <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i &lt; <span class="built_in">len</span>(intermediate) &#123;</span><br><span class="line">	j := i + <span class="number">1</span></span><br><span class="line">	<span class="keyword">for</span> j &lt; <span class="built_in">len</span>(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key &#123;</span><br><span class="line">		j++</span><br><span class="line">	&#125;</span><br><span class="line">	values := []<span class="keyword">string</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> k := i; k &lt; j; k++ &#123;</span><br><span class="line">		values = <span class="built_in">append</span>(values, intermediate[k].Value)</span><br><span class="line">	&#125;</span><br><span class="line">	output := reducef(intermediate[i].Key, values)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// this is the correct format for each line of Reduce output.</span></span><br><span class="line">	fmt.Fprintf(ofile, <span class="string">&quot;%v %v\n&quot;</span>, intermediate[i].Key, output)</span><br><span class="line"></span><br><span class="line">	i = j</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ofile.Close()</span><br></pre></td></tr></table></figure>
-
-<p>至此，一个串行化的 <code>MapReduce</code> 程序就完成了。</p>
+</li>
+<li>严格按照论文5.4节的描述来比较两个节点的日志哪个较新，不要只比较日志的长度。</li>
+</ul>
+<h3 id="未遵循-Rules-for-Servers"><a href="#未遵循-Rules-for-Servers" class="headerlink" title="未遵循 Rules for Servers"></a>未遵循 Rules for Servers</h3><ul>
+<li>如果 <code>commitIndex &gt; lastApplied</code>，说明可以应用新的日志到状态机中。应用到状态机的顺序必须严格按照日志的顺序，可以由一个单独的线程顺序执行，也可以由多个线程并行执行，但各线程间必须确保不互相干扰，避免执行覆盖，对于同一个变量的不同写请求，多线程间必须按照日志的顺序写入。</li>
+<li>确保周期性的检查 <code>commitIndex &gt; lastApplied</code> 或者在 <code>commitIndex</code> 更新后检查（在 <code>matchIndex</code> 更新后）。这里并没有太明白这个问题，作者举了个例子，假设现在主节点发出了 <code>AppendEntries</code> 请求并同时检查 <code>commitIndex</code>，如果这条日志被过半数的节点复制了，那么需要等到主节点再添加一条新日志后才能应用上一条日志到状态机。不过根据这个例子也没有看出两者的关联，因为如果采用单线程顺序应用日志到状态机的方式，如果 <code>commitIndex &gt; lastApplied</code> 不满足，线程可以先睡眠然后再尝试，除此以外没有依赖其他条件。</li>
+<li>假设主节点发出 <code>AppendEntries</code> 请求然后被拒绝了，如果不是因为日志不一致被拒绝，那么这个主节点就必须马上转为从节点，且不能更新 <code>nextIndex</code>，因为这说明当前主节点的任期小于从节点。如果错误的更新了 <code>nextIndex</code>，而这个主节点在转为从节点后又当选了主节点，就会造成 <code>nextIndex</code> 和从节点永远不会匹配的情况（相当于错位了一格）。</li>
+<li>如果主节点发现某条过去任期的日志被大多数的节点复制了，但是自身的 <code>commitIndex</code> 却小于这条日志的索引，此时主节点也不能够更新 <code>commitIndex</code>，这个就是论文中 <code>Figure 8</code> 描述的问题，提交一条之前任期的日志存在被新一轮的主节点覆盖的风险。所以提交日之前需要判断 <code>log[N].term == currentTerm</code>。</li>
+</ul>
+<p>有一个常见的困惑是 <code>nextIndex</code> 和 <code>matchIndex</code> 的区别。你可能会观察到 <code>matchIndex = nextIndex - 1</code>，然后用 <code>nextIndex</code> 来替代 <code>matchIndex</code>，然而这是有风险的。举一个很明显的反例，假设某个节点被选为主节点，此时收到一个客户端请求并添加了一条日志，那么它发给从节点的 <code>nextIndex</code> 就是最后一条日志的下一条，而 <code>matchIndex</code> 显然不是 <code>nextIndex - 1</code>（新添加的日志的索引）。</p>
+<h3 id="任期混淆"><a href="#任期混淆" class="headerlink" title="任期混淆"></a>任期混淆</h3><p>任期混淆指的是节点收到了来自之前任期的 <code>RPC</code> 请求。<code>Figure 2</code> 清晰的描述了收到过期任期的请求应该怎么做，但是并没有说明收到过期任期的响应应该怎么做。一个简单的做法就是比较响应中的任期和当前的任期，如果相等则执行相应的逻辑，如果当前任期小则转为从节点（只有主节点、候选节点才能发请求，才有收到响应的可能），如果当前任期大则不处理。</p>
+<p>还有一个相关但不同的问题，假设主节点收到 <code>AppendEntries</code> 响应后设置 <code>matchIndex = nextIndex - 1</code> 或 <code>matchIndex = len(log)</code>，这都是不安全的，因为 <code>nextIndex</code> 和 <code>len(log)</code> 在这期间都有可能改变，正确的做法应该是使用原始请求中不变的参数，即 <code>matchIndex = prevLogIndex + len(entries[])</code>。</p>
+<h3 id="关于性能"><a href="#关于性能" class="headerlink" title="关于性能"></a>关于性能</h3><p>实验中会要求实现两个关于性能方面的优化，一个是日志压缩，另一个是快速确认正确的 <code>prevLogIndex</code>。</p>
+<p>关于日志压缩需要注意几点：</p>
+<ul>
+<li>当执行快照时，需要确保快照中的状态和指定日志中的索引是严格对应的，即快照不能落后于日志，也不能超前。</li>
+<li>论文中并没有描述当节点异常然后恢复后应该如何处理快照。论文中要求创建完快照后，需要删除快照所对应的日志，而系统可能在删除日志前异常，那么系统恢复后会根据快照和日志进行重放。文中说系统可能会重放已经在快照中的日志，这里有点疑问，因为快照中包含了 <code>lastIncludedIndex</code> 和 <code>lastIncludedTerm</code>，和当前日志进行对比就能知道哪些日志已经在快照中了，从而可以跳过。</li>
+</ul>
+<p>论文中并没有详细描述如何快速确认正确的 <code>prevLogIndex</code>，这部分的逻辑可以参考 <a href="https://pdos.csail.mit.edu/6.824/notes/l-raft2.txt">6.824 2022 Lecture 7: Raft (2)</a> 或者文中的建议：</p>
+<ul>
+<li>如果从节点在 <code>prevLogIndex</code> 处没有日志，说明从节点的日志较短，则返回 <code>conflictIndex = len(log)</code> 以及 <code>conflictTerm = None</code>。</li>
+<li>如果从节点在 <code>prevLogIndex</code> 处有日志，但是日志对应的任期不匹配，那么返回 <code>conflictTerm = log[prevLogIndex].Term</code>，然后找到属于 <code>conflictTerm</code> 的第一条日志的索引。</li>
+<li>主节点收到 <code>conflictIndex/conflictTerm</code> 后，首先在日志中搜索 <code>conflictTerm</code>，如果找到有日志属于 <code>conflictTerm</code>，那么 <code>nextIndex</code> 需要更新为主节点中属于 <code>conflictTerm</code> 的最后一条日志的索引加1。</li>
+<li>如果主节点没有找到属于 <code>conflictTerm</code> 的日志，那么更新 <code>nextIndex</code> 为 <code>conflictIndex</code>。</li>
+</ul>
+<p>其中一个不完善的实现是只考虑 <code>conflictIndex</code> 而忽略了 <code>conflictTerm</code>，这样会简化实现，不过主从节点交互的次数会变多，因为如果考虑了 <code>conflictTerm</code>，那么一次性能跳过的日志会更多。</p>
+<p>最后一部分的 <code>Applications on top of Raft</code> 属于 <code>Lab 3</code> 的内容，即基于 <code>Raft</code> 构建应用，在 <code>Lab 2</code> 中暂不描述。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
+<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
 </ul>
 ]]></content>
       <tags>
         <tag>MIT 6.824</tag>
         <tag>Go</tag>
-        <tag>MapReduce</tag>
+        <tag>Distributed Systems</tag>
+        <tag>Raft</tag>
       </tags>
   </entry>
   <entry>
@@ -1683,8 +1769,8 @@
       <tags>
         <tag>MIT 6.824</tag>
         <tag>MapReduce</tag>
-        <tag>Paper</tag>
         <tag>Distributed Systems</tag>
+        <tag>Paper</tag>
       </tags>
   </entry>
   <entry>
@@ -1770,8 +1856,8 @@
 ]]></content>
       <tags>
         <tag>MIT 6.824</tag>
-        <tag>Paper</tag>
         <tag>Distributed Systems</tag>
+        <tag>Paper</tag>
       </tags>
   </entry>
   <entry>
@@ -1949,8 +2035,8 @@
 ]]></content>
       <tags>
         <tag>MIT 6.824</tag>
-        <tag>Paper</tag>
         <tag>Distributed Systems</tag>
+        <tag>Paper</tag>
         <tag>GFS</tag>
       </tags>
   </entry>
@@ -2179,7 +2265,7 @@
 <li>如果 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 和从节点当前的日志状态不匹配，则返回 <code>false</code></li>
 <li>如果新添加的日志和当前某个位置的日志冲突（相同的日志索引，不同的任期），则删除该位置及其之后的日志</li>
 <li>追加所有不在从节点中的日志</li>
-<li>如果 <code>leaderCommit</code> 大于自身的 <code>commitIndex</code>，则更新 <code>commitIndex</code> 为 <code>min(leaderCommit, 最后一条日志的索引)</code></li>
+<li>如果 <code>leaderCommit</code> 大于自身的 <code>commitIndex</code>，则更新 <code>commitIndex</code> 为 <code>min(leaderCommit, 最后一条新的日志的索引)</code></li>
 </ol>
 <h3 id="RequestVote-RPC"><a href="#RequestVote-RPC" class="headerlink" title="RequestVote RPC"></a>RequestVote RPC</h3><p><code>RequestVote</code> 在选主时由候选节点发起，用于向其他节点获取选票。</p>
 <p>参数：</p>
@@ -2271,9 +2357,9 @@
 ]]></content>
       <tags>
         <tag>MIT 6.824</tag>
+        <tag>Distributed Systems</tag>
         <tag>Raft</tag>
         <tag>Paper</tag>
-        <tag>Distributed Systems</tag>
       </tags>
   </entry>
 </search>

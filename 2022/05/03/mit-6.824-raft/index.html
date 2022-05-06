@@ -42,9 +42,9 @@
 <meta property="article:modified_time" content="2022-05-02T16:00:00.000Z">
 <meta property="article:author" content="Xiaodan Mao">
 <meta property="article:tag" content="MIT 6.824">
+<meta property="article:tag" content="Distributed Systems">
 <meta property="article:tag" content="Raft">
 <meta property="article:tag" content="Paper">
-<meta property="article:tag" content="Distributed Systems">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://frederick-s.github.io/images/raft-1.png">
 
@@ -497,7 +497,7 @@
 <li>如果 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 和从节点当前的日志状态不匹配，则返回 <code>false</code></li>
 <li>如果新添加的日志和当前某个位置的日志冲突（相同的日志索引，不同的任期），则删除该位置及其之后的日志</li>
 <li>追加所有不在从节点中的日志</li>
-<li>如果 <code>leaderCommit</code> 大于自身的 <code>commitIndex</code>，则更新 <code>commitIndex</code> 为 <code>min(leaderCommit, 最后一条日志的索引)</code></li>
+<li>如果 <code>leaderCommit</code> 大于自身的 <code>commitIndex</code>，则更新 <code>commitIndex</code> 为 <code>min(leaderCommit, 最后一条新的日志的索引)</code></li>
 </ol>
 <h3 id="RequestVote-RPC"><a href="#RequestVote-RPC" class="headerlink" title="RequestVote RPC"></a>RequestVote RPC</h3><p><code>RequestVote</code> 在选主时由候选节点发起，用于向其他节点获取选票。</p>
 <p>参数：</p>
@@ -613,9 +613,9 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
               <a href="/tags/Raft/" rel="tag"># Raft</a>
               <a href="/tags/Paper/" rel="tag"># Paper</a>
-              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
           </div>
 
         
@@ -627,7 +627,10 @@
     <a href="/2022/04/24/mit-6.824-vm-ft/" rel="prev" title="MIT 6.824 - The Design of a Practical System for Fault-Tolerant Virtual Machines">
       <i class="fa fa-chevron-left"></i> MIT 6.824 - The Design of a Practical System for Fault-Tolerant Virtual Machines
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/06/mit-6.824-lab2-students-guide-to-raft/" rel="next" title="MIT 6.824 - Lab 2 (1): Students' Guide to Raft">
+      MIT 6.824 - Lab 2 (1): Students' Guide to Raft <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -700,7 +703,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
