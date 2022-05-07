@@ -6,7 +6,7 @@
   <link href="https://frederick-s.github.io/atom.xml" rel="self"/>
   
   <link href="https://frederick-s.github.io/"/>
-  <updated>2022-05-05T16:00:00.000Z</updated>
+  <updated>2022-05-06T16:00:00.000Z</updated>
   <id>https://frederick-s.github.io/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MIT 6.824 - Lab 2 (2): Raft Locking Advice</title>
+    <link href="https://frederick-s.github.io/2022/05/07/mit-6.824-lab2-raft-locking-advice/"/>
+    <id>https://frederick-s.github.io/2022/05/07/mit-6.824-lab2-raft-locking-advice/</id>
+    <published>2022-05-06T16:00:00.000Z</published>
+    <updated>2022-05-06T16:00:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a> 提供了些关于如何在 <code>Lab 2</code> 中使用锁的建议。</p><h2 id="规则1"><a href="#规则1" class="headerlink" title="规则1"></a>规则1</h2><p>只要有多个 <code>goroutine</code> 访问同一份数据，并且至少有一个 <code>goroutine</code> 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 <code>Go</code> 的竞争检测（添加 <code>-race</code> 标记）来识别这类问题。</p><h2 id="规则2"><a href="#规则2" class="headerlink" title="规则2"></a>规则2</h2><p>如果有多个数据需要作为一个整体被修改，为了避免其他的 <code>goroutine</code> 看到部分数据更新而造成不正确的行为，此时也需要加锁。例如：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure><p>上面的代码需要同时更新 <code>rf.currentTerm</code> 和 <code>rf.state</code>，如果不加锁其他 <code>goroutine</code> 有可能看到更新后的任期，但是节点状态还未更新。同时，其他任何地方用到 <code>rf.currentTerm</code> 或者 <code>rf.state</code> 的地方也必须先持有锁，一是保证可见性，二是避免在多处同时修改 <code>rf.currentTerm</code> 或者 <code>rf.state</code>。</p><h2 id="规则3"><a href="#规则3" class="headerlink" title="规则3"></a>规则3</h2><p>如果需要对某个数据做一系列读操作（或者读写混合），那么为了避免其他 <code>goroutine</code> 在中途修改数据，就需要对这一系列操作加锁。例如：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line"><span class="keyword">if</span> args.Term &gt; rf.currentTerm &#123;</span><br><span class="line">    rf.currentTerm = args.Term</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure><p>上面的代码是典型的 <code>如果满足某个条件，那么就执行 xxx</code> 场景。如果不加锁，可能其他的 <code>goroutine</code> 将 <code>rf.currentTerm</code> 更新后，当前 <code>goroutine</code> 会将 <code>rf.currentTerm</code> 重置为 <code>args.Term</code>，在 <code>Raft</code> 中有可能造成任期倒退。</p><p>在真实的 <code>Raft</code> 代码中加锁的粒度可能会更大，例如可能在整个 <code>RPC handler</code> 处理期间都持有锁。</p><h2 id="规则4"><a href="#规则4" class="headerlink" title="规则4"></a>规则4</h2><p>不建议在等待某个事件时持有锁，例如从 <code>channel</code> 中读取数据，向 <code>channel</code> 发送数据，计时器等待，调用 <code>time.Sleep()</code>，或者发送一个 <code>RPC</code> 请求并等待响应结果。因为有可能造成死锁，文中举了两个节点互发 <code>RPC</code> 请求并希望获取对方持有的锁的例子，这是个典型的死锁场景。</p><p>又或者某个 <code>goroutine</code> 先持有锁，但是使用 <code>time.Sleep</code> 来等待某个条件发生，其他的 <code>goroutine</code> 由于无法获取锁从而使得等待的条件永远无法成立，这个时候应该用 <code>sync.Cond</code>：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mu.Lock()</span><br><span class="line"></span><br><span class="line">while (!someCondition) &#123;</span><br><span class="line">    time.Sleep(time.Millisecond * <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mu.Unlock()</span><br></pre></td></tr></table></figure><h2 id="规则5"><a href="#规则5" class="headerlink" title="规则5"></a>规则5</h2><p>当释放锁然后重新获取锁之后，某些释放锁之前成立的条件可能此时已经不成立。例如下面的候选节点获取选票的实现是不正确的：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line"><span class="keyword">for</span> &lt;each peer&gt; &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        rf.mu.Lock()</span><br><span class="line">        args.Term = rf.currentTerm</span><br><span class="line">        rf.mu.Unlock()</span><br><span class="line">        Call(<span class="string">&quot;Raft.RequestVote&quot;</span>, &amp;args, ...)</span><br><span class="line">        <span class="comment">// handle the reply...</span></span><br><span class="line">    &#125; ()</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure><p>在每个 <code>goroutine</code> 中，重新获取锁后拿到的任期可能已经不是当初的任期。这里需要将 <code>goroutine</code> 中的 <code>rf.currentTerm</code> 提取到循环之外作为一个变量，然后在 <code>goroutine</code> 中访问这个变量。另外，在 <code>Call</code> 执行完成后，也需要再次获取锁并检查 <code>rf.currentTerm</code> 或其他变量是否还满足条件，例如需要检查下当前的任期是否还是最初的任期，如果不是那说明又开启了一轮选主或者已经有其他节点成为了主节点。</p><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul><li><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a></li></ul>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;a href=&quot;https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt&quot;&gt;Raft Locking Advice&lt;/a&gt; 提供了些关于如何在 &lt;code&gt;Lab 2&lt;/code&gt; 中使用锁的建议。&lt;/p&gt;
+&lt;h2 id</summary>
+      
+    
+    
+    
+    
+    <category term="MIT 6.824" scheme="https://frederick-s.github.io/tags/MIT-6-824/"/>
+    
+    <category term="Go" scheme="https://frederick-s.github.io/tags/Go/"/>
+    
+    <category term="Distributed Systems" scheme="https://frederick-s.github.io/tags/Distributed-Systems/"/>
+    
+    <category term="Raft" scheme="https://frederick-s.github.io/tags/Raft/"/>
+    
+  </entry>
   
   <entry>
     <title>MIT 6.824 - Lab 2 (1): Students&#39; Guide to Raft</title>
@@ -516,28 +545,6 @@
     
     
     <category term="Java" scheme="https://frederick-s.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python for/while else</title>
-    <link href="https://frederick-s.github.io/2021/08/08/python-for-while-else/"/>
-    <id>https://frederick-s.github.io/2021/08/08/python-for-while-else/</id>
-    <published>2021-08-07T16:00:00.000Z</published>
-    <updated>2021-08-07T16:00:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure><p>借助 <code>for/while else</code> 可改写成：</p><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure><p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p><p>参考：</p><ul><li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li></ul>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;和常见的语言不同，&lt;code&gt;Python&lt;/code&gt; 的 &lt;code&gt;for/while&lt;/code&gt; 可以配合 &lt;code&gt;else&lt;/code&gt; 使用。简单来说，当 &lt;code&gt;for/while&lt;/code&gt; 循环体中没有执行 &lt;code&gt;break&lt;/code&gt;</summary>
-      
-    
-    
-    
-    
-    <category term="Python" scheme="https://frederick-s.github.io/tags/Python/"/>
     
   </entry>
   

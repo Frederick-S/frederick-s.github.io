@@ -141,19 +141,6 @@
       </tags>
   </entry>
   <entry>
-    <title>VS Code error - No source control providers registered</title>
-    <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
-    <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Visual Studio Code</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True</title>
     <url>/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/</url>
     <content><![CDATA[<p><code>Integer</code> 类的内部维护了一个 <code>IntegerCache</code> 的静态类，默认缓存了-128到127的 <code>Integer</code> 对象，而 <code>java.lang.Integer#valueOf(int)</code> 方法执行时会判断参数是否在-128到127之间，如果在这个区间，则返回 <code>IntegerCache</code> 内部的缓存对象，所以 <code>Integer.valueOf(127) == Integer.valueOf(127)</code> 为 <code>True</code>。</p>
@@ -170,6 +157,19 @@
 ]]></content>
       <tags>
         <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VS Code error - No source control providers registered</title>
+    <url>/2019/11/24/vscode-no-source-control-providers-registered/</url>
+    <content><![CDATA[<p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Visual Studio Code</tag>
       </tags>
   </entry>
   <entry>
@@ -786,19 +786,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何修改 AppVeyor 的 JDK 版本</title>
-    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
-    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>AppVeyor</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何使用 JUnit 测试异常信息</title>
     <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
     <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
@@ -815,14 +802,26 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Rule</span></span><br><span class="line"><span class="keyword">public</span> ExpectedException expectedException = ExpectedException.none();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shouldAssertExceptionMessageByRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    expectedException.expect(IllegalArgumentException.class);</span><br><span class="line">    expectedException.expectMessage(<span class="string">&quot;a must be positive&quot;</span>);</span><br><span class="line"></span><br><span class="line">    SumService.sum(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>完整的代码可参考 <a href="https://github.com/Frederick-S/test-exception-message-with-junit-demo">GitHub</a>。</p>
-<p>参考：</p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation">How do I assert my exception message with JUnit Test annotation?</a></li>
 </ul>
 ]]></content>
       <tags>
         <tag>Java</tag>
         <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何修改 AppVeyor 的 JDK 版本</title>
+    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
+    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>AppVeyor</tag>
       </tags>
   </entry>
   <entry>
@@ -1304,31 +1303,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 - Lab 1 (2): Go buildmode</title>
-    <url>/2022/03/26/mit-6.824-lab1-go-buildmode-plugin/</url>
-    <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
-<p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对 <code>sum.go</code> 以插件形式编译：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
-
-<p>会生成一个 <code>sum.so</code> 文件。</p>
-<p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://pkg.go.dev/cmd/go#hdr-Build_modes">Build modes</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Go</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MIT 6.824 - Lab 1 (1): Go Race Detector</title>
     <url>/2022/03/24/mit-6.824-lab1-go-race-detector/</url>
     <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-race</code> 表示启用 <code>Go</code> 的竞争检测，在多线程编程时，数据竞争是必须要考虑的问题，而数据竞争的问题往往难以察觉和排查，所以 <code>Go</code> 内置了竞争检测的工具来帮助开发人员提前发现问题。另外，<code>MIT 6.824</code> 是一门分布式系统课程，必然会涉及多线程编程，所以竞争检测也是校验 <code>Lab</code> 程序正确性的一种方式。</p>
@@ -1378,6 +1352,31 @@
 <li><a href="https://go.dev/blog/race-detector">Introducing the Go Race Detector</a></li>
 <li><a href="https://go.dev/doc/articles/race_detector">Data Race Detector</a></li>
 <li><a href="https://go.dev/ref/mem">The Go Memory Model</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - Lab 1 (2): Go buildmode</title>
+    <url>/2022/03/26/mit-6.824-lab1-go-buildmode-plugin/</url>
+    <content><![CDATA[<p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
+<p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对 <code>sum.go</code> 以插件形式编译：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
+
+<p>会生成一个 <code>sum.so</code> 文件。</p>
+<p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://pkg.go.dev/cmd/go#hdr-Build_modes">Build modes</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -1518,6 +1517,39 @@
         <tag>Go</tag>
         <tag>MapReduce</tag>
         <tag>Distributed Systems</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - Lab 2 (2): Raft Locking Advice</title>
+    <url>/2022/05/07/mit-6.824-lab2-raft-locking-advice/</url>
+    <content><![CDATA[<p><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a> 提供了些关于如何在 <code>Lab 2</code> 中使用锁的建议。</p>
+<h2 id="规则1"><a href="#规则1" class="headerlink" title="规则1"></a>规则1</h2><p>只要有多个 <code>goroutine</code> 访问同一份数据，并且至少有一个 <code>goroutine</code> 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 <code>Go</code> 的竞争检测（添加 <code>-race</code> 标记）来识别这类问题。</p>
+<h2 id="规则2"><a href="#规则2" class="headerlink" title="规则2"></a>规则2</h2><p>如果有多个数据需要作为一个整体被修改，为了避免其他的 <code>goroutine</code> 看到部分数据更新而造成不正确的行为，此时也需要加锁。例如：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码需要同时更新 <code>rf.currentTerm</code> 和 <code>rf.state</code>，如果不加锁其他 <code>goroutine</code> 有可能看到更新后的任期，但是节点状态还未更新。同时，其他任何地方用到 <code>rf.currentTerm</code> 或者 <code>rf.state</code> 的地方也必须先持有锁，一是保证可见性，二是避免在多处同时修改 <code>rf.currentTerm</code> 或者 <code>rf.state</code>。</p>
+<h2 id="规则3"><a href="#规则3" class="headerlink" title="规则3"></a>规则3</h2><p>如果需要对某个数据做一系列读操作（或者读写混合），那么为了避免其他 <code>goroutine</code> 在中途修改数据，就需要对这一系列操作加锁。例如：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line"><span class="keyword">if</span> args.Term &gt; rf.currentTerm &#123;</span><br><span class="line">    rf.currentTerm = args.Term</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码是典型的 <code>如果满足某个条件，那么就执行 xxx</code> 场景。如果不加锁，可能其他的 <code>goroutine</code> 将 <code>rf.currentTerm</code> 更新后，当前 <code>goroutine</code> 会将 <code>rf.currentTerm</code> 重置为 <code>args.Term</code>，在 <code>Raft</code> 中有可能造成任期倒退。</p>
+<p>在真实的 <code>Raft</code> 代码中加锁的粒度可能会更大，例如可能在整个 <code>RPC handler</code> 处理期间都持有锁。</p>
+<h2 id="规则4"><a href="#规则4" class="headerlink" title="规则4"></a>规则4</h2><p>不建议在等待某个事件时持有锁，例如从 <code>channel</code> 中读取数据，向 <code>channel</code> 发送数据，计时器等待，调用 <code>time.Sleep()</code>，或者发送一个 <code>RPC</code> 请求并等待响应结果。因为有可能造成死锁，文中举了两个节点互发 <code>RPC</code> 请求并希望获取对方持有的锁的例子，这是个典型的死锁场景。</p>
+<p>又或者某个 <code>goroutine</code> 先持有锁，但是使用 <code>time.Sleep</code> 来等待某个条件发生，其他的 <code>goroutine</code> 由于无法获取锁从而使得等待的条件永远无法成立，这个时候应该用 <code>sync.Cond</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mu.Lock()</span><br><span class="line"></span><br><span class="line">while (!someCondition) &#123;</span><br><span class="line">    time.Sleep(time.Millisecond * <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mu.Unlock()</span><br></pre></td></tr></table></figure>
+
+<h2 id="规则5"><a href="#规则5" class="headerlink" title="规则5"></a>规则5</h2><p>当释放锁然后重新获取锁之后，某些释放锁之前成立的条件可能此时已经不成立。例如下面的候选节点获取选票的实现是不正确的：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line"><span class="keyword">for</span> &lt;each peer&gt; &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        rf.mu.Lock()</span><br><span class="line">        args.Term = rf.currentTerm</span><br><span class="line">        rf.mu.Unlock()</span><br><span class="line">        Call(<span class="string">&quot;Raft.RequestVote&quot;</span>, &amp;args, ...)</span><br><span class="line">        <span class="comment">// handle the reply...</span></span><br><span class="line">    &#125; ()</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
+
+<p>在每个 <code>goroutine</code> 中，重新获取锁后拿到的任期可能已经不是当初的任期。这里需要将 <code>goroutine</code> 中的 <code>rf.currentTerm</code> 提取到循环之外作为一个变量，然后在 <code>goroutine</code> 中访问这个变量。另外，在 <code>Call</code> 执行完成后，也需要再次获取锁并检查 <code>rf.currentTerm</code> 或其他变量是否还满足条件，例如需要检查下当前的任期是否还是最初的任期，如果不是那说明又开启了一轮选主或者已经有其他节点成为了主节点。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+        <tag>Distributed Systems</tag>
+        <tag>Raft</tag>
       </tags>
   </entry>
   <entry>
