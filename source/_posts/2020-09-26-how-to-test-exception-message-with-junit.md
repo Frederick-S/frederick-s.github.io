@@ -67,6 +67,6 @@ public void shouldAssertExceptionMessageByRule() {
 
 完整的代码可参考 [GitHub](https://github.com/Frederick-S/test-exception-message-with-junit-demo)。
 
-参考：
+## 参考
 
 - [How do I assert my exception message with JUnit Test annotation?](https://stackoverflow.com/questions/2469911/how-do-i-assert-my-exception-message-with-junit-test-annotation)
