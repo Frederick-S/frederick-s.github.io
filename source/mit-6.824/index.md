@@ -13,4 +13,4 @@ date: 2022-02-13 15:39:40
 * [MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version)](/2022/05/03/mit-6.824-raft/)
 * [MIT 6.824 - Lab 2 (1): Students' Guide to Raft](/2022/05/06/mit-6.824-lab2-students-guide-to-raft/)
 * [MIT 6.824 - Lab 2 (2): Raft Locking Advice](/2022/05/07/mit-6.824-lab2-raft-locking-advice/)
-* [MIT 6.824 - Lab 2 (3): 实现](/2022/05/14/mit-6.824-lab2-implementation/)
+* [MIT 6.824 - Lab 2 (3): 实现](/2022/05/15/mit-6.824-lab2-implementation/)
