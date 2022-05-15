@@ -27,24 +27,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Add new list field in SharePoint App upgrade</title>
-    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
-    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
-<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>And it works. Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
     <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
     <content><![CDATA[<h2 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h2><p>Today I met a bug in SharePoint 2013, I failed to resize my app part by using <code>postMessage</code>. Here is my code:</p>
@@ -64,6 +46,24 @@
 <p>Hope it’s helpful.</p>
 <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
 <li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Add new list field in SharePoint App upgrade</title>
+    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
+    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>And it works. Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -247,23 +247,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>HTTP</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
     <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
     <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
@@ -295,6 +278,41 @@
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
       </tags>
   </entry>
   <entry>
@@ -433,24 +451,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SSH 连接服务器时指定私钥的路径</title>
     <url>/2020/04/04/how-to-configure-ssh-key-path/</url>
     <content><![CDATA[<p>使用 <code>Visual Studio Code</code> 的 <code>Remote - SSH</code> 插件连接服务器开发时，有可能会遇到不同的服务器对应不同的私钥的情况，这时就需要单独为各个服务器指定私钥的位置。打开 <code>SSH</code> 配置文件（默认路径是 <code>~/.ssh/config</code>），在需要指定私钥路径的服务器下添加 <code>IdentityFile path-to-private-key</code> 即可，例如：</p>
@@ -483,36 +483,6 @@
       <tags>
         <tag>Ubuntu</tag>
         <tag>Puppeteer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
-    <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
-    <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
-
-<h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
-<h4 id="Remote-branch-alpha-not-found-in-upstream-origin"><a href="#Remote-branch-alpha-not-found-in-upstream-origin" class="headerlink" title="Remote branch alpha not found in upstream origin"></a>Remote branch alpha not found in upstream origin</h4><p>这个错误发生在下载 <code>Flutter</code> 代码的阶段，原文中的配置会下载 <code>Flutter</code> 的 <code>alpha</code> 分支代码，但是目前 <code>Flutter</code> 的仓库已经没有 <code>alpha</code> 分支，切换到 <code>stable</code> 分支即可，即：<code>git clone https://github.com/flutter/flutter.git -b stable --depth 1</code>。</p>
-<h4 id="Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted"><a href="#Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted" class="headerlink" title="Failed to install the following Android SDK packages as some licences have not been accepted"></a>Failed to install the following Android SDK packages as some licences have not been accepted</h4><p>详细错误信息如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[        ] &gt; Failed to install the following Android SDK packages as some</span><br><span class="line"></span><br><span class="line">licences have not been accepted.</span><br><span class="line"></span><br><span class="line">[        ]      build-tools;28.0.3 Android SDK Build-Tools 28.0.3</span><br><span class="line"></span><br><span class="line">[        ]      platforms;android-29 Android SDK Platform 29</span><br><span class="line"></span><br><span class="line">[        ]   To build this project, accept the SDK license agreements and</span><br><span class="line"></span><br><span class="line">install the missing components using the Android Studio SDK Manager.</span><br></pre></td></tr></table></figure>
-
-<p>这个错误是由于没有同意 <code>Android SDK</code> 的许可证协议，在 <code>before_script</code> 中加入如下配置即可：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><h4 id="pip-command-not-found"><a href="#pip-command-not-found" class="headerlink" title="pip: command not found"></a>pip: command not found</h4><p>这个错误在执行 <code>pip install six</code> 时遇到，经过实际验证构建 <code>iOS</code> 应用时并不需要此行配置，所以删掉即可。</p>
-<h4 id="Xcode-11-0-or-greater-is-required-to-develop-for-iOS"><a href="#Xcode-11-0-or-greater-is-required-to-develop-for-iOS" class="headerlink" title="Xcode 11.0 or greater is required to develop for iOS"></a>Xcode 11.0 or greater is required to develop for iOS</h4><p>原文中的配置使用的是 <code>Xcode 8.3</code>，最后打包时会提示此错误，将 <code>osx_image</code> 设置为 <code>xcode11</code> 即可。</p>
-<p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
-<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
-<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -569,6 +539,36 @@
 ]]></content>
       <tags>
         <tag>.NET Core</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
+    <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
+    <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget http:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode8.3</span><br><span class="line">      before_script:</span><br><span class="line">        - pip install six</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b alpha --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
+
+<h3 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h3><h4 id="wget-403-Forbidden"><a href="#wget-403-Forbidden" class="headerlink" title="wget - 403 Forbidden"></a>wget - 403 Forbidden</h4><p>这个错误发生在执行 <code>wget http://services.gradle.org/distributions/gradle-3.5-bin.zip</code> 的时候，把 <code>gradle</code> 的下载路径替换成 <code>https</code> 即可。</p>
+<h4 id="Remote-branch-alpha-not-found-in-upstream-origin"><a href="#Remote-branch-alpha-not-found-in-upstream-origin" class="headerlink" title="Remote branch alpha not found in upstream origin"></a>Remote branch alpha not found in upstream origin</h4><p>这个错误发生在下载 <code>Flutter</code> 代码的阶段，原文中的配置会下载 <code>Flutter</code> 的 <code>alpha</code> 分支代码，但是目前 <code>Flutter</code> 的仓库已经没有 <code>alpha</code> 分支，切换到 <code>stable</code> 分支即可，即：<code>git clone https://github.com/flutter/flutter.git -b stable --depth 1</code>。</p>
+<h4 id="Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted"><a href="#Failed-to-install-the-following-Android-SDK-packages-as-some-licences-have-not-been-accepted" class="headerlink" title="Failed to install the following Android SDK packages as some licences have not been accepted"></a>Failed to install the following Android SDK packages as some licences have not been accepted</h4><p>详细错误信息如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[        ] &gt; Failed to install the following Android SDK packages as some</span><br><span class="line"></span><br><span class="line">licences have not been accepted.</span><br><span class="line"></span><br><span class="line">[        ]      build-tools;28.0.3 Android SDK Build-Tools 28.0.3</span><br><span class="line"></span><br><span class="line">[        ]      platforms;android-29 Android SDK Platform 29</span><br><span class="line"></span><br><span class="line">[        ]   To build this project, accept the SDK license agreements and</span><br><span class="line"></span><br><span class="line">install the missing components using the Android Studio SDK Manager.</span><br></pre></td></tr></table></figure>
+
+<p>这个错误是由于没有同意 <code>Android SDK</code> 的许可证协议，在 <code>before_script</code> 中加入如下配置即可：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><h4 id="pip-command-not-found"><a href="#pip-command-not-found" class="headerlink" title="pip: command not found"></a>pip: command not found</h4><p>这个错误在执行 <code>pip install six</code> 时遇到，经过实际验证构建 <code>iOS</code> 应用时并不需要此行配置，所以删掉即可。</p>
+<h4 id="Xcode-11-0-or-greater-is-required-to-develop-for-iOS"><a href="#Xcode-11-0-or-greater-is-required-to-develop-for-iOS" class="headerlink" title="Xcode 11.0 or greater is required to develop for iOS"></a>Xcode 11.0 or greater is required to develop for iOS</h4><p>原文中的配置使用的是 <code>Xcode 8.3</code>，最后打包时会提示此错误，将 <code>osx_image</code> 设置为 <code>xcode11</code> 即可。</p>
+<p>最后完整可用的 <code>.travis.yml</code> 配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">matrix:</span><br><span class="line">  include:</span><br><span class="line">    - os: linux</span><br><span class="line">      language: android</span><br><span class="line">      licenses:</span><br><span class="line">        - &#39;android-sdk-preview-license-.+&#39;</span><br><span class="line">        - &#39;android-sdk-license-.+&#39;</span><br><span class="line">        - &#39;google-gdk-license-.+&#39;</span><br><span class="line">      android:</span><br><span class="line">        components:</span><br><span class="line">          - tools</span><br><span class="line">          - platform-tools</span><br><span class="line">          - build-tools-25.0.3</span><br><span class="line">          - android-25</span><br><span class="line">          - sys-img-armeabi-v7a-google_apis-25</span><br><span class="line">          - extra-android-m2repository</span><br><span class="line">          - extra-google-m2repository</span><br><span class="line">          - extra-google-android-support</span><br><span class="line">      jdk: oraclejdk8</span><br><span class="line">      sudo: false</span><br><span class="line">      addons:</span><br><span class="line">        apt:</span><br><span class="line">          # Flutter depends on &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libstdc++.so.6 version GLIBCXX_3.4.18</span><br><span class="line">          sources:</span><br><span class="line">            - ubuntu-toolchain-r-test # if we don&#39;t specify this, the libstdc++6 we get is the wrong version</span><br><span class="line">          packages:</span><br><span class="line">            - libstdc++6</span><br><span class="line">            - fonts-droid</span><br><span class="line">      before_script:</span><br><span class="line">        - wget https:&#x2F;&#x2F;services.gradle.org&#x2F;distributions&#x2F;gradle-3.5-bin.zip</span><br><span class="line">        - unzip -qq gradle-3.5-bin.zip</span><br><span class="line">        - export GRADLE_HOME&#x3D;$PWD&#x2F;gradle-3.5</span><br><span class="line">        - export PATH&#x3D;$GRADLE_HOME&#x2F;bin:$PATH</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">        - yes | sdkmanager &quot;platforms;android-29&quot;</span><br><span class="line">        - yes | sdkmanager &quot;build-tools;28.0.3&quot;</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build apk</span><br><span class="line"></span><br><span class="line">    - os: osx</span><br><span class="line">      language: generic</span><br><span class="line">      osx_image: xcode11</span><br><span class="line">      before_script:</span><br><span class="line">        - brew update</span><br><span class="line">        - brew install --HEAD libimobiledevice</span><br><span class="line">        - brew install ideviceinstaller</span><br><span class="line">        - brew install ios-deploy</span><br><span class="line">        - git clone https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;flutter.git -b stable --depth 1</span><br><span class="line">      script:</span><br><span class="line">        - .&#x2F;flutter&#x2F;bin&#x2F;flutter -v build ios --no-codesign</span><br><span class="line"></span><br><span class="line">cache:</span><br><span class="line">  directories:</span><br><span class="line">    - $HOME&#x2F;.pub-cache</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/flutter-travis-build-demo">flutter-travis-build-demo</a>。</p>
+<h2 id="Codemagic"><a href="#Codemagic" class="headerlink" title="Codemagic"></a>Codemagic</h2><p>最后推荐 <a href="https://codemagic.io/">Codemagic</a> 这个服务，提供云端打包 <code>Flutter</code> 应用的功能，省去了 <code>Travis CI</code> 配置的步骤，免费用户每月有500分钟的额度来执行构建。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a></li>
+<li><a href="https://stackoverflow.com/questions/54273412/failed-to-install-the-following-android-sdk-packages-as-some-licences-have-not-b">Failed to install the following Android SDK packages as some licences have not been accepted in jitpack</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -844,24 +844,6 @@
       </tags>
   </entry>
   <entry>
-    <title>为什么1不是质数</title>
-    <url>/2021/07/04/why-is-1-not-a-prime/</url>
-    <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
-<blockquote>
-<p>任何一个大于1的自然数都可以唯一分解成有限个质数的乘积。</p>
-</blockquote>
-<p>如果把1列为质数，就会破坏这种唯一性，因为在这种情况下每个自然数都有无限种分解方式，即在原有分解的基础上再乘以任意个数的1，所以1不作为质数。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://math.stackexchange.com/questions/120/why-is-1-not-a-prime-number">Why is 1 not a prime number?</a></li>
-<li><a href="https://primes.utm.edu/notes/faq/one.html">FAQ: Why is the number one not prime?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Math</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Permissions 0644 for &#39;xxx.pem&#39; are too open</title>
     <url>/2021/07/10/permissions-0644-for-xx-are-too-open/</url>
     <content><![CDATA[<p>使用 <code>SSH</code> 连接到 <code>Azure</code> 的虚拟机时遇到错误：</p>
@@ -877,6 +859,24 @@
 ]]></content>
       <tags>
         <tag>SSH</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>为什么1不是质数</title>
+    <url>/2021/07/04/why-is-1-not-a-prime/</url>
+    <content><![CDATA[<p>如果一个数除了1和它本身外，没有其他约数，我们称这个数为质数，但在这个定义下，1却不是质数。要回答这个问题需要先了解质数的作用，质数的主要作用在于构建欧几里得的算数基本定理：</p>
+<blockquote>
+<p>任何一个大于1的自然数都可以唯一分解成有限个质数的乘积。</p>
+</blockquote>
+<p>如果把1列为质数，就会破坏这种唯一性，因为在这种情况下每个自然数都有无限种分解方式，即在原有分解的基础上再乘以任意个数的1，所以1不作为质数。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://math.stackexchange.com/questions/120/why-is-1-not-a-prime-number">Why is 1 not a prime number?</a></li>
+<li><a href="https://primes.utm.edu/notes/faq/one.html">FAQ: Why is the number one not prime?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Math</tag>
       </tags>
   </entry>
   <entry>
@@ -1674,7 +1674,8 @@
 <p>第二个问题是测试用例会模拟出特别不稳定的网络，如果在 <code>AppendEntries</code> 的响应中接着递归异步调用 <code>AppendEntries</code>，由于 <code>goroutine</code> 都在等待网络可能会造成同时存在的 <code>goroutine</code> 数量过多，导致测试失败。</p>
 <p>所以，可以选择不在 <code>Start</code> 中发送带日志的 <code>AppendEntries</code> 请求，而是在常规心跳中根据 <code>nextIndex</code> 计算是否要发送日志。</p>
 <h3 id="2C"><a href="#2C" class="headerlink" title="2C"></a>2C</h3><p>第三个实验是持久化，虽然从代码编写角度来说是所有实验中最简单和直白的，但是测试用例并不会比其他实验简单。特别是 <code>TestFigure8Unreliable2C</code>，容易在指定时间内无法提交某条日志，一方面是可以批量发送日志而不是逐条发送，另一方面是及时识别过期的 <code>RPC</code> 请求并丢弃，例如如果响应中的任期小于当前任期则可以直接忽略该响应，因为从节点收到请求时会更新任期（如果从节点的任期比主节点的小），并将更新后的任期放到响应中，所以在当前任期下主节点收到的响应中的任期必然等于当前任期，如果收到了小于当前任期的响应，必然是过期的响应。</p>
-<h3 id="2D"><a href="#2D" class="headerlink" title="2D"></a>2D</h3><p>第四个实验遇到两个死锁问题。第一个死锁发生在应用已提交的日志，日志的应用会由一个单独的 <code>goroutine</code> 执行，它会遍历所有需要应用的日志，然后发送到 <code>applyCh</code>，并且在整个期间持有锁：</p>
+<h3 id="2D"><a href="#2D" class="headerlink" title="2D"></a>2D</h3><p>由于执行快照后会对日志压缩，所以 <code>LogEntry.Index</code> 和 <code>rf.log</code> 的数组索引不再一一对应，有两点需要改动，一是使用 <code>len(rf.log)</code> 表示日志长度的地方需要改为 <code>rf.log[len(rf.log)-1].Index</code>；二是使用 <code>rf.log[i]</code> 来引用 <code>LogEntry</code> 的地方需要将 <code>i</code> 减去某个偏移量，这个偏移量可以使用 <code>lastIncludedIndex</code>，例如，从节点想要判断 <code>args.PrevLogIndex</code> 所指向的日志的任期是否和主节点相同，需要改为 <code>rf.log[args.PrevLogIndex-rf.lastIncludedIndex].Term</code> 访问，因此 <code>rf.lastIncludedIndex</code> 也需要持久化。</p>
+<p>另外还遇到两个死锁问题。第一个死锁发生在应用已提交的日志，日志的应用会由一个单独的 <code>goroutine</code> 执行，它会遍历所有需要应用的日志，然后发送到 <code>applyCh</code>，并且在整个期间持有锁：</p>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(rf *Raft)</span> <span class="title">applyLog</span><span class="params">(applyCh <span class="keyword">chan</span> ApplyMsg)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> rf.killed() == <span class="literal">false</span> &#123;</span><br><span class="line">		rf.mu.Lock()</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> rf.lastApplied &lt; rf.commitIndex &#123;</span><br><span class="line">			<span class="keyword">for</span> i := rf.lastApplied + <span class="number">1</span>; i &lt;= rf.commitIndex; i++ &#123;</span><br><span class="line">				logEntry := rf.log[i]</span><br><span class="line">				applyMsg := ApplyMsg&#123;</span><br><span class="line">					CommandValid: <span class="literal">true</span>,</span><br><span class="line">					Command:      logEntry.Command,</span><br><span class="line">					CommandIndex: logEntry.Index,</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				applyCh &lt;- applyMsg</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			rf.lastApplied = rf.commitIndex</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		rf.mu.Unlock()</span><br><span class="line"></span><br><span class="line">		time.Sleep(time.Millisecond * <span class="number">10</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这种处理方式在之前的实验中没有问题，不过在 <code>2D</code> 中，客户端从 <code>applyCh</code> 中取出数据后，有一定概率会调用 <code>Snapshot</code> 方法，而实现 <code>Snapshot</code> 方法时会继续获取锁，从而造成死锁：</p>
