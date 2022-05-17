@@ -1,4 +1,4 @@
-title: 'MIT 6.824: Distributed Systems'
+title: 'MIT 6.824: Distributed Systems (Spring 2022)'
 date: 2022-02-13 15:39:40
 ---
 
