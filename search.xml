@@ -27,24 +27,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Add new list field in SharePoint App upgrade</title>
-    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
-    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
-<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>And it works. Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
     <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
     <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
@@ -83,18 +65,21 @@
       </tags>
   </entry>
   <entry>
-    <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
-    <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
-    <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">test</span> &#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = <span class="string">&#x27;full&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <title>Add new list field in SharePoint App upgrade</title>
+    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
+    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>参考：</p>
+<p>And it works. Hope it’s helpful.</p>
+<p>Reference:</p>
 <ul>
-<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html">Gradle Goodness: Show More Information About Failed Tests</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Gradle</tag>
+        <tag>SharePoint Add-in</tag>
       </tags>
   </entry>
   <entry>
@@ -108,6 +93,21 @@
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何在 Gradle 的测试中显示详尽的错误信息</title>
+    <url>/2019/02/02/how-to-show-more-information-about-failed-tests-in-gradle/</url>
+    <content><![CDATA[<p>在<code>build.gradle</code>中添加如下设置：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">test</span> &#123;</span><br><span class="line">    testLogging &#123;</span><br><span class="line">        exceptionFormat = <span class="string">&#x27;full&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="http://mrhaki.blogspot.com/2013/05/gradle-goodness-show-more-information.html">Gradle Goodness: Show More Information About Failed Tests</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Gradle</tag>
       </tags>
   </entry>
   <entry>
@@ -199,6 +199,21 @@
       </tags>
   </entry>
   <entry>
+    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
+    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
+    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Flutter</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何在 TypeScript 中定义属性名未知的对象类型</title>
     <url>/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/</url>
     <content><![CDATA[<p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
@@ -214,21 +229,6 @@
 ]]></content>
       <tags>
         <tag>TypeScript</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何解决“Waiting for another flutter command to release the startup lock...”</title>
-    <url>/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/</url>
-    <content><![CDATA[<p>执行 <code>Flutter</code> 包管理相关命令时有可能遇到 <code>Waiting for another flutter command to release the startup lock...</code> 这样的错误，可尝试杀死所有的 <code>dart</code> 进程解决：</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">// Linux</span><br><span class="line">killall -9 dart</span><br><span class="line"></span><br><span class="line">// Windows</span><br><span class="line">taskkill /F /IM dart.exe</span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/51679269/waiting-for-another-flutter-command-to-release-the-startup-lock">Waiting for another flutter command to release the startup lock</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Flutter</tag>
       </tags>
   </entry>
   <entry>
@@ -433,24 +433,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>如何在 Dockerfile 中定义变量</title>
-    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
-    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
-
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1</title>
     <url>/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/</url>
     <content><![CDATA[<p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
@@ -542,6 +524,24 @@
       </tags>
   </entry>
   <entry>
+    <title>如何在 Dockerfile 中定义变量</title>
+    <url>/2020/03/28/how-to-define-a-variable-in-dockerfile/</url>
+    <content><![CDATA[<p>在某些场景下，编写 <code>Dockerfile</code> 时需要定义变量来避免重复出现的值，例如下面的例子中，<code>Gradle</code> 的版本号出现了三次，如果未来需要更新 <code>Gradle</code> 的版本号，则需要修改三次。</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-6.3-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-6.3/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>ARG variable-name=variable-value</code> 来定义一个变量，使用变量时通过 <code>$variable-name</code> 访问即可，对开头的例子使用变量修改后如下：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ARG</span> GRADLE_VERSION=<span class="number">6.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> wget https://services.gradle.org/distributions/gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unzip gradle-<span class="variable">$GRADLE_VERSION</span>-bin.zip</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> gradle-<span class="variable">$GRADLE_VERSION</span>/bin/gradle task</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/33935807/how-to-define-a-variable-in-a-dockerfile">How to define a variable in a Dockerfile?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用 Travis CI 为 Flutter 项目打包 Android/iOS 应用</title>
     <url>/2020/05/02/how-to-build-flutter-app-for-android-and-ios-with-travisci/</url>
     <content><![CDATA[<h2 id="Travis-CI-构建"><a href="#Travis-CI-构建" class="headerlink" title="Travis CI 构建"></a>Travis CI 构建</h2><p><a href="https://medium.com/@yegorj/building-flutter-apks-and-ipas-on-travis-98d84d8e9b4">Building Flutter APKs and IPAs on Travis</a> 这篇文章详细介绍了如何在 Travis CI 上为 Flutter 项目打包 Android/iOS 应用，不过实际构建时存在几个问题，原文中的 <code>.travis.yml</code> 配置如下：</p>
@@ -588,13 +588,6 @@
       </tags>
   </entry>
   <entry>
-    <title>【分享】隐私政策生成器</title>
-    <url>/2020/05/04/share-privacy-policy-generator/</url>
-    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
     <title>野生 NHK NEWS EASY 客户端</title>
     <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
     <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
@@ -604,6 +597,13 @@
 </ul>
 <p><img src="/images/nhk-1.png" alt="alt"></p>
 <p><img src="/images/nhk-2.png" alt="alt"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>【分享】隐私政策生成器</title>
+    <url>/2020/05/04/share-privacy-policy-generator/</url>
+    <content><![CDATA[<p>对于发布到 <code>Google Play</code> 或者 <code>App Store</code> 的应用，需要提供一份隐私政策的说明，如果不知道怎么写的话推荐一个在线的网站来自动生成隐私政策。通过 <a href="https://app-privacy-policy-generator.firebaseapp.com/">App Privacy Policy Generator</a> 只需填写一些关键信息即可生成一份隐私政策说明，最终效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">**Privacy Policy**</span><br><span class="line"></span><br><span class="line">Awesome developer built the My awesome app app as an Open Source app. This SERVICE is provided by Awesome developer at no cost and is intended for use as is.</span><br><span class="line"></span><br><span class="line">This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</span><br><span class="line"></span><br><span class="line">If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at My awesome app unless otherwise defined in this Privacy Policy.</span><br><span class="line"></span><br><span class="line">**Information Collection and Use**</span><br><span class="line"></span><br><span class="line">For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to ip. The information that I request will be retained on your device and is not collected by me in any way.</span><br><span class="line"></span><br><span class="line">The app does use third party services that may collect information used to identify you.</span><br><span class="line"></span><br><span class="line">Link to privacy policy of third party service providers used by the app</span><br><span class="line"></span><br><span class="line">*   [Google Play Services](https:&#x2F;&#x2F;www.google.com&#x2F;policies&#x2F;privacy&#x2F;)</span><br><span class="line"></span><br><span class="line">**Log Data**</span><br><span class="line"></span><br><span class="line">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</span><br><span class="line"></span><br><span class="line">**Cookies**</span><br><span class="line"></span><br><span class="line">Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device&#39;s internal memory.</span><br><span class="line"></span><br><span class="line">This Service does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.</span><br><span class="line"></span><br><span class="line">**Service Providers**</span><br><span class="line"></span><br><span class="line">I may employ third-party companies and individuals due to the following reasons:</span><br><span class="line"></span><br><span class="line">*   To facilitate our Service;</span><br><span class="line">*   To provide the Service on our behalf;</span><br><span class="line">*   To perform Service-related services; or</span><br><span class="line">*   To assist us in analyzing how our Service is used.</span><br><span class="line"></span><br><span class="line">I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.</span><br><span class="line"></span><br><span class="line">**Security**</span><br><span class="line"></span><br><span class="line">I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</span><br><span class="line"></span><br><span class="line">**Links to Other Sites**</span><br><span class="line"></span><br><span class="line">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</span><br><span class="line"></span><br><span class="line">**Children’s Privacy**</span><br><span class="line"></span><br><span class="line">These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13\. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.</span><br><span class="line"></span><br><span class="line">**Changes to This Privacy Policy**</span><br><span class="line"></span><br><span class="line">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page.</span><br><span class="line"></span><br><span class="line">This policy is effective as of 2020-05-04</span><br><span class="line"></span><br><span class="line">**Contact Us**</span><br><span class="line"></span><br><span class="line">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at dev@example.com.</span><br><span class="line"></span><br><span class="line">This privacy policy page was created at [privacypolicytemplate.net](https:&#x2F;&#x2F;privacypolicytemplate.net) and modified&#x2F;generated by [App Privacy Policy Generator](https:&#x2F;&#x2F;app-privacy-policy-generator.firebaseapp.com&#x2F;)</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -786,19 +786,6 @@
       </tags>
   </entry>
   <entry>
-    <title>如何修改 AppVeyor 的 JDK 版本</title>
-    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
-    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
-
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-        <tag>AppVeyor</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>如何使用 JUnit 测试异常信息</title>
     <url>/2020/09/26/how-to-test-exception-message-with-junit/</url>
     <content><![CDATA[<p>假设有如下的 <code>SumService</code>：</p>
@@ -822,6 +809,19 @@
       <tags>
         <tag>Java</tag>
         <tag>JUnit</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何修改 AppVeyor 的 JDK 版本</title>
+    <url>/2020/10/24/how-to-change-jdk-version-in-appveyor/</url>
+    <content><![CDATA[<p>使用 <code>AppVeyor</code> 的<code>Visual Studio 2019</code> 镜像构建 <code>Java</code> 项目时默认使用的是 <code>JDK 1.8</code>（<a href="https://www.appveyor.com/docs/windows-images-software/#java">这里</a>说明了 <code>AppVeyor</code> 各个镜像下默认使用的 <code>JDK</code> 版本，虽然表格里写着 <code>Visual Studio 2019</code> 镜像下的默认 <code>JDK</code> 是1.7，不过实际是1.8），如果想更换 <code>JDK</code> 版本，比如更换为 <code>JDK 11</code>，可以重新设置 <code>JAVA_HOME</code> 和 <code>PATH</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">before_test:</span><br><span class="line">  - SET JAVA_HOME&#x3D;C:\Program Files\Java\jdk11</span><br><span class="line">  - SET PATH&#x3D;%JAVA_HOME%\bin;%PATH%</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/appveyor-jdk11-demo">GitHub</a>。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>AppVeyor</tag>
       </tags>
   </entry>
   <entry>
@@ -880,24 +880,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Python heapq 自定义比较器</title>
-    <url>/2021/07/31/python-heapq-custom-comparator/</url>
-    <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
-<h2 id="使用元组"><a href="#使用元组" class="headerlink" title="使用元组"></a>使用元组</h2><p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">numbers, k</span>):</span></span><br><span class="line">  heap = [(n, i) <span class="keyword">for</span> i, n <span class="keyword">in</span> <span class="built_in">enumerate</span>(numbers)]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap)[<span class="number">1</span>], <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>], <span class="number">3</span>)) <span class="comment"># [4, 3, 2]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="实现自定义比较器"><a href="#实现自定义比较器" class="headerlink" title="实现自定义比较器"></a>实现自定义比较器</h2><p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">    self.value = value</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">nodes, k</span>):</span></span><br><span class="line">  heap = [node <span class="keyword">for</span> node <span class="keyword">in</span> nodes]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap).value, <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([Node(<span class="number">5</span>), Node(<span class="number">4</span>), Node(<span class="number">3</span>), Node(<span class="number">2</span>), Node(<span class="number">1</span>)], <span class="number">3</span>)) <span class="comment"># [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Docker 磁盘占用清理</title>
     <url>/2021/07/11/clean-up-docker/</url>
     <content><![CDATA[<p>日常随着 <code>Docker</code> 的使用，<code>Docker</code> 会逐渐占用磁盘空间，通过 <code>docker system df</code> 可查看 <code>Docker</code> 所占用的空间：</p>
@@ -936,6 +918,24 @@
 ]]></content>
       <tags>
         <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python heapq 自定义比较器</title>
+    <url>/2021/07/31/python-heapq-custom-comparator/</url>
+    <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
+<h2 id="使用元组"><a href="#使用元组" class="headerlink" title="使用元组"></a>使用元组</h2><p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">numbers, k</span>):</span></span><br><span class="line">  heap = [(n, i) <span class="keyword">for</span> i, n <span class="keyword">in</span> <span class="built_in">enumerate</span>(numbers)]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap)[<span class="number">1</span>], <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>], <span class="number">3</span>)) <span class="comment"># [4, 3, 2]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="实现自定义比较器"><a href="#实现自定义比较器" class="headerlink" title="实现自定义比较器"></a>实现自定义比较器</h2><p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">    self.value = value</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">nodes, k</span>):</span></span><br><span class="line">  heap = [node <span class="keyword">for</span> node <span class="keyword">in</span> nodes]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap).value, <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([Node(<span class="number">5</span>), Node(<span class="number">4</span>), Node(<span class="number">3</span>), Node(<span class="number">2</span>), Node(<span class="number">1</span>)], <span class="number">3</span>)) <span class="comment"># [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -1020,6 +1020,25 @@
       </tags>
   </entry>
   <entry>
+    <title>使用 GitHub Actions 自动构建和推送 Docker 镜像到 Docker Hub</title>
+    <url>/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-actions/</url>
+    <content><![CDATA[<p><code>Docker Hub</code> 的免费账户已不再支持关联 <code>GitHub</code> 仓库并自动构建镜像的功能，不过可以通过 <code>GitHub Actions</code> 来自动构建和推送镜像。实现方式非常简单，<code>Docker</code> 官方已给出了示例（<a href="https://github.com/marketplace/actions/build-and-push-docker-images">Build and push Docker images</a>）：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">name: ci</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - &#39;master&#39;</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  docker:</span><br><span class="line">    runs-on: ubuntu-latest</span><br><span class="line">    steps:</span><br><span class="line">      -</span><br><span class="line">        name: Set up QEMU</span><br><span class="line">        uses: docker&#x2F;setup-qemu-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Set up Docker Buildx</span><br><span class="line">        uses: docker&#x2F;setup-buildx-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Login to DockerHub</span><br><span class="line">        uses: docker&#x2F;login-action@v1 </span><br><span class="line">        with:</span><br><span class="line">          username: $&#123;&#123; secrets.DOCKERHUB_USERNAME &#125;&#125;</span><br><span class="line">          password: $&#123;&#123; secrets.DOCKERHUB_TOKEN &#125;&#125;</span><br><span class="line">      -</span><br><span class="line">        name: Build and push</span><br><span class="line">        id: docker_build</span><br><span class="line">        uses: docker&#x2F;build-push-action@v2</span><br><span class="line">        with:</span><br><span class="line">          push: true</span><br><span class="line">          tags: user&#x2F;app:latest</span><br></pre></td></tr></table></figure>
+
+<p>一共有三处要注意，第一开头的 <code>branches</code> 下对于新建的仓库需要填写 <code>main</code> 而不是 <code>master</code>。</p>
+<p>第二需要为 <code>Login to DockerHub</code> 阶段设置 <code>Docker</code> 的 <code>Access Token</code>，<code>Access Token</code> 可以通过 <code>Docker Hub</code> 的 <code>Account Settings -&gt; Security -&gt; New Access Token</code> 创建，然后通过 <code>GitHub</code> 仓库的 <code>Settings -&gt; Secrets -&gt; New repository secret</code> 分别创建 <code>DOCKERHUB_USERNAME</code> 和 <code>DOCKERHUB_TOKEN</code>。</p>
+<p>第三最后的 <code>tags: user/app:latest</code> 中的 <code>user</code> 和 <code>app</code> 需要修改为实际的用户名和镜像名。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/61989951/github-action-workflow-not-running">GitHub Action workflow not running</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+        <tag>GitHub Actions</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>二叉树非递归遍历</title>
     <url>/2022/02/02/binary-tree-traverse-with-stack/</url>
     <content><![CDATA[<p>二叉树的遍历直观的解法是使用递归求解，不过同样也可使用非递归方式求解。</p>
@@ -1064,25 +1083,6 @@
         <tag>Data Structure</tag>
         <tag>Algorithm</tag>
         <tag>Binary Tree</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用 GitHub Actions 自动构建和推送 Docker 镜像到 Docker Hub</title>
-    <url>/2021/12/26/build-and-push-docker-image-to-docker-hub-with-github-actions/</url>
-    <content><![CDATA[<p><code>Docker Hub</code> 的免费账户已不再支持关联 <code>GitHub</code> 仓库并自动构建镜像的功能，不过可以通过 <code>GitHub Actions</code> 来自动构建和推送镜像。实现方式非常简单，<code>Docker</code> 官方已给出了示例（<a href="https://github.com/marketplace/actions/build-and-push-docker-images">Build and push Docker images</a>）：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">name: ci</span><br><span class="line"></span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - &#39;master&#39;</span><br><span class="line"></span><br><span class="line">jobs:</span><br><span class="line">  docker:</span><br><span class="line">    runs-on: ubuntu-latest</span><br><span class="line">    steps:</span><br><span class="line">      -</span><br><span class="line">        name: Set up QEMU</span><br><span class="line">        uses: docker&#x2F;setup-qemu-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Set up Docker Buildx</span><br><span class="line">        uses: docker&#x2F;setup-buildx-action@v1</span><br><span class="line">      -</span><br><span class="line">        name: Login to DockerHub</span><br><span class="line">        uses: docker&#x2F;login-action@v1 </span><br><span class="line">        with:</span><br><span class="line">          username: $&#123;&#123; secrets.DOCKERHUB_USERNAME &#125;&#125;</span><br><span class="line">          password: $&#123;&#123; secrets.DOCKERHUB_TOKEN &#125;&#125;</span><br><span class="line">      -</span><br><span class="line">        name: Build and push</span><br><span class="line">        id: docker_build</span><br><span class="line">        uses: docker&#x2F;build-push-action@v2</span><br><span class="line">        with:</span><br><span class="line">          push: true</span><br><span class="line">          tags: user&#x2F;app:latest</span><br></pre></td></tr></table></figure>
-
-<p>一共有三处要注意，第一开头的 <code>branches</code> 下对于新建的仓库需要填写 <code>main</code> 而不是 <code>master</code>。</p>
-<p>第二需要为 <code>Login to DockerHub</code> 阶段设置 <code>Docker</code> 的 <code>Access Token</code>，<code>Access Token</code> 可以通过 <code>Docker Hub</code> 的 <code>Account Settings -&gt; Security -&gt; New Access Token</code> 创建，然后通过 <code>GitHub</code> 仓库的 <code>Settings -&gt; Secrets -&gt; New repository secret</code> 分别创建 <code>DOCKERHUB_USERNAME</code> 和 <code>DOCKERHUB_TOKEN</code>。</p>
-<p>第三最后的 <code>tags: user/app:latest</code> 中的 <code>user</code> 和 <code>app</code> 需要修改为实际的用户名和镜像名。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/61989951/github-action-workflow-not-running">GitHub Action workflow not running</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-        <tag>GitHub Actions</tag>
       </tags>
   </entry>
   <entry>
@@ -1419,6 +1419,56 @@
       </tags>
   </entry>
   <entry>
+    <title>MIT 6.824 - Lab 1 (4): Go RPC</title>
+    <url>/2022/04/04/mit-6.824-lab1-go-rpc/</url>
+    <content><![CDATA[<p><code>Lab 1</code> 虽然是个单机器多线程、多进程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
+<h2 id="定义请求体和响应体"><a href="#定义请求体和响应体" class="headerlink" title="定义请求体和响应体"></a>定义请求体和响应体</h2><p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> pb</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	A <span class="keyword">int</span></span><br><span class="line">	B <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumReply <span class="keyword">struct</span> &#123;</span><br><span class="line">	Result <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><p>首先定义服务类 <code>SumService</code> 和提供的方法：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> SumService <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(sumService *SumService)</span> <span class="title">Sum</span><span class="params">(sumRequest *pb.SumRequest, sumReplay *pb.SumReply)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	sumReplay.Result = sumRequest.A + sumRequest.B</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>SumService</code> 只有一个 <code>Sum</code> 方法，接收 <code>SumRequest</code> 和 <code>SumReply</code> 两个参数，求和后将结果放回到 <code>SumReply</code> 中（<code>Sum</code> 的方法签名必须是这样的形式，即两个入参和一个 <code>error</code> 类型的出参，具体规则见下文描述）。</p>
+<p>然后进行服务注册：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">sumService := &amp;SumService&#123;&#125;</span><br><span class="line">rpc.Register(sumService)</span><br><span class="line">rpc.HandleHTTP()</span><br></pre></td></tr></table></figure>
+
+<p>通过 <code>rpc.Register</code> 这个方法可以知道，一个服务类及其提供的方法必须满足以下条件才能注册成功：</p>
+<ol>
+<li>服务类必须是公共的</li>
+<li>服务类提供的方法必须是公共的</li>
+<li>服务类提供的方法入参必须是两个，一个表示请求，一个表示响应（从编码的角度来说方法入参是两个，但是实际代码是判断是否等于3个，因为在这种场景下定义的方法的第一个入参类似于 <code>Java</code> 中的 <code>this</code>）</li>
+<li>服务类提供的方法的第一个参数类型必须是公共的或者是 <code>Go</code> 内置的数据类型</li>
+<li>服务类提供的方法的第二个参数类型也必须是公共的或者是 <code>Go</code> 内置的数据类型，且必须是指针类型</li>
+<li>服务类提供的方法的出参个数只能是1个</li>
+<li>服务类提供的方法的出参类型必须是 <code>error</code></li>
+</ol>
+<p>而 <code>rpc.HandleHTTP()</code> 表示通过 <code>HTTP</code> 作为客户端和服务端间的通信协议，当客户端发起一个 <code>RPC</code> 调用时，本质上是将要调用的方法和参数包装成一个 <code>HTTP</code> 请求，服务端收到 <code>HTTP</code> 请求后，解码出要调用的本地方法名称和入参，然后调用本地方法，在本地方法调用完成后再将结果写入到 <code>HTTP</code> 响应中，客户端收到响应后，再解析出远程调用的结果。</p>
+<p><code>rpc.HandleHTTP()</code> 本质上是个 <code>HTTP</code> 路由注册，实际上是调用 <code>Handle(pattern string, handler Handler)</code> 方法，当请求路由匹配 <code>pattern</code> 时，会调用对应的 <code>handler</code> 执行，对于 <code>Go RPC</code> 来说，固定路由路径是 <code>/_goRPC_</code>。</p>
+<p>所以，在完成 <code>HTTP</code> 路由注册后，还需要配合开启一个 <code>HTTP</code> 服务，这样才能接受远程服务调用：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">listener, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;listen error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Listening on port 1234&quot;</span>)</span><br><span class="line">http.Serve(listener, <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure>
+
+<p><code>http.Serve</code> 方法中对于每一个客户端的连接，最终会分配一个 <code>goroutine</code> 来调用 <code>Handler</code> 的 <code>ServeHTTP(ResponseWriter, *Request)</code> 方法来处理，对于 <code>Go</code> 的 <code>RPC</code> 包来说，则可以实现该方法来处理 <code>RPC</code> 请求：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ServeHTTP implements an http.Handler that answers RPC requests.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(server *Server)</span> <span class="title">ServeHTTP</span><span class="params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> req.Method != <span class="string">&quot;CONNECT&quot;</span> &#123;</span><br><span class="line">		w.Header().Set(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;text/plain; charset=utf-8&quot;</span>)</span><br><span class="line">		w.WriteHeader(http.StatusMethodNotAllowed)</span><br><span class="line">		io.WriteString(w, <span class="string">&quot;405 must CONNECT\n&quot;</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	conn, _, err := w.(http.Hijacker).Hijack()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Print(<span class="string">&quot;rpc hijacking &quot;</span>, req.RemoteAddr, <span class="string">&quot;: &quot;</span>, err.Error())</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	io.WriteString(conn, <span class="string">&quot;HTTP/1.0 &quot;</span>+connected+<span class="string">&quot;\n\n&quot;</span>)</span><br><span class="line">	server.ServeConn(conn)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>对于客户端来说，发起远程方法调用前需要先和服务端建立连接：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">client, err := rpc.DialHTTP(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;dialing:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">defer</span> client.Close()</span><br></pre></td></tr></table></figure>
+
+<p>该方法同时返回了一个 <code>RPC</code> 客户端类，内部同时负责对 <code>RPC</code> 请求的编码和解码。</p>
+<p>然后通过 <code>client.Call</code> 来发起远程调用：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">sumRequest := &amp;pb.SumRequest&#123;</span><br><span class="line">	A: <span class="number">1</span>,</span><br><span class="line">	B: <span class="number">2</span>,</span><br><span class="line">&#125;</span><br><span class="line">sumReply := &amp;pb.SumReply&#123;&#125;</span><br><span class="line">err = client.Call(<span class="string">&quot;SumService.Sum&quot;</span>, sumRequest, sumReply)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;call error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Result:&quot;</span>, sumReply.Result)</span><br></pre></td></tr></table></figure>
+
+<p>这里的调用一共有三个参数，第一个是被调用的远程方法名，需要是 <code>类名.方法名</code> 的形式，后两个则是远程方法的约定入参。</p>
+<p>完整的代码可参考 <a href="https://github.com/Frederick-S/go-rpc-demo">go-rpc-demo</a>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Go</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MIT 6.824 - Lab 1 (5): 实现</title>
     <url>/2022/04/10/mit-6.824-lab1-implementation/</url>
     <content><![CDATA[<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
@@ -1467,56 +1517,6 @@
         <tag>Go</tag>
         <tag>MapReduce</tag>
         <tag>Distributed Systems</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MIT 6.824 - Lab 1 (4): Go RPC</title>
-    <url>/2022/04/04/mit-6.824-lab1-go-rpc/</url>
-    <content><![CDATA[<p><code>Lab 1</code> 虽然是个单机器多线程、多进程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
-<h2 id="定义请求体和响应体"><a href="#定义请求体和响应体" class="headerlink" title="定义请求体和响应体"></a>定义请求体和响应体</h2><p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> pb</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	A <span class="keyword">int</span></span><br><span class="line">	B <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumReply <span class="keyword">struct</span> &#123;</span><br><span class="line">	Result <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><p>首先定义服务类 <code>SumService</code> 和提供的方法：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> SumService <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(sumService *SumService)</span> <span class="title">Sum</span><span class="params">(sumRequest *pb.SumRequest, sumReplay *pb.SumReply)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	sumReplay.Result = sumRequest.A + sumRequest.B</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>SumService</code> 只有一个 <code>Sum</code> 方法，接收 <code>SumRequest</code> 和 <code>SumReply</code> 两个参数，求和后将结果放回到 <code>SumReply</code> 中（<code>Sum</code> 的方法签名必须是这样的形式，即两个入参和一个 <code>error</code> 类型的出参，具体规则见下文描述）。</p>
-<p>然后进行服务注册：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">sumService := &amp;SumService&#123;&#125;</span><br><span class="line">rpc.Register(sumService)</span><br><span class="line">rpc.HandleHTTP()</span><br></pre></td></tr></table></figure>
-
-<p>通过 <code>rpc.Register</code> 这个方法可以知道，一个服务类及其提供的方法必须满足以下条件才能注册成功：</p>
-<ol>
-<li>服务类必须是公共的</li>
-<li>服务类提供的方法必须是公共的</li>
-<li>服务类提供的方法入参必须是两个，一个表示请求，一个表示响应（从编码的角度来说方法入参是两个，但是实际代码是判断是否等于3个，因为在这种场景下定义的方法的第一个入参类似于 <code>Java</code> 中的 <code>this</code>）</li>
-<li>服务类提供的方法的第一个参数类型必须是公共的或者是 <code>Go</code> 内置的数据类型</li>
-<li>服务类提供的方法的第二个参数类型也必须是公共的或者是 <code>Go</code> 内置的数据类型，且必须是指针类型</li>
-<li>服务类提供的方法的出参个数只能是1个</li>
-<li>服务类提供的方法的出参类型必须是 <code>error</code></li>
-</ol>
-<p>而 <code>rpc.HandleHTTP()</code> 表示通过 <code>HTTP</code> 作为客户端和服务端间的通信协议，当客户端发起一个 <code>RPC</code> 调用时，本质上是将要调用的方法和参数包装成一个 <code>HTTP</code> 请求，服务端收到 <code>HTTP</code> 请求后，解码出要调用的本地方法名称和入参，然后调用本地方法，在本地方法调用完成后再将结果写入到 <code>HTTP</code> 响应中，客户端收到响应后，再解析出远程调用的结果。</p>
-<p><code>rpc.HandleHTTP()</code> 本质上是个 <code>HTTP</code> 路由注册，实际上是调用 <code>Handle(pattern string, handler Handler)</code> 方法，当请求路由匹配 <code>pattern</code> 时，会调用对应的 <code>handler</code> 执行，对于 <code>Go RPC</code> 来说，固定路由路径是 <code>/_goRPC_</code>。</p>
-<p>所以，在完成 <code>HTTP</code> 路由注册后，还需要配合开启一个 <code>HTTP</code> 服务，这样才能接受远程服务调用：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">listener, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;listen error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Listening on port 1234&quot;</span>)</span><br><span class="line">http.Serve(listener, <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure>
-
-<p><code>http.Serve</code> 方法中对于每一个客户端的连接，最终会分配一个 <code>goroutine</code> 来调用 <code>Handler</code> 的 <code>ServeHTTP(ResponseWriter, *Request)</code> 方法来处理，对于 <code>Go</code> 的 <code>RPC</code> 包来说，则可以实现该方法来处理 <code>RPC</code> 请求：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ServeHTTP implements an http.Handler that answers RPC requests.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(server *Server)</span> <span class="title">ServeHTTP</span><span class="params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> req.Method != <span class="string">&quot;CONNECT&quot;</span> &#123;</span><br><span class="line">		w.Header().Set(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;text/plain; charset=utf-8&quot;</span>)</span><br><span class="line">		w.WriteHeader(http.StatusMethodNotAllowed)</span><br><span class="line">		io.WriteString(w, <span class="string">&quot;405 must CONNECT\n&quot;</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	conn, _, err := w.(http.Hijacker).Hijack()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Print(<span class="string">&quot;rpc hijacking &quot;</span>, req.RemoteAddr, <span class="string">&quot;: &quot;</span>, err.Error())</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	io.WriteString(conn, <span class="string">&quot;HTTP/1.0 &quot;</span>+connected+<span class="string">&quot;\n\n&quot;</span>)</span><br><span class="line">	server.ServeConn(conn)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>对于客户端来说，发起远程方法调用前需要先和服务端建立连接：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">client, err := rpc.DialHTTP(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;dialing:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">defer</span> client.Close()</span><br></pre></td></tr></table></figure>
-
-<p>该方法同时返回了一个 <code>RPC</code> 客户端类，内部同时负责对 <code>RPC</code> 请求的编码和解码。</p>
-<p>然后通过 <code>client.Call</code> 来发起远程调用：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">sumRequest := &amp;pb.SumRequest&#123;</span><br><span class="line">	A: <span class="number">1</span>,</span><br><span class="line">	B: <span class="number">2</span>,</span><br><span class="line">&#125;</span><br><span class="line">sumReply := &amp;pb.SumReply&#123;&#125;</span><br><span class="line">err = client.Call(<span class="string">&quot;SumService.Sum&quot;</span>, sumRequest, sumReply)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;call error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Result:&quot;</span>, sumReply.Result)</span><br></pre></td></tr></table></figure>
-
-<p>这里的调用一共有三个参数，第一个是被调用的远程方法名，需要是 <code>类名.方法名</code> 的形式，后两个则是远程方法的约定入参。</p>
-<p>完整的代码可参考 <a href="https://github.com/Frederick-S/go-rpc-demo">go-rpc-demo</a>。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Go</tag>
       </tags>
   </entry>
   <entry>
@@ -2046,7 +2046,7 @@
 <h4 id="读写锁（Read-Write-Locks）"><a href="#读写锁（Read-Write-Locks）" class="headerlink" title="读写锁（Read/Write Locks）"></a>读写锁（Read/Write Locks）</h4><p>在前面锁的基础上稍加修改就能实现一个读写锁。释放锁的操作和前面的相同：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Write Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;write-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if n is lowest znode in C, exit</span><br><span class="line">4 p &#x3D; znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 2</span><br><span class="line"></span><br><span class="line">Read Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;read-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if no write znodes lower than n in C, exit</span><br><span class="line">4 p &#x3D; write znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 3</span><br></pre></td></tr></table></figure>
 
-<p>写锁是互斥锁，这里的实现和前面的锁的实现一模一样，只是改变了创建节点的名称。而由于读锁之间没有互斥，所以获取读锁时只需要检查有没有序号更小的写锁即可。另外，读锁实现时最后的 <code>goto</code> 直接跳到了第三行而没有到第二行，这是因为 <code>ZooKeeper</code> 节点创建的顺序性保证，新创建的写锁的序号一定比当前任何一个节点的序号大，所以如果客户端收到当前序号最小的写锁释放的通知后，则说明排在前面的节点中必然没有写锁了，可以直接获取读锁，故不需要再次读取所有的子节点信息。这里看起来会有羊群效应，即存在大量的客户端会监听某个写锁，当写锁被删除时这些客户端都会收到通知，不过这本身就是预期的行为，因为读锁之间没有互斥，写锁释放后就应该唤醒所有等待中的读锁。</p>
+<p>写锁是互斥锁，这里的实现和前面的锁的实现一模一样，只是改变了创建节点的名称。而由于读锁之间没有互斥，所以获取读锁时只需要检查有没有序号更小的写锁即可。另外，读锁实现时最后的 <code>goto</code> 直接跳到了第三行而没有到第二行，这个在 <a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a> 中也提到可能是个笔误。这里看起来会有羊群效应，即存在大量的客户端会监听某个写锁，当写锁被删除时这些客户端都会收到通知，不过这本身就是预期的行为，因为读锁之间没有互斥，写锁释放后就应该唤醒所有等待中的读锁。</p>
 <h4 id="双屏障（Double-Barrier）"><a href="#双屏障（Double-Barrier）" class="headerlink" title="双屏障（Double Barrier）"></a>双屏障（Double Barrier）</h4><p>双屏障用于客户端在某个计算开始和结束时进行同步，当指定数量的进程加入到屏障中后，就可以开始各自的计算任务，每个进程在整个计算任务结束后就可以离开屏障。<code>MapReduce</code> 任务就是一个典型示例，<code>reduce</code> 任务的开始需要所有 <code>map</code> 任务的完成，当所有 <code>map</code> 任务完成后，各进程就可以进入屏障开始 <code>reduce</code> 任务，而整个 <code>MapRecuce</code> 任务的完成依赖所有 <code>reduce</code> 任务的完成，当所有 <code>reduce</code> 任务完成后，各进程就可以离开屏障。客户端可以使用一个 <code>znode</code> 来表示屏障，记作 <code>b</code>。每个进程在 <code>b</code> 下创建一个子节点来表示进入屏障，通过删除子节点来表示离开屏障。如果 <code>b</code> 下的子节点的数量超过了指定值，那么就允许开始执行计算任务。当 <code>b</code> 下的子节点都被删除后，进程就可以离开屏障。这里同样使用监听机制来高效的等待进入屏障和离开屏障的事件发生。一旦 <code>b</code> 下的子节点数量满足了阈值，创建最后一个子节点的进程会同时创建一个 <code>ready</code> 子节点，那么通过监听 <code>ready</code> 子节点是否存在就可以判断是否可以开始计算。另一方面，论文中提到通过监听某个特定的子节点来判断是否可以离开屏障，这里略显模糊，这个特定的子节点是谁创建的？创建了这个子节点的进程什么时候可以删除这个子节点？<a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a> 中提出了另一种方案，每个进程各自监听 <code>b</code> 下的子节点，并且在任务完成后删除所创建的节点，如果各进程发现 <code>b</code> 下没有子节点了，就说明可以离开屏障，整个计算任务已结束。</p>
 <h2 id="ZooKeeper-的实现"><a href="#ZooKeeper-的实现" class="headerlink" title="ZooKeeper 的实现"></a>ZooKeeper 的实现</h2><p><code>ZooKeeper</code> 通过将数据复制到每台服务器上来实现服务的高可用。<code>ZooKeeper</code> 处理的服务器异常针对的是服务器宕机，且这些异常的服务器可能之后会恢复。下图展示了 <code>ZooKeeper</code> 服务的主要组件。当 <code>ZooKeeper</code> 服务收到一个请求时，会对这个请求进行预处理（<code>request processor</code>），如果这个请求需要各服务器协同完成（例如写请求），则会通过一致性协议处理（一种 <code>atomic broadcast</code> 的实现），最终 <code>ZooKeeper</code> 会将修改提交到各服务器副本中。而对于读请求，服务端则直接从本地数据库中读取数据然后返回给客户端。</p>
 <p><img src="/images/zookeeper-2.png" alt="alt"></p>
