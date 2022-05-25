@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="在某些场景下，我们会使用 &amp;#123;&amp;#125; 来存储某类对象的映射关系，例如车主和车子的映射关系可记为： 1234&amp;#123;    &amp;#x27;Alice&amp;#x27;: new Car(),    &amp;#x27;Bob&amp;#x27;: new Car()&amp;#125;  而在 TypeScript 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这">
+  <meta name="description" content="在某些场景下，我们会使用 &amp;#123;&amp;#125; 来存储某类对象的映射关系，例如车主和车子的映射关系可记为： 1234&amp;#123;    &amp;#x27;Alice&amp;#x27;: new Car(),    &amp;#x27;Bob&amp;#x27;: new Car()&amp;#125; 而在 TypeScript 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这种">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何在 TypeScript 中定义属性名未知的对象类型">
 <meta property="og:url" content="https://frederick-s.github.io/2020/03/14/how-to-define-interface-with-unknown-property-names-in-typescript/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="在某些场景下，我们会使用 &amp;#123;&amp;#125; 来存储某类对象的映射关系，例如车主和车子的映射关系可记为： 1234&amp;#123;    &amp;#x27;Alice&amp;#x27;: new Car(),    &amp;#x27;Bob&amp;#x27;: new Car()&amp;#125;  而在 TypeScript 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这">
+<meta property="og:description" content="在某些场景下，我们会使用 &amp;#123;&amp;#125; 来存储某类对象的映射关系，例如车主和车子的映射关系可记为： 1234&amp;#123;    &amp;#x27;Alice&amp;#x27;: new Car(),    &amp;#x27;Bob&amp;#x27;: new Car()&amp;#125; 而在 TypeScript 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这种">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-03-13T16:00:00.000Z">
 <meta property="article:modified_time" content="2020-03-13T16:00:00.000Z">
@@ -86,7 +86,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -262,10 +266,8 @@
       
         <p>在某些场景下，我们会使用 <code>&#123;&#125;</code> 来存储某类对象的映射关系，例如车主和车子的映射关系可记为：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&#x27;Alice&#x27;</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">&#x27;Bob&#x27;</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>而在 <code>TypeScript</code> 中声明这种对象的类型时遇到了问题：该对象的属性名是未知的，不过所有属性名对应的值的类型是确定的。这种情况下可以借助 <a target="_blank" rel="noopener" href="https://www.typescriptlang.org/docs/handbook/interfaces.html#indexable-types">Indexable Types</a> 解决，以上述的例子为例：</p>
 <figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> CarOwners &#123;</span><br><span class="line">    [key: <span class="built_in">string</span>]: Car;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> carOwners: CarOwners = &#123;</span><br><span class="line">    <span class="string">&#x27;Alice&#x27;</span>: <span class="keyword">new</span> Car(),</span><br><span class="line">    <span class="string">&#x27;Bob&#x27;</span>: <span class="keyword">new</span> Car()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>参考：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://github.com/Microsoft/TypeScript/issues/7803">Type annotation for object with unknown properties but known property types?</a></li>
@@ -305,12 +307,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/12/18/vagrant-box-speed-up/" rel="prev" title="Vagrant 镜像下载加速">
-      <i class="fa fa-chevron-left"></i> Vagrant 镜像下载加速
+    <a href="/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/" rel="prev" title="如何解决“Waiting for another flutter command to release the startup lock...”">
+      <i class="fa fa-chevron-left"></i> 如何解决“Waiting for another flutter command to release the startup lock...”
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/03/14/how-to-fix-waiting-for-another-flutter-command-to-release-the-startup-lock/" rel="next" title="如何解决“Waiting for another flutter command to release the startup lock...”">
-      如何解决“Waiting for another flutter command to release the startup lock...” <i class="fa fa-chevron-right"></i>
+    <a href="/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/" rel="next" title="配置 Flutter 国内镜像">
+      配置 Flutter 国内镜像 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -383,7 +385,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

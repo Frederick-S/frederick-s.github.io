@@ -86,7 +86,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -242,7 +246,7 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>329</span>
+              <span>313</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -262,10 +266,8 @@
       
         <p>在 <code>Java</code> 中，如果两个同名方法仅返回值类型不同，这是不允许的，即编译器不会认为这是方法重载，如下述类中的方法 <code>f</code>：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译器会提示 <code>&#39;f()&#39; is already defined in &#39;Demo&#39;</code>。假设编译器支持这种方式的方法重载，会有什么问题？在某些情况下，编译器无法区分调用的是哪个方法，例如当调用 <code>f()</code> 却忽略返回值时：</p>
+<p>编译器会提示 <code>'f()' is already defined in 'Demo'</code>。假设编译器支持这种方式的方法重载，会有什么问题？在某些情况下，编译器无法区分调用的是哪个方法，例如当调用 <code>f()</code> 却忽略返回值时：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f();</span><br></pre></td></tr></table></figure>
-
 <p>所以仅返回值类型不同不能作为方法重载的形式。</p>
 <p>参考：</p>
 <ul>
@@ -384,7 +386,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

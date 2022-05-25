@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="项目搭建首先执行命令 dotnet new classlib --name App 来创建一个类库程序作为测试的对象，该类库只包含一个 SumService 类： 123456789101112using System;namespace App&amp;#123;    public class SumService    &amp;#123;        public static int Sum(int">
+  <meta name="description" content="项目搭建 首先执行命令 dotnet new classlib --name App 来创建一个类库程序作为测试的对象，该类库只包含一个 SumService 类： 123456789101112using System;namespace App&amp;#123;    public class SumService    &amp;#123;        public static int Sum(in">
 <meta property="og:type" content="article">
 <meta property="og:title" content=".NET Core 覆盖率测试">
 <meta property="og:url" content="https://frederick-s.github.io/2020/04/18/dotnet-core-test-coverage-demo/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="项目搭建首先执行命令 dotnet new classlib --name App 来创建一个类库程序作为测试的对象，该类库只包含一个 SumService 类： 123456789101112using System;namespace App&amp;#123;    public class SumService    &amp;#123;        public static int Sum(int">
+<meta property="og:description" content="项目搭建 首先执行命令 dotnet new classlib --name App 来创建一个类库程序作为测试的对象，该类库只包含一个 SumService 类： 123456789101112using System;namespace App&amp;#123;    public class SumService    &amp;#123;        public static int Sum(in">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-04-17T16:00:00.000Z">
 <meta property="article:modified_time" content="2020-04-17T16:00:00.000Z">
@@ -86,7 +86,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -260,24 +264,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h2><p>首先执行命令 <code>dotnet new classlib --name App</code> 来创建一个类库程序作为测试的对象，该类库只包含一个 <code>SumService</code> 类：</p>
+        <h2 id="项目搭建"><a class="markdownIt-Anchor" href="#项目搭建"></a> 项目搭建</h2>
+<p>首先执行命令 <code>dotnet new classlib --name App</code> 来创建一个类库程序作为测试的对象，该类库只包含一个 <code>SumService</code> 类：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumService</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">Sum</span>(<span class="params"><span class="built_in">int</span> a, <span class="built_in">int</span> b</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> a + b;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>然后创建一个基于 <code>xunit</code> 的单元测试项目来编写测试用例，并将 <code>App</code> 类库项目作为项目引用加入到 <code>App.Tests</code> 项目中：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dotnet new xunit --name App.Tests</span><br><span class="line">dotnet add .\App.Tests\App.Tests.csproj reference .\App\App.csproj</span><br></pre></td></tr></table></figure>
-
 <p>并编写一个测试用例 <code>SumServiceTest</code>：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> Xunit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App.Tests</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SumServiceTest</span></span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="meta">Fact</span>]</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShouldReturn5</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Assert.Equal(<span class="number">5</span>, SumService.Sum(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>接着创建一个解决方案，并将 <code>App</code> 和 <code>App.Tests</code> 项目加入到该解决方案中：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dotnet new sln --name App</span><br><span class="line">dotnet sln add .\App\App.csproj .\App.Tests\App.Tests.csproj</span><br></pre></td></tr></table></figure>
-
 <p>最后项目结构如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">├── App</span><br><span class="line">│   └── App.csproj</span><br><span class="line">│   └── SumService.cs</span><br><span class="line">├── App.Tests</span><br><span class="line">│   └── App.Tests.csproj</span><br><span class="line">│   └── SumServiceTest.cs</span><br><span class="line">├── App.sln</span><br></pre></td></tr></table></figure>
-
-<h2 id="覆盖率测试"><a href="#覆盖率测试" class="headerlink" title="覆盖率测试"></a>覆盖率测试</h2><p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
+<h2 id="覆盖率测试"><a class="markdownIt-Anchor" href="#覆盖率测试"></a> 覆盖率测试</h2>
+<p>覆盖率测试依赖 <code>coverlet</code>，在创建单元测试项目时已自动添加了该依赖，执行测试时添加 <code>coverlet</code> 相关的参数即可生成测试覆盖率报告：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br></pre></td></tr></table></figure>
-
 <p>执行成功后会在 <code>App.Tests/TestResults/&#123;random-string&#125;</code> 目录下生成名为 <code>coverage.cobertura.xml</code> 的测试覆盖率报告。</p>
 <p>但是，自动创建的单元测试项目默认添加的 <code>coverlet</code> 依赖是 <code>coverlet.collector</code>，目前还不支持在控制台中打印测试覆盖率报告：</p>
 <blockquote>
@@ -285,24 +285,22 @@
 </blockquote>
 <p>如果希望在控制台中打印测试覆盖率报告可将 <code>coverlet.collector</code> 依赖改为 <code>coverlet.msbuild</code>：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dotnet remove .\App.Tests package coverlet.collector</span><br><span class="line">dotnet add .\App.Tests\ package coverlet.msbuild</span><br></pre></td></tr></table></figure>
-
 <p>然后执行测试命令：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet test &#x2F;p:CollectCoverage&#x3D;true</span><br></pre></td></tr></table></figure>
-
 <p>即可在控制台打印测试覆盖率报告：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Calculating coverage result...</span><br><span class="line">  Generating report &#39;D:\WorkSpace\dotnet-core-coverlet-msbuild-demo\App.Tests\coverage.json&#39;</span><br><span class="line"></span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| Module | Line | Branch | Method |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line">| App    | 100% | 100%   | 100%   |</span><br><span class="line">+--------+------+--------+--------+</span><br><span class="line"></span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">|         | Line | Branch | Method |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Total   | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br><span class="line">| Average | 100% | 100%   | 100%   |</span><br><span class="line">+---------+------+--------+--------+</span><br></pre></td></tr></table></figure>
-
-<h2 id="集成-codecov"><a href="#集成-codecov" class="headerlink" title="集成 codecov"></a>集成 codecov</h2><h3 id="coverlet-msbuild"><a href="#coverlet-msbuild" class="headerlink" title="coverlet.msbuild"></a>coverlet.msbuild</h3><p>集成 <code>codecov</code> 需要指定测试覆盖率报告文件的路径，暂不支持 <code>coverlet.msbuild</code> 默认生成的 <code>json</code> 格式的文件，可以在执行测试时添加 <code>/p:CoverletOutputFormat=opencover</code> 参数来生成 <code>opencover</code> 格式的文件，相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
+<h2 id="集成-codecov"><a class="markdownIt-Anchor" href="#集成-codecov"></a> 集成 codecov</h2>
+<h3 id="coverletmsbuild"><a class="markdownIt-Anchor" href="#coverletmsbuild"></a> coverlet.msbuild</h3>
+<p>集成 <code>codecov</code> 需要指定测试覆盖率报告文件的路径，暂不支持 <code>coverlet.msbuild</code> 默认生成的 <code>json</code> 格式的文件，可以在执行测试时添加 <code>/p:CoverletOutputFormat=opencover</code> 参数来生成 <code>opencover</code> 格式的文件，相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test &#x2F;p:CollectCoverage&#x3D;true &#x2F;p:CoverletOutputFormat&#x3D;opencover</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;coverage.opencover.xml</span><br></pre></td></tr></table></figure>
-
-<h3 id="coverlet-collector"><a href="#coverlet-collector" class="headerlink" title="coverlet.collector"></a>coverlet.collector</h3><p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
+<h3 id="coverletcollector"><a class="markdownIt-Anchor" href="#coverletcollector"></a> coverlet.collector</h3>
+<p>使用 <code>coverlet.collector</code> 时每次生成的测试覆盖率报告所在的路径是随机的，所以需要将测试覆盖率报告复制到一个固定的路径中，可以使用如下的 <code>PowerShell</code> 脚本：</p>
 <figure class="highlight ps"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$source</span> = <span class="string">&quot;./App.Tests/TestResults&quot;</span></span><br><span class="line"><span class="variable">$destination</span> = <span class="variable">$source</span></span><br><span class="line"><span class="variable">$filter</span> = <span class="string">&quot;coverage.cobertura.xml&quot;</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="literal">-Recurse</span> <span class="literal">-Path</span> <span class="variable">$source</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Name <span class="operator">-match</span> <span class="variable">$filter</span> &#125; | <span class="built_in">Copy-Item</span> <span class="literal">-Destination</span> <span class="variable">$destination</span></span><br></pre></td></tr></table></figure>
-
 <p>相应的 <code>.appveyor.yml</code> 文件内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">image: Visual Studio 2019</span><br><span class="line">before_build:</span><br><span class="line">  - choco install codecov</span><br><span class="line">build_script:</span><br><span class="line">  - dotnet build</span><br><span class="line">test_script:</span><br><span class="line">  - dotnet test --collect:&quot;XPlat Code Coverage&quot;</span><br><span class="line">  - ps: .&#x2F;FindCoverageFile.ps1</span><br><span class="line">  - codecov -f .&#x2F;App.Tests&#x2F;TestResults&#x2F;coverage.cobertura.xml</span><br></pre></td></tr></table></figure>
-
 <p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/dotnet-core-coverlet-msbuild-demo">dotnet-core-coverlet-msbuild-demo</a> 及 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/dotnet-core-coverlet-collector-demo">dotnet-core-coverlet-collector-demo</a>。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://codeburst.io/code-coverage-in-net-core-projects-c3d6536fd7d7?gi=4c835df2b1bf">Code Coverage in .NET Core Projects</a></li>
 <li><a target="_blank" rel="noopener" href="https://github.com/tonerdo/coverlet/blob/master/Documentation/VSTestIntegration.md">Coverlet integration with VSTest (a.k.a. Visual Studio Test Platform)</a></li>
 <li><a target="_blank" rel="noopener" href="https://github.com/codecov/codecov-exe">codecov-exe</a></li>
@@ -408,7 +406,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">项目搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E7%8E%87%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">覆盖率测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E6%88%90-codecov"><span class="nav-number">3.</span> <span class="nav-text">集成 codecov</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#coverlet-msbuild"><span class="nav-number">3.1.</span> <span class="nav-text">coverlet.msbuild</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#coverlet-collector"><span class="nav-number">3.2.</span> <span class="nav-text">coverlet.collector</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text"> 项目搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E7%8E%87%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text"> 覆盖率测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E6%88%90-codecov"><span class="nav-number">3.</span> <span class="nav-text"> 集成 codecov</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#coverletmsbuild"><span class="nav-number">3.1.</span> <span class="nav-text"> coverlet.msbuild</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#coverletcollector"><span class="nav-number">3.2.</span> <span class="nav-text"> coverlet.collector</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -422,7 +420,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

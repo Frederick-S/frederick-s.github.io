@@ -87,7 +87,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -263,13 +267,10 @@
       
         <p>创建了 <code>Azure MySQL</code> 实例后（这里使用的是 <code>Flexible Server</code>），首先导出原始数据库的数据，因为用的是 <code>Docker</code> 所以通过以下方式导出：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec $&#123;container_id&#125; &#x2F;usr&#x2F;bin&#x2F;mysqldump -u $&#123;user_name&#125; --password&#x3D;$&#123;password&#125; $&#123;database_name&#125; &gt; backup.sql</span><br></pre></td></tr></table></figure>
-
 <p>然后通过 <code>Azure CLI</code> 创建一个新的数据库：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">az mysql flexible-server db create --resource-group $&#123;resource_group&#125; --server-name $&#123;server_name&#125; --database-name $&#123;database_name&#125;</span><br></pre></td></tr></table></figure>
-
 <p>最后通过 <code>Azure CLI</code> 导入数据：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">az mysql flexible-server execute -n $&#123;server_name&#125; -u $&#123;user_name&#125; -p $&#123;password&#125; -d $&#123;database_name&#125; -f $&#123;path_to_backup_sql_file&#125;</span><br></pre></td></tr></table></figure>
-
 <p>参考：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://github.com/Azure-samples/mysql-database-samples">Sample Databases for Azure Database for MySQL flexible server</a></li>
@@ -389,7 +390,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

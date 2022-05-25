@@ -86,7 +86,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -262,34 +266,33 @@
       
         <p>日常随着 <code>Docker</code> 的使用，<code>Docker</code> 会逐渐占用磁盘空间，通过 <code>docker system df</code> 可查看 <code>Docker</code> 所占用的空间：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE</span><br><span class="line">Images          20        14        22.21GB   17.07GB (76%)</span><br><span class="line">Containers      29        0         6.743GB   6.743GB (100%)</span><br><span class="line">Local Volumes   2         0         417MB     417MB (100%)</span><br><span class="line">Build Cache     0         0         0B        0B</span><br></pre></td></tr></table></figure>
-
 <p>其中 <code>Images</code> 表示镜像，<code>Containers</code> 表示容器，<code>Local Volumes</code> 表示本地卷，<code>Build Cache</code> 表示构建缓存。</p>
-<h2 id="整体清理"><a href="#整体清理" class="headerlink" title="整体清理"></a>整体清理</h2><p>可以通过 <code>docker system prune</code> 进行一次空间清理：</p>
+<h2 id="整体清理"><a class="markdownIt-Anchor" href="#整体清理"></a> 整体清理</h2>
+<p>可以通过 <code>docker system prune</code> 进行一次空间清理：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">WARNING! This will remove:</span><br><span class="line">  - all stopped containers</span><br><span class="line">  - all networks not used by at least one container</span><br><span class="line">  - all dangling images</span><br><span class="line">  - all dangling build cache</span><br><span class="line"></span><br><span class="line">Are you sure you want to continue? [y&#x2F;N]</span><br></pre></td></tr></table></figure>
-
 <p>该操作会删除所有停止的容器，所有未被至少一个容器使用的网络，所有的 <code>dangling</code> 镜像（在构建镜像时产生的 <code>tag</code> 为 <code>none</code> 的镜像，没有和任何其他有 <code>tag</code> 的镜像有关联），所有的 <code>dangling</code> 构建缓存（和 <code>dangling</code> 镜像同理）。</p>
 <p>更激进一点，还可以执行 <code>docker system prune -a</code>，该操作还会删除没有和运行中的容器有关联的镜像。</p>
-<h2 id="镜像清理"><a href="#镜像清理" class="headerlink" title="镜像清理"></a>镜像清理</h2><p><code>Docker</code> 镜像是某个应用（如数据库、某个程序语言的运行时）的磁盘快照，可以通过 <code>docker image ls -a</code> 查看所有的镜像（活跃的以及 <code>dangling</code> 的镜像）：</p>
+<h2 id="镜像清理"><a class="markdownIt-Anchor" href="#镜像清理"></a> 镜像清理</h2>
+<p><code>Docker</code> 镜像是某个应用（如数据库、某个程序语言的运行时）的磁盘快照，可以通过 <code>docker image ls -a</code> 查看所有的镜像（活跃的以及 <code>dangling</code> 的镜像）：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY    TAG       IMAGE ID       CREATED        SIZE</span><br><span class="line">hello-world   latest    d1165f221234   4 months ago   13.3kB</span><br></pre></td></tr></table></figure>
-
 <p>可以通过 <code>docker image rm &lt;name_or_id&gt;</code> 来删除某个镜像，支持批量删除多个镜像，多个镜像 <code>id</code> 之间使用空格分隔即可。不过，删除镜像要求该镜像没有被某个容器所使用，否则会提示下述类似错误：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error response from daemon: conflict: unable to delete 4cdc5dd7eaad (must be forced) - image is being used by stopped container 3d9f62acc483</span><br><span class="line">Error response from daemon: conflict: unable to delete d1165f221234 (must be forced) - image is being used by stopped container 57027ba35bdd</span><br></pre></td></tr></table></figure>
-
 <p>可以通过在执行时增加 <code>-f</code> 来强制删除镜像。</p>
-<h2 id="容器清理"><a href="#容器清理" class="headerlink" title="容器清理"></a>容器清理</h2><p>容器是某个镜像的一个运行实例，可以通过 <code>docker container ls -a</code> 查看所有的容器：</p>
+<h2 id="容器清理"><a class="markdownIt-Anchor" href="#容器清理"></a> 容器清理</h2>
+<p>容器是某个镜像的一个运行实例，可以通过 <code>docker container ls -a</code> 查看所有的容器：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS                      PORTS     NAMES</span><br><span class="line">3d9f62acc483   4cdc5dd7eaad   &quot;&#x2F;docker-entrypoint.…&quot;   11 minutes ago   Exited (0) 11 minutes ago             sleepy_babbage</span><br></pre></td></tr></table></figure>
-
 <p>要删除一个容器必须要先停止该容器（<code>docker container stop &lt;name_or_id&gt;</code>），然后通过 <code>docker container rm &lt;name_or_id&gt;</code> 删除，同样的，和删除镜像类似，该命令支持批量删除多个容器，多个容器 <code>id</code> 之间使用空格分隔。</p>
-<h2 id="网络清理"><a href="#网络清理" class="headerlink" title="网络清理"></a>网络清理</h2><p><code>Docker</code> 网络用于容器间的通信，它们都是一些配置文件，并不会占用多大空间，可以通过 <code>docker network ls</code> 查看所有的网络：</p>
+<h2 id="网络清理"><a class="markdownIt-Anchor" href="#网络清理"></a> 网络清理</h2>
+<p><code>Docker</code> 网络用于容器间的通信，它们都是一些配置文件，并不会占用多大空间，可以通过 <code>docker network ls</code> 查看所有的网络：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NETWORK ID     NAME      DRIVER    SCOPE</span><br><span class="line">b96312481a51   bridge    bridge    local</span><br><span class="line">85a64f881d4d   host      host      local</span><br><span class="line">e6808b80f888   none      null      local</span><br></pre></td></tr></table></figure>
-
 <p>可以通过 <code>docker network rm &lt;name_or_id&gt;</code> 来删除一个网络。</p>
-<h2 id="数据卷清理"><a href="#数据卷清理" class="headerlink" title="数据卷清理"></a>数据卷清理</h2><p><code>Docker</code> 数据卷用于持久化容器运行时保存的数据，例如通过 <code>Docker</code> 运行 <code>MySQL</code> 时指定数据卷，从而对 <code>MySQL</code> 的数据进行备份，可以通过 <code>docker volume ls</code> 查看所有的数据卷：</p>
+<h2 id="数据卷清理"><a class="markdownIt-Anchor" href="#数据卷清理"></a> 数据卷清理</h2>
+<p><code>Docker</code> 数据卷用于持久化容器运行时保存的数据，例如通过 <code>Docker</code> 运行 <code>MySQL</code> 时指定数据卷，从而对 <code>MySQL</code> 的数据进行备份，可以通过 <code>docker volume ls</code> 查看所有的数据卷：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DRIVER    VOLUME NAME</span><br><span class="line">local     test-volume</span><br></pre></td></tr></table></figure>
-
 <p>同样的，可以通过 <code>docker volume rm &lt;name&gt;</code> 来删除指定的数据卷，或者使用 <code>docker volume prune</code> 来删除所有未和运行中的容器关联的数据卷，以及通过 <code>docker volume prune -a</code> 删除所有的数据卷。</p>
 <p>最后，<code>docker system prune -a --volumes</code> 是在 <code>docker system prune -a</code> 的基础上删除所有未使用的卷。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://dockerwebdev.com/tutorials/clean-up-docker/">How to clean your Docker data</a></li>
 <li><a target="_blank" rel="noopener" href="https://jinnabalu.medium.com/docker-frequently-used-commands-on-images-b812d76a4b8e">Dangling or Unused Images in Docker</a></li>
 </ul>
@@ -393,7 +396,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%B8%85%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">整体清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%E6%B8%85%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">镜像清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E6%B8%85%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">容器清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%B8%85%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">网络清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8D%B7%E6%B8%85%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text">数据卷清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%B8%85%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text"> 整体清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%E6%B8%85%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text"> 镜像清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E6%B8%85%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text"> 容器清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%B8%85%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text"> 网络清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8D%B7%E6%B8%85%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text"> 数据卷清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -407,7 +410,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

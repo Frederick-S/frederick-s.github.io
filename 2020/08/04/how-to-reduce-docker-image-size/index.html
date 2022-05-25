@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="问题首先来看一个例子，构建一个 C 语言版的 hello world 镜像： 12345&#x2F;* hello.c *&#x2F;int main () &amp;#123;  puts(&quot;Hello, world!&quot;);  return 0;&amp;#125;  对应的 Dockerfile 为： 1234FROM gccCOPY hello.c .RUN gcc -o hello hello.cCMD">
+  <meta name="description" content="问题 首先来看一个例子，构建一个 C 语言版的 hello world 镜像： 12345&#x2F;* hello.c *&#x2F;int main () &amp;#123;  puts(&quot;Hello, world!&quot;);  return 0;&amp;#125; 对应的 Dockerfile 为： 1234FROM gccCOPY hello.c .RUN gcc -o hello hello.cCMD">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何减小 Docker 镜像的大小">
 <meta property="og:url" content="https://frederick-s.github.io/2020/08/04/how-to-reduce-docker-image-size/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="问题首先来看一个例子，构建一个 C 语言版的 hello world 镜像： 12345&#x2F;* hello.c *&#x2F;int main () &amp;#123;  puts(&quot;Hello, world!&quot;);  return 0;&amp;#125;  对应的 Dockerfile 为： 1234FROM gccCOPY hello.c .RUN gcc -o hello hello.cCMD">
+<meta property="og:description" content="问题 首先来看一个例子，构建一个 C 语言版的 hello world 镜像： 12345&#x2F;* hello.c *&#x2F;int main () &amp;#123;  puts(&quot;Hello, world!&quot;);  return 0;&amp;#125; 对应的 Dockerfile 为： 1234FROM gccCOPY hello.c .RUN gcc -o hello hello.cCMD">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-08-03T16:00:00.000Z">
 <meta property="article:modified_time" content="2020-08-03T16:00:00.000Z">
@@ -86,7 +86,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -260,55 +264,45 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>首先来看一个例子，构建一个 <code>C</code> 语言版的 <code>hello world</code> 镜像：</p>
+        <h2 id="问题"><a class="markdownIt-Anchor" href="#问题"></a> 问题</h2>
+<p>首先来看一个例子，构建一个 <code>C</code> 语言版的 <code>hello world</code> 镜像：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* hello.c */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>对应的 <code>Dockerfile</code> 为：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FROM gcc</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
-
 <p>然后执行 <code>docker build -t hello-world .</code> 构建一个名为 <code>hello-world</code> 的镜像，然而以这种方式构建的镜像的大小竟然有1.19 GB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              b11e170bd1d2        6 minutes ago       1.19GB</span><br></pre></td></tr></table></figure>
-
 <p>因为这种构建方式生成的镜像会同时包含 <code>gcc</code> 镜像的内容，查看 <code>gcc</code> 镜像大小发现达到了1.19 GB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">gcc                 latest              21f378ba43ec        11 days ago         1.19GB</span><br></pre></td></tr></table></figure>
-
 <p>如果我们把基础镜像换成 <code>Ubuntu</code> 并安装 <code>gcc</code> 编译 <code>hello.c</code> 重新构建镜像，最后的镜像大小为213 MB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install gcc -y</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE</span><br><span class="line">hello-world         latest              42f17d1d12a5        About a minute ago   213MB</span><br></pre></td></tr></table></figure>
-
 <p>虽然新镜像相比1.19 GB有大幅减少，但相比于 <code>hello-world</code> 程序本身的大小（17k）来说，213 MB依然是个庞大的数字：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ls hello -hl</span><br><span class="line">-rwxr-xr-x 1 root root 17K Aug  4 13:54 hello</span><br></pre></td></tr></table></figure>
-
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h3 id="Multi-stage"><a href="#Multi-stage" class="headerlink" title="Multi-stage"></a>Multi-stage</h3><p>对于 <code>hello-world</code> 这个镜像来说，我们真正需要的只是最终的可执行程序，而并不关心中间的编译过程，如果能将编译阶段作为一个临时阶段而并不包含在最终的镜像中，则可有效减少最终的镜像大小。针对此，<code>Docker</code> 在 17.05 版本开始提供了名为 <code>multi-stage</code> 构建的功能。我们将原来的 <code>Dockerfile</code> 稍作修改，将原来的编译阶段抽取为一个 <code>stage</code>，然后将编译好的可执行文件复制到最终的 <code>stage</code> 中：</p>
+<h2 id="解决"><a class="markdownIt-Anchor" href="#解决"></a> 解决</h2>
+<h3 id="multi-stage"><a class="markdownIt-Anchor" href="#multi-stage"></a> Multi-stage</h3>
+<p>对于 <code>hello-world</code> 这个镜像来说，我们真正需要的只是最终的可执行程序，而并不关心中间的编译过程，如果能将编译阶段作为一个临时阶段而并不包含在最终的镜像中，则可有效减少最终的镜像大小。针对此，<code>Docker</code> 在 17.05 版本开始提供了名为 <code>multi-stage</code> 构建的功能。我们将原来的 <code>Dockerfile</code> 稍作修改，将原来的编译阶段抽取为一个 <code>stage</code>，然后将编译好的可执行文件复制到最终的 <code>stage</code> 中：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM ubuntu</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
-
 <p>最终的镜像大小只有73.9 MB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              7dd2b51c53b2        7 minutes ago       73.9MB</span><br></pre></td></tr></table></figure>
-
-<h3 id="FROM-scratch"><a href="#FROM-scratch" class="headerlink" title="FROM scratch"></a><code>FROM scratch</code></h3><p>在上一步中，我们使用 <code>Ubuntu</code> 作为基础镜像来运行 <code>hello-world</code>，相比于一个可执行程序，<code>Ubuntu</code> 依然过于庞大，有没有比 <code>Ubuntu</code> 更轻量的镜像呢？有，那就是 <code>scratch</code>，这表示一个空的镜像，继续将 <code>Dockerfile</code> 稍作修改：</p>
+<h3 id="from-scratch"><a class="markdownIt-Anchor" href="#from-scratch"></a> <code>FROM scratch</code></h3>
+<p>在上一步中，我们使用 <code>Ubuntu</code> 作为基础镜像来运行 <code>hello-world</code>，相比于一个可执行程序，<code>Ubuntu</code> 依然过于庞大，有没有比 <code>Ubuntu</code> 更轻量的镜像呢？有，那就是 <code>scratch</code>，这表示一个空的镜像，继续将 <code>Dockerfile</code> 稍作修改：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM scratch</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
-
 <p>最终的镜像大小只有16.4 KB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              676253b0e9c4        31 minutes ago      16.4kB</span><br></pre></td></tr></table></figure>
-
 <p>不过在运行该镜像时却提示错误：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">standard_init_linux.go:211: exec user process caused &quot;no such file or directory&quot;</span><br></pre></td></tr></table></figure>
-
 <p>这是因为这种方式构建出的镜像缺少 <code>hello-world</code> 运行时依赖的库。我们可以在编译 <code>hello-world</code> 时通过指定 <code>-static</code> 参数将依赖的库包含到最后的可执行文件中来解决这个问题：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c -static</span><br><span class="line">FROM scratch</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
-
 <p>不过包含了依赖的库后最终镜像的大小也上涨为945 KB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e6a1fccc2de7        9 seconds ago       945kB</span><br></pre></td></tr></table></figure>
-
 <p>另外，如果不想将依赖的库包含到最终的镜像中，可以使用 <code>busybox:glibc</code> 这个基础镜像，该镜像包含了 <code>C</code> 语言的标准库，有了这个镜像在编译 <code>hello-world</code> 时则无需指定 <code>-static</code> 参数：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FROM gcc AS mybuildstage</span><br><span class="line">COPY hello.c .</span><br><span class="line">RUN gcc -o hello hello.c</span><br><span class="line">FROM busybox:glibc</span><br><span class="line">COPY --from&#x3D;mybuildstage hello .</span><br><span class="line">CMD [&quot;.&#x2F;hello&quot;]</span><br></pre></td></tr></table></figure>
-
 <p>不过由于该镜像本身有一定大小，最终镜像的大小达到了5.22 MB：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hello-world         latest              e2f2c0544800        7 seconds ago       5.22MB</span><br></pre></td></tr></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过 <code>multi-stage</code> 构建可以有效的减少 <code>Docker</code> 镜像的大小，而基础镜像的选择则要具体情况分析，在满足需求的情况下选择合理的基础镜像。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>通过 <code>multi-stage</code> 构建可以有效的减少 <code>Docker</code> 镜像的大小，而基础镜像的选择则要具体情况分析，在满足需求的情况下选择合理的基础镜像。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://www.ardanlabs.com/blog/2020/02/docker-images-part1-reducing-image-size.html">Docker Images : Part I - Reducing Image Size</a></li>
 </ul>
 
@@ -411,7 +405,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text">解决</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Multi-stage"><span class="nav-number">2.1.</span> <span class="nav-text">Multi-stage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FROM-scratch"><span class="nav-number">2.2.</span> <span class="nav-text">FROM scratch</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text"> 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text"> 解决</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#multi-stage"><span class="nav-number">2.1.</span> <span class="nav-text"> Multi-stage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#from-scratch"><span class="nav-number">2.2.</span> <span class="nav-text"> FROM scratch</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text"> 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -425,7 +419,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

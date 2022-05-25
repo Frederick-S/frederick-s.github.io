@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="介绍共识算法使得一批机器作为一个整体对外提供服务，同时当部分机器异常时系统仍能保证可用性。因此，共识算法在构建可靠的大型软件系统中扮演着至关重要的角色。而在所有的共识算法中，Paxos 占据了主导的地位：大部分共识算法的实现都是基于 Paxos 或者受其影响，并且它也成为了教授学生们共识算法的第一选择。 然而，尽管人们为了让 Paxos 易于理解做了大量的尝试，Paxos 依然非常难以理解。另外，">
+  <meta name="description" content="介绍 共识算法使得一批机器作为一个整体对外提供服务，同时当部分机器异常时系统仍能保证可用性。因此，共识算法在构建可靠的大型软件系统中扮演着至关重要的角色。而在所有的共识算法中，Paxos 占据了主导的地位：大部分共识算法的实现都是基于 Paxos 或者受其影响，并且它也成为了教授学生们共识算法的第一选择。 然而，尽管人们为了让 Paxos 易于理解做了大量的尝试，Paxos 依然非常难以理解。另">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version)">
 <meta property="og:url" content="https://frederick-s.github.io/2022/05/03/mit-6.824-raft/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="介绍共识算法使得一批机器作为一个整体对外提供服务，同时当部分机器异常时系统仍能保证可用性。因此，共识算法在构建可靠的大型软件系统中扮演着至关重要的角色。而在所有的共识算法中，Paxos 占据了主导的地位：大部分共识算法的实现都是基于 Paxos 或者受其影响，并且它也成为了教授学生们共识算法的第一选择。 然而，尽管人们为了让 Paxos 易于理解做了大量的尝试，Paxos 依然非常难以理解。另外，">
+<meta property="og:description" content="介绍 共识算法使得一批机器作为一个整体对外提供服务，同时当部分机器异常时系统仍能保证可用性。因此，共识算法在构建可靠的大型软件系统中扮演着至关重要的角色。而在所有的共识算法中，Paxos 占据了主导的地位：大部分共识算法的实现都是基于 Paxos 或者受其影响，并且它也成为了教授学生们共识算法的第一选择。 然而，尽管人们为了让 Paxos 易于理解做了大量的尝试，Paxos 依然非常难以理解。另">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://frederick-s.github.io/images/raft-1.png">
 <meta property="og:image" content="https://frederick-s.github.io/images/raft-2.png">
@@ -41,10 +41,10 @@
 <meta property="article:published_time" content="2022-05-02T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-05-02T16:00:00.000Z">
 <meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="Paper">
 <meta property="article:tag" content="MIT 6.824">
 <meta property="article:tag" content="Distributed Systems">
 <meta property="article:tag" content="Raft">
-<meta property="article:tag" content="Paper">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://frederick-s.github.io/images/raft-1.png">
 
@@ -101,7 +101,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -275,7 +279,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>共识算法使得一批机器作为一个整体对外提供服务，同时当部分机器异常时系统仍能保证可用性。因此，共识算法在构建可靠的大型软件系统中扮演着至关重要的角色。而在所有的共识算法中，<code>Paxos</code> 占据了主导的地位：大部分共识算法的实现都是基于 <code>Paxos</code> 或者受其影响，并且它也成为了教授学生们共识算法的第一选择。</p>
+        <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p>共识算法使得一批机器作为一个整体对外提供服务，同时当部分机器异常时系统仍能保证可用性。因此，共识算法在构建可靠的大型软件系统中扮演着至关重要的角色。而在所有的共识算法中，<code>Paxos</code> 占据了主导的地位：大部分共识算法的实现都是基于 <code>Paxos</code> 或者受其影响，并且它也成为了教授学生们共识算法的第一选择。</p>
 <p>然而，尽管人们为了让 <code>Paxos</code> 易于理解做了大量的尝试，<code>Paxos</code> 依然非常难以理解。另外，如果要将 <code>Paxos</code> 应用到实际的系统中需要涉及复杂的修改。因此，系统开发人员和学生都受困于 <code>Paxos</code>。</p>
 <p>在受困于 <code>Paxos</code> 之后，<code>Raft</code> 的作者开始尝试设计一种新的共识算法，从而能够为系统构建和教学提供一个更好的基础。和常见的共识算法的设计目标不同，这个新的共识算法的首要设计目标是可理解性：能否为实际的系统设计一个远比 <code>Paxos</code> 易于理解的共识算法？另外，对于系统构建者来说这个算法需要能易于实现。该算法仅仅是正确的还不够，重要的是能显而易见的被人们理解为什么是正确的。</p>
 <p>这个新的共识算法就是 <code>Raft</code>。在设计 <code>Raft</code> 时为了提高可理解性作者借助了某些特定的手段，包括解耦（<code>Raft</code> 分离了选主，日志复制和安全性的处理）和减少了状态机的状态（相比于 <code>Paxos</code>，<code>Raft</code> 减少了非确定性的状态以及各服务器间不一致的情况）。根据两所大学共43名学生的调查反馈，<code>Raft</code> 明显比 <code>Paxos</code> 易于理解：在学习了两种共识算法后，有33名学生在回答关于 <code>Raft</code> 的问题时比回答关于 <code>Paxos</code> 的问题表现的更好。</p>
@@ -286,8 +291,9 @@
 <li>节点变更（<code>Membership changes</code>）：当集群中的节点需要变更时，<code>Raft</code> 使用 <code>joint consensus</code> 机制来保证在变更时新旧两套集群下过半数的节点同时属于两套集群。这就保证了整个集群在节点变更时依然正常对外提供服务。</li>
 </ul>
 <p><code>Raft</code> 的作者认为不管是出于教学还是实现目的，<code>Raft</code> 都优于 <code>Paxos</code> 和其他共识算法。它相比于其他共识算法更简单和易于理解；也完全覆盖了实现一个实际系统的需求；它也有了一些开源的实现并且已经被一些公司所使用；它的安全性也已被正式定义和证明；其性能也不输给其他共识算法。</p>
-<h2 id="复制状态机"><a href="#复制状态机" class="headerlink" title="复制状态机"></a>复制状态机</h2><p>谈论共识算法时一般离不开复制状态机（<code>replicated state machines</code>）。在这个模型下，集群中的每台机器上的状态机能产生有着相同状态的副本，并且在某些机器异常时整个系统依然能对外提供服务。复制状态机被用于解决分布式系统中的一系列容错问题。例如，对于 <code>GFS</code>、<code>HDFS</code> 和 <code>RAMCloud</code> 这样的单主节点的大型系统来说，一般会用一个独立的复制状态机来管理选主，以及存储某些配置信息，并且主节点发生异常时这些信息也不会丢失。复制状态机的应用包括 <code>Chubby</code> 和 <code>ZooKeeper</code>。</p>
-<p><img src="/images/raft-1.png" alt="alt"></p>
+<h2 id="复制状态机"><a class="markdownIt-Anchor" href="#复制状态机"></a> 复制状态机</h2>
+<p>谈论共识算法时一般离不开复制状态机（<code>replicated state machines</code>）。在这个模型下，集群中的每台机器上的状态机能产生有着相同状态的副本，并且在某些机器异常时整个系统依然能对外提供服务。复制状态机被用于解决分布式系统中的一系列容错问题。例如，对于 <code>GFS</code>、<code>HDFS</code> 和 <code>RAMCloud</code> 这样的单主节点的大型系统来说，一般会用一个独立的复制状态机来管理选主，以及存储某些配置信息，并且主节点发生异常时这些信息也不会丢失。复制状态机的应用包括 <code>Chubby</code> 和 <code>ZooKeeper</code>。</p>
+<p><img src="/images/raft-1.png" alt="alt" /></p>
 <p>复制状态机一般通过复制日志来实现。在上图中，每台机器保存的日志中包含了一系列命令，这些命令会被状态机按顺序执行。每份日志中以相同的顺序保存着相同的命令，所以每台状态机能以相同的顺序执行这些命令。因为状态机是确定性的，所以最终所有状态机的状态和输出的结果都是相同的。</p>
 <p>共识算法的任务就是要保证这些日志数据的一致性。服务器上的共识模块收到客户端的命令后会将其添加到本地日志中。然后它会和其他服务器上的共识模块通信来保证即使在某些服务器异常的情况下，各服务器也会以相同的顺序记录下所有的请求日志。当客户端命令被正确复制后，每台服务器上的状态机会以日志中的顺序执行这些命令，然后将结果返回给客户端。从整体上来说，所有的服务器对外组成了一个独立，高可用的状态机。</p>
 <p>针对实际系统的共识算法来说一般有以下几个特性：</p>
@@ -297,7 +303,8 @@
 <li>不依赖时间来保证日志的一致性：错误的时钟和极大的消息延迟在最坏的情况下会造成可用性问题。</li>
 <li>在一般情况下，当集群中过半数的服务器在一轮 <code>RPC</code> 请求中成功响应时，这次的客户端请求就被视为完成，剩下少数响应缓慢的服务器不会影响整个系统的性能。</li>
 </ul>
-<h2 id="Paxos-的问题"><a href="#Paxos-的问题" class="headerlink" title="Paxos 的问题"></a>Paxos 的问题</h2><p><code>Leslie Lamport</code> 的 <code>Paxos</code> 协议几乎成为了共识算法的代名词：它是在课堂上被教授的最多的协议，以及大部分的共识算法的实现都以此为出发点。<code>Paxos</code> 首先定义了一个协议能够对单一决策达成共识，例如复制某一条日志。这个被称之为 <code>single-decree Paxos</code>。然后，<code>Paxos</code> 能组合多个单一决策以达成对一系列决策的共识（<code>multi-Paxos</code>），例如一整个日志文件。<code>Paxos</code> 保证了安全性和存活性，同时支持集群中的节点变更。它的正确性已经被证明而且在常规使用中已足够高效。</p>
+<h2 id="paxos-的问题"><a class="markdownIt-Anchor" href="#paxos-的问题"></a> Paxos 的问题</h2>
+<p><code>Leslie Lamport</code> 的 <code>Paxos</code> 协议几乎成为了共识算法的代名词：它是在课堂上被教授的最多的协议，以及大部分的共识算法的实现都以此为出发点。<code>Paxos</code> 首先定义了一个协议能够对单一决策达成共识，例如复制某一条日志。这个被称之为 <code>single-decree Paxos</code>。然后，<code>Paxos</code> 能组合多个单一决策以达成对一系列决策的共识（<code>multi-Paxos</code>），例如一整个日志文件。<code>Paxos</code> 保证了安全性和存活性，同时支持集群中的节点变更。它的正确性已经被证明而且在常规使用中已足够高效。</p>
 <p>不幸的是，<code>Paxos</code> 有两个重大的缺点。第一个缺点是 <code>Paxos</code> 非常难以理解。它的完整的解释是众所周知的晦涩难懂，只有少数人拼尽全力后才能正确理解。因此，人们尝试用通俗易懂的方式来解释 <code>Paxos</code>。不过这些尝试主要针对的是 <code>single-decree Paxos</code>，虽然也足够具有挑战性。根据 <code>NSDI 2012</code> 与会者的一项非正式调查显示，即使在经验老到的研究者中，也只有少数人能掌握 <code>Paxos</code>。<code>Raft</code> 的作者自身也受困于 <code>Paxos</code>，直到它们读了某些简化的 <code>Paxos</code> 的解释和实现了 <code>Raft</code> 之后才理解了 <code>Paxos</code> 的完整的协议，而这花了几乎一年的时间。</p>
 <p><code>Raft</code> 的作者认为 <code>Paxos</code> 的晦涩难懂来源于 <code>Paxos</code> 选择 <code>single-decree</code> 作为其协议的基础。<code>single-decree Paxos</code> 难以理解：它被分为两阶段但是又缺少简单直白的解释来单独理解每个阶段。鉴于此，人们也很难理解为什么整个 <code>single-decree</code> 协议是正确的。而由 <code>single-decree Paxos</code> 组合而来的 <code>multi-Paxos</code> 则更添加了额外的复杂性。<code>Raft</code> 的作者相信多决策共识的问题能够以更直白的方式拆解。</p>
 <p><code>Paxos</code> 的第二个问题是没有为构建实际的系统提供坚实的基础。其中一个原因是还没有一个被广泛认可的 <code>multi-Paxos</code> 算法。<code>Lamport</code> 的论文中主要描述的是 <code>single-decree Paxos</code>；他只是概括性的描述了 <code>multi-Paxos</code>，但是缺少很多细节。虽然人们有很多尝试来补充和优化 <code>Paxos</code>，但是它们相互之间以及和 <code>Lamport</code> 的描述都各有不同。虽然有些系统如 <code>Chubby</code> 实现了类似 <code>Paxos</code> 的算法，但是实现的算法细节并没有公开。</p>
@@ -307,11 +314,13 @@
 <p><code>Paxos</code> 的描述和现实世界的系统的实现间存在巨大的鸿沟…最终的系统将会构建在一个没有被证明的协议上。</p>
 </blockquote>
 <p>鉴于以上的问题，<code>Paxos</code> 即没有为系统构建也没有为教学提供一个坚实的基础。考虑到共识算法在构建大型软件系统中的重要性，<code>Raft</code> 的作者决定尝试能否设计成比 <code>Paxos</code> 更优秀的共识算法，<code>Raft</code> 因此应运而生。</p>
-<h2 id="为可理解性设计"><a href="#为可理解性设计" class="headerlink" title="为可理解性设计"></a>为可理解性设计</h2><p>作者在设计 <code>Raft</code> 时有几个目标：必须为系统构建提供完整坚实的基础，从而能大大减少开发人员的设计工作；必须在任何场景下保证安全性以及在特定操作场景下保证可用性；大多数的操作必须高效。不过最重要也是最困难的是可理解性。它必须能让大部分的受众易于理解。另外，这个算法必须能让人形成直观的认识，系统构建者就可以在实现时进行必要的扩展。</p>
+<h2 id="为可理解性设计"><a class="markdownIt-Anchor" href="#为可理解性设计"></a> 为可理解性设计</h2>
+<p>作者在设计 <code>Raft</code> 时有几个目标：必须为系统构建提供完整坚实的基础，从而能大大减少开发人员的设计工作；必须在任何场景下保证安全性以及在特定操作场景下保证可用性；大多数的操作必须高效。不过最重要也是最困难的是可理解性。它必须能让大部分的受众易于理解。另外，这个算法必须能让人形成直观的认识，系统构建者就可以在实现时进行必要的扩展。</p>
 <p>在设计 <code>Raft</code> 时有很多方面需要在多种方案中做选择。在选择哪种方案时基于的是可理解性：解释每种方案难度有多大（例如，其内部状态有多复杂），读者完全理解这个方案需要付出多大的努力？</p>
 <p>虽然做这样的分析有很大的主观性，作者使用了两方面的手段来解决这个问题。第一个手段是众所周知的问题分解：只要有可能，作者都会先将一个问题分解为一系列独立可解决，可解释，可相对的单独理解的子问题。例如，在 <code>Raft</code> 中选主，日志复制，安全性，集群节点变更被分解为独立的模块。</p>
 <p>第二个手段是通过减少系统状态的数量来简化系统状态，这样就使得系统更具一致性并尽可能的消除非确定性。特别的，系统中的日志不允许有空洞，<code>Raft</code> 也限制了各节点间日志不一致的场景。虽然在大多数情况下会尽可能的消除非确定性，不过在某些场景下非确定性却更有助于理解。特别是随机化会带来非确定性，不过它能以相似的手段来处理所有可能的场景来降低系统状态的复杂性。<code>Raft</code> 使用随机化来简化了选主算法。</p>
-<h2 id="Raft-共识算法"><a href="#Raft-共识算法" class="headerlink" title="Raft 共识算法"></a>Raft 共识算法</h2><p><code>Raft</code> 是一种管理第二节中所描述的复制日志的算法，下面描述了该算法的关键特性：</p>
+<h2 id="raft-共识算法"><a class="markdownIt-Anchor" href="#raft-共识算法"></a> Raft 共识算法</h2>
+<p><code>Raft</code> 是一种管理第二节中所描述的复制日志的算法，下面描述了该算法的关键特性：</p>
 <ul>
 <li><code>Election Safety</code>：在任一任期内最多只有一个节点被选为主节点。</li>
 <li><code>Leader Append-Only</code>：主节点永远不会覆盖或者删除某些日志项，它只会追加写新的日志项。</li>
@@ -326,13 +335,15 @@
 <li>日志复制：主节点必须从客户端接收日志请求，然后将其复制到其他从节点上，并强制要求其他从节点的日志以主节点的为准。</li>
 <li>安全性：如果任意一台服务器已经将某条日志应用到了自身的状态机中，那么其他任何服务器都不能在这条日志对应的索引上应用不同的命令到状态机中。</li>
 </ul>
-<h3 id="Raft-基础"><a href="#Raft-基础" class="headerlink" title="Raft 基础"></a>Raft 基础</h3><p>一个 <code>Raft</code> 集群包含若干台服务器，5台是一个常见的配置，这允许系统最多能容忍两台服务器的异常。在任一时刻，每台服务器只会处于其中一个状态：主节点（<code>leader</code>），从节点（<code>follower</code>），或者候选节点（<code>candidate</code>）。在正常操作下，系统中只有一个主节点，剩下的都是从节点。从节点是被动的：它们不会主动发起任何请求，只是简单的响应来自主节点和候选节点的请求。主节点会处理所有来自客户端的请求（如果客户端将请求发给了一个从节点，从节点会将其转发给主节点）。候选节点这个状态会在选举新的主节点时用到。下图展示了各节点状态间的转换：</p>
-<p><img src="/images/raft-2.png" alt="alt"></p>
+<h3 id="raft-基础"><a class="markdownIt-Anchor" href="#raft-基础"></a> Raft 基础</h3>
+<p>一个 <code>Raft</code> 集群包含若干台服务器，5台是一个常见的配置，这允许系统最多能容忍两台服务器的异常。在任一时刻，每台服务器只会处于其中一个状态：主节点（<code>leader</code>），从节点（<code>follower</code>），或者候选节点（<code>candidate</code>）。在正常操作下，系统中只有一个主节点，剩下的都是从节点。从节点是被动的：它们不会主动发起任何请求，只是简单的响应来自主节点和候选节点的请求。主节点会处理所有来自客户端的请求（如果客户端将请求发给了一个从节点，从节点会将其转发给主节点）。候选节点这个状态会在选举新的主节点时用到。下图展示了各节点状态间的转换：</p>
+<p><img src="/images/raft-2.png" alt="alt" /></p>
 <p>如下图所示，<code>Raft</code> 将时间切分为任意长度的任期（<code>term</code>）。任期会以连续的整数来标记。每个任期以选举作为开始，一个或多个候选节点会尝试成为主节点。如果某个候选节点赢得了选举，那么在这个任期剩下的时间里它将作为主节点。在某些情况下，多个候选节点可能会分票，造成没有一个候选节点赢得半数的选票。在这种情况下，当前任期会以没有主节点的状态结束，接着系统会马上对新的任期发起新的一轮选举。<code>Raft</code> 保证在任一任期内至多只有一个主节点。</p>
-<p><img src="/images/raft-3.png" alt="alt"></p>
+<p><img src="/images/raft-3.png" alt="alt" /></p>
 <p>不同的服务器可能会观测到不同次数的任期转变，在某些情况下一台服务器可能观测不到某次选举的发生或者感知不到整个任期。任期在 <code>Raft</code> 中扮演了逻辑时钟的角色，它能允许服务器侦测过期的信息例如过期的主节点。每台服务器都会保存一个当前任期（<code>current term</code>）的数字，这个数字会随时间递增。在服务器间通信时双方会附加上当前任期，如果某台服务器的当前任期小于另外一台服务器，那么这个服务器会将当前任期更新为另一台服务器的值。如果某个候选节点或者主节点发现自己的当前任期过期了，那么它会马上转为从节点状态。如果某台服务器收到的请求中的任期过期了，那么它会拒绝这个请求。</p>
 <p><code>Raft</code> 服务器间通过 <code>RPC</code> 进行通信，基础的共识算法只需要两种 <code>RPC</code>。<code>RequestVote</code> 用于候选节点在选主期间获取选票，<code>AppendEntries</code> 用于主节点向各从节点复制日志以及充当心跳的作用。如果某个 <code>RPC</code> 请求在一段时间内没有响应，那么服务器会重新发起请求，同时服务器也会并行发送 <code>RPC</code> 请求来达到最佳性能。</p>
-<h3 id="选主"><a href="#选主" class="headerlink" title="选主"></a>选主</h3><p><code>Raft</code> 通过心跳机制来触发选主。当服务器启动时，它们的初始状态是从节点。只要服务器能收到来自候选节点或者主节点的有效请求，就会一直出于从节点状态。主节点会定期的向所有从节点发送心跳（不带任何日志的 <code>AppendEntries</code> 请求）来维持自己主节点的地位。如果在某段时间内某台从节点没有收到心跳，那么它就会认为此时没有存活的主节点，则会发起选主来选择一个新的主节点，这个等待时间就叫做 <code>election timeout</code>。</p>
+<h3 id="选主"><a class="markdownIt-Anchor" href="#选主"></a> 选主</h3>
+<p><code>Raft</code> 通过心跳机制来触发选主。当服务器启动时，它们的初始状态是从节点。只要服务器能收到来自候选节点或者主节点的有效请求，就会一直出于从节点状态。主节点会定期的向所有从节点发送心跳（不带任何日志的 <code>AppendEntries</code> 请求）来维持自己主节点的地位。如果在某段时间内某台从节点没有收到心跳，那么它就会认为此时没有存活的主节点，则会发起选主来选择一个新的主节点，这个等待时间就叫做 <code>election timeout</code>。</p>
 <p>开始新的一轮选主时，从节点会先将当前任期递增然后转换为候选节点。接着，它会给自己投一票然后并行发起 <code>RequestVote</code> 请求给其他从节点来获取选票。一个候选节点会保持当前的状态直到下面三种情况之一发生：</p>
 <ol>
 <li>当前候选节点赢得了选举</li>
@@ -344,9 +355,10 @@
 <p>第三种情况是没有一个候选节点赢得了选举：当很多从节点在同一时间转变为候选节点时，会分散选票，最终造成没有一个候选节点赢得过半数的选票。当发生这种情况时，候选节点会将此次选主作超时处理，然后再次将当前任期自增，重新发起新的任期的选主，并向其他从节点继续发起一轮 <code>RequestVote</code> 请求。不过，如果缺少额外机制，分票可能会一直持续下去。</p>
 <p><code>Raft</code> 通过随机的 <code>election timeout</code> 来确保分票极少会发生并且在发生时能快速解决。为了避免分票，首先 <code>election timeout</code> 的值会在一个固定区间内随机选择（例如150-300ms）。这就分散了各从节点的选主启动时机，使得在大多数的情况下只有一个从节点会进入选主状态；在其他从节点进入选主状态之前，这个节点就已经赢得了选举并向其他从节点发送了心跳，这就大大扼杀了分票的可能性。同样的机制也被用来解决当分票确实发生的场景，每个候选节点在启动新的选主时会重新设置一个随机的 <code>election timeout</code>，然后在这段期间内等待其他从节点的选票，或者新的主节点的心跳，假设第一轮选主发生了分票，那么由于随机 <code>election timeout</code> 的存在，不同的候选节点进入第二轮选主的时机也不会相同，这就降低了第二轮选主继续发生分票的可能性。</p>
 <p>选主是一个很好的例子展示了可理解性这个设计目标如何来指导在不同设计方案中做出选择。在最初的方案中作者打算使用一个排序系统：每一个候选节点被分配了一个唯一的权重，用来在多个候选节点中选择最终的主节点。如果某个候选节点发现其他候选节点的权重比自己高，那么这个候选节点就会退回到从节点状态，这就使得有着更高权重的候选节点能更容易的赢得下一轮的选举。不过这种实现可能会造成难以察觉的可用性问题（在不采用随机 <code>election timeout</code> 的情况下，当某个高权重的候选节点异常时，由于低权重的候选节点已经退回到了从节点状态，它需要再等待一个 <code>election timeout</code> 周期才能再次转变为候选节点，而在正常的情况下本身各节点间的信息交换速度较快，其他候选节点可能都已经退回到了从节点状态，此时高权重的候选节点异常就会造成系统没有候选节点，而距离各从节点进入选主状态又还有较长时间，从而造成系统在这段期间的不可用）。虽然作者对该算法进行了多次调整，但是每次调整后都会出现新的边界问题。最终作者认为随机化的 <code>election timeout</code> 更胜一筹和易于理解。</p>
-<h3 id="日志复制"><a href="#日志复制" class="headerlink" title="日志复制"></a>日志复制</h3><p>当某个候选节点被选为主节点后，它就开始处理客户端请求。每个客户端请求中包含了复制状态机需要执行的命令。主节点将这个命令以日志的形式追加到自己的日志文件中，然后并行的给所有从节点发送 <code>AppendEntries</code> 请求来复制日志。当日志在各从节点上被安全的复制后，主节点就将日志对应的命令应用到自身的状态机中，并将结果返回给客户端。如果某个从节点异常或者运行缓慢，或者网络包丢失，主节点会一直重发 <code>AppendEntries</code> 请求（即使主节点已经将结果返回给了客户端），直到所有从节点保存了所有的日志。</p>
+<h3 id="日志复制"><a class="markdownIt-Anchor" href="#日志复制"></a> 日志复制</h3>
+<p>当某个候选节点被选为主节点后，它就开始处理客户端请求。每个客户端请求中包含了复制状态机需要执行的命令。主节点将这个命令以日志的形式追加到自己的日志文件中，然后并行的给所有从节点发送 <code>AppendEntries</code> 请求来复制日志。当日志在各从节点上被安全的复制后，主节点就将日志对应的命令应用到自身的状态机中，并将结果返回给客户端。如果某个从节点异常或者运行缓慢，或者网络包丢失，主节点会一直重发 <code>AppendEntries</code> 请求（即使主节点已经将结果返回给了客户端），直到所有从节点保存了所有的日志。</p>
 <p>日志内容的组织如下图所示，每一条日志包含了状态机需要执行的命令以及主节点收到该请求时对应的任期。日志中的任期信息用来检测日志间的不一致性以及保证前面所提到的 <code>Raft</code> 的几个关键特性。每条日志同时有一个索引信息来标记这条日志在日志文件中的位置。</p>
-<p><img src="/images/raft-4.png" alt="alt"></p>
+<p><img src="/images/raft-4.png" alt="alt" /></p>
 <p>在上图中，方块中形如 <code>x &lt;- 3</code> 表示客户端的命令，命令上方的数字表示任期。</p>
 <p>主节点会决定什么时候能安全的将某条日志对应的命令应用到状态机中，该条日志就被称为已提交（<code>commited</code>）。<code>Raft</code> 保证已提交的日志是持久化了的，并且最终会被所有可用的状态机执行。当主节点将某条日志复制到集群中过半数的机器上时（例如上图中索引位置为7的日志），这条日志就会被标记为已提交。同时，该条日志之前的日志也都会被提交，包括从其他主节点复制而来的日志。主节点维护了已提交日志中的最大的索引值，并将其附加到后续的 <code>AppendEntries</code> 请求中（包括心跳），所以最终所有的机器都能知道当前的最远日志提交位置。当某个从节点发现某条日志已经提交了，它就会将该条日志对应的命令应用到自身的状态机中（以日志中出现的顺序执行命令）。</p>
 <p><code>Raft</code> 设计的日志机制能保证在不同机器间高层次下的一致性。这不仅简化了系统的行为和使得系统更有可预测性，同时也是保证安全性的重要组成部分。<code>Raft</code> 保证了下面两个性质（同时也组成了 <code>Log Matching Property</code>）：</p>
@@ -356,7 +368,7 @@
 </ul>
 <p>第一个性质保证是因为主节点在某个任期内最多只会在某个索引位置创建一条日志，而日志的位置创建后就不会改变。第二个性质保证则是通过 <code>AppendEntries</code> 请求中的一致性检查来实现。当主节点发送 <code>AppendEntries</code> 请求时，主节点会附带上本次需要复制的日志的前一条日志的索引和对应任期。如果从节点没有在自己的日志中找到这个指定索引和任期的日志，那么它会拒绝新日志的写入请求。日志的一致性检查类似于数学归纳法：初始情况日志为空，所以满足 <code>Log Matching Property</code>，假设从索引位置1到 <code>i</code> 的日志都满足 <code>Log Matching Property</code>，那么当主节点在成功提交了新的日志即索引位置 <code>i + 1</code> 的日志后，则在 <code>[i + 1, i + 1]</code> 这个范围满足了 <code>Log Matching Property</code>，从而得出从索引位置1到 <code>i + 1</code> 的日志都满足了 <code>Log Matching Property</code>。因此，只要 <code>AppendEntries</code> 的请求成功返回，那么主节点就知道从节点的日志和自己的相同。</p>
 <p>在正常的操作下，主节点的日志和从节点的日志始终能保持一致，所以 <code>AppendEntries</code> 的一致性检查从来不会失败。不过，当主节点异常时则会造成日志不一致（主节点还没有来得及复制所有的日志）。同样的，从节点的异常也会造成日志不一致（从节点没有收到所有的日志）。下图展示了从节点的日志可能和新的主节点不同的情况。一个从节点有可能缺少某些主节点拥有的日志，或者拥有一些主节点没有的日志，或者两者都有。这种日志的缺少或多余的情况可能会横跨几个任期。</p>
-<p><img src="/images/raft-5.png" alt="alt"></p>
+<p><img src="/images/raft-5.png" alt="alt" /></p>
 <p>在上图中，方块中的数字表示任期。当前已提交的日志的索引位置是1-9，一共有四台机器在1-9位置的日志相同，符合过半数的原则。<code>a</code> 和 <code>b</code> 相比于主节点来说缺少日志，<code>c</code> 和 <code>d</code> 相比于主节点来说有多余的日志，<code>e</code> 和 <code>f</code> 两种情况都有。对于 <code>f</code> 来说，它在任期2中被选为主节点，然后开始接受客户端请求并写入本地日志，但是还没有成功复制到其他从节点上就异常了，恢复后又被选举为任期3的主节点，又重复了类似的操作。</p>
 <p>在 <code>Raft</code> 中，主节点通过强制从节点复制自己的日志来保证日志的一致性。也就是对于从节点来说，和主节点日志不一致的地方会被主节点的日志覆盖。</p>
 <p>为了让从节点的日志和主节点保持一致，主节点必须知道到哪个索引位置为止主从节点间的日志是一致的，然后删除从节点在这个索引位置之后的日志，并替换为主节点中的日志。主节点为每个从节点维护了一个 <code>nextIndex</code> 变量，用来表示下一条由主节点发送给从节点的日志索引位置。当某个节点成为主节点时，它先将 <code>nextIndex</code> 初始化为自身日志文件中最后一条日志的索引位置加1。如果从节点的日志和主节点不一致，那么在下一次的 <code>AppendEntries</code> 请求中会返回失败。当主节点收到失败响应后，会将 <code>nextIndex</code> 减1并重新发送 <code>AppendEntries</code> 请求（前面提到，当主节点发送 <code>AppendEntries</code> 请求时，主节点会附带上本次需要复制的日志的前一条日志的索引和对应任期，从节点会根据这两个值来决定是否接受写入，当 <code>nextIndex</code> 减1时，在新的 <code>AppendEntries</code> 请求中这两个值也需要相应的往前移），最终 <code>nextIndex</code> 会等于某个值使得主从节点在 <code>nextIndex</code> 之前的日志都相同。此时 <code>AppendEntries</code> 会返回成功，从节点会将 <code>nextIndex</code> 及其之后的日志都替换为主节点的日志，至此，主从节点的日志就恢复了一致，并一直保持到当前任期结束。</p>
@@ -364,7 +376,7 @@
 <p>如果需要的话，可以对上述的交互协议进行优化来减少 <code>AppendEntries</code> 的次数，尤其是从节点的日志落后主节点太多的时候。例如，当从节点需要拒绝 <code>AppendEntries</code> 的请求时，可以在响应结果中带上不一致的日志的任期，以及该任期下的第一条日志的索引位置。根据这个信息，主节点就可以大幅减少 <code>nextIndex</code> 的值从而直接跳过该任期下不一致的日志，而不是一次 <code>RPC</code> 请求识别一条日志。不过作者怀疑这个优化在实际中是否有必要，因为异常并不会频繁发生所以不太可能会有那么多的不一致。</p>
 </blockquote>
 <p>针对上面的优化手段作者并没有描述过多的细节，在 <a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/notes/l-raft2.txt">6.824 2022 Lecture 7: Raft (2)</a> 中 <code>Robert Morris</code> 提出了自己的猜想。在下图中，<code>S1</code> 是主节点，<code>S2</code> 到 <code>S7</code> 是从节点，其中 <code>S2</code> 到 <code>S4</code> 节点的日志和主节点不一致，日志索引1到3已提交，现在主节点要在索引位置4追加一条新日志，分别来看 <code>S2</code> 到 <code>S4</code> 如何处理。</p>
-<p><img src="/images/raft-6.png" alt="alt"></p>
+<p><img src="/images/raft-6.png" alt="alt" /></p>
 <p><code>Robert Morris</code> 认为当从节点拒绝 <code>AppendEntries</code> 请求时，需要返回三个信息给主节点：</p>
 <ul>
 <li><code>XTerm</code>：冲突的日志的任期（如果有的话）</li>
@@ -373,24 +385,27 @@
 </ul>
 <p>记 <code>prevLogIndex</code> 表示主节点发送给从节点的上一条日志的索引位置，<code>prevLogTerm</code> 表示上一条日志所属的任期。则在主节点的第一轮 <code>AppendEntries</code> 中 <code>prevLogIndex = 3</code>，<code>prevLogTerm = 6</code>，对于 <code>S2</code> 到 <code>S4</code> 初始化的 <code>nextIndex</code> 为：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;S2&quot;: 4,</span><br><span class="line">    &quot;S3&quot;: 4,</span><br><span class="line">    &quot;S4&quot;: 4</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>对于 <code>S2</code>，首先检查自己日志中索引位置为 <code>prevLogIndex = 3</code> 的日志，发现其任期为5，和 <code>prevLogTerm = 6</code> 不匹配，从而拒绝请求，并返回 <code>XTerm = 5</code>，<code>XIndex = 2</code>，<code>XLen = 3</code>。主节点收到结果后，发现 <code>S2</code> 中 <code>prevLogIndex</code> 指向的任期和自己不同，这里比主节点小所以主节点往前遍历日志，发现没有任期5的日志，说明 <code>S2</code> 中整个任期5的日志都可以跳过，因此主节点将 <code>S2</code> 的 <code>nextIndex</code> 修改为 <code>XIndex</code>，即 <code>nextIndex = 2</code>。在第二轮的 <code>AppendEntries</code> 请求中，<code>prevLogIndex = 1</code>，<code>prevLogTerm = 4</code>，同时主节点也会将索引位置2到3的日志连同最新的日志一起随请求发送。<code>S2</code> 再次收到请求后，发现这次 <code>prevLogIndex/prevLogTerm</code> 标记的日志和自己匹配，因此返回成功，并将主节点的日志覆盖到索引位置2到4中。</p>
-<p>对于 <code>S3</code>，首先检查自己日志中索引位置为 <code>prevLogIndex = 3</code> 的日志，发现其任期为4，和 <code>prevLogTerm = 6</code> 不匹配，从而拒绝请求，并返回 <code>XTerm = 4</code>，<code>XIndex = 1</code>，<code>XLen = 3</code>。主节点收到结果后，发现 <code>S3</code> 中 <code>prevLogIndex</code> 指向的任期和自己不同，这里比主节点小所以主节点往前遍历日志，发现了任期4的日志，说明 <code>S3</code> 中任期4的日志比主节点多，因此主节点将 <code>S3</code> 的 <code>nextIndex</code> 修改为2，即主节点中任期4的最后一个日志的索引位置加1（这里 <code>Robert Morris</code> 的原话是 <code>leader&#39;s last entry for XTerm</code>，不过为了能统一处理下一次请求中的 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>，这里加了1）。在第二轮的 <code>AppendEntries</code> 请求中，<code>prevLogIndex = 1</code>，<code>prevLogTerm = 4</code>，同时主节点也会将索引位置2到3的日志连同最新的日志一起随请求发送。<code>S3</code> 再次收到请求后，发现这次 <code>prevLogIndex/prevLogTerm</code> 标记的日志和自己匹配，因此返回成功，并将主节点的日志覆盖到索引位置2到4中。</p>
+<p>对于 <code>S3</code>，首先检查自己日志中索引位置为 <code>prevLogIndex = 3</code> 的日志，发现其任期为4，和 <code>prevLogTerm = 6</code> 不匹配，从而拒绝请求，并返回 <code>XTerm = 4</code>，<code>XIndex = 1</code>，<code>XLen = 3</code>。主节点收到结果后，发现 <code>S3</code> 中 <code>prevLogIndex</code> 指向的任期和自己不同，这里比主节点小所以主节点往前遍历日志，发现了任期4的日志，说明 <code>S3</code> 中任期4的日志比主节点多，因此主节点将 <code>S3</code> 的 <code>nextIndex</code> 修改为2，即主节点中任期4的最后一个日志的索引位置加1（这里 <code>Robert Morris</code> 的原话是 <code>leader's last entry for XTerm</code>，不过为了能统一处理下一次请求中的 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>，这里加了1）。在第二轮的 <code>AppendEntries</code> 请求中，<code>prevLogIndex = 1</code>，<code>prevLogTerm = 4</code>，同时主节点也会将索引位置2到3的日志连同最新的日志一起随请求发送。<code>S3</code> 再次收到请求后，发现这次 <code>prevLogIndex/prevLogTerm</code> 标记的日志和自己匹配，因此返回成功，并将主节点的日志覆盖到索引位置2到4中。</p>
 <p>对于 <code>S4</code>，首先检查自己日志中索引位置为 <code>prevLogIndex = 3</code> 的日志，发现不存在，所以拒绝请求，并返回 <code>XTerm = null</code>，<code>XIndex = null</code>，<code>XLen = 1</code>。主节点收到结果后，发现 <code>XTerm</code> 和 <code>XIndex</code> 都为空，说明 <code>S4</code> 的日志比自己短，因此主节点将 <code>S4</code> 的 <code>nextIndex</code> 修改为2，即 <code>S4</code> 的日志长度加1（这里 <code>Robert Morris</code> 的原话是 <code>XLen</code>，不过为了能统一处理下一次请求中的 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>，这里加了1）。在第二轮的 <code>AppendEntries</code> 请求中，<code>prevLogIndex = 1</code>，<code>prevLogTerm = 4</code>，同时主节点也会将索引位置2到3的日志连同最新的日志一起随请求发送。<code>S4</code> 再次收到请求后，发现这次 <code>prevLogIndex/prevLogTerm</code> 标记的日志和自己匹配，因此返回成功，并将主节点的日志覆盖到索引位置2到4中，如果不匹配，则又会流转到上面两种情况中。</p>
 <p>在这种机制下，主节点不需要采用其他特殊的操作就能保持从节点日志的一致性。通过正常的 <code>AppendEntries</code> 请求，结合其一致性检查的功能，从节点的日志就可以自行恢复一致。而对于主节点来说，它永远不会覆盖或者删除自己的日志（<code>Leader Append-Only Property</code>）。</p>
 <p>这种日志复制机制展现了第二节中描述的共识算法所需要的特性：只要集群中过半数的机器存活，<code>Raft</code> 就能接收，复制和应用新的日志；在正常情况下，只需要一轮过半数机器的 <code>RPC</code> 请求响应成功就能复制一条新日志；一台运行缓慢的机器并不会影响整体的性能。</p>
-<h3 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h3><p>前面几节描述了 <code>Raft</code> 如何选主以及复制日志。不过，这些机制还不足以保证每个节点能以相同的顺序执行相同的命令。例如，某个从节点可能在某段期间内异常了，在这段期间内某个主节点已经提交了部分日志，此时假设主节点异常，之前异常的节点恢复并被选为主节点，根据前面所描述的 <code>AppendEntries</code> 的工作流程，它就有可能将其他从节点中之前提交的日志覆盖掉。因此，不同的节点可能会执行不同的命令序列。</p>
+<h3 id="安全性"><a class="markdownIt-Anchor" href="#安全性"></a> 安全性</h3>
+<p>前面几节描述了 <code>Raft</code> 如何选主以及复制日志。不过，这些机制还不足以保证每个节点能以相同的顺序执行相同的命令。例如，某个从节点可能在某段期间内异常了，在这段期间内某个主节点已经提交了部分日志，此时假设主节点异常，之前异常的节点恢复并被选为主节点，根据前面所描述的 <code>AppendEntries</code> 的工作流程，它就有可能将其他从节点中之前提交的日志覆盖掉。因此，不同的节点可能会执行不同的命令序列。</p>
 <p>本节通过描述了什么样的节点才允许被选为主节点来补充完善 <code>Raft</code> 算法。这个选主的限制保证了如果某个节点被选为了主节点，那么它就一定包含之前所有任期内由其他主节点提交的日志（<code>Leader Completeness Property</code>）。根据这个选主限制，我们可以使日志提交的规则更加清晰。</p>
-<h4 id="选主限制"><a href="#选主限制" class="headerlink" title="选主限制"></a>选主限制</h4><p>在所有基于主节点的共识算法中，最终主节点必须保存所有已提交的日志。在某些共识算法中，例如 <code>Viewstamped Replication</code>，如果某个节点没有包含所有已提交的日志也能被选为主节点。这些共识算法有额外的机制来识别出缺失的日志，并在选主期间或之后将缺失的日志发送给主节点。然而，这就增加了额外的机制和复杂性。<code>Raft</code> 采用了一种更简便的方案来保证每一个被新选举的主节点一定包含了之前所有主节点提交的日志，而无需额外传输缺失的日志给主节点。这就表明日志始终是单向流动，即从主节点流向从节点，并且主节点永远不会覆盖已经存在的日志。</p>
+<h4 id="选主限制"><a class="markdownIt-Anchor" href="#选主限制"></a> 选主限制</h4>
+<p>在所有基于主节点的共识算法中，最终主节点必须保存所有已提交的日志。在某些共识算法中，例如 <code>Viewstamped Replication</code>，如果某个节点没有包含所有已提交的日志也能被选为主节点。这些共识算法有额外的机制来识别出缺失的日志，并在选主期间或之后将缺失的日志发送给主节点。然而，这就增加了额外的机制和复杂性。<code>Raft</code> 采用了一种更简便的方案来保证每一个被新选举的主节点一定包含了之前所有主节点提交的日志，而无需额外传输缺失的日志给主节点。这就表明日志始终是单向流动，即从主节点流向从节点，并且主节点永远不会覆盖已经存在的日志。</p>
 <p><code>Raft</code> 在选主阶段会避免某个没有完整提交日志的候选节点成为主节点。一个候选节点必须和集群中过半数的节点通信来获取选票，这说明每一条提交的日志都至少存在于其中一台节点上（假设有 <code>S1</code> 到 <code>S5</code> 五个节点，之前 <code>S1</code> 是主节点并将某条日志成功提交到 <code>S1</code>、<code>S2</code>、<code>S3</code>，此时 <code>S1</code> 异常假设 <code>S4</code> 成为新的主节点，并获得了 <code>S3</code>、<code>S4</code>、<code>S5</code> 的选票，由于过半数原则，新的主节点的选票必然和之前的主节点的选票存在重合，也就说明必然至少有一台机器上保存了之前主节点提交的日志）。如果候选节点的日志至少和过半数的节点的日志一样新（一样新的定义见后文描述），那么它将会拥有所有已提交的日志。<code>RequestVote</code> 接口实现了这个限制：发送请求时会带上候选节点的日志信息，如果其他节点的日志比这个候选节点还要新，则会拒绝这个候选节点的选票。</p>
 <p><code>Raft</code> 通过比较两个日志文件中的最后一条日志的索引位置和任期来决定哪个日志较新。如果两个日志的任期不同，则更高任期的日志较新；如果两个日志的任期相同，则索引位置大的日志较新。</p>
-<h4 id="提交之前任期的日志"><a href="#提交之前任期的日志" class="headerlink" title="提交之前任期的日志"></a>提交之前任期的日志</h4><p>对于主节点来说，如果当前任期下的某条日志被过半数的节点成功复制，那么这条日志就可以被提交。如果日志变为已提交前主节点异常了（已复制的副本未过半数或者还没有来得及执行提交），后续的主节点会尝试继续复制该日志。然而，主节点并不能马上下结论说某条之前任期产生的日志在过半数的节点上保存后就算被安全提交了。</p>
-<p><img src="/images/raft-7.png" alt="alt"></p>
+<h4 id="提交之前任期的日志"><a class="markdownIt-Anchor" href="#提交之前任期的日志"></a> 提交之前任期的日志</h4>
+<p>对于主节点来说，如果当前任期下的某条日志被过半数的节点成功复制，那么这条日志就可以被提交。如果日志变为已提交前主节点异常了（已复制的副本未过半数或者还没有来得及执行提交），后续的主节点会尝试继续复制该日志。然而，主节点并不能马上下结论说某条之前任期产生的日志在过半数的节点上保存后就算被安全提交了。</p>
+<p><img src="/images/raft-7.png" alt="alt" /></p>
 <p>上图描述了某条日志被过半数的节点复制后，有可能会被某个新的主节点的日志所覆盖的情况。在 <code>a</code> 中，<code>S1</code> 是主节点，并且部分复制了索引位置2的日志到其他从节点上；在 <code>b</code> 中，<code>S1</code> 发生异常，<code>S5</code> 被选为主节点，在索引位置2的地方追加了一条任期3的日志；在 <code>c</code> 中，<code>S5</code> 发生异常，<code>S1</code> 恢复并再次被选为了主节点，此时任期是4，<code>S1</code> 会继续通过 <code>AppendEntries</code> 的一致性检查将索引位置2的日志继续复制给过半数的节点，但是还未提交，同时又在索引位置3的地方追加了一条任期4的日志；在 <code>d</code> 中，<code>S1</code> 发生异常，<code>S5</code> 成为主节点，则 <code>S5</code> 会将自己的索引位置2的日志复制给其他的从节点；而在 <code>e</code> 中的另一种情况下，如果 <code>S1</code> 在异常前将当前任期下的索引位置3的日志复制到了过半数的节点上，那么索引位置3的日志就可以被提交，因为 <code>S5</code> 节点不可能会成为主节点（它的日志相比于其他过半数的节点来说不够新）也就不会覆盖，而在此时，索引位置3之前的日志也可以被认为是已提交的。</p>
 <p>为了避免上面 <code>d</code> 所描述的情况，<code>Raft</code> 永远不会通过计算某条之前任期的日志副本的数量来判断这条日志是否能提交（也就是 <code>c</code> 中的情况，此时 <code>S1</code> 是主节点，任期是4，通过和其他从节点的通信将任期2的日志复制给了过半数的从节点，但是 <code>S1</code> 不会提交任期2的日志，因为一旦提交就有可能出现 <code>d</code> 中的情况）。只有当前主节点当前任期下生成的日志才会根据已复制的副本的数量来判断是否能提交；如果当前任期下的某条日志以这种方式提交了，那么根据 <code>Log Matching Property</code> 这条日志之前的日志也会间接的被提交。虽然在某些场合下，主节点可以知道某条之前任期的日志是被提交的（例如，如果这条日志在每个节点上都有保存），但是 <code>Raft</code> 出于简洁性的考虑采用了更保守的策略。回到上面的例子，在 <code>c</code> 中即使 <code>S1</code> 将索引位置2的日志提交了才发生异常，也依然有可能发生 <code>d</code> 的情况，因为 <code>d</code> 中的 <code>S5</code> 并不知道其他过半数的从节点提交了索引位置2任期2的日志（除非有额外的机制，所以这里说 <code>Raft</code> 采用了保守的策略没有引入其他机制），也就是说提交一个之前任期的日志并不能保证它不会被之后的主节点覆盖，所以这部分之前任期的日志就不能当做已提交或者做了提交也没有用。一直等到 <code>e</code> 中的情况，在当前任期4下，只要 <code>S1</code> 将索引位置3的日志复制到了过半数的节点上，即使此时 <code>S1</code> 异常了，这个日志在未来也能被其他主节点间接提交，因为下一轮的候选节点要么有索引位置3的日志，要么没有索引位置3的日志，而根据日志新旧原则，没有索引位置3的日志的候选节点不可能成为主节点，所以只有那些复制了索引位置3的日志的候选节点才有可能成为新的主节点，因为主节点不会增删日志，所以索引位置2、3的日志必然存在于新的主节点中，一旦新的主节点提交了一个更高任期的日志，索引位置2、3的日志也就被间接提交了。这就保证了在这种方式下索引位置3及其之前的日志不会被覆盖。</p>
 <p>因为主节点将之前任期的日志复制到其他从节点时依然保留原始任期信息，所以 <code>Raft</code> 选择在提交日志时增加额外的机制（上述描述的日志提交规则，同时引入了一定的复杂性）来保证安全性。在其他共识算法中，如果一个新的主节点需要复制之前任期的日志，那么就必须以当前任期的名义。<code>Raft</code> 的做法可以很方便的识别每条日志属于哪个任期，因为每条日志的任期不会随时间而改变。另外，相比于其他共识算法，在 <code>Raft</code> 中新的主节点会发送更少的来自之前任期的日志（其他共识算法在提交日志前需要发送冗余的日志来重新编号）。</p>
-<h4 id="安全性证明"><a href="#安全性证明" class="headerlink" title="安全性证明"></a>安全性证明</h4><p>以完整的 <code>Raft</code> 算法为基础，现在可以更精确的验证 <code>Leader Completeness Property</code> 的正确性。这里使用反证法来证明，假设 <code>Leader Completeness Property</code> 不正确，继而推导出一个矛盾，从而证明假设不成立。假设在任期 <code>T</code> 内某个主节点 <code>leader_T</code> 提交了一条日志，然后这条日志不会出现在新的任期的主节点中。不妨令满足假设的最小的任期为 <code>U</code>（<code>U &gt; T</code>），对应任期 <code>U</code> 的主节点为 <code>leader_U</code>，则 <code>leader_U</code> 没有 <code>leader_T</code> 提交的日志。</p>
-<p><img src="/images/raft-8.png" alt="alt"></p>
+<h4 id="安全性证明"><a class="markdownIt-Anchor" href="#安全性证明"></a> 安全性证明</h4>
+<p>以完整的 <code>Raft</code> 算法为基础，现在可以更精确的验证 <code>Leader Completeness Property</code> 的正确性。这里使用反证法来证明，假设 <code>Leader Completeness Property</code> 不正确，继而推导出一个矛盾，从而证明假设不成立。假设在任期 <code>T</code> 内某个主节点 <code>leader_T</code> 提交了一条日志，然后这条日志不会出现在新的任期的主节点中。不妨令满足假设的最小的任期为 <code>U</code>（<code>U &gt; T</code>），对应任期 <code>U</code> 的主节点为 <code>leader_U</code>，则 <code>leader_U</code> 没有 <code>leader_T</code> 提交的日志。</p>
+<p><img src="/images/raft-8.png" alt="alt" /></p>
 <ol>
 <li><code>leader_T</code> 提交的日志必然在选主时就不存在于 <code>leader_U</code> 中，因为主节点不会删除和覆盖日志。</li>
 <li><code>leader_T</code> 将日志复制给了集群中过半数的节点，而 <code>leader_U</code> 从集群中过半数的节点获得了选票，所以两者必然有重合，因此必然存在一个节点即复制了 <code>leader_T</code> 提交的日志，又投票选举了 <code>leader_U</code> 作为新的主节点，在上图中这个节点就是 <code>S3</code>。这个节点是推导出矛盾的关键。</li>
@@ -406,16 +421,18 @@
 <p>根据 <code>Leader Completeness Property</code>，我们可以证明 <code>State Machine Safety Property</code>，即如果某台服务器将某个索引位置的日志应用到了自身的状态机中，那么不会有任何一台服务器在相同索引位置应用了一条不同的日志到状态机中。如果某台服务器要将某条日志应用到状态机中，那么这台服务器在这条日志之前的日志都是和主节点相同的，而且是已提交的。现在来考虑在某个最小的任期内，某一台服务器要应用某一条日志，根据 <code>Log Completeness Property</code> 的保证，后续更高任期的主节点都会存储这条日志，所以后续节点在后续任期中应用相同索引位置的日志时也必然是应用了相同的日志内容。因此 <code>State Machine Safety Property</code> 是正确的。</p>
 <p>最后，<code>Raft</code> 要求各节点以日志的索引顺序来应用日志。结合 <code>State Machine Safety Property</code>，可以得出所有的节点会以相同的顺序应用相同的日志到自身的状态机中。</p>
 </blockquote>
-<h3 id="主节点和候选节点异常"><a href="#主节点和候选节点异常" class="headerlink" title="主节点和候选节点异常"></a>主节点和候选节点异常</h3><p>截止目前我们讨论的都是主节点异常。从节点和候选节点异常相比于主节点异常来说更容易处理，而且能以相同的方式处理。当从节点或候选节点异常时，则其他节点发送的 <code>RequestVote</code> 和 <code>AppendEntries</code> 请求都会失败。<code>Raft</code> 通过无限重试来处理这个问题；如果异常的机器重启了，那么这些 <code>RPC</code> 请求就会成功。如果某台机器完成了某个请求但在响应前异常了，那么它会在重启后收到相同的请求。<code>Raft</code> 的 <code>RPC</code> 请求都是幂等的，所以这种情况不会造成影响。例如，某个从节点收到了 <code>AppendEntries</code> 请求然后发现请求中的日志已经在本地日志中了，那么这个节点就会忽略这个请求。</p>
-<h3 id="时间和可用性"><a href="#时间和可用性" class="headerlink" title="时间和可用性"></a>时间和可用性</h3><p><code>Raft</code> 的其中一个要求是安全性的保证不依赖于时间：系统不能因为某些事件发生的快了些或慢了些而产生不正确的结果。然而，可用性（系统可以及时的响应客户端）不可避免的要依赖时间。例如，如果服务器间的信息交换需要的时间大于服务器异常的间隔时间（例如信息交换需要5秒，而每隔2秒服务器就异常了），则候选节点没有足够的时间来赢得选举；而缺少主节点，系统也无法继续运行。</p>
+<h3 id="主节点和候选节点异常"><a class="markdownIt-Anchor" href="#主节点和候选节点异常"></a> 主节点和候选节点异常</h3>
+<p>截止目前我们讨论的都是主节点异常。从节点和候选节点异常相比于主节点异常来说更容易处理，而且能以相同的方式处理。当从节点或候选节点异常时，则其他节点发送的 <code>RequestVote</code> 和 <code>AppendEntries</code> 请求都会失败。<code>Raft</code> 通过无限重试来处理这个问题；如果异常的机器重启了，那么这些 <code>RPC</code> 请求就会成功。如果某台机器完成了某个请求但在响应前异常了，那么它会在重启后收到相同的请求。<code>Raft</code> 的 <code>RPC</code> 请求都是幂等的，所以这种情况不会造成影响。例如，某个从节点收到了 <code>AppendEntries</code> 请求然后发现请求中的日志已经在本地日志中了，那么这个节点就会忽略这个请求。</p>
+<h3 id="时间和可用性"><a class="markdownIt-Anchor" href="#时间和可用性"></a> 时间和可用性</h3>
+<p><code>Raft</code> 的其中一个要求是安全性的保证不依赖于时间：系统不能因为某些事件发生的快了些或慢了些而产生不正确的结果。然而，可用性（系统可以及时的响应客户端）不可避免的要依赖时间。例如，如果服务器间的信息交换需要的时间大于服务器异常的间隔时间（例如信息交换需要5秒，而每隔2秒服务器就异常了），则候选节点没有足够的时间来赢得选举；而缺少主节点，系统也无法继续运行。</p>
 <p>选主是 <code>Raft</code> 中对时间要求最关键的方面。只要遵循如下的时间要求那么 <code>Raft</code> 就能维持选主的正常运行：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">broadcastTime &lt;&lt; electionTimeout &lt;&lt; MTBF</span><br></pre></td></tr></table></figure>
-
 <p>其中 <code>broadcastTime</code> 是服务器并行的给集群中的其他服务器发送 <code>RPC</code> 请求并收到响应的平均时间；<code>electionTimeout</code> 是前面描述的选主等待时间，如果在这个时间段内某个节点没有收到来自主节点的心跳，那么它就会启动选主流程；<code>MTBF</code> 则是单台服务器各次异常间的平均间隔时间。<code>broadcastTime</code> 应该比 <code>electionTimeout</code> 小一个量级，这样主节点才能来得及给从节点发送心跳来维持主节点的地位；再结合随机化的 <code>electionTimeout</code>，这种不固定的时间也避免了选主的分票。<code>electionTimeout</code> 应该比 <code>MTBF</code> 小几个量级从而使得系统能平稳运行。当主节点异常时，系统大概会在 <code>electionTimeout</code> 的时间段内不可用，如果 <code>MTBF</code> 足够大就可以避免这个现象频繁发生。</p>
 <p><code>broadcastTime</code> 和 <code>MTBF</code> 由底层系统决定，而 <code>electionTimeout</code> 则是需要由设计者决定。<code>Raft</code> 的 <code>RPC</code> 请求一般会要求接受者将数据持久化到可靠存储上，根据存储技术的不同 <code>broadcastTime</code> 的范围会在0.5毫秒到20毫秒之间。因此，<code>electionTimeout</code> 的设定范围一般是10毫秒到500毫秒之间。服务器的 <code>MTBF</code> 时间一般是几个月或更久，已经足够满足 <code>Raft</code> 对时间的要求。</p>
-<h2 id="集群节点变更"><a href="#集群节点变更" class="headerlink" title="集群节点变更"></a>集群节点变更</h2><p>目前为止我们所讨论的都是基于集群配置（参与共识算法的服务器）不变的基础上。而实际上，集群的配置不是一成不变的，有时候就需要修改集群的配置，例如替换掉异常的服务器或者调整复制的级别。虽然操作时可以先下线集群中的全部机器，然后更新配置文件，最后再重启集群，不过在操作期间整个系统都是不可用的。另外，如果其中涉及了人工操作，那么就会有人为错误的风险。为了避免这些问题，<code>Raft</code> 的作者决定将集群配置设计为自动化并整合到 <code>Raft</code> 共识算法中。</p>
+<h2 id="集群节点变更"><a class="markdownIt-Anchor" href="#集群节点变更"></a> 集群节点变更</h2>
+<p>目前为止我们所讨论的都是基于集群配置（参与共识算法的服务器）不变的基础上。而实际上，集群的配置不是一成不变的，有时候就需要修改集群的配置，例如替换掉异常的服务器或者调整复制的级别。虽然操作时可以先下线集群中的全部机器，然后更新配置文件，最后再重启集群，不过在操作期间整个系统都是不可用的。另外，如果其中涉及了人工操作，那么就会有人为错误的风险。为了避免这些问题，<code>Raft</code> 的作者决定将集群配置设计为自动化并整合到 <code>Raft</code> 共识算法中。</p>
 <p>为了使集群配置变更是安全的，需要保证在变更期间不会发生在某个任期内有两个主节点的情况。不幸的是，不管怎么样让服务器直接从旧的配置替换为新的配置都是不安全的。因为不可能原子性的将所有服务器一次性的完成配置替换，所以如下图所示，在转换期间整个集群有可能分裂成两个独立的群体。</p>
-<p><img src="/images/raft-9.png" alt="alt"></p>
+<p><img src="/images/raft-9.png" alt="alt" /></p>
 <p>在上图中，集群由原来3台机器扩展为5台，由于每台服务器实际替换配置文件的时机不同，如红色箭头所示，存在某一时刻集群中可能会有两个主节点，假设此时发生选主，由于在 <code>Server 1</code> 看来集群中的节点数量还是3个，所以它只要获取到 <code>Server 2</code> 的选票就可以声明自己为主节点；而在 <code>Server 5</code> 看来，此时集群中有5个节点，所以它在获取了 <code>Server 3</code>、<code>Server 4</code> 的选票后就成为主节点，此时集群中就存在了两个主节点。</p>
 <p>为了保证安全性，机器配置变更必须使用两阶段提交。有很多种方式来实现两阶段提交，例如，某些系统在第一阶段会先禁用掉旧的配置从而使系统不再处理客户端请求；然后在第二阶段启用新的配置。在 <code>Raft</code> 中，集群会先切换为一个被称之为 <code>joint consensus</code> 的过渡配置；一旦这个过渡配置被提交，集群就会切换为新配置。<code>joint consensus</code> 包含了新老两套配置：</p>
 <ul>
@@ -424,17 +441,18 @@
 <li>选主和日志提交需要同时获得新老配置下大多数节点的选票。</li>
 </ul>
 <p><code>joint consensus</code> 使得每台服务器能在不同的时间点切换配置而不会破坏 <code>Raft</code> 的安全性。另外，<code>joint consensus</code> 也保障了集群在切换期间能正常响应客户端请求。</p>
-<p><img src="/images/raft-10.png" alt="alt"></p>
+<p><img src="/images/raft-10.png" alt="alt" /></p>
 <p>集群配置通过日志文件中特殊的日志项来存储和通信，上图描述了配置变更的过程。当主节点收到需要将配置从 <code>C_old</code> 变为 <code>C_new</code> 的请求时，它首先将 <code>joint consensus</code> 的配置 <code>C_old_new</code> 写入到本地日志中，然后将其复制到过半数的从节点中。一旦某个节点将 <code>C_old_new</code> 写入到自己的日志中后，它后续的决定都会基于 <code>C_old_new</code> 的规则（<code>Raft</code> 中的节点始终使用最新的配置来做决策，不管这条日志是否已提交）。所以主节点会根据 <code>C_old_new</code> 需要的规则来决定 <code>C_old_new</code> 状态下的日志是否已提交。如果此时主节点异常，新的主节点可能来自 <code>C_old</code>，也可能来自 <code>C_old_new</code>，这取决于这个候选节点是否收到来自 <code>C_old_new</code> 的复制请求。不过不管哪种情况，在这期间 <code>C_new</code> 下的节点都不可能单方面做决策。</p>
 <p>一旦 <code>C_old_new</code> 提交成功，说明集群中过半数的机器都有了 <code>C_old_new</code> 配置，此时不管是 <code>C_old</code> 还是 <code>C_new</code> 的机器都不可能单方面做决策，另外 <code>Leader Completeness Property</code> 也保证了后续没有 <code>C_old_new</code> 日志的节点不可能被选为主节点。所以此时主节点可以开始将 <code>C_new</code> 写入到日志中，然后再复制给其他从节点。同样的，各节点一旦收到 <code>C_new</code> 的配置就会以 <code>C_new</code> 的配置为准做决策。当 <code>C_new</code> 被提交后，旧配置就无关紧要了，那些不在新配置下的机器就可以被下线。在整个变更期间，没有任何一个时刻 <code>C_old</code> 和 <code>C_new</code> 的节点可以同时做决策，这就保证了安全性。</p>
 <p>在配置变更时还有其他一些问题需要指出。第一个问题是新加入的节点一开始可能没有保存任何日志。如果它们以这个状态加入集群，那么它们可能需要很长一段时间来复制日志，可能会造成在这期间主节点无法提交新的日志。为了避免造成可用性问题，<code>Raft</code> 在配置变更前引入了额外的一个阶段，新加入的节点不会参与投票（主节点会将日志发给这些节点，但是在基于过半数节点原则做决策时会忽略这些节点）。当这些新加入的节点的日志追赶上其他节点后，<code>Raft</code> 就开始上面描述的配置变更流程。</p>
 <p>第二个问题是在配置变更后当前的主节点可能不再属于新集群（例如归到其他集群或下线）。在这种情况下，一旦 <code>C_new</code> 的配置被提交，那么它就会退回到从节点状态。这说明存在某段时间（提交 <code>C_new</code> 的期间），当前主节点在管理集群时不会把自己计算在内；它在复制日志时依然会进行过半数的节点确认，但这个过半数的节点不包括自己。主节点状态的转变发生在 <code>C_new</code> 提交后，因为只有这个时间点 <code>C_new</code> 才能独立做决策（选出的主节点一定包含 <code>C_new</code> 的配置）。而在这个时间点之前，可能只有 <code>C_old</code> 的节点能被选为主节点。</p>
 <p>第三个问题是被删除的节点可能会干扰集群（不在 <code>C_new</code> 中的节点）。因为这些节点不再收到心跳，所以过了 <code>election timeout</code> 后它们会发起选主流程。它们会向其他节点发送新任期的 <code>RequestVote</code> 请求，当前的主节点收到请求后因为新任期比自己的任期大（假设这些被剔除的节点在剔除时所属的任期和主节点相同；不过即使任期比主节点小也没关系，因为每次选主都会增加任期，这些被删除的节点不断的选主然后失败，任期会逐渐增加，最终超过主节点），主节点会认为自己的任期过期了，所以会转为从节点状态。最终系统会选择出一个新的主节点，不过这些被删除的节点又会再次超时然后再次发起选主，从而造成系统可用性问题。</p>
 <p>为了避免这个问题，各节点在确认主节点存在的情况下会丢弃 <code>RequestVote</code> 请求。如果某个节点在最小 <code>election timeout</code> 内收到了 <code>RequestVote</code> 请求（前面提到，<code>election timeout</code> 的值是某个区间内的随机值，某个节点在收到主节点的心跳后，在还没有达到最小 <code>election timeout</code> 的时候就又收到 <code>RequestVote</code> 请求，例如 <code>election timeout</code> 的区间为 <code>[150, 300]</code>，这里最小 <code>election timeout</code> 指的就是100），则该节点不会更新自己的任期或者投票。这样做并不会影响正常的选主，因为正常的选择至少会等待一个最小 <code>election timeout</code> 时间。不过这样做却能避免那些被删除的节点对集群的干扰，只要主节点能给其他从节点发送心跳，那么它就不会受到被删除的节点所发送的更大的任期的影响。</p>
-<h2 id="日志压缩"><a href="#日志压缩" class="headerlink" title="日志压缩"></a>日志压缩</h2><p>在和客户端的日常通信中，<code>Raft</code> 节点的日志会逐渐增长，但是在实际的系统中，日志不可能无限增长。当日志越来越多，它占据的空间也越来越大，需要根据日志来重放的时间也越来越多。如果没有一个机制来丢弃过期的日志，那么这最终会导致可用率问题。</p>
+<h2 id="日志压缩"><a class="markdownIt-Anchor" href="#日志压缩"></a> 日志压缩</h2>
+<p>在和客户端的日常通信中，<code>Raft</code> 节点的日志会逐渐增长，但是在实际的系统中，日志不可能无限增长。当日志越来越多，它占据的空间也越来越大，需要根据日志来重放的时间也越来越多。如果没有一个机制来丢弃过期的日志，那么这最终会导致可用率问题。</p>
 <p>快照是压缩日志的最简便的方法。执行快照时，整个系统的状态被写入到保存在可靠存储上的快照里，那么一直到快照执行时的日志都可以被丢弃。快照技术也在 <code>Chubby</code> 和 <code>ZooKeeper</code> 中使用，在本节剩余的内容中将会介绍 <code>Raft</code> 中的快照。</p>
 <p>类似 <code>log cleaning</code> 和 <code>log-structured merge trees</code> 这样的增量手段也能处理压缩日志。它们每次只操作一部分数据，所以就将压缩带来的负载影响随着时间摊平。它们首先会选择一片已经积累了大量被删除或被覆盖的对象的数据区域，然后以更紧凑的方式重写这片区域内存活的对象，最后释放这片区域。这种手段相对于快照来说需要引入额外的机制同时复杂性也更高，而快照通过始终操作整个数据集来简化了问题。<code>log cleaning</code> 技术需要对 <code>Raft</code> 进行修改，状态机可以使用和快照相同的接口来实现 <code>log-structured merge trees</code>。</p>
-<p><img src="/images/raft-11.png" alt="alt"></p>
+<p><img src="/images/raft-11.png" alt="alt" /></p>
 <p>上图展示了 <code>Raft</code> 快照的概念。每台服务器会独立的执行快照，并且只包含已提交的日志。执行快照时大部分的工作是状态机将当前的状态写入到快照中。<code>Raft</code> 同时添加了一小部分元数据到快照中：快照对应的最后一个日志的索引（<code>last included index</code>，状态机已应用的最后一条日志），以及最后一个日志对应的任期（<code>last included term</code>）。这两个元数据信息用于执行快照后的第一次 <code>AppendEntries</code> 请求的一致性检查，因为需要比对前一个日志的索引和任期。同时为了启用集群配置变更，快照中也保存了当前最新的集群配置。一旦服务器完成了快照的写入，那么它就可以删除到快照为止的所有日志，以及以前的快照。</p>
 <p>虽然各节点能独立的创建快照，主节点有时必须将快照发给那些落后的从节点。这个发生在主节点已经丢弃了需要发送给从节点的日志的情况下。幸运的是，这种情况在正常情况下不大可能发生：一个时刻和主节点保持同步的从节点已经包含了需要的日志。然而，某个运行异常缓慢的从节点或者新加入集群的从节点可能会缺少很多日志。所以主节点通过直接发送快照的方式来同步从节点的状态。</p>
 <p>主节点通过一个新的 <code>RPC</code> 请求 <code>InstallSnapshot</code> 来将快照发送给那些落后太多的从节点。当从节点收到这个请求后，它必须决定如何处理目前已有的日志。一般来说，快照会包含当前从节点还没有的日志。在这种情况下，因为快照捕捉的是整个状态机的状态，说明快照对应的日志范围大于当前从节点的日志范围，所以从节点直接丢弃自己的日志即可。当然从节点的日志可能会包含某些未提交的日志和快照冲突，不过因为是未提交所以也没有问题。不过，如果从节点收到的快照只覆盖了自己日志的前一部分（可能是因为重传或者错传），那么和快照重合的日志就可以被删除，不过在这之后的日志还依然有效而且也必须保留。</p>
@@ -446,7 +464,8 @@
 <blockquote>
 <p>当某个节点需要写快照时，它会调用 <code>Linux</code> 的 <code>fork</code> 方法，从而创建了一个子进程，子进程会复制父进程的内存空间，从而复制了状态机的状态。当然，如果单纯的复制内存显然是不现实的，<code>Linux</code> 不会整个复制内存，在这里就采用了写时复制技术，操作系统会将涉及的内存页标记为 <code>copy-on-write</code>，对于父进程和子进程来说都是只读的，当父进程或子进程想要写入某个内存页时会触发缺页中断（<code>page fault</code>），这个时候操作系统才会实际复制这个内存页。</p>
 </blockquote>
-<h2 id="客户端交互"><a href="#客户端交互" class="headerlink" title="客户端交互"></a>客户端交互</h2><p>本节描述了客户端如何与 <code>Raft</code> 交互，包括客户端如何找到集群中的主节点以及 <code>Raft</code> 如何支持线性化语义。这几个问题同时适用于其他基于共识的系统，<code>Raft</code> 的解决方案也和其他系统类似。</p>
+<h2 id="客户端交互"><a class="markdownIt-Anchor" href="#客户端交互"></a> 客户端交互</h2>
+<p>本节描述了客户端如何与 <code>Raft</code> 交互，包括客户端如何找到集群中的主节点以及 <code>Raft</code> 如何支持线性化语义。这几个问题同时适用于其他基于共识的系统，<code>Raft</code> 的解决方案也和其他系统类似。</p>
 <p><code>Raft</code> 的客户端会将所有请求发送给主节点。当客户端首次启动时，它会随机与一台服务器建立连接。如果客户端选中的服务器不是主节点，那么这台服务器就会拒绝客户端的请求并告知客户端它所知道的最近一段时间的主节点（<code>AppendEntries</code> 请求中包含了主节点的网络地址）。如果主节点异常了，那么客户端的请求会超时，然后它会继续随机挑选一台服务器重复上述流程。</p>
 <p><code>Raft</code> 的实现目标是线性化语义（每个操作看起来都是立即执行，在请求和响应之间只执行了一次）。不过，通过对 <code>Raft</code> 的描述可以知道一个客户端的请求有可能被执行多次：例如，主节点在日志提交完成后但是在响应客户端前发生异常，那么客户端就会选择一个新的主节点发起重试，造成请求被执行两次。这个解决方案是让客户端在每次请求时生成一个唯一的编号。这样，状态机就可以跟踪每个请求的最新编号和对应的响应。如果某个节点收到的请求编号已经被处理过了，那么它就立即返回响应的结果而不会重新执行。</p>
 <p>只读请求可以不记录日志而直接处理。然而，如果没有其他机制的保证，这有可能会返回过期的数据，因为和客户端通信的主节点已经有可能被其他的主节点所取代。在线性化语义下，<code>Raft</code> 不能够返回过期数据。<code>Raft</code> 需要额外的两个措施在不借助日志的情况下避免返回过期的数据。第一，主节点必须知道最新提交的日志的信息。虽然 <code>Leader Completeness Property</code> 保证了主节点有所有已提交的日志，但是在主节点任期开始的时候，它可能并不知道哪些日志是提交的。为了找到已经提交的日志，主节点需要在任期内提交一条日志。<code>Raft</code> 会要求主节点在任期开始时提交一条 <code>no-op</code> 的日志。<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/raft2-faq.txt">Raft (2) FAQ</a> 中解释了为什么这么做：</p>
@@ -457,8 +476,10 @@
 <blockquote>
 <p>例如主节点在发给其他从节点的心跳中要求在接下来的100毫秒内其他节点不允许成为主节点，那么在接下来的100毫秒内主节点就可以直接处理只读请求而不用担心会有新的主节点。</p>
 </blockquote>
-<h2 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h2><p>这部分的内容来自于论文中的 <code>Figure 2</code> 和 <code>Figure 13</code>，主要描述了 <code>Raft</code> 涉及的 <code>RPC</code> 接口的实现要求以及其他一些系统约束。</p>
-<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p>本节描述了各个节点内部需要维护的状态。</p>
+<h2 id="rpc"><a class="markdownIt-Anchor" href="#rpc"></a> RPC</h2>
+<p>这部分的内容来自于论文中的 <code>Figure 2</code> 和 <code>Figure 13</code>，主要描述了 <code>Raft</code> 涉及的 <code>RPC</code> 接口的实现要求以及其他一些系统约束。</p>
+<h3 id="状态"><a class="markdownIt-Anchor" href="#状态"></a> 状态</h3>
+<p>本节描述了各个节点内部需要维护的状态。</p>
 <p>所有节点都需要持久化的状态（先持久化再响应 <code>RPC</code> 请求）：</p>
 <ul>
 <li><code>currentTerm</code>：当前节点所处在的最新任期（第一次启动时初始化为0，单调递增），如果这个不持久化，那么节点重启后由于不知道当前的准确任期从而无法发起选主流程，日志中虽然记录了任期但不一定是最新的，例如某个节点的日志可以一直为空但当前任期却一直在增长；同时也可以避免将选票投给任期更低的节点，以及识别出过期的主节点。</li>
@@ -476,7 +497,8 @@
 <li><code>matchIndex[]</code>：每个从节点已复制的日志的最大索引位置（初始化为0，单调递增）。这个值可以结合 <code>AppendEntries</code> 请求计算出来，只要 <code>AppendEntries</code> 成功了，那么 <code>matchIndex</code> 就等于主节点当前日志的索引位置。同样的，持久化了也有可能存在过期的风险。</li>
 </ul>
 <p>另外，某个主节点重启后不一定还能当选主节点，持久化 <code>nextIndex</code> 和 <code>matchIndex</code> 也意义不大。</p>
-<h3 id="AppendEntries-RPC"><a href="#AppendEntries-RPC" class="headerlink" title="AppendEntries RPC"></a>AppendEntries RPC</h3><p><code>AppendEntries</code> 由主节点发送给从节点，用于复制日志和作为心跳探测。</p>
+<h3 id="appendentries-rpc"><a class="markdownIt-Anchor" href="#appendentries-rpc"></a> AppendEntries RPC</h3>
+<p><code>AppendEntries</code> 由主节点发送给从节点，用于复制日志和作为心跳探测。</p>
 <p>参数：</p>
 <ul>
 <li><code>term</code>：主节点的任期</li>
@@ -499,7 +521,8 @@
 <li>追加所有不在从节点中的日志</li>
 <li>如果 <code>leaderCommit</code> 大于自身的 <code>commitIndex</code>，则更新 <code>commitIndex</code> 为 <code>min(leaderCommit, 最后一条新的日志的索引)</code></li>
 </ol>
-<h3 id="RequestVote-RPC"><a href="#RequestVote-RPC" class="headerlink" title="RequestVote RPC"></a>RequestVote RPC</h3><p><code>RequestVote</code> 在选主时由候选节点发起，用于向其他节点获取选票。</p>
+<h3 id="requestvote-rpc"><a class="markdownIt-Anchor" href="#requestvote-rpc"></a> RequestVote RPC</h3>
+<p><code>RequestVote</code> 在选主时由候选节点发起，用于向其他节点获取选票。</p>
 <p>参数：</p>
 <ul>
 <li><code>term</code>：候选节点的任期</li>
@@ -517,7 +540,8 @@
 <li>如果候选节点的 <code>term</code> 小于自身的任期，则返回 <code>voteGranted</code> 为 <code>false</code></li>
 <li>如果 <code>votedFor</code> 为空或者等于 <code>candidateId</code>，并且候选节点的日志相比自身的日志一样新或者较新，则返回 <code>voteGranted</code> 为 <code>true</code></li>
 </ol>
-<h3 id="InstallSnapshot-RPC"><a href="#InstallSnapshot-RPC" class="headerlink" title="InstallSnapshot RPC"></a>InstallSnapshot RPC</h3><p><code>InstallSnapshot</code> 由主节点发起，用于向其他从节点发送快照块（<code>chunk</code>）。主节点始终会按顺序发送 <code>chunk</code>。</p>
+<h3 id="installsnapshot-rpc"><a class="markdownIt-Anchor" href="#installsnapshot-rpc"></a> InstallSnapshot RPC</h3>
+<p><code>InstallSnapshot</code> 由主节点发起，用于向其他从节点发送快照块（<code>chunk</code>）。主节点始终会按顺序发送 <code>chunk</code>。</p>
 <p>参数：</p>
 <ul>
 <li><code>term</code>：主节点的任期</li>
@@ -543,7 +567,8 @@
 <li>删除全部的日志（符合第6条情况的日志除外）</li>
 <li>将快照的内容应用到状态机中，并加载快照中的集群配置</li>
 </ol>
-<h3 id="各节点需要遵循的规则"><a href="#各节点需要遵循的规则" class="headerlink" title="各节点需要遵循的规则"></a>各节点需要遵循的规则</h3><p>所有节点：</p>
+<h3 id="各节点需要遵循的规则"><a class="markdownIt-Anchor" href="#各节点需要遵循的规则"></a> 各节点需要遵循的规则</h3>
+<p>所有节点：</p>
 <ul>
 <li>如果 <code>commitIndex</code> 大于 <code>lastApplied</code>，则自增 <code>lastApplied</code>，并应用 <code>log[lastApplied]</code> 到状态机</li>
 <li>如果某个 <code>RPC</code> 的请求或响应中的 <code>term T</code> 大于 <code>currentTerm</code>，则设置 <code>currentTerm = T</code>，并转为从节点状态</li>
@@ -555,7 +580,8 @@
 </ul>
 <p>候选节点：</p>
 <ul>
-<li>由从节点转换为候选节点后，开始选主：<ul>
+<li>由从节点转换为候选节点后，开始选主：
+<ul>
 <li>将 <code>currentTerm</code> 自增</li>
 <li>给自己投票，设置 <code>votedFor</code> 为自己的 <code>id</code></li>
 <li>重置 <code>election timeout</code></li>
@@ -570,14 +596,16 @@
 <ul>
 <li>一旦成为主节点，就开始向其他节点发送空的 <code>AppendEntries</code> 请求（心跳），并在空闲时周而复始的发送，避免其他节点进入选主过程</li>
 <li>如果收到来自客户端的请求，则追加一条新的日志，并在将日志应用到状态机后返回结果给客户端</li>
-<li>如果最后一条日志的索引大于等于某个从节点的 <code>nextIndex</code>，说明从节点的日志和主节点的日志不一致，则主节点会将 <code>[nextIndex, 当前主节点的最后一条日志的索引]</code> 范围内的日志通过 <code>AppendEntries</code> 请求发给从节点：<ul>
+<li>如果最后一条日志的索引大于等于某个从节点的 <code>nextIndex</code>，说明从节点的日志和主节点的日志不一致，则主节点会将 <code>[nextIndex, 当前主节点的最后一条日志的索引]</code> 范围内的日志通过 <code>AppendEntries</code> 请求发给从节点：
+<ul>
 <li>如果执行成功，则更新该从节点对应的 <code>nextIndex</code> 和 <code>matchIndex</code></li>
 <li>如果执行失败，说明当前 <code>nextIndex</code> 还不是最优解，将 <code>nextIndex</code> 减1后继续重试</li>
 </ul>
 </li>
 <li>如果存在某个数字 <code>N</code> 满足 <code>N &gt; commitIndex</code>，且过半数的从节点的 <code>matchIndex &gt;= N</code>，以及 <code>log[N].term</code> 等于 <code>currentTerm</code>，则将 <code>commitIndex</code> 设置为 <code>N</code>。这说明 <code>N</code> 是实质上已提交的日志索引，但是主节点还不知道</li>
 </ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf">In Search of an Understandable Consensus Algorithm (Extended Version)</a></li>
 <li><a target="_blank" rel="noopener" href="http://thesecretlivesofdata.com/raft/">Raft: Understandable Distributed Consensus</a></li>
 <li><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
@@ -612,10 +640,10 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/Paper/" rel="tag"># Paper</a>
               <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
               <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
               <a href="/tags/Raft/" rel="tag"># Raft</a>
-              <a href="/tags/Paper/" rel="tag"># Paper</a>
           </div>
 
         
@@ -689,7 +717,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="nav-number">2.</span> <span class="nav-text">复制状态机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Paxos-%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">Paxos 的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E5%8F%AF%E7%90%86%E8%A7%A3%E6%80%A7%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">为可理解性设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Raft-%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">Raft 共识算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Raft-%E5%9F%BA%E7%A1%80"><span class="nav-number">5.1.</span> <span class="nav-text">Raft 基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E4%B8%BB"><span class="nav-number">5.2.</span> <span class="nav-text">选主</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6"><span class="nav-number">5.3.</span> <span class="nav-text">日志复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7"><span class="nav-number">5.4.</span> <span class="nav-text">安全性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E4%B8%BB%E9%99%90%E5%88%B6"><span class="nav-number">5.4.1.</span> <span class="nav-text">选主限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E4%B9%8B%E5%89%8D%E4%BB%BB%E6%9C%9F%E7%9A%84%E6%97%A5%E5%BF%97"><span class="nav-number">5.4.2.</span> <span class="nav-text">提交之前任期的日志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7%E8%AF%81%E6%98%8E"><span class="nav-number">5.4.3.</span> <span class="nav-text">安全性证明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%8A%82%E7%82%B9%E5%92%8C%E5%80%99%E9%80%89%E8%8A%82%E7%82%B9%E5%BC%82%E5%B8%B8"><span class="nav-number">5.5.</span> <span class="nav-text">主节点和候选节点异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%92%8C%E5%8F%AF%E7%94%A8%E6%80%A7"><span class="nav-number">5.6.</span> <span class="nav-text">时间和可用性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%8F%98%E6%9B%B4"><span class="nav-number">6.</span> <span class="nav-text">集群节点变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E5%8E%8B%E7%BC%A9"><span class="nav-number">7.</span> <span class="nav-text">日志压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="nav-number">8.</span> <span class="nav-text">客户端交互</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RPC"><span class="nav-number">9.</span> <span class="nav-text">RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8A%B6%E6%80%81"><span class="nav-number">9.1.</span> <span class="nav-text">状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AppendEntries-RPC"><span class="nav-number">9.2.</span> <span class="nav-text">AppendEntries RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestVote-RPC"><span class="nav-number">9.3.</span> <span class="nav-text">RequestVote RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InstallSnapshot-RPC"><span class="nav-number">9.4.</span> <span class="nav-text">InstallSnapshot RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84%E8%8A%82%E7%82%B9%E9%9C%80%E8%A6%81%E9%81%B5%E5%BE%AA%E7%9A%84%E8%A7%84%E5%88%99"><span class="nav-number">9.5.</span> <span class="nav-text">各节点需要遵循的规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">10.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text"> 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="nav-number">2.</span> <span class="nav-text"> 复制状态机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#paxos-%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text"> Paxos 的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E5%8F%AF%E7%90%86%E8%A7%A3%E6%80%A7%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text"> 为可理解性设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#raft-%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text"> Raft 共识算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#raft-%E5%9F%BA%E7%A1%80"><span class="nav-number">5.1.</span> <span class="nav-text"> Raft 基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E4%B8%BB"><span class="nav-number">5.2.</span> <span class="nav-text"> 选主</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6"><span class="nav-number">5.3.</span> <span class="nav-text"> 日志复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7"><span class="nav-number">5.4.</span> <span class="nav-text"> 安全性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E4%B8%BB%E9%99%90%E5%88%B6"><span class="nav-number">5.4.1.</span> <span class="nav-text"> 选主限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E4%B9%8B%E5%89%8D%E4%BB%BB%E6%9C%9F%E7%9A%84%E6%97%A5%E5%BF%97"><span class="nav-number">5.4.2.</span> <span class="nav-text"> 提交之前任期的日志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7%E8%AF%81%E6%98%8E"><span class="nav-number">5.4.3.</span> <span class="nav-text"> 安全性证明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%8A%82%E7%82%B9%E5%92%8C%E5%80%99%E9%80%89%E8%8A%82%E7%82%B9%E5%BC%82%E5%B8%B8"><span class="nav-number">5.5.</span> <span class="nav-text"> 主节点和候选节点异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%92%8C%E5%8F%AF%E7%94%A8%E6%80%A7"><span class="nav-number">5.6.</span> <span class="nav-text"> 时间和可用性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%8F%98%E6%9B%B4"><span class="nav-number">6.</span> <span class="nav-text"> 集群节点变更</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E5%8E%8B%E7%BC%A9"><span class="nav-number">7.</span> <span class="nav-text"> 日志压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="nav-number">8.</span> <span class="nav-text"> 客户端交互</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rpc"><span class="nav-number">9.</span> <span class="nav-text"> RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8A%B6%E6%80%81"><span class="nav-number">9.1.</span> <span class="nav-text"> 状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#appendentries-rpc"><span class="nav-number">9.2.</span> <span class="nav-text"> AppendEntries RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#requestvote-rpc"><span class="nav-number">9.3.</span> <span class="nav-text"> RequestVote RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#installsnapshot-rpc"><span class="nav-number">9.4.</span> <span class="nav-text"> InstallSnapshot RPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84%E8%8A%82%E7%82%B9%E9%9C%80%E8%A6%81%E9%81%B5%E5%BE%AA%E7%9A%84%E8%A7%84%E5%88%99"><span class="nav-number">9.5.</span> <span class="nav-text"> 各节点需要遵循的规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">10.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -703,7 +731,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

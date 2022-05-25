@@ -87,7 +87,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -264,14 +268,11 @@
         <p><code>Lab 1</code> 中遇到的第一个命令是 <code>go build -race -buildmode=plugin ../mrapps/wc.go</code>，其中 <code>-buildmode=plugin</code> 表示以插件的形式打包源文件，这里的 <code>wc.go</code> 是用户实现的 <code>map</code> 和 <code>reduce</code> 方法，这体现了面向接口编程的思想，只要用户编写的 <code>map</code> 和 <code>reduce</code> 方法遵循统一的签名，则可以在不重新编译 <code>MapReduce</code> 框架代码的情况下，实时替换运行不同的用户应用。</p>
 <p>假设有个 <code>sum.go</code> 文件，里面只有一个 <code>Sum</code> 方法：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Sum</span><span class="params">(a <span class="keyword">int</span>, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>对 <code>sum.go</code> 以插件形式编译：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go build -buildmode&#x3D;plugin sum.go</span><br></pre></td></tr></table></figure>
-
 <p>会生成一个 <code>sum.so</code> 文件。</p>
 <p>接着，在 <code>main.go</code> 中就可以通过 <code>plugin.Open</code> 读取 <code>sum.so</code>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;plugin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fileName := <span class="string">&quot;sum.so&quot;</span></span><br><span class="line">	p, err := plugin.Open(fileName)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot load plugin %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sumSymbol, err := p.Lookup(<span class="string">&quot;Sum&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot find Map in %v&quot;</span>, fileName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sum := sumSymbol.(<span class="function"><span class="keyword">func</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">int</span>)</span> <span class="title">int</span>)</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;1 + 2 is&quot;</span>, sum(<span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>然后通过 <code>Lookup</code> 根据方法名找到 <code>Sum</code> 方法，按照指定方法签名转换后即可进行调用。而如果需要换一个 <code>Sum</code> 的实现，则无需重新编译 <code>main.go</code>。</p>
 <p>参考：</p>
 <ul>
@@ -391,7 +392,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

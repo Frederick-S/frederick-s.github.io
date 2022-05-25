@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="在 Ubuntu 下运行 Puppeteer 遇到了如下错误： 1error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory  需要安装以下依赖来解决： 1sudo apt-get install gconf-service libx">
+  <meta name="description" content="在 Ubuntu 下运行 Puppeteer 遇到了如下错误： 1error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory 需要安装以下依赖来解决： 1sudo apt-get install gconf-service libxe">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在 Ubuntu 下使用 Puppeteer 时无法加载类库 libX11-xcb.so.1">
 <meta property="og:url" content="https://frederick-s.github.io/2020/04/11/puppeteer-error-loading-libx11-xcb.so.1-on-ubuntu/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="在 Ubuntu 下运行 Puppeteer 遇到了如下错误： 1error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory  需要安装以下依赖来解决： 1sudo apt-get install gconf-service libx">
+<meta property="og:description" content="在 Ubuntu 下运行 Puppeteer 遇到了如下错误： 1error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory 需要安装以下依赖来解决： 1sudo apt-get install gconf-service libxe">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-04-10T16:00:00.000Z">
 <meta property="article:modified_time" content="2020-04-10T16:00:00.000Z">
@@ -87,7 +87,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -263,10 +267,8 @@
       
         <p>在 <code>Ubuntu</code> 下运行 <code>Puppeteer</code> 遇到了如下错误：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">error while loading shared libraries: libX11-xcb.so.1: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
-
 <p>需要安装以下依赖来解决：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget</span><br></pre></td></tr></table></figure>
-
 <p>参考：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://medium.com/@cloverinks/how-to-fix-puppetteer-error-ibx11-xcb-so-1-on-ubuntu-152c336368">How to fix puppetteer error ibX11-xcb.so.1 on Ubuntu</a></li>
@@ -385,7 +387,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

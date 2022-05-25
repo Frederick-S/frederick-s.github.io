@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Raft Locking Advice 提供了些关于如何在 Lab 2 中使用锁的建议。 规则1只要有多个 goroutine 访问同一份数据，并且至少有一个 goroutine 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 Go 的竞争检测（添加 -race 标记）来识别这类问题。 规则2如果有多个数据需要作为一个整体被修改，为了避免其他的 goroutine 看到部分数据更新而造成不">
+  <meta name="description" content="Raft Locking Advice 提供了些关于如何在 Lab 2 中使用锁的建议。  规则1 只要有多个 goroutine 访问同一份数据，并且至少有一个 goroutine 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 Go 的竞争检测（添加 -race 标记）来识别这类问题。  规则2 如果有多个数据需要作为一个整体被修改，为了避免其他的 goroutine 看到部分数据更新">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT 6.824 - Lab 2 (2): Raft Locking Advice">
 <meta property="og:url" content="https://frederick-s.github.io/2022/05/07/mit-6.824-lab2-raft-locking-advice/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="Raft Locking Advice 提供了些关于如何在 Lab 2 中使用锁的建议。 规则1只要有多个 goroutine 访问同一份数据，并且至少有一个 goroutine 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 Go 的竞争检测（添加 -race 标记）来识别这类问题。 规则2如果有多个数据需要作为一个整体被修改，为了避免其他的 goroutine 看到部分数据更新而造成不">
+<meta property="og:description" content="Raft Locking Advice 提供了些关于如何在 Lab 2 中使用锁的建议。  规则1 只要有多个 goroutine 访问同一份数据，并且至少有一个 goroutine 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 Go 的竞争检测（添加 -race 标记）来识别这类问题。  规则2 如果有多个数据需要作为一个整体被修改，为了避免其他的 goroutine 看到部分数据更新">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-05-06T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-05-06T16:00:00.000Z">
 <meta property="article:author" content="Xiaodan Mao">
 <meta property="article:tag" content="MIT 6.824">
-<meta property="article:tag" content="Go">
 <meta property="article:tag" content="Distributed Systems">
+<meta property="article:tag" content="Go">
 <meta property="article:tag" content="Raft">
 <meta name="twitter:card" content="summary">
 
@@ -89,7 +89,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -264,25 +268,27 @@
 
       
         <p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a> 提供了些关于如何在 <code>Lab 2</code> 中使用锁的建议。</p>
-<h2 id="规则1"><a href="#规则1" class="headerlink" title="规则1"></a>规则1</h2><p>只要有多个 <code>goroutine</code> 访问同一份数据，并且至少有一个 <code>goroutine</code> 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 <code>Go</code> 的竞争检测（添加 <code>-race</code> 标记）来识别这类问题。</p>
-<h2 id="规则2"><a href="#规则2" class="headerlink" title="规则2"></a>规则2</h2><p>如果有多个数据需要作为一个整体被修改，为了避免其他的 <code>goroutine</code> 看到部分数据更新而造成不正确的行为，此时也需要加锁。例如：</p>
+<h2 id="规则1"><a class="markdownIt-Anchor" href="#规则1"></a> 规则1</h2>
+<p>只要有多个 <code>goroutine</code> 访问同一份数据，并且至少有一个 <code>goroutine</code> 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 <code>Go</code> 的竞争检测（添加 <code>-race</code> 标记）来识别这类问题。</p>
+<h2 id="规则2"><a class="markdownIt-Anchor" href="#规则2"></a> 规则2</h2>
+<p>如果有多个数据需要作为一个整体被修改，为了避免其他的 <code>goroutine</code> 看到部分数据更新而造成不正确的行为，此时也需要加锁。例如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
-
 <p>上面的代码需要同时更新 <code>rf.currentTerm</code> 和 <code>rf.state</code>，如果不加锁其他 <code>goroutine</code> 有可能看到更新后的任期，但是节点状态还未更新。同时，其他任何地方用到 <code>rf.currentTerm</code> 或者 <code>rf.state</code> 的地方也必须先持有锁，一是保证可见性，二是避免在多处同时修改 <code>rf.currentTerm</code> 或者 <code>rf.state</code>。</p>
-<h2 id="规则3"><a href="#规则3" class="headerlink" title="规则3"></a>规则3</h2><p>如果需要对某个数据做一系列读操作（或者读写混合），那么为了避免其他 <code>goroutine</code> 在中途修改数据，就需要对这一系列操作加锁。例如：</p>
+<h2 id="规则3"><a class="markdownIt-Anchor" href="#规则3"></a> 规则3</h2>
+<p>如果需要对某个数据做一系列读操作（或者读写混合），那么为了避免其他 <code>goroutine</code> 在中途修改数据，就需要对这一系列操作加锁。例如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line"><span class="keyword">if</span> args.Term &gt; rf.currentTerm &#123;</span><br><span class="line">    rf.currentTerm = args.Term</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
-
 <p>上面的代码是典型的 <code>如果满足某个条件，那么就执行 xxx</code> 场景。如果不加锁，可能其他的 <code>goroutine</code> 将 <code>rf.currentTerm</code> 更新后，当前 <code>goroutine</code> 会将 <code>rf.currentTerm</code> 重置为 <code>args.Term</code>，在 <code>Raft</code> 中有可能造成任期倒退。</p>
 <p>在真实的 <code>Raft</code> 代码中加锁的粒度可能会更大，例如可能在整个 <code>RPC handler</code> 处理期间都持有锁。</p>
-<h2 id="规则4"><a href="#规则4" class="headerlink" title="规则4"></a>规则4</h2><p>不建议在等待某个事件时持有锁，例如从 <code>channel</code> 中读取数据，向 <code>channel</code> 发送数据，计时器等待，调用 <code>time.Sleep()</code>，或者发送一个 <code>RPC</code> 请求并等待响应结果。因为有可能造成死锁，文中举了两个节点互发 <code>RPC</code> 请求并希望获取对方持有的锁的例子，这是个典型的死锁场景。</p>
+<h2 id="规则4"><a class="markdownIt-Anchor" href="#规则4"></a> 规则4</h2>
+<p>不建议在等待某个事件时持有锁，例如从 <code>channel</code> 中读取数据，向 <code>channel</code> 发送数据，计时器等待，调用 <code>time.Sleep()</code>，或者发送一个 <code>RPC</code> 请求并等待响应结果。因为有可能造成死锁，文中举了两个节点互发 <code>RPC</code> 请求并希望获取对方持有的锁的例子，这是个典型的死锁场景。</p>
 <p>又或者某个 <code>goroutine</code> 先持有锁，但是使用 <code>time.Sleep</code> 来等待某个条件发生，其他的 <code>goroutine</code> 由于无法获取锁从而使得等待的条件永远无法成立，这个时候应该用 <code>sync.Cond</code>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mu.Lock()</span><br><span class="line"></span><br><span class="line">while (!someCondition) &#123;</span><br><span class="line">    time.Sleep(time.Millisecond * <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mu.Unlock()</span><br></pre></td></tr></table></figure>
-
-<h2 id="规则5"><a href="#规则5" class="headerlink" title="规则5"></a>规则5</h2><p>当释放锁然后重新获取锁之后，某些释放锁之前成立的条件可能此时已经不成立。例如下面的候选节点获取选票的实现是不正确的：</p>
+<h2 id="规则5"><a class="markdownIt-Anchor" href="#规则5"></a> 规则5</h2>
+<p>当释放锁然后重新获取锁之后，某些释放锁之前成立的条件可能此时已经不成立。例如下面的候选节点获取选票的实现是不正确的：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line"><span class="keyword">for</span> &lt;each peer&gt; &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        rf.mu.Lock()</span><br><span class="line">        args.Term = rf.currentTerm</span><br><span class="line">        rf.mu.Unlock()</span><br><span class="line">        Call(<span class="string">&quot;Raft.RequestVote&quot;</span>, &amp;args, ...)</span><br><span class="line">        <span class="comment">// handle the reply...</span></span><br><span class="line">    &#125; ()</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
-
 <p>在每个 <code>goroutine</code> 中，重新获取锁后拿到的任期可能已经不是当初的任期。这里需要将 <code>goroutine</code> 中的 <code>rf.currentTerm</code> 提取到循环之外作为一个变量，然后在 <code>goroutine</code> 中访问这个变量。另外，在 <code>Call</code> 执行完成后，也需要再次获取锁并检查 <code>rf.currentTerm</code> 或其他变量是否还满足条件，例如需要检查下当前的任期是否还是最初的任期，如果不是那说明又开启了一轮选主或者已经有其他节点成为了主节点。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a></li>
 </ul>
 
@@ -312,8 +318,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
-              <a href="/tags/Go/" rel="tag"># Go</a>
               <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
+              <a href="/tags/Go/" rel="tag"># Go</a>
               <a href="/tags/Raft/" rel="tag"># Raft</a>
           </div>
 
@@ -388,7 +394,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%991"><span class="nav-number">1.</span> <span class="nav-text">规则1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%992"><span class="nav-number">2.</span> <span class="nav-text">规则2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%993"><span class="nav-number">3.</span> <span class="nav-text">规则3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%994"><span class="nav-number">4.</span> <span class="nav-text">规则4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%995"><span class="nav-number">5.</span> <span class="nav-text">规则5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%991"><span class="nav-number">1.</span> <span class="nav-text"> 规则1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%992"><span class="nav-number">2.</span> <span class="nav-text"> 规则2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%993"><span class="nav-number">3.</span> <span class="nav-text"> 规则3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%994"><span class="nav-number">4.</span> <span class="nav-text"> 规则4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%84%E5%88%995"><span class="nav-number">5.</span> <span class="nav-text"> 规则5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -402,7 +408,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

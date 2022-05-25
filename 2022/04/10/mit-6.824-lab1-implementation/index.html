@@ -20,20 +20,20 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="概览Lab 1 需要我们实现一个单机多线程、多进程的 MapReduce 程序，通过 test-mr.sh 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。 主节点主节点的入口是 mrcoordinator.go，通过 go run mrcoordinator.go pg*.txt 可运行一个主节点程序，其中 pg*.txt 是本次 MapReduce 程序的输入数据。同时，主节">
+  <meta name="description" content="概览 Lab 1 需要我们实现一个单机多线程、多进程的 MapReduce 程序，通过 test-mr.sh 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。  主节点 主节点的入口是 mrcoordinator.go，通过 go run mrcoordinator.go pg*.txt 可运行一个主节点程序，其中 pg*.txt 是本次 MapReduce 程序的输入数据。同">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIT 6.824 - Lab 1 (5): 实现">
 <meta property="og:url" content="https://frederick-s.github.io/2022/04/10/mit-6.824-lab1-implementation/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="概览Lab 1 需要我们实现一个单机多线程、多进程的 MapReduce 程序，通过 test-mr.sh 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。 主节点主节点的入口是 mrcoordinator.go，通过 go run mrcoordinator.go pg*.txt 可运行一个主节点程序，其中 pg*.txt 是本次 MapReduce 程序的输入数据。同时，主节">
+<meta property="og:description" content="概览 Lab 1 需要我们实现一个单机多线程、多进程的 MapReduce 程序，通过 test-mr.sh 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。  主节点 主节点的入口是 mrcoordinator.go，通过 go run mrcoordinator.go pg*.txt 可运行一个主节点程序，其中 pg*.txt 是本次 MapReduce 程序的输入数据。同">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-04-09T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-04-09T16:00:00.000Z">
 <meta property="article:author" content="Xiaodan Mao">
 <meta property="article:tag" content="MIT 6.824">
-<meta property="article:tag" content="Go">
 <meta property="article:tag" content="MapReduce">
 <meta property="article:tag" content="Distributed Systems">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://frederick-s.github.io/2022/04/10/mit-6.824-lab1-implementation/">
@@ -89,7 +89,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -263,31 +267,39 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
-<h2 id="主节点"><a href="#主节点" class="headerlink" title="主节点"></a>主节点</h2><p>主节点的入口是 <code>mrcoordinator.go</code>，通过 <code>go run mrcoordinator.go pg*.txt</code> 可运行一个主节点程序，其中 <code>pg*.txt</code> 是本次 <code>MapReduce</code> 程序的输入数据。同时，主节点和工作节点间通过 <code>RPC</code> 进行交互，本实验需要我们实现以下 <code>RPC</code> 接口：</p>
+        <h2 id="概览"><a class="markdownIt-Anchor" href="#概览"></a> 概览</h2>
+<p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
+<h2 id="主节点"><a class="markdownIt-Anchor" href="#主节点"></a> 主节点</h2>
+<p>主节点的入口是 <code>mrcoordinator.go</code>，通过 <code>go run mrcoordinator.go pg*.txt</code> 可运行一个主节点程序，其中 <code>pg*.txt</code> 是本次 <code>MapReduce</code> 程序的输入数据。同时，主节点和工作节点间通过 <code>RPC</code> 进行交互，本实验需要我们实现以下 <code>RPC</code> 接口：</p>
 <ol>
 <li>实验中主节点的任务分发采用的是拉模式，工作节点会定期向主节点请求一个任务，这个任务可以是 <code>map</code> 任务也可以是 <code>reduce</code> 任务，由主节点根据当前任务的状态决定应该推送 <code>map</code> 任务还是 <code>reduce</code> 任务。由于 <code>reduce</code> 任务会不间断的拉取中间结果数据，这里为了方便处理，当某个工作节点正在处理 <code>reduce</code> 任务时，在向主节点请求任务时可指明要求分发对应的 <code>reduce</code> 任务</li>
 <li><code>map</code> 任务完成后需要通知主节点生成的中间结果文件地址，主节点收到请求后需要将中间结果文件地址保存到内部数据结构中，供后续发送给对应 <code>reduce</code> 任务</li>
 <li><code>reduce</code> 任务完成后同样需要通知主节点任务完成，否则主节点无法知晓所有 <code>reduce</code> 任务是否已完成，从而无法退出主节点</li>
 </ol>
-<h3 id="任务管理"><a href="#任务管理" class="headerlink" title="任务管理"></a>任务管理</h3><p>主节点需要维护所有 <code>map</code> 任务和 <code>reduce</code> 任务的状态，由于工作节点有可能失败，所以主节点需要同时记录每个任务已执行了多久，如果超过一定时间还没有收到任务完成的通知，则认为执行这个任务的工作节点已失联，然后需要将该任务重新分配给其他工作节点，在本实验中主节点等待每个任务完成的时间为10秒。</p>
-<h2 id="工作节点"><a href="#工作节点" class="headerlink" title="工作节点"></a>工作节点</h2><p>工作节点的入口是 <code>mrworker.go</code>，通过 <code>go run mrworker.go wc.so</code> 可运行一个工作节点程序，其中 <code>wc.so</code> 是本次 <code>MapReduce</code> 程序用到的用户自定义 <code>map</code> 和 <code>reduce</code> 函数。工作节点只有一个 <code>Worker</code> 主方法，需要不断向主节点轮询请求任务，那么工作节点什么时候结束轮询？根据实验建议有两种方法，一种是当本次 <code>MapReduce</code> 任务完成后，主节点进程退出，当工作节点再次请求主节点任务时，<code>RPC</code> 请求必然失败，此时工作节点可认为本次任务已完成主节点已退出，从而结束轮询并退出；另一种是当主节点完成后，在一定时间内，在收到工作节点新的任务请求时，返回一个要求工作节点退出的标识（或者也可抽象为一种任务类型），工作节点收到 <code>RPC</code> 响应后退出，主节点在等待时间到了之后也进行退出。</p>
-<h3 id="空任务"><a href="#空任务" class="headerlink" title="空任务"></a>空任务</h3><p>当工作节点向主节点申请任务，而此时主节点没有可分发的任务时，主节点可返回一个自定义任务类型的任务，来表示空任务，工作节点收到响应后则直接睡眠等待下次唤醒。</p>
-<h3 id="map-任务"><a href="#map-任务" class="headerlink" title="map 任务"></a>map 任务</h3><p><code>map</code> 任务负责调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据，然后将中间结果数据保存为文件，实验建议的文件名是 <code>mr-X-Y</code>，其中 <code>X</code> 表示 <code>map</code> 任务的编号，<code>Y</code> 表示 <code>reduce</code> 任务的编号，<code>map</code> 任务编号的范围可简单使用 <code>[1, 输入文件的数量]</code> 来表示，<code>reduce</code> 任务编号的范围为 <code>[1, nReduce]</code>。每个 <code>map</code> 任务会生成 <code>R</code> 个中间结果文件，实验已提供了分片函数，对中间结果的每个键使用 <code>ihash(key) % nReduce</code> 来决定写入到哪个中间结果文件中。</p>
+<h3 id="任务管理"><a class="markdownIt-Anchor" href="#任务管理"></a> 任务管理</h3>
+<p>主节点需要维护所有 <code>map</code> 任务和 <code>reduce</code> 任务的状态，由于工作节点有可能失败，所以主节点需要同时记录每个任务已执行了多久，如果超过一定时间还没有收到任务完成的通知，则认为执行这个任务的工作节点已失联，然后需要将该任务重新分配给其他工作节点，在本实验中主节点等待每个任务完成的时间为10秒。</p>
+<h2 id="工作节点"><a class="markdownIt-Anchor" href="#工作节点"></a> 工作节点</h2>
+<p>工作节点的入口是 <code>mrworker.go</code>，通过 <code>go run mrworker.go wc.so</code> 可运行一个工作节点程序，其中 <code>wc.so</code> 是本次 <code>MapReduce</code> 程序用到的用户自定义 <code>map</code> 和 <code>reduce</code> 函数。工作节点只有一个 <code>Worker</code> 主方法，需要不断向主节点轮询请求任务，那么工作节点什么时候结束轮询？根据实验建议有两种方法，一种是当本次 <code>MapReduce</code> 任务完成后，主节点进程退出，当工作节点再次请求主节点任务时，<code>RPC</code> 请求必然失败，此时工作节点可认为本次任务已完成主节点已退出，从而结束轮询并退出；另一种是当主节点完成后，在一定时间内，在收到工作节点新的任务请求时，返回一个要求工作节点退出的标识（或者也可抽象为一种任务类型），工作节点收到 <code>RPC</code> 响应后退出，主节点在等待时间到了之后也进行退出。</p>
+<h3 id="空任务"><a class="markdownIt-Anchor" href="#空任务"></a> 空任务</h3>
+<p>当工作节点向主节点申请任务，而此时主节点没有可分发的任务时，主节点可返回一个自定义任务类型的任务，来表示空任务，工作节点收到响应后则直接睡眠等待下次唤醒。</p>
+<h3 id="map-任务"><a class="markdownIt-Anchor" href="#map-任务"></a> map 任务</h3>
+<p><code>map</code> 任务负责调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据，然后将中间结果数据保存为文件，实验建议的文件名是 <code>mr-X-Y</code>，其中 <code>X</code> 表示 <code>map</code> 任务的编号，<code>Y</code> 表示 <code>reduce</code> 任务的编号，<code>map</code> 任务编号的范围可简单使用 <code>[1, 输入文件的数量]</code> 来表示，<code>reduce</code> 任务编号的范围为 <code>[1, nReduce]</code>。每个 <code>map</code> 任务会生成 <code>R</code> 个中间结果文件，实验已提供了分片函数，对中间结果的每个键使用 <code>ihash(key) % nReduce</code> 来决定写入到哪个中间结果文件中。</p>
 <p>从数据结构角度来说，所有的中间结果数据是一个 <code>nReduce * nMap</code> 的二维矩阵，每一行对应一个 <code>reduce</code> 任务。</p>
 <p>由于 <code>map</code> 节点有可能执行失败，为避免 <code>reduce</code> 节点读取到的是未写入完成的中间结果文件，在写入中间结果文件时可以先写入一个临时文件，在写入完成后再重命名为最终的文件名。在本实验中，可以使用 <code>ioutil.TempFile</code> 来创建临时文件，以及使用 <code>os.Rename</code> 来原子性的重命名文件。</p>
 <p>在当前 <code>map</code> 任务的中间结果文件写入完成后，需要通过 <code>RPC</code> 请求通知主节点所有中间结果文件的文件地址。在本实验中，各个工作节点运行在同一台机器上，实验要求保存 <code>map</code> 任务的中间结果文件到当前文件夹，这样 <code>reduce</code> 任务就能通过中间结果文件的文件名读取中间结果数据。</p>
 <p>对中间结果数据的写文件可以借助 <code>Go</code> 的 <code>encoding/json</code> 模块，例如：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">enc := json.NewEncoder(file)</span><br><span class="line"><span class="keyword">for</span> _, kv := ... &#123;</span><br><span class="line">    err := enc.Encode(&amp;kv)</span><br></pre></td></tr></table></figure>
-
 <p>然后 <code>reduce</code> 任务读取文件：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">dec := json.NewDecoder(file)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> kv KeyValue</span><br><span class="line">    <span class="keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">    kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="reduce-任务"><a href="#reduce-任务" class="headerlink" title="reduce 任务"></a>reduce 任务</h3><p><code>reduce</code> 任务负责将所有中间结果数据按照键排序后应用用户自定义的 <code>reduce</code> 函数，并生成最终输出文件，文件格式为 <code>mr-out-X</code>，其中 <code>X</code> 表示 <code>reduce</code> 任务的编号。文件中的每一行对应一个 <code>reduce</code> 函数调用的结果，需要按照 <code>Go</code> 的 <code>%v %v</code> 形式对键值对进行格式化。</p>
+<h3 id="reduce-任务"><a class="markdownIt-Anchor" href="#reduce-任务"></a> reduce 任务</h3>
+<p><code>reduce</code> 任务负责将所有中间结果数据按照键排序后应用用户自定义的 <code>reduce</code> 函数，并生成最终输出文件，文件格式为 <code>mr-out-X</code>，其中 <code>X</code> 表示 <code>reduce</code> 任务的编号。文件中的每一行对应一个 <code>reduce</code> 函数调用的结果，需要按照 <code>Go</code> 的 <code>%v %v</code> 形式对键值对进行格式化。</p>
 <p>在收到所有的中间结果数据之前，<code>reduce</code> 任务无法开始执行，所以在这个期间当工作节点请求 <code>reduce</code> 任务时，如果主节点暂时没有新的 <code>reduce</code> 任务可分发，则可返回一个空任务，工作节点收到响应后则暂时等待一段时间再重新请求任务。<code>reduce</code> 每次收到中间结果数据后会暂存在内存中，如果暂存的中间结果数据的数量等于 <code>map</code> 任务的数量（这个值可以放在 <code>RPC</code> 响应中），则说明所有中间结果数据已经接收完毕，可以开始执行 <code>reduce</code> 任务。</p>
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p><code>mrworker.go</code> 中注释描述通过 <code>go run mrworker.go wc.so</code> 来运行工作节点，不过如果构建 <code>wc.so</code> 时开启了竞争检测（<code>-race</code>），则运行 <code>mrworker.go</code> 时也同样需要开启竞争检测，否则会提示 <code>cannot load plugin wc.so</code>，如果打印 <code>err</code> 则会显示 <code>plugin.Open(&quot;wc&quot;): plugin was built with a different version of package runtime</code>。</p>
+<h2 id="注意"><a class="markdownIt-Anchor" href="#注意"></a> 注意</h2>
+<p><code>mrworker.go</code> 中注释描述通过 <code>go run mrworker.go wc.so</code> 来运行工作节点，不过如果构建 <code>wc.so</code> 时开启了竞争检测（<code>-race</code>），则运行 <code>mrworker.go</code> 时也同样需要开启竞争检测，否则会提示 <code>cannot load plugin wc.so</code>，如果打印 <code>err</code> 则会显示 <code>plugin.Open(&quot;wc&quot;): plugin was built with a different version of package runtime</code>。</p>
 <p>同样的，如果使用 <code>GoLand</code> 调试程序，由于在调试模式下 <code>GoLand</code> 编译 <code>Go</code> 文件时会增加 <code>-gcflags=&quot;all=-N -l&quot;</code> 参数，所以也需要在打包 <code>wc.so</code> 时增加相同的参数。</p>
-<h2 id="活锁"><a href="#活锁" class="headerlink" title="活锁"></a>活锁</h2><p>在最后的 <code>crash test</code> 遇到个类似活锁的问题，在前文提到，如果某个工作节点开始了 <code>reduce</code> 任务但是还没有接收全部的中间结果数据，则该节点下次申请任务时会继续申请该 <code>reduce</code> 任务（普通工作节点对申请的任务类型没有要求）。在 <code>crash test</code> 下，工作节点在执行用户自定义的 <code>map</code> 或 <code>reduce</code> 函数时有一定概率结束进程，假设现在有4个工作节点，其中一个在执行 <code>map</code> 任务，另外三个各自在执行 <code>reduce</code> 任务（轮询获取中间结果数据），不幸的是<br>这个时候 <code>map</code> 节点挂了，此时 <code>test-mr.sh</code> 会自动再启动一个工作节点，然后更不幸的是挂掉的 <code>map</code> 任务在主节点看来还没有到超时时间，所以主节点此时不会分配 <code>map</code> 任务给新的节点（假设没有其他 <code>map</code> 任务），会再分配一个 <code>reduce</code> 任务给新的节点，至此所有工作节点都在执行 <code>reduce</code> 任务，又都在等待中间结果数据完成，却又不可能完成。</p>
+<h2 id="活锁"><a class="markdownIt-Anchor" href="#活锁"></a> 活锁</h2>
+<p>在最后的 <code>crash test</code> 遇到个类似活锁的问题，在前文提到，如果某个工作节点开始了 <code>reduce</code> 任务但是还没有接收全部的中间结果数据，则该节点下次申请任务时会继续申请该 <code>reduce</code> 任务（普通工作节点对申请的任务类型没有要求）。在 <code>crash test</code> 下，工作节点在执行用户自定义的 <code>map</code> 或 <code>reduce</code> 函数时有一定概率结束进程，假设现在有4个工作节点，其中一个在执行 <code>map</code> 任务，另外三个各自在执行 <code>reduce</code> 任务（轮询获取中间结果数据），不幸的是<br />
+这个时候 <code>map</code> 节点挂了，此时 <code>test-mr.sh</code> 会自动再启动一个工作节点，然后更不幸的是挂掉的 <code>map</code> 任务在主节点看来还没有到超时时间，所以主节点此时不会分配 <code>map</code> 任务给新的节点（假设没有其他 <code>map</code> 任务），会再分配一个 <code>reduce</code> 任务给新的节点，至此所有工作节点都在执行 <code>reduce</code> 任务，又都在等待中间结果数据完成，却又不可能完成。</p>
 <p>造成这个问题的主要原因是任务分配顺序，上述问题下的任务分配顺序是：</p>
 <ol>
 <li>指定的 <code>reduce</code> 任务</li>
@@ -300,7 +312,8 @@
 <li>指定的 <code>reduce</code> 任务</li>
 <li>空闲或超时的 <code>reduce</code> 任务</li>
 </ol>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
 </ul>
 
@@ -330,9 +343,9 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
-              <a href="/tags/Go/" rel="tag"># Go</a>
               <a href="/tags/MapReduce/" rel="tag"># MapReduce</a>
               <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
+              <a href="/tags/Go/" rel="tag"># Go</a>
           </div>
 
         
@@ -406,7 +419,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%A7%88"><span class="nav-number">1.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%8A%82%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">主节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">任务管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">工作节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.1.</span> <span class="nav-text">空任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.2.</span> <span class="nav-text">map 任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reduce-%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.3.</span> <span class="nav-text">reduce 任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B4%BB%E9%94%81"><span class="nav-number">5.</span> <span class="nav-text">活锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%A7%88"><span class="nav-number">1.</span> <span class="nav-text"> 概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%8A%82%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text"> 主节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text"> 任务管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text"> 工作节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.1.</span> <span class="nav-text"> 空任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.2.</span> <span class="nav-text"> map 任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reduce-%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.3.</span> <span class="nav-text"> reduce 任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">4.</span> <span class="nav-text"> 注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B4%BB%E9%94%81"><span class="nav-number">5.</span> <span class="nav-text"> 活锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -420,7 +433,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="使用 Python 的 heapq 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。 使用元组如果 heapq 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 k 小的数字所在数组中的位置。Top k 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的">
+  <meta name="description" content="使用 Python 的 heapq 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。  使用元组 如果 heapq 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 k 小的数字所在数组中的位置。Top k 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python heapq 自定义比较器">
 <meta property="og:url" content="https://frederick-s.github.io/2021/07/31/python-heapq-custom-comparator/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="使用 Python 的 heapq 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。 使用元组如果 heapq 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 k 小的数字所在数组中的位置。Top k 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的">
+<meta property="og:description" content="使用 Python 的 heapq 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。  使用元组 如果 heapq 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 k 小的数字所在数组中的位置。Top k 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-07-30T16:00:00.000Z">
 <meta property="article:modified_time" content="2021-07-30T16:00:00.000Z">
@@ -86,7 +86,11 @@
   </style>
 </noscript>
 
-<link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -261,13 +265,14 @@
 
       
         <p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
-<h2 id="使用元组"><a href="#使用元组" class="headerlink" title="使用元组"></a>使用元组</h2><p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
+<h2 id="使用元组"><a class="markdownIt-Anchor" href="#使用元组"></a> 使用元组</h2>
+<p>如果 <code>heapq</code> 中放入的是元组，那么元组的第一个元素会用于大小比较。假设有这样一个问题，给定一个数组，返回前 <code>k</code> 小的数字所在数组中的位置。<code>Top k</code> 的问题的一个解法是使用堆，但是这里要求的是数字在数组中的位置而不是数字本身，所以不能直接将数组堆化，可以先将数组中的每个数字转换成一个包含2个元素的元组，元组的第一个元素是数字本身，第二个元素则是数字在数组中的位置。</p>
 <figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">numbers, k</span>):</span></span><br><span class="line">  heap = [(n, i) <span class="keyword">for</span> i, n <span class="keyword">in</span> <span class="built_in">enumerate</span>(numbers)]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap)[<span class="number">1</span>], <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>], <span class="number">3</span>)) <span class="comment"># [4, 3, 2]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="实现自定义比较器"><a href="#实现自定义比较器" class="headerlink" title="实现自定义比较器"></a>实现自定义比较器</h2><p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
+<h2 id="实现自定义比较器"><a class="markdownIt-Anchor" href="#实现自定义比较器"></a> 实现自定义比较器</h2>
+<p>当放入堆中的是自定义类时，可以通过实现 <code>__lt__</code> 方法来比较元素大小。假设有一个自定义类为 <code>Node</code>，它包含一个 <code>value</code> 属性，现在问题改为给定一个 <code>Node</code> 的数组，返回前 <code>k</code> 小的 <code>Node</code> 的值，可通过实现 <code>__lt__</code> 方法求解。</p>
 <figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">    self.value = value</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__lt__</span>(<span class="params">self, other</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.value &lt; other.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">top_k</span>(<span class="params">nodes, k</span>):</span></span><br><span class="line">  heap = [node <span class="keyword">for</span> node <span class="keyword">in</span> nodes]</span><br><span class="line">  heapq.heapify(heap)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x: heapq.heappop(heap).value, <span class="built_in">range</span>(k)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  print(top_k([Node(<span class="number">5</span>), Node(<span class="number">4</span>), Node(<span class="number">3</span>), Node(<span class="number">2</span>), Node(<span class="number">1</span>)], <span class="number">3</span>)) <span class="comment"># [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
 </ul>
 
@@ -370,7 +375,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%85%83%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">使用元组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%AF%94%E8%BE%83%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">实现自定义比较器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%85%83%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text"> 使用元组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%AF%94%E8%BE%83%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text"> 实现自定义比较器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -384,7 +389,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
