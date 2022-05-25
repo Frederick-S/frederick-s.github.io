@@ -117,3 +117,13 @@ symbols_count_time:
   awl: 2
   wpm: 300
   suffix: "mins."
+
+math:
+  engine: katex
+  katex:
+    css: https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css
+    js: https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.js
+    config:
+      # KaTeX config
+      throwOnError: false
+      errorColor: "#cc0000"
