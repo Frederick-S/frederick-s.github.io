@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Students’ Guide to Raft 是 MIT 6.824: Distributed Systems 之前的助教写给学生看的实验生存指南。在 MIT 6.824 - Lab 2 (1): Students’ Guide to Raft 中介绍了关于 Lab 2 的部分，本文将继续介绍关于 Lab 3 的部分。 在 Lab 3 中，我们需要实现一个基于 Raft 的 Key-Value">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIT 6.824 - Lab 3 (1): Students&#39; Guide to Raft（续）">
+<meta property="og:url" content="https://frederick-s.github.io/2022/05/30/mit-6.824-lab2-students-guide-to-raft-part-2/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="Students’ Guide to Raft 是 MIT 6.824: Distributed Systems 之前的助教写给学生看的实验生存指南。在 MIT 6.824 - Lab 2 (1): Students’ Guide to Raft 中介绍了关于 Lab 2 的部分，本文将继续介绍关于 Lab 3 的部分。 在 Lab 3 中，我们需要实现一个基于 Raft 的 Key-Value">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-05-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-05-29T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="MIT 6.824">
+<meta property="article:tag" content="Distributed Systems">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Raft">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://frederick-s.github.io/2022/05/30/mit-6.824-lab2-students-guide-to-raft-part-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续） | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-J1NC2B33VK');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Übung macht den Meister</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-mit-6.824">
+
+    <a href="/mit-6.824/" rel="section"><i class="fas fa-landmark fa-fw"></i>MIT 6.824</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/05/30/mit-6.824-lab2-students-guide-to-raft-part-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-05-30 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-30T00:00:00+08:00">2022-05-30</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。在 <a href="/2022/05/06/mit-6.824-lab2-students-guide-to-raft/">MIT 6.824 - Lab 2 (1): Students’ Guide to Raft</a> 中介绍了关于 <code>Lab 2</code> 的部分，本文将继续介绍关于 <code>Lab 3</code> 的部分。</p>
+<p>在 <code>Lab 3</code> 中，我们需要实现一个基于 <code>Raft</code> 的 <code>Key-Value</code> 数据库，本文描述了某些对实现可能有帮助的细节。</p>
+<h2 id="提交客户端操作"><a class="markdownIt-Anchor" href="#提交客户端操作"></a> 提交客户端操作</h2>
+<p>实现客户端请求时可能会先直接发一个请求给客户端所认为的主节点，然后对应的服务端等待 <code>Raft</code> 应用日志，接着服务端执行客户端的请求逻辑，最后再把结果返回给客户端。这种方式适合单客户端的系统，不过不适合多客户端并发的系统。在多客户端请求下，每个客户端请求都有可能修改系统状态，即使各 <code>Raft</code> 节点的日志保持一致，由于各客户端请求间可能相互交替执行，服务端本地状态可能和 <code>Raft</code> 节点的最新日志不一致，除非使用全局的锁隔离各客户端请求，不过系统会退化为串行程序。</p>
+<p>文中建议将服务端当做状态机处理，每个客户端的请求本质上都是将状态机从一个状态转变为另一个状态。服务端中有一个专门的线程来处理客户端请求，该线程每次获取一个客户端请求，然后将其提交给 <code>Raft</code>，之后收到 <code>Raft</code> 应用日志的通知后，按顺序将客户端命令应用到服务端的本地状态机中，这里虽然看起来也是串行处理客户端请求，不过由于 <code>Raft.Start()</code> 方法会立即返回，当有大量请求时，<code>Raft</code> 在实现时会批量发送日志。这个线程是整个服务端中唯一能修改本地状态机的地方，所以服务端的 <code>RPC</code> 就简化为了向任务队列中提交任务，并且当 <code>applyCh</code> 接收到可以执行的日志时，将日志所对应的命令应用到本地状态机中，然后响应客户端。</p>
+<p>不过，这也带来了一个问题：什么时候知道某个客户端请求执行完成了？这在一切正常的情况下非常简单，因为我们是按序将客户端请求提交给 <code>Raft</code>，所以最后从 <code>applyCh</code> 中出来的日志的顺序就是提交客户端请求的顺序。不过，当前客户端所通信的服务端有可能在中途不再是主节点，所以客户端所发送的日志有可能被丢弃，此时客户端需要能够知道发生了异常，然后尝试换一个服务端。</p>
+<p>一个简单的方法是记录提交客户端请求时 <code>Raft</code> 返回的日志索引，然后从 <code>applyCh</code> 收到对应索引的日志时，判断该条日志是否对应最初的客户端请求（可以向 <code>ApplyMsg.Command</code> 添加额外的信息来标识是否是当初的请求）。如果不是同一条请求，则说明发生了异常。</p>
+<h2 id="识别重复请求"><a class="markdownIt-Anchor" href="#识别重复请求"></a> 识别重复请求</h2>
+<p>因为客户端异常重试的机制存在，所以服务端需要能识别出重复的客户端请求：例如某个客户端发送 <code>APPEND</code> 请求，当前服务端成功执行但是客户端没有收到响应，客户端会选择一个新的服务端发送请求，新的服务端需要确保 <code>APPEND</code> 请求不会被执行两次。因此，每个客户端请求需要一个唯一的标识，使得服务端能够识别已经执行的请求。另外，由于客户端会选择不同的服务端发送请求，各服务端需要对已执行的客户端请求达成共识。</p>
+<p>有很多方法来为客户端请求生成唯一的标识符。一种简单并且相对有效的方法是先给每个客户端分配一个唯一的标识符，然后给每一个请求附带一个递增的序列号。如果某个客户端重新发送请求，则会复用之前的请求序列号。各服务端需要维护每个客户端最新的请求序列号，如果服务端发现客户端的请求序列号已处理，则直接忽略该请求。</p>
+<h2 id="难以定位的边界条件"><a class="markdownIt-Anchor" href="#难以定位的边界条件"></a> 难以定位的边界条件</h2>
+<p>如果按照上述的方式实现，有可能会遇到两个难以定位的问题。</p>
+<h3 id="重复出现的日志索引"><a class="markdownIt-Anchor" href="#重复出现的日志索引"></a> 重复出现的日志索引</h3>
+<p><code>Raft.Start()</code> 会返回所添加的日志的索引，不过在实际实现时可能会认为这个索引不会重复返回，或者遇到重复的索引时会认为前一个相同索引的日志所对应的请求已经执行失败。不过实际上这两种看法都不正确，即使没有个任何一个服务端发生异常。</p>
+<p>假设有 <code>S1</code> 到 <code>S5</code> 五个节点，一开始 <code>S1</code> 是主节点，并且没有日志，然后系统发生以下交互：</p>
+<ol>
+<li><code>S1</code> 收到两个客户端请求 <code>C1</code> 和 <code>C2</code></li>
+<li><code>S1</code> 分别返回日志索引1和2给 <code>C1</code> 和 <code>C2</code></li>
+<li><code>S1</code> 发送包含了 <code>C1</code> 和 <code>C2</code> 的 <code>AppendEntries</code> 请求给其他从节点，其中 <code>S2</code> 收到请求，其余节点均未收到</li>
+<li><code>S3</code> 成为候选节点</li>
+<li><code>S1</code> 和 <code>S2</code> 不会投票给 <code>S3</code>，但是 <code>S4</code> 和 <code>S5</code> 会，所以 <code>S3</code> 成为新的主节点</li>
+<li><code>S3</code> 收到新的客户端请求 <code>C3</code></li>
+<li><code>S3</code> 调用 <code>Start()</code> 方法并返回日志索引1给 <code>C3</code></li>
+<li><code>S3</code> 发送包含 <code>C3</code> 的 <code>AppendEntries</code> 请求给 <code>S1</code>，<code>S1</code> 丢弃 <code>C1</code> 和 <code>C2</code> 的日志后添加 <code>C3</code></li>
+<li><code>S3</code> 在给其他从节点发送 <code>AppendEntries</code> 请求前发生异常</li>
+<li><code>S1</code> 成为候选节点，由于它的日志最新，所以再次成为主节点</li>
+<li><code>S1</code> 收到新的客户端请求 <code>C4</code></li>
+<li><code>S1</code> 调用 <code>Start()</code> 方法并返回日志索引2给 <code>C4</code>（在之前的步骤中，日志索引2也返回给了 <code>C2</code>）</li>
+<li><code>S1</code> 在给其他从节点发送 <code>AppendEntries</code> 请求前发生异常，此时 <code>S2</code> 成为候选节点</li>
+<li><code>S1</code> 和 <code>S3</code> 不会投票给 <code>S2</code>，但是 <code>S4</code> 和 <code>S5</code> 会，所以 <code>S2</code> 成为新的主节点</li>
+<li><code>S2</code> 收到新的客户端请求 <code>C5</code></li>
+<li><code>S2</code> 调用 <code>Start()</code> 方法并返回日志索引3给 <code>C5</code></li>
+<li><code>S2</code> 成功将 <code>AppendEntries</code> 请求发送给其他所有从节点，在后续的心跳中，<code>leaderCommit = 3</code></li>
+</ol>
+<p>最终 <code>S2</code> 的日志为 <code>[C1, C2, C5]</code>，此时所有节点在索引位置2处的日志为 <code>C2</code>，这就为开头的两个观点提供了反例：<code>Start()</code> 方法可能返回重复的日志索引，以及遇到重复的索引时不代表前一个相同索引的日志所对应的请求已经执行失败。</p>
+<h3 id="四方死锁"><a class="markdownIt-Anchor" href="#四方死锁"></a> 四方死锁</h3>
+<p>课程的另一个助教 <a target="_blank" rel="noopener" href="https://stebalien.com/">Steven Allen</a> 发现在实现 <code>Lab 3</code> 时很容易遇到一个四方死锁问题。</p>
+<p>不管具体的 <code>Raft</code> 代码如何实现，一般来说都会有一个类似于 <code>Raft.Start()</code> 的方法来使得应用程序添加日志，以及很有可能有一个单独的线程将位于 <code>[lastApplied + 1, commitIndex]</code> 范围内的日志通过 <code>apply()</code> 方法发送给应用程序（<a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 这篇文章写于2016年，在最新的课程中 <code>Raft</code> 通过 <code>applyCh</code> 来发送日志）。这两个方法很可能都需要持有锁 <code>a</code>。而在应用程序中，很可能会在某个 <code>RPC</code> 中调用 <code>Raft.Start()</code> 方法，然后同样可能有个线程会等待 <code>Raft</code> 的日志应用通知，当这个线程收到通知后，就可以响应客户端。由于这两个方法需要通信（例如，<code>RPC</code> 方法需要知道什么时候客户端请求执行完成），所以很可能也都需要持有锁 <code>b</code>。</p>
+<p>上述的方法用 <code>Go</code> 描述如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *App)</span> <span class="title">RPC</span><span class="params">(args <span class="keyword">interface</span>&#123;&#125;, reply <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    a.mutex.Lock()</span><br><span class="line">    i := a.raft.Start(args)</span><br><span class="line">    <span class="comment">// update some data structure so that apply knows to poke us later</span></span><br><span class="line">    a.mutex.Unlock()</span><br><span class="line">    <span class="comment">// wait for apply to poke us</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Raft)</span> <span class="title">Start</span><span class="params">(cmd <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">    r.mutex.Lock()</span><br><span class="line">    <span class="comment">// do things to start agreement on this new command</span></span><br><span class="line">    <span class="comment">// store index in the log where cmd was placed</span></span><br><span class="line">    r.mutex.Unlock()</span><br><span class="line">    <span class="keyword">return</span> index</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *App)</span> <span class="title">apply</span><span class="params">(index <span class="keyword">int</span>, cmd <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">    a.mutex.Lock()</span><br><span class="line">    <span class="keyword">switch</span> cmd := cmd.(<span class="keyword">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> GetArgs:</span><br><span class="line">        <span class="comment">// do the get</span></span><br><span class="line">	<span class="comment">// see who was listening for this index</span></span><br><span class="line">	<span class="comment">// poke them all with the result of the operation</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    a.mutex.Unlock()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Raft)</span> <span class="title">AppendEntries</span><span class="params">(...)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    r.mutex.Lock()</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">for</span> r.lastApplied &lt; r.commitIndex &#123;</span><br><span class="line">      r.lastApplied++</span><br><span class="line">      r.app.apply(r.lastApplied, r.log[r.lastApplied])</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    r.mutex.Unlock()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设此时系统处于以下状态：</p>
+<ul>
+<li><code>App.RPC</code> 获取锁 <code>a.mutex</code> 然后调用 <code>Raft.Start</code></li>
+<li><code>Raft.Start</code> 正在等待锁 <code>r.mutex</code></li>
+<li><code>Raft.AppendEntries</code> 持有锁 <code>r.mutex</code>，然后调用 <code>App.apply</code></li>
+</ul>
+<p>此时就发生了死锁，因为：</p>
+<ul>
+<li><code>Raft.AppendEntries</code> 在 <code>App.apply</code> 返回前无法释放锁 <code>r.mutex</code></li>
+<li><code>App.apply</code> 在获取锁 <code>a.mutex</code> 前无法返回</li>
+<li><code>a.mutex</code> 在 <code>App.RPC</code> 返回前无法被释放</li>
+<li><code>App.RPC</code> 在 <code>Raft.Start</code> 返回前无法返回</li>
+<li><code>Raft.Start</code> 在获取锁 <code>r.mutex</code> 前无法返回</li>
+<li><code>Raft.Start</code> 需要等待 <code>Raft.AppendEntries</code> 释放锁 <code>r.mutex</code></li>
+</ul>
+<p>有几种方法来避免死锁。其中最简单的就是在 <code>App.RPC</code> 中，调用 <code>a.raft.Start</code> 之后再尝试获取锁。不过这可能会带来个问题，在 <code>a.raft.Start(args)</code> 和 <code>a.mutex.Lock()</code> 执行之间可能触发 <code>app.Apply</code>，造成错失日志通知。所以另一种方法是从 <code>Raft.AppendEntries</code> 中分离出 <code>r.app.apply</code>，由一个单独的线程来调用 <code>r.app.apply</code>，这就保证了服务端不会错过日志的通知，同时又避免了死锁。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://frederick-s.github.io/2022/05/30/mit-6.824-lab2-students-guide-to-raft-part-2/" title="MIT 6.824 - Lab 3 (1): Students&#39; Guide to Raft（续）">https://frederick-s.github.io/2022/05/30/mit-6.824-lab2-students-guide-to-raft-part-2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
+              <a href="/tags/Go/" rel="tag"># Go</a>
+              <a href="/tags/Raft/" rel="tag"># Raft</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/25/mit-6.824-chain-replication/" rel="prev" title="MIT 6.824 - Chain Replication for Supporting High Throughput and Availability">
+      <i class="fa fa-chevron-left"></i> MIT 6.824 - Chain Replication for Supporting High Throughput and Availability
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text"> 提交客户端操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%86%E5%88%AB%E9%87%8D%E5%A4%8D%E8%AF%B7%E6%B1%82"><span class="nav-number">2.</span> <span class="nav-text"> 识别重复请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%BE%E4%BB%A5%E5%AE%9A%E4%BD%8D%E7%9A%84%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text"> 难以定位的边界条件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E5%87%BA%E7%8E%B0%E7%9A%84%E6%97%A5%E5%BF%97%E7%B4%A2%E5%BC%95"><span class="nav-number">3.1.</span> <span class="nav-text"> 重复出现的日志索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E6%96%B9%E6%AD%BB%E9%94%81"><span class="nav-number">3.2.</span> <span class="nav-text"> 四方死锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
