@@ -17,3 +17,4 @@ date: 2022-02-13 15:39:40
 * [MIT 6.824 - ZooKeeper: Wait-free coordination for Internet-scale systems](/2022/05/19/mit-6.824-zookeeper/)
 * [MIT 6.824 - Chain Replication for Supporting High Throughput and Availability](/2022/05/25/mit-6.824-chain-replication/)
 * [MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续）](/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/)
+* [MIT 6.824 - Lab 3 (2): 实现](/2022/06/04/mit-6.824-lab3-implementation/)
