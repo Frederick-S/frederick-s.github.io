@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Lab 3 需要我们实现一个基于 Raft 的键值数据库，支持三个操作：  Put(key, value) Append(key, value) Get(key)   3A  客户端 客户端要做的只有一件事，就是向某个服务端发送请求。不过由于客户端不知道哪个服务端是主节点，所以需要不断轮询各服务端发送请求。为了避免每次轮询所有服务端浪费时间，客户端可以记录每次请求成功后的服务端编号，这个服务端就是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIT 6.824 - Lab 3 (2): 实现">
+<meta property="og:url" content="https://frederick-s.github.io/2022/06/04/mit-6.824-lab3-implementation/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="Lab 3 需要我们实现一个基于 Raft 的键值数据库，支持三个操作：  Put(key, value) Append(key, value) Get(key)   3A  客户端 客户端要做的只有一件事，就是向某个服务端发送请求。不过由于客户端不知道哪个服务端是主节点，所以需要不断轮询各服务端发送请求。为了避免每次轮询所有服务端浪费时间，客户端可以记录每次请求成功后的服务端编号，这个服务端就是">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-03T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="MIT 6.824">
+<meta property="article:tag" content="Distributed Systems">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Raft">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://frederick-s.github.io/2022/06/04/mit-6.824-lab3-implementation/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MIT 6.824 - Lab 3 (2): 实现 | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-J1NC2B33VK');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Übung macht den Meister</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-mit-6.824">
+
+    <a href="/mit-6.824/" rel="section"><i class="fas fa-landmark fa-fw"></i>MIT 6.824</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/04/mit-6.824-lab3-implementation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MIT 6.824 - Lab 3 (2): 实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-06-04 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-04T00:00:00+08:00">2022-06-04</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>Lab 3</code> 需要我们实现一个基于 <code>Raft</code> 的键值数据库，支持三个操作：</p>
+<ul>
+<li><code>Put(key, value)</code></li>
+<li><code>Append(key, value)</code></li>
+<li><code>Get(key)</code></li>
+</ul>
+<h2 id="3a"><a class="markdownIt-Anchor" href="#3a"></a> 3A</h2>
+<h3 id="客户端"><a class="markdownIt-Anchor" href="#客户端"></a> 客户端</h3>
+<p>客户端要做的只有一件事，就是向某个服务端发送请求。不过由于客户端不知道哪个服务端是主节点，所以需要不断轮询各服务端发送请求。为了避免每次轮询所有服务端浪费时间，客户端可以记录每次请求成功后的服务端编号，这个服务端就是当次请求中的主节点；当客户端再次发起请求时，可以先假定之前的服务端依然是主节点，从而先向该服务端发送请求，如果请求失败并返回非主节点异常，则再尝试下一个服务端。</p>
+<h3 id="服务端"><a class="markdownIt-Anchor" href="#服务端"></a> 服务端</h3>
+<p><code>Lab 3</code> 要求服务端将客户端请求成功的结果放到 <code>RPC</code> 响应中，不过 <code>Raft.Start()</code> 的执行成功不代表最终日志的应用成功，所以服务端调用 <code>Raft.Start()</code> 后需要阻塞等待，直到 <code>Raft</code> 将对应日志应用到状态机。等待/唤醒的模式可以想到使用条件变量 <code>sync.Cond</code>，不过 <code>Go</code> 中有 <code>channel</code> 这个更方便的特性来实现。</p>
+<p>正常情况下，服务端调用 <code>Raft.Start()</code> 添加日志的顺序和之后从 <code>applyCh</code> 中收到日志的顺序一致，也就是说客户端请求到达服务端并被处理的顺序和服务端从 <code>applyCh</code> 中收到日志的顺序一致。所以，服务端可以维护一个客户端请求的队列，队列中存放的是 <code>channel</code>，每当服务端从 <code>applyCh</code> 中收到日志，就将日志发送到队首的 <code>channel</code> 中，并从队列中移除。这样阻塞等待中的 <code>RPC</code> 服务端线程就能被唤醒，并响应客户端。</p>
+<p>不过在异常情况下，客户端请求队列和服务端从 <code>applyCh</code> 中收到日志的顺序并不是一一对应，因此服务端收到日志时需要剔除掉队列中无效的请求，并通过 <code>channel</code> 发送一个 <code>ErrWrongLeader</code> 异常，这样客户端就能换一个服务端来重试。由于通过日志索引无法唯一确定一条 <code>Raft</code> 日志，所以需要在 <code>ApplyMsg</code> 中添加 <code>CommandTerm</code> 来标识日志所属的任期，这样服务端从 <code>applyCh</code> 中收到日志后就能通过比较客户端请求队列中的日志任期和索引来判断请求是否有效。</p>
+<p>记客户端请求队列队首日志的任期和索引为 <code>(term_client, index_client)</code>，记服务端从 <code>applyCh</code> 收到的日志的任期和索引为 <code>(term_applied, index_applied)</code>。正常情况下有 <code>term_client == term_applied</code> 以及 <code>index_client == index_applied</code>。从服务端角度来说，异常情况有两种，一种是当前服务端不再是主节点，另一种情况是当前服务端依然是主节点，不过中途发生了主从切换可能造成当前的日志和最初的不同。对于第一种情况可以直接清空客户端请求队列，虽然 <code>(term_applied, index_applied)</code> 有可能符合部分的客户端请求，不过由于当前服务端不再是主节点，下次客户端请求的时候本身就要再轮询所有的服务端，所以这里等同于是提前让客户端轮询。对于第二种情况（也考虑原来是从节点后来变成主节点的场景），可以从队首开始遍历客户端请求队列，剔除掉比 <code>(term_applied, index_applied)</code> 小的 <code>(term_client, index_client)</code> 请求，并通过 <code>channel</code> 返回异常（这里需要一个自定义异常，告诉客户端直接重试，因为当前服务端依然是主节点，所以客户端没有必要轮询）。这里的剔除掉比 <code>(term_applied, index_applied)</code> 小的 <code>(term_client, index_client)</code> 请求，指的是仅保留 <code>term_client &gt;= term_applied</code> 和 <code>index_client &gt;= index_applied</code> 的请求，因为根据 <code>Raft</code> 日志的性质，其他的客户端请求都已经不可能被提交。</p>
+<p>因此，服务端需要开启一个单独的 <code>goroutine</code>，并不断的从 <code>applyCh</code> 中获取日志，然后根据日志的指令内容更新本地的键值数据库，最后唤醒客户端请求队列中的请求。</p>
+<h3 id="客户端请求去重"><a class="markdownIt-Anchor" href="#客户端请求去重"></a> 客户端请求去重</h3>
+<p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-kvraft.html">6.824 Lab 3: Fault-tolerant Key/Value Service</a> 中提到：</p>
+<blockquote>
+<p>It’s OK to assume that a client will make only one call into a Clerk at a time.</p>
+</blockquote>
+<p>一个客户端一次只发送一个请求，加上请求阻塞的特性，任何一个时间每个客户端都最多只有一个进行中的请求。为了对请求去重，每个客户端可以生成一个唯一的客户端 <code>id</code>，每次发请求时生成一个递增的请求序号，而服务端只需要维护每个客户端已提交到状态机的最大请求序号即可，因为每个客户端的请求序列是个递增的序列（非严格递增，相邻数字之间可能存在重复）。所以，服务端收到请求时，如果发现请求中的序号小于等于该客户端的最大请求序号，则说明该请求是重复的。</p>
+<p>不过，处理重复的读请求有两种方案，一种是返回当前值，另一种是返回第一次收到读请求时的值。两种方式都可解释，本实验中直接返回当前值即可。</p>
+<p>那么服务端收到 <code>Raft</code> 日志时如何知道这个日志对应的客户端请求序号？这个属于应用层面的数据，可以将客户端 <code>id</code> 和请求序号放到 <code>Op</code> 中，服务端收到 <code>Raft</code> 的日志后，将 <code>ApplyMsg.Command</code> 进行类型转换，转为 <code>Op</code> 即可。</p>
+<h3 id="问题"><a class="markdownIt-Anchor" href="#问题"></a> 问题</h3>
+<h4 id="testspeed3a"><a class="markdownIt-Anchor" href="#testspeed3a"></a> TestSpeed3A</h4>
+<p><code>TestSpeed3A</code> 要求每个心跳周期至少完成三次客户端请求，不过在做 <code>Lab 2</code> 时，<code>Raft</code> 收到日志后不会马上发起共识，而是在下一次发送心跳时批量对收到的日志发起共识。又由于 <code>TestSpeed3A</code> 会循环发起请求，每个请求阻塞，服务端只有在收到 <code>applyCh</code> 的日志后才会通知客户端，所以本质上在这个测试中服务端约等于一个心跳周期只处理一个请求。所以需要修改 <code>Raft.Start()</code>，收到日志后开启一个 <code>goroutine</code> 发起心跳。</p>
+<h4 id="客户端请求队列无法被唤醒"><a class="markdownIt-Anchor" href="#客户端请求队列无法被唤醒"></a> 客户端请求队列无法被唤醒</h4>
+<p>服务端收到 <code>Raft</code> 的日志后才唤醒客户端请求队列会造成客户端请求队列永远不会被唤醒，因为这强依赖于某条日志被提交，而客户端的日志不一定会被提交。例如，某个服务端收到客户端的请求，将请求放到队列中，此时服务端发生异常，其他服务端成为新的主节点，在没有其他客户端请求的情况下，最开始的客户端请求永远不会被唤醒。所以，这里也额外开启了一个 <code>goroutine</code>，如果当前服务端不是主节点且客户端请求队列不为空，则清空客户端请求队列，并通知异常。</p>
+<p>不过，这个策略也会带来一个请求重复执行的问题。当前身为主节点的服务端成功提交了某个客户端的请求，注意这里是 <code>commit</code>，而不是 <code>apply</code>，此时服务端发生异常，另一个服务端成为新的主节点，原来的服务端发现自己不是主节点并且请求队列不为空，则清空了请求队列，然后客户端发起重试，新的主节点收到了请求并成功提交，最后 <code>Raft</code> 的日志中就会有两条内容一样的日志，但是 <code>Raft</code> 并不关心两条日志的内容是否相同。所以这个去重需要在服务端处理，服务端从 <code>applyCh</code> 收到日志后，需要判断日志中对应的请求是否已被处理。造成这个问题的主要原因在于 <code>Raft</code> 处理日志的 <code>commit</code> 和 <code>apply</code> 间存在时间差，而服务端只通过 <code>applyCh</code> 和 <code>Raft</code> 进行交互。</p>
+<h2 id="3b"><a class="markdownIt-Anchor" href="#3b"></a> 3B</h2>
+<p>引入快照之后，服务端从 <code>applyCh</code> 收到日志时需要判断是否是快照消息，如果是快照消息则执行快照逻辑。<code>3B</code> 整体难度低于 <code>3A</code>，快照的代码逻辑类似于 <code>Lab 2</code> 中的快照代码，不过要注意两点：</p>
+<ol>
+<li>快照会通过 <code>RPC</code> 发送，所以涉及快照的字段命名注意首字母大写</li>
+<li><code>Raft</code> 收到快照 <code>RPC</code> 后，再通过 <code>applyCh</code> 发送快照，由于涉及网络请求，所以服务端从 <code>applyCh</code> 中收到的快照消息不一定是最新的，如果快照不是最新的，服务端直接忽略即可，避免覆盖当前的状态机</li>
+</ol>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-kvraft.html">6.824 Lab 3: Fault-tolerant Key/Value Service</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://frederick-s.github.io/2022/06/04/mit-6.824-lab3-implementation/" title="MIT 6.824 - Lab 3 (2): 实现">https://frederick-s.github.io/2022/06/04/mit-6.824-lab3-implementation/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
+              <a href="/tags/Go/" rel="tag"># Go</a>
+              <a href="/tags/Raft/" rel="tag"># Raft</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/" rel="prev" title="MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续）">
+      <i class="fa fa-chevron-left"></i> MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#3a"><span class="nav-number">1.</span> <span class="nav-text"> 3A</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">1.1.</span> <span class="nav-text"> 客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">1.2.</span> <span class="nav-text"> 服务端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%B7%E6%B1%82%E5%8E%BB%E9%87%8D"><span class="nav-number">1.3.</span> <span class="nav-text"> 客户端请求去重</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text"> 问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#testspeed3a"><span class="nav-number">1.4.1.</span> <span class="nav-text"> TestSpeed3A</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%B7%E6%B1%82%E9%98%9F%E5%88%97%E6%97%A0%E6%B3%95%E8%A2%AB%E5%94%A4%E9%86%92"><span class="nav-number">1.4.2.</span> <span class="nav-text"> 客户端请求队列无法被唤醒</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3b"><span class="nav-number">2.</span> <span class="nav-text"> 3B</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

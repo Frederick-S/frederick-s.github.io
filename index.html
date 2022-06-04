@@ -209,6 +209,114 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/04/mit-6.824-lab3-implementation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/04/mit-6.824-lab3-implementation/" class="post-title-link" itemprop="url">MIT 6.824 - Lab 3 (2): 实现</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-06-04 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-04T00:00:00+08:00">2022-06-04</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><code>Lab 3</code> 需要我们实现一个基于 <code>Raft</code> 的键值数据库，支持三个操作：</p>
+<ul>
+<li><code>Put(key, value)</code></li>
+<li><code>Append(key, value)</code></li>
+<li><code>Get(key)</code></li>
+</ul>
+<h2 id="3a"><a class="markdownIt-Anchor" href="#3a"></a> 3A</h2>
+<h3 id="客户端"><a class="markdownIt-Anchor" href="#客户端"></a> 客户端</h3>
+<p>客户端要做的只有一件事，就是向某个服务端发送请求。不过由于客户端不知道哪个服务端是主节点，所以需要不断轮询各服务端发送请求。为了避免每次轮询所有服务端浪费时间，客户端可以记录每次请求成功后的服务端编号，这个服务端就是当次请求中的主节点；当客户端再次发起请求时，可以先假定之前的服务端依然是主节点，从而先向该服务端发送请求，如果请求失败并返回非主节点异常，则再尝试下一个服务端。</p>
+<h3 id="服务端"><a class="markdownIt-Anchor" href="#服务端"></a> 服务端</h3>
+<p><code>Lab 3</code> 要求服务端将客户端请求成功的结果放到 <code>RPC</code> 响应中，不过 <code>Raft.Start()</code> 的执行成功不代表最终日志的应用成功，所以服务端调用 <code>Raft.Start()</code> 后需要阻塞等待，直到 <code>Raft</code> 将对应日志应用到状态机。等待/唤醒的模式可以想到使用条件变量 <code>sync.Cond</code>，不过 <code>Go</code> 中有 <code>channel</code> 这个更方便的特性来实现。</p>
+<p>正常情况下，服务端调用 <code>Raft.Start()</code> 添加日志的顺序和之后从 <code>applyCh</code> 中收到日志的顺序一致，也就是说客户端请求到达服务端并被处理的顺序和服务端从 <code>applyCh</code> 中收到日志的顺序一致。所以，服务端可以维护一个客户端请求的队列，队列中存放的是 <code>channel</code>，每当服务端从 <code>applyCh</code> 中收到日志，就将日志发送到队首的 <code>channel</code> 中，并从队列中移除。这样阻塞等待中的 <code>RPC</code> 服务端线程就能被唤醒，并响应客户端。</p>
+<p>不过在异常情况下，客户端请求队列和服务端从 <code>applyCh</code> 中收到日志的顺序并不是一一对应，因此服务端收到日志时需要剔除掉队列中无效的请求，并通过 <code>channel</code> 发送一个 <code>ErrWrongLeader</code> 异常，这样客户端就能换一个服务端来重试。由于通过日志索引无法唯一确定一条 <code>Raft</code> 日志，所以需要在 <code>ApplyMsg</code> 中添加 <code>CommandTerm</code> 来标识日志所属的任期，这样服务端从 <code>applyCh</code> 中收到日志后就能通过比较客户端请求队列中的日志任期和索引来判断请求是否有效。</p>
+<p>记客户端请求队列队首日志的任期和索引为 <code>(term_client, index_client)</code>，记服务端从 <code>applyCh</code> 收到的日志的任期和索引为 <code>(term_applied, index_applied)</code>。正常情况下有 <code>term_client == term_applied</code> 以及 <code>index_client == index_applied</code>。从服务端角度来说，异常情况有两种，一种是当前服务端不再是主节点，另一种情况是当前服务端依然是主节点，不过中途发生了主从切换可能造成当前的日志和最初的不同。对于第一种情况可以直接清空客户端请求队列，虽然 <code>(term_applied, index_applied)</code> 有可能符合部分的客户端请求，不过由于当前服务端不再是主节点，下次客户端请求的时候本身就要再轮询所有的服务端，所以这里等同于是提前让客户端轮询。对于第二种情况（也考虑原来是从节点后来变成主节点的场景），可以从队首开始遍历客户端请求队列，剔除掉比 <code>(term_applied, index_applied)</code> 小的 <code>(term_client, index_client)</code> 请求，并通过 <code>channel</code> 返回异常（这里需要一个自定义异常，告诉客户端直接重试，因为当前服务端依然是主节点，所以客户端没有必要轮询）。这里的剔除掉比 <code>(term_applied, index_applied)</code> 小的 <code>(term_client, index_client)</code> 请求，指的是仅保留 <code>term_client &gt;= term_applied</code> 和 <code>index_client &gt;= index_applied</code> 的请求，因为根据 <code>Raft</code> 日志的性质，其他的客户端请求都已经不可能被提交。</p>
+<p>因此，服务端需要开启一个单独的 <code>goroutine</code>，并不断的从 <code>applyCh</code> 中获取日志，然后根据日志的指令内容更新本地的键值数据库，最后唤醒客户端请求队列中的请求。</p>
+<h3 id="客户端请求去重"><a class="markdownIt-Anchor" href="#客户端请求去重"></a> 客户端请求去重</h3>
+<p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-kvraft.html">6.824 Lab 3: Fault-tolerant Key/Value Service</a> 中提到：</p>
+<blockquote>
+<p>It’s OK to assume that a client will make only one call into a Clerk at a time.</p>
+</blockquote>
+<p>一个客户端一次只发送一个请求，加上请求阻塞的特性，任何一个时间每个客户端都最多只有一个进行中的请求。为了对请求去重，每个客户端可以生成一个唯一的客户端 <code>id</code>，每次发请求时生成一个递增的请求序号，而服务端只需要维护每个客户端已提交到状态机的最大请求序号即可，因为每个客户端的请求序列是个递增的序列（非严格递增，相邻数字之间可能存在重复）。所以，服务端收到请求时，如果发现请求中的序号小于等于该客户端的最大请求序号，则说明该请求是重复的。</p>
+<p>不过，处理重复的读请求有两种方案，一种是返回当前值，另一种是返回第一次收到读请求时的值。两种方式都可解释，本实验中直接返回当前值即可。</p>
+<p>那么服务端收到 <code>Raft</code> 日志时如何知道这个日志对应的客户端请求序号？这个属于应用层面的数据，可以将客户端 <code>id</code> 和请求序号放到 <code>Op</code> 中，服务端收到 <code>Raft</code> 的日志后，将 <code>ApplyMsg.Command</code> 进行类型转换，转为 <code>Op</code> 即可。</p>
+<h3 id="问题"><a class="markdownIt-Anchor" href="#问题"></a> 问题</h3>
+<h4 id="testspeed3a"><a class="markdownIt-Anchor" href="#testspeed3a"></a> TestSpeed3A</h4>
+<p><code>TestSpeed3A</code> 要求每个心跳周期至少完成三次客户端请求，不过在做 <code>Lab 2</code> 时，<code>Raft</code> 收到日志后不会马上发起共识，而是在下一次发送心跳时批量对收到的日志发起共识。又由于 <code>TestSpeed3A</code> 会循环发起请求，每个请求阻塞，服务端只有在收到 <code>applyCh</code> 的日志后才会通知客户端，所以本质上在这个测试中服务端约等于一个心跳周期只处理一个请求。所以需要修改 <code>Raft.Start()</code>，收到日志后开启一个 <code>goroutine</code> 发起心跳。</p>
+<h4 id="客户端请求队列无法被唤醒"><a class="markdownIt-Anchor" href="#客户端请求队列无法被唤醒"></a> 客户端请求队列无法被唤醒</h4>
+<p>服务端收到 <code>Raft</code> 的日志后才唤醒客户端请求队列会造成客户端请求队列永远不会被唤醒，因为这强依赖于某条日志被提交，而客户端的日志不一定会被提交。例如，某个服务端收到客户端的请求，将请求放到队列中，此时服务端发生异常，其他服务端成为新的主节点，在没有其他客户端请求的情况下，最开始的客户端请求永远不会被唤醒。所以，这里也额外开启了一个 <code>goroutine</code>，如果当前服务端不是主节点且客户端请求队列不为空，则清空客户端请求队列，并通知异常。</p>
+<p>不过，这个策略也会带来一个请求重复执行的问题。当前身为主节点的服务端成功提交了某个客户端的请求，注意这里是 <code>commit</code>，而不是 <code>apply</code>，此时服务端发生异常，另一个服务端成为新的主节点，原来的服务端发现自己不是主节点并且请求队列不为空，则清空了请求队列，然后客户端发起重试，新的主节点收到了请求并成功提交，最后 <code>Raft</code> 的日志中就会有两条内容一样的日志，但是 <code>Raft</code> 并不关心两条日志的内容是否相同。所以这个去重需要在服务端处理，服务端从 <code>applyCh</code> 收到日志后，需要判断日志中对应的请求是否已被处理。造成这个问题的主要原因在于 <code>Raft</code> 处理日志的 <code>commit</code> 和 <code>apply</code> 间存在时间差，而服务端只通过 <code>applyCh</code> 和 <code>Raft</code> 进行交互。</p>
+<h2 id="3b"><a class="markdownIt-Anchor" href="#3b"></a> 3B</h2>
+<p>引入快照之后，服务端从 <code>applyCh</code> 收到日志时需要判断是否是快照消息，如果是快照消息则执行快照逻辑。<code>3B</code> 整体难度低于 <code>3A</code>，快照的代码逻辑类似于 <code>Lab 2</code> 中的快照代码，不过要注意两点：</p>
+<ol>
+<li>快照会通过 <code>RPC</code> 发送，所以涉及快照的字段命名注意首字母大写</li>
+<li><code>Raft</code> 收到快照 <code>RPC</code> 后，再通过 <code>applyCh</code> 发送快照，由于涉及网络请求，所以服务端从 <code>applyCh</code> 中收到的快照消息不一定是最新的，如果快照不是最新的，服务端直接忽略即可，避免覆盖当前的状态机</li>
+</ol>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-kvraft.html">6.824 Lab 3: Fault-tolerant Key/Value Service</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1963,124 +2071,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/04/10/mit-6.824-lab1-implementation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/10/mit-6.824-lab1-implementation/" class="post-title-link" itemprop="url">MIT 6.824 - Lab 1 (5): 实现</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-04-10 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-10T00:00:00+08:00">2022-04-10</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>3.1k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>5 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概览"><a class="markdownIt-Anchor" href="#概览"></a> 概览</h2>
-<p><code>Lab 1</code> 需要我们实现一个单机多线程、多进程的 <code>MapReduce</code> 程序，通过 <code>test-mr.sh</code> 可以看到该实验会先启动一个主节点进程，然后再启动多个工作节点进程。</p>
-<h2 id="主节点"><a class="markdownIt-Anchor" href="#主节点"></a> 主节点</h2>
-<p>主节点的入口是 <code>mrcoordinator.go</code>，通过 <code>go run mrcoordinator.go pg*.txt</code> 可运行一个主节点程序，其中 <code>pg*.txt</code> 是本次 <code>MapReduce</code> 程序的输入数据。同时，主节点和工作节点间通过 <code>RPC</code> 进行交互，本实验需要我们实现以下 <code>RPC</code> 接口：</p>
-<ol>
-<li>实验中主节点的任务分发采用的是拉模式，工作节点会定期向主节点请求一个任务，这个任务可以是 <code>map</code> 任务也可以是 <code>reduce</code> 任务，由主节点根据当前任务的状态决定应该推送 <code>map</code> 任务还是 <code>reduce</code> 任务。由于 <code>reduce</code> 任务会不间断的拉取中间结果数据，这里为了方便处理，当某个工作节点正在处理 <code>reduce</code> 任务时，在向主节点请求任务时可指明要求分发对应的 <code>reduce</code> 任务</li>
-<li><code>map</code> 任务完成后需要通知主节点生成的中间结果文件地址，主节点收到请求后需要将中间结果文件地址保存到内部数据结构中，供后续发送给对应 <code>reduce</code> 任务</li>
-<li><code>reduce</code> 任务完成后同样需要通知主节点任务完成，否则主节点无法知晓所有 <code>reduce</code> 任务是否已完成，从而无法退出主节点</li>
-</ol>
-<h3 id="任务管理"><a class="markdownIt-Anchor" href="#任务管理"></a> 任务管理</h3>
-<p>主节点需要维护所有 <code>map</code> 任务和 <code>reduce</code> 任务的状态，由于工作节点有可能失败，所以主节点需要同时记录每个任务已执行了多久，如果超过一定时间还没有收到任务完成的通知，则认为执行这个任务的工作节点已失联，然后需要将该任务重新分配给其他工作节点，在本实验中主节点等待每个任务完成的时间为10秒。</p>
-<h2 id="工作节点"><a class="markdownIt-Anchor" href="#工作节点"></a> 工作节点</h2>
-<p>工作节点的入口是 <code>mrworker.go</code>，通过 <code>go run mrworker.go wc.so</code> 可运行一个工作节点程序，其中 <code>wc.so</code> 是本次 <code>MapReduce</code> 程序用到的用户自定义 <code>map</code> 和 <code>reduce</code> 函数。工作节点只有一个 <code>Worker</code> 主方法，需要不断向主节点轮询请求任务，那么工作节点什么时候结束轮询？根据实验建议有两种方法，一种是当本次 <code>MapReduce</code> 任务完成后，主节点进程退出，当工作节点再次请求主节点任务时，<code>RPC</code> 请求必然失败，此时工作节点可认为本次任务已完成主节点已退出，从而结束轮询并退出；另一种是当主节点完成后，在一定时间内，在收到工作节点新的任务请求时，返回一个要求工作节点退出的标识（或者也可抽象为一种任务类型），工作节点收到 <code>RPC</code> 响应后退出，主节点在等待时间到了之后也进行退出。</p>
-<h3 id="空任务"><a class="markdownIt-Anchor" href="#空任务"></a> 空任务</h3>
-<p>当工作节点向主节点申请任务，而此时主节点没有可分发的任务时，主节点可返回一个自定义任务类型的任务，来表示空任务，工作节点收到响应后则直接睡眠等待下次唤醒。</p>
-<h3 id="map-任务"><a class="markdownIt-Anchor" href="#map-任务"></a> map 任务</h3>
-<p><code>map</code> 任务负责调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据，然后将中间结果数据保存为文件，实验建议的文件名是 <code>mr-X-Y</code>，其中 <code>X</code> 表示 <code>map</code> 任务的编号，<code>Y</code> 表示 <code>reduce</code> 任务的编号，<code>map</code> 任务编号的范围可简单使用 <code>[1, 输入文件的数量]</code> 来表示，<code>reduce</code> 任务编号的范围为 <code>[1, nReduce]</code>。每个 <code>map</code> 任务会生成 <code>R</code> 个中间结果文件，实验已提供了分片函数，对中间结果的每个键使用 <code>ihash(key) % nReduce</code> 来决定写入到哪个中间结果文件中。</p>
-<p>从数据结构角度来说，所有的中间结果数据是一个 <code>nReduce * nMap</code> 的二维矩阵，每一行对应一个 <code>reduce</code> 任务。</p>
-<p>由于 <code>map</code> 节点有可能执行失败，为避免 <code>reduce</code> 节点读取到的是未写入完成的中间结果文件，在写入中间结果文件时可以先写入一个临时文件，在写入完成后再重命名为最终的文件名。在本实验中，可以使用 <code>ioutil.TempFile</code> 来创建临时文件，以及使用 <code>os.Rename</code> 来原子性的重命名文件。</p>
-<p>在当前 <code>map</code> 任务的中间结果文件写入完成后，需要通过 <code>RPC</code> 请求通知主节点所有中间结果文件的文件地址。在本实验中，各个工作节点运行在同一台机器上，实验要求保存 <code>map</code> 任务的中间结果文件到当前文件夹，这样 <code>reduce</code> 任务就能通过中间结果文件的文件名读取中间结果数据。</p>
-<p>对中间结果数据的写文件可以借助 <code>Go</code> 的 <code>encoding/json</code> 模块，例如：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">enc := json.NewEncoder(file)</span><br><span class="line"><span class="keyword">for</span> _, kv := ... &#123;</span><br><span class="line">    err := enc.Encode(&amp;kv)</span><br></pre></td></tr></table></figure>
-<p>然后 <code>reduce</code> 任务读取文件：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">dec := json.NewDecoder(file)</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> kv KeyValue</span><br><span class="line">    <span class="keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">    kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="reduce-任务"><a class="markdownIt-Anchor" href="#reduce-任务"></a> reduce 任务</h3>
-<p><code>reduce</code> 任务负责将所有中间结果数据按照键排序后应用用户自定义的 <code>reduce</code> 函数，并生成最终输出文件，文件格式为 <code>mr-out-X</code>，其中 <code>X</code> 表示 <code>reduce</code> 任务的编号。文件中的每一行对应一个 <code>reduce</code> 函数调用的结果，需要按照 <code>Go</code> 的 <code>%v %v</code> 形式对键值对进行格式化。</p>
-<p>在收到所有的中间结果数据之前，<code>reduce</code> 任务无法开始执行，所以在这个期间当工作节点请求 <code>reduce</code> 任务时，如果主节点暂时没有新的 <code>reduce</code> 任务可分发，则可返回一个空任务，工作节点收到响应后则暂时等待一段时间再重新请求任务。<code>reduce</code> 每次收到中间结果数据后会暂存在内存中，如果暂存的中间结果数据的数量等于 <code>map</code> 任务的数量（这个值可以放在 <code>RPC</code> 响应中），则说明所有中间结果数据已经接收完毕，可以开始执行 <code>reduce</code> 任务。</p>
-<h2 id="注意"><a class="markdownIt-Anchor" href="#注意"></a> 注意</h2>
-<p><code>mrworker.go</code> 中注释描述通过 <code>go run mrworker.go wc.so</code> 来运行工作节点，不过如果构建 <code>wc.so</code> 时开启了竞争检测（<code>-race</code>），则运行 <code>mrworker.go</code> 时也同样需要开启竞争检测，否则会提示 <code>cannot load plugin wc.so</code>，如果打印 <code>err</code> 则会显示 <code>plugin.Open(&quot;wc&quot;): plugin was built with a different version of package runtime</code>。</p>
-<p>同样的，如果使用 <code>GoLand</code> 调试程序，由于在调试模式下 <code>GoLand</code> 编译 <code>Go</code> 文件时会增加 <code>-gcflags=&quot;all=-N -l&quot;</code> 参数，所以也需要在打包 <code>wc.so</code> 时增加相同的参数。</p>
-<h2 id="活锁"><a class="markdownIt-Anchor" href="#活锁"></a> 活锁</h2>
-<p>在最后的 <code>crash test</code> 遇到个类似活锁的问题，在前文提到，如果某个工作节点开始了 <code>reduce</code> 任务但是还没有接收全部的中间结果数据，则该节点下次申请任务时会继续申请该 <code>reduce</code> 任务（普通工作节点对申请的任务类型没有要求）。在 <code>crash test</code> 下，工作节点在执行用户自定义的 <code>map</code> 或 <code>reduce</code> 函数时有一定概率结束进程，假设现在有4个工作节点，其中一个在执行 <code>map</code> 任务，另外三个各自在执行 <code>reduce</code> 任务（轮询获取中间结果数据），不幸的是<br />
-这个时候 <code>map</code> 节点挂了，此时 <code>test-mr.sh</code> 会自动再启动一个工作节点，然后更不幸的是挂掉的 <code>map</code> 任务在主节点看来还没有到超时时间，所以主节点此时不会分配 <code>map</code> 任务给新的节点（假设没有其他 <code>map</code> 任务），会再分配一个 <code>reduce</code> 任务给新的节点，至此所有工作节点都在执行 <code>reduce</code> 任务，又都在等待中间结果数据完成，却又不可能完成。</p>
-<p>造成这个问题的主要原因是任务分配顺序，上述问题下的任务分配顺序是：</p>
-<ol>
-<li>指定的 <code>reduce</code> 任务</li>
-<li>空闲或超时的 <code>map</code> 任务</li>
-<li>空闲或超时的 <code>reduce</code> 任务</li>
-</ol>
-<p>解决方法就是把前两个换下顺序即可，即：</p>
-<ol>
-<li>空闲或超时的 <code>map</code> 任务</li>
-<li>指定的 <code>reduce</code> 任务</li>
-<li>空闲或超时的 <code>reduce</code> 任务</li>
-</ol>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2150,7 +2140,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">66</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
