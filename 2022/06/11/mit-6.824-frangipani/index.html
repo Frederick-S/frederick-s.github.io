@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="介绍 这是一篇上世纪九十年代的论文，在当时的环境下，安装新工作站的需求与日俱增，而针对大量工作站的文件系统管理却费时费力。为了保存更多的文件和服务更多的用户，就需要更多的磁盘，并挂载到更多的机器上。某一组文件经常会被手动分配给某些特定的磁盘，当磁盘空间不足，异常或者成为性能热点时，就需要手动移动或者复制文件到其他磁盘上。使用 RAID 技术管理多个磁盘只能解决部分问题；当系统增长到需要多个磁盘阵">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIT 6.824 - Frangipani: A Scalable Distributed File System">
+<meta property="og:url" content="https://frederick-s.github.io/2022/06/11/mit-6.824-frangipani/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="介绍 这是一篇上世纪九十年代的论文，在当时的环境下，安装新工作站的需求与日俱增，而针对大量工作站的文件系统管理却费时费力。为了保存更多的文件和服务更多的用户，就需要更多的磁盘，并挂载到更多的机器上。某一组文件经常会被手动分配给某些特定的磁盘，当磁盘空间不足，异常或者成为性能热点时，就需要手动移动或者复制文件到其他磁盘上。使用 RAID 技术管理多个磁盘只能解决部分问题；当系统增长到需要多个磁盘阵">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frederick-s.github.io/images/frangipani-1.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/frangipani-2.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/frangipani-3.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/frangipani-4.png">
+<meta property="article:published_time" content="2022-06-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-10T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="Paper">
+<meta property="article:tag" content="MIT 6.824">
+<meta property="article:tag" content="Distributed Systems">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frederick-s.github.io/images/frangipani-1.png">
+
+<link rel="canonical" href="https://frederick-s.github.io/2022/06/11/mit-6.824-frangipani/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MIT 6.824 - Frangipani: A Scalable Distributed File System | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-J1NC2B33VK');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Übung macht den Meister</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-mit-6.824">
+
+    <a href="/mit-6.824/" rel="section"><i class="fas fa-landmark fa-fw"></i>MIT 6.824</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/11/mit-6.824-frangipani/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MIT 6.824 - Frangipani: A Scalable Distributed File System
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-06-11 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-11T00:00:00+08:00">2022-06-11</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>28 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p>这是一篇上世纪九十年代的论文，在当时的环境下，安装新工作站的需求与日俱增，而针对大量工作站的文件系统管理却费时费力。为了保存更多的文件和服务更多的用户，就需要更多的磁盘，并挂载到更多的机器上。某一组文件经常会被手动分配给某些特定的磁盘，当磁盘空间不足，异常或者成为性能热点时，就需要手动移动或者复制文件到其他磁盘上。使用 <code>RAID</code> 技术管理多个磁盘只能解决部分问题；当系统增长到需要多个磁盘阵列和多台服务器时，系统管理问题也随之而来。</p>
+<p><code>Frangipani</code> 是一个可扩展的分布式文件系统，它能统一管理挂载在不同机器上的磁盘，对外来说，这些磁盘构成了一个独立的共享存储池。组成 <code>Frangipani</code> 的机器默认能够被统一管理而且相互间能安全的通信。在 <code>Frangipani</code> 之前已经有了一些分布式文件系统的实现，并且在吞吐和容量上有很好的扩展性。<code>Frangipani</code> 的一个显著特性是它的内部结构非常简单——各台协作的机器共同访问一个通用的存储，并使用锁来保证访问的同步性。这种简单的结构使得只需要少量的机器就能处理系统恢复，重配置和负载均衡。<code>Frangipani</code> 的另一个关键特性是相比于已知的分布式文件系统，它结合了一系列功能使得 <code>Frangipani</code> 更易于使用和管理：</p>
+<ol>
+<li>所有用户读取到的文件内容都相同。</li>
+<li>可以轻易的向 <code>Frangipani</code> 添加更多的服务器来增加存储容量和吞吐，而无需修改已有服务器的配置，或者中断其操作。这些服务器可以像积木一样根据需要搭建来构建更大的文件系统。</li>
+<li>系统管理员添加新用户时无需关心新用户的数据会由哪台服务器管理或者保存在哪个磁盘上。</li>
+<li>系统管理员可以对整个文件系统进行完整和一致的备份，而无需停止服务。备份可以在线进行，使得用户可以快速访问被意外删除的文件。</li>
+<li>文件系统可以在无需人工干预的情况下容忍机器、网络、磁盘异常并自行恢复。</li>
+</ol>
+<p><code>Frangipani</code> 构建于 <code>Petal</code> 之上，<code>Petal</code> 是一个易于管理的分布式存储系统，为客户端提供了虚拟磁盘。和物理磁盘一样，<code>Petal</code> 的虚拟磁盘也是以块（<code>block</code>）的方式来读取和写入。和物理磁盘不同的是，一个 <code>Petal</code> 虚拟磁盘提供了<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>字节的稀疏地址空间，并且只在需要的时候才会分配物理存储。<code>Petal</code> 也支持数据备份来保证高可用。<code>Petal</code> 同时提供了高效的快照功能来支持一致性备份。<code>Frangipani</code> 从下层存储系统继承了扩展性，容错和易于管理的特性，不过将这些特性扩展到文件系统还需要些细致的设计。下一节将会详细描述 <code>Frangipani</code> 的结构以及和 <code>Petal</code> 的关系。</p>
+<p><img src="/images/frangipani-1.png" alt="alt" /></p>
+<p>上图展示了 <code>Frangipani</code> 的层级设计。多个可替换的 <code>Frangipani</code> 服务器运行于一个共享的 <code>Petal</code> 虚拟磁盘之上，不同的用户程序可以各自通过连接的 <code>Frangipani</code> 服务器来访问相同的文件，而各 <code>Frangipani</code> 服务器间通过分布式锁服务来保证数据的一致性。通过添加 <code>Frangipani</code> 服务器可以实现对文件系统层的扩展。<code>Frangipani</code> 通过异常服务器的自动恢复和借助依然存活的服务器来提供服务实现了容错。相比于中心化的网络文件服务器，<code>Frangipani</code> 通过将负载分摊到各个正在使用文件的机器上来提供更好的负载均衡。出于扩展性，容错和负载均衡的考虑，<code>Petal</code> 和 <code>Frangipani</code> 用到的锁服务也是分布式的。</p>
+<p><code>Frangipani</code> 服务器默认信任 <code>Petal</code> 服务器和锁服务。<code>Frangipani</code> 的最佳使用场景是在同一个管理域下的工作站集群，虽然它也可以扩展到其他管理域下。因此，<code>Frangipani</code> 可以被看做是一个集群文件系统。</p>
+<p>论文的作者在 <code>DIGITAL Unix 4.0</code> 之上实现了 <code>Frangipani</code>。得益于 <code>Frangipani</code> 在 <code>Petal</code> 之上构建的简洁的层级设计，使得在几个月内实现了一个可用的系统。</p>
+<p><code>Frangipani</code> 的目标运行环境的场景是程序开发和工程。测试表明在这样的负载下，<code>Frangipani</code> 有着优秀的性能并且能很好的扩展，而最终的性能上限则受限于网络能力。</p>
+<h2 id="系统结构"><a class="markdownIt-Anchor" href="#系统结构"></a> 系统结构</h2>
+<p><img src="/images/frangipani-2.png" alt="alt" /></p>
+<p>上图展示了 <code>Frangipani</code> 系统下各机器的一种典型职责分配。最上方的机器运行着用户程序和 <code>Frangipani</code> 的文件服务模块，这些机器无需挂载磁盘。最下方的机器运行着 <code>Petal</code> 和分布式锁服务。</p>
+<p>不过在实际场景中，组成 <code>Frangipani</code> 的机器无需严格按照上图中的描述承担职责。<code>Petal</code> 和 <code>Frangipani</code> 文件服务不一定要运行在不同的机器上；每台运行着 <code>Petal</code> 的机器也可以同时运行着 <code>Frangipani</code> 文件服务，特别是当 <code>Petal</code> 的机器负载不高时。分布式锁服务独立于系统中的其他服务，上图中描述了每个 <code>Petal</code> 机器上运行着一个锁服务，不过它们也可以运行在 <code>Frangipani</code> 或者其他可用的机器上。</p>
+<h3 id="组件"><a class="markdownIt-Anchor" href="#组件"></a> 组件</h3>
+<p>如前面的图中所示，用户程序通过标准的系统调用接口来访问 <code>Frangipani</code>。运行在不同机器上的应用程序能访问到相同的文件，而且看到的文件内容也是相同的；也就是说，如果在某台机器上修改了某个文件或者文件夹，那么运行在其他机器上的程序也能马上看到这个修改。对于使用 <code>Frangipani</code> 的程序来说，<code>Frangipani</code> 提供的文件操作语义保证和本地 <code>Unix</code> 文件系统提供的文件操作语义保证相同：程序对文件的修改会先暂存在内核的缓冲区中，在下一次的 <code>fsync</code> 或者 <code>sync</code> 系统调用之前，系统不保证对文件的修改会保存到非易失存储上，不过系统会记录对文件元数据的修改并且可选的保证当系统调用返回时，文件的元数据修改已经保存到了非易失存储上。和本地文件系统的文件操作语义有点小小的不同，<code>Frangipani</code> 中文件的最后访问时间是一个近似值，从而避免了每次读取文件时都需要写元数据。</p>
+<p>每台机器上的 <code>Frangipani</code> 文件服务模块运行在操作系统内核中。通过内核的 <code>file system switch</code> <code>Frangipani</code> 将自己注册为一个可用的文件系统实现。<code>Frangipani</code> 的文件服务模块使用了内核的缓冲区来缓存最近使用的文件数据。它通过本地的 <code>Petal</code> 设备驱动来实现对 <code>Petal</code> 虚拟磁盘的读写。每个文件服务器使用相同的数据结构来读取和写入文件到共享的 <code>Petal</code> 磁盘上，不过各服务器会在 <code>Petal</code> 磁盘的不同区域上针对进行中的修改维护各自的重做日志。因为 <code>Frangipani</code> 的重做日志保存在 <code>Petal</code> 中，所以当某个 <code>Frangipani</code> 服务器异常时，其他的服务器可以通过 <code>Petal</code> 访问日志并进行数据恢复。各 <code>Frangipani</code> 服务器之间无需通信；它们只会和 <code>Petal</code> 和分布式锁通信。这就简化了服务器的添加，删除和恢复。</p>
+<p><code>Petal</code> 的设备驱动程序掩盖了 <code>Petal</code> 分布式的特性，对操作系统的上层应用来说，<code>Petal</code> 就等同于是一块本地磁盘。驱动程序负责和正确的 <code>Petal</code> 服务器通信，以及如果当前的服务器发生异常，能切换到另一台可用的服务器。类似 <code>Digital Unix</code>  的文件系统都可以运行在 <code>Petal</code> 之上，不过只有 <code>Frangipani</code> 提供了多客户端下访问同一文件的数据一致性特性。</p>
+<p><code>Petal</code> 的各服务器基于本地挂载的物理磁盘并通过协作来向 <code>Frangipani</code> 提供大型，可扩展，容错的虚拟磁盘。<code>Petal</code> 可以容忍一个或多个磁盘或者服务器异常，只要大多数的 <code>Petal</code> 服务器依然存活并且相互之间可以通信，以及每个数据块都至少有一个副本保存在物理存储上并且能够被访问。</p>
+<p><code>Frangipani</code> 用到的锁服务能够为网络中的客户端提供通用的读写锁服务。出于容错和扩展性考虑，它的实现是分布式的。<code>Frangipani</code> 使用锁服务来协调对虚拟磁盘的访问，以及保证各服务器内文件缓存的一致性。</p>
+<h3 id="安全和客户端服务器配置"><a class="markdownIt-Anchor" href="#安全和客户端服务器配置"></a> 安全和客户端/服务器配置</h3>
+<p>如 <code>Fugure 2</code> 所示，每台运行着用户程序的机器同时运行着 <code>Frangipani</code> 的文件服务模块。虽然这种配置有利于负载均衡和扩展，不过存在安全隐患。每个 <code>Frangipani</code> 机器都可以对共享的 <code>Petal</code> 虚拟磁盘上的数据块进行任意读写，所以 <code>Frangipani</code> 必须运行在受信任的操作系统上；类似于 <code>NFS</code> 的远程文件访问协议中的身份认证还不足以保证安全性。完整的安全性也要求 <code>Petal</code> 和锁服务运行在受信任的操作系统上，并且 <code>Frangipani</code>、<code>Petal</code>、锁服务这三个组件都需要能够互相认证。最后，为了保证文件数据的私有性，也需要保证没有人能够窃听 <code>Petal</code> 和 <code>Frangipani</code> 机器间的网络通信。</p>
+<p>一种解决方案是运行用户程序的机器被设置为不允许运行自定义修改的操作系统，同时这些机器间通过一个私有网络连接并且用户程序没有权限访问。不过这并不是说需要将所有的机器放在同一个机房中并通过私有的物理网络相连；可以借助某些加密技术来实现系统的安全启动，以及某些认证技术和加密链路来保证通信安全性。另外，对于某些应用程序来说，一个不完整的解决方案也是可以接受的；典型的如 <code>NFS</code> 就不能防止网络窃听以及杜绝用户在自己的工作站上运行修改后的操作系统。论文的作者并没有实现所有的安全措施，不过 <code>Frangipani</code> 基本也可以达到 <code>NFS</code> 的安全级别，<code>Petal</code> 服务器只会接受来自已知网络地址的 <code>Frangipani</code> 服务器的请求。</p>
+<p><img src="/images/frangipani-3.png" alt="alt" /></p>
+<p>如上图所示，<code>Frangipani</code> 文件系统可以扩展到外部非受信的管理域中。图中区分开了 <code>Frangipani</code> 客户端和服务端。只有受信的 <code>Frangipani</code> 服务端可以和 <code>Petal</code> 以及锁服务通信。这三个组件可以放置在一个受限制的环境中并且通过私有的网络连接。而外部的非受信远程客户端只能和 <code>Frangipani</code> 服务端通信，而不能直接访问 <code>Petal</code> 服务器。</p>
+<p>客户端可以和 <code>Frangipani</code> 服务端以任何操作系统支持的文件访问协议通信，例如 <code>DCE/DFS</code>，<code>NFS</code>，<code>SMB</code>，因为对于运行着 <code>Frangipani</code> 服务端的机器来说，<code>Frangipani</code> 就类似于是个本地文件系统。当然，如果访问协议本身支持一致性访问是最好的（例如 <code>DCE/DFS</code>），从而使得 <code>Frangipani</code> 的多服务器间的一致性不会在上一层丢失。理想情况下，客户端的访问协议需要支持故障转移。上述提到的协议并不直接支持故障转移，不过在其他系统中如果某台服务器发生异常，会有另一台服务器接管并复用异常服务器的 <code>IP</code> 地址，因此可以在这里应用同样的手段。</p>
+<p>除了安全之外，还有第二个原因要使用上述的客户端/服务端配置。因为 <code>Frangipani</code> 运行在操作系统内核，不能快速的适配不同的操作系统甚至是不同版本的 <code>Unix</code>。所以通过远程客户端的方式就能使得运行不支持的操作系统的客户端也能够使用 <code>Frangipani</code>。</p>
+<h3 id="讨论"><a class="markdownIt-Anchor" href="#讨论"></a> 讨论</h3>
+<p>构建文件系统的分层思想——低层提供存储服务，高层提供命名，文件夹和文件服务，并不是 <code>Frangipani</code> 独有的。最早应用这个思想的是 <code>Universal File Server</code>。不过，<code>Petal</code> 提供的存储功能和早先的系统大有不同，从而引申出不同的上层结构设计。</p>
+<p><code>Frangipani</code> 的设计是基于 <code>Petal</code> 提供的抽象存储服务，作者还未充分考虑为了适配其他的存储服务（例如 <code>NASD</code>）需要对 <code>Frangipani</code> 做出哪些修改。</p>
+<p><code>Petal</code> 提供了高可用的存储服务并且能够通过添加资源来实现对吞吐和容量的扩展。不过，<code>Petal</code> 不提供协同功能或者在多个客户端间共享存储。另外，大部分的应用程序不能直接使用 <code>Petal</code> 的接口因为 <code>Petal</code> 面向的是磁盘而不是文件。<code>Frangipani</code> 在 <code>Petal</code> 之上构建了文件系统层使得在保留和扩展了 <code>Petal</code> 有用的特性的同时对应用程序更加易用。</p>
+<p><code>Frangipani</code> 的一个优势是能够透明的添加服务器，删除服务器以及实现故障恢复。通过将预写日志、锁和提供一致性访问、高可用的存储结合使用，<code>Frangipani</code> 能轻易的实现这个特性。</p>
+<p><code>Frangipani</code> 的另一个特性是能在文件系统运行时生成一致性的备份。这个机制会在后面介绍。</p>
+<p>不过 <code>Frangipani</code> 的设计可能在三个方面上存在问题。基于启用了副本的 <code>Petal</code> 虚拟磁盘构建的 <code>Frangipani</code> 有时候会记录重复的日志，一次是 <code>Frangipani</code> 自己写入的日志，这里是 <code>Frangipani</code> 为客户端提供服务；另一次是 <code>Petal</code>记录的日志，这里以 <code>Petal</code> 的视角来说 <code>Frangipani</code> 成为了客户端。第二，<code>Frangipani</code> 无法根据磁盘的位置来选择在哪里保存数据，因为 <code>Petal</code> 提供的是虚拟的磁盘，之所以有这个需求可能是因为类似于 <code>GFS</code> 选择在哪里放置副本一样，如果 <code>Frangipani</code> 能知道具体磁盘的位置，它就能选择一个距离客户端近的磁盘保存文件。最后，<code>Frangipani</code> 会对整个文件或者文件夹加锁而不是对某个数据块加锁。不过作者还没有足够的使用经历来评估这三个问题的影响，不过撇开它们不谈，在作者所处环境下测试出的 <code>Frangipani</code> 的性能还是不错的。</p>
+<h2 id="磁盘布局"><a class="markdownIt-Anchor" href="#磁盘布局"></a> 磁盘布局</h2>
+<p><code>Frangipani</code> 使用 <code>Petal</code> 提供的巨大、稀疏的磁盘地址空间来简化其数据结构。这个想法是受之前有着巨大内存空间的计算机上的相关工作所启发。因为有着如此巨大的地址空间所以可以将其任意切分。</p>
+<p>一个 <code>Petal</code> 虚拟磁盘有<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>字节的地址空间。<code>Petal</code> 只会在物理磁盘空间写入后才会将其提交到虚拟地址中。<code>Petal</code> 同时提供了 <code>decommit</code> 原语用来释放某个范围内的虚拟地址所关联的物理磁盘空间。</p>
+<p>为了使内部的数据结构足够小，<code>Petal</code> 会以较大的数据块来提交（<code>commit</code>）和回收（<code>decommit</code>）虚拟地址，目前的数据块大小是 <code>64 KB</code>。也就是说，对于每个 <code>64 KB</code> 的虚拟地址空间<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mi>a</mi><mo>∗</mo><msup><mn>2</mn><mn>16</mn></msup><mo separator="true">,</mo><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>∗</mo><msup><mn>2</mn><mn>16</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">[a * 2^{16}, (a + 1) * 2^{16})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">(</span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，如果有数据写入且没有被回收，那么同时就需要分配 <code>64 KB</code> 的物理磁盘地址空间。因此 <code>Petal</code> 客户端写入的数据不能太稀疏，否则可能由于碎片化造成物理磁盘空间浪费。下图展示了 <code>Frangipani</code> 如何切分 <code>Petal</code> 的虚拟磁盘空间：</p>
+<p><img src="/images/frangipani-4.png" alt="alt" /></p>
+<p>图中的第一个区域用于保存共享的配置参数和其他信息。这个区域的最大大小是 <code>1 T</code>，不过目前实际上只用了几 <code>K</code>。</p>
+<p>第二个区域用于保存日志。每个 <code>Frangipani</code> 服务器会在这块区域中选择一部分来保存自己的私有日志。这里总共预留了 <code>1 T</code> 的空间，并切分为256个分区，所以可以保存256份日志。这就限制了一个 <code>Petal</code> 虚拟磁盘最多支持256个 <code>Frangipani</code> 服务器，不过这可以轻易的通过调整分区个数来扩展。</p>
+<p>第三个区域用于保存分配位图，从而知道余下的虚拟空间中哪些是可用的。每个 <code>Frangipani</code> 服务器会独占式的锁住这块区域中的某一部分。当某台 <code>Frangipani</code> 服务器的分配位图空间不够时，它会再次找到可用的区域然后加锁使用。整个区域的大小是 <code>3 T</code>。</p>
+<p>第四个区域用于保存 <code>inode</code>。每个文件需要一个 <code>inode</code> 来保存元数据，例如访问的时间戳和指向文件数据位置的指针。对于符号链接来说它们的数据直接保存在了 <code>inode</code> 中。每个 <code>inode</code> 的大小为512字节，和磁盘块的大小相同，从而避免了两个服务器同时访问同一个磁盘块上保存的不同 <code>inode</code> 所带来的竞争（也就是 <code>false sharing</code>，<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/frangipani-faq.txt">FAQ for Frangipani, Thekkath, Mann, Lee, SOSP 1997</a> 中对这个问题有所解释，磁盘数据的读取以块为单位，如果 <code>inode</code> 小于512字节，某个 <code>Frangipani</code> 服务器先读取了磁盘数据块并缓存，此时另一个服务器需要读取和修改同一个磁盘数据块上的 <code>inode</code>，那么为了保证缓存一致性，第一个服务器再次读取 <code>inode</code> 时就需要重新读取磁盘数据块并刷新缓存，造成两个服务器交替的读取修改同一个数据块的内容，缓存也就失去了意义，而本质上两个服务器之间并不应该有竞争。）。整个区域的大小是 <code>1 TB</code>，所以可以保存<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup></mrow><annotation encoding="application/x-tex">2^{31}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>个 <code>inode</code>。在位图分配区域中的比特位和 <code>inode</code> 的映射是固定的，也就是说根据位图分配区域中的比特位地址就能推算出对应 <code>inode</code> 的地址，所以每个 <code>Frangipani</code> 为新文件所创建的 <code>inode</code> 地址在第四个区域中的偏移比例和该 <code>inode</code> 对应位图分配区域中的比特位的偏移比例是一致的。不过任何一个 <code>Frangipani</code> 都可能读写或释放某个已经存在的文件的 <code>inode</code>。</p>
+<p>第五个区域用于保存小数据块，每个数据块大小为 <code>4 KB</code>（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">2^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span>字节）。一个文件的前 <code>64 KB</code>（16个数据块） 的内容会保存在小数据块中。如果某个文件的大小超过 <code>64 KB</code>，则超过的部分会保存在一个大数据块中。<code>Frangipani</code> 在一个 <code>Fetal</code> 虚拟磁盘上最多可以分配<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>47</mn></msup></mrow><annotation encoding="application/x-tex">2^{47}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span></span>字节（<code>128 T</code>）的小数据块，共计<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>35</mn></msup></mrow><annotation encoding="application/x-tex">2^{35}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span>块，是 <code>inode</code> 最大数量的16倍。</p>
+<p><code>Petal</code> 虚拟磁盘剩下的地址空间用于保存大数据块。每个大数据块有 <code>1 TB</code> 空间。</p>
+<p>选择 <code>4 KB</code> 作为数据块大小会比更小的数据块的策略更容易产生磁盘碎片。同时，一个 <code>inode</code> 512字节在某种程度上也是空间浪费。可以将小文件直接保存在 <code>inode</code> 中来缓解这个问题。虽然存在碎片和空间浪费的问题，不过出于设计简洁性的考虑，作者认为这是一种合理的折中选择。</p>
+<p>在当前的设计下，<code>Frangipani</code> 能保存的大文件个数小于<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup></mrow><annotation encoding="application/x-tex">2^{24}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>（1600万，大文件需要保存在大数据块中，一个大数据块 <code>1 T</code>，而虚拟空间最大地址<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>，即<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup><mi>T</mi></mrow><annotation encoding="application/x-tex">2^{24} T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span>，又因为不是整个空间都用来保存大文件，所以实际个数小于<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup></mrow><annotation encoding="application/x-tex">2^{24}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>），大文件是指大于 <code>64 KB</code> 的文件。另外，<code>Frangipani</code> 能保存文件的最大大小是16个小数据块加上一个大数据块（<code>64 KB</code> 加 <code>1 TB</code>）。如果需要保存更多的文件，可以通过减小大数据块的大小来解决；以及允许一个大文件可以保存在多个大数据块中，这样就可以提高最大能保存文件的大小。如果<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>字节的地址空间不够，则一个 <code>Frangipani</code> 服务器可以支持扩展为多个 <code>Petal</code> 虚拟磁盘组成的 <code>Frangipani</code> 文件系统。</p>
+<p>作者基于之前文件系统的使用经验设定了上述的系统参数。作者认为这种配置已经足够满足需求，不过还是需要时间和实际使用来检验。<code>Frangipani</code> 的设计足够灵活所以可以通过备份和恢复来验证合适的磁盘布局。</p>
+<h2 id="日志和恢复"><a class="markdownIt-Anchor" href="#日志和恢复"></a> 日志和恢复</h2>
+<p><code>Frangipani</code> 通过元数据的预写重做日志来简化异常恢复和提高性能；不过用户的数据并不会记录到日志中。每个 <code>Frangipani</code> 服务器会将自己的日志保存在 <code>Petal</code> 中。当某个 <code>Frangipani</code> 服务器需要修改某个元数据时，它会首先生成一条日志来描述具体的修改内容并将其添加到内存日志中。这些内存中的日志会周期性的按照修改请求发起的顺序写入到 <code>Petal</code> 中（<code>Frangipani</code> 同时也支持将日志同步的写入到 <code>Petal</code> 中，这会稍微提高容错性不过会增加元数据更新操作的延迟。）。只有当某条日志写入 <code>Petal</code> 之后，系统才会真正修改对应文件的元数据。实际文件的元数据更新会交由一个 <code>Unix</code> 的 <code>update</code> 守护进程来周期性（大概每隔30秒）的更新。</p>
+<p>在当前的实现中，<code>Frangipani</code> 写到 <code>Petal</code> 的日志的最大大小为 <code>128 KB</code>。根据 <code>Petal</code> 的空间分配策略，一份日志会拆分到两个不同的物理磁盘上，每个磁盘上的大小为 <code>64 KB</code>。<code>Frangipani</code> 会以环形缓冲（<code>circular buffer</code>）的方式来管理所分配的日志空间。当日志空间满时，<code>Frangipani</code> 会回收25%的最老的日志空间来存放新的日志。一般来说，被回收的日志所对应的元数据修改都应该已经写入到了 <code>Petal</code> 中（通过之前的 <code>sync</code> 操作），因此回收日志时不需要额外的写操作。如果回收日志时发现存在某些待回收的日志所对应的元数据修改还没有写入到 <code>Petal</code>，则需要先执行元数据的写入操作再回收日志。根据日志缓冲区和单条 <code>Frangipani</code> 日志的大小（80-128字节），如果在两个 <code>sync</code> 周期内存在1000-1600个元数据修改操作就能写满整个日志缓冲区。</p>
+<p>如果某个 <code>Frangipani</code> 服务器发生异常，系统最终能检测到异常并根据该 <code>Frangipani</code> 服务器的日志进行恢复。<code>Frangipani</code> 服务器异常可以被所访问的客户端发现，或者当锁服务向持有锁的 <code>Frangipani</code> 服务器要求返回锁而没有响应时发现。当异常发生时，负责恢复的守护进程会临时拥有异常的 <code>Frangipani</code> 服务器的日志和锁的所有权。异常恢复进程会先找到异常服务器日志的起始位置和结束位置，然后逐条检查每一条日志，判断哪些日志所对应的元数据更新还没有被执行。当日志处理完成后，异常恢复进程就会释放所持有的锁并清空日志。其他的 <code>Frangipani</code> 服务器就可以在不受异常服务器影响的情况下继续工作，而异常的服务器可以在稍后被重启（对应的日志为空）。只要底层的 <code>Petal</code> 磁盘依然可用，系统就能容忍任意数量的 <code>Frangipani</code> 服务器异常。</p>
+<p>为了确保异常恢复进程能找到异常服务器的日志的结束位置（即使磁盘控制器没有按照顺序写数据），系统为每512字节的日志数据块分配了一个递增的序号。只要发现某个数据块的序号小于前一个数据块的序号，那就说明前一个数据块就是日志的结束位置。</p>
+<p><code>Frangipani</code> 确保了日志和异常恢复能正确的处理多条日志。不过这在细节上有几点要注意。</p>
+<p>首先，在下一节会介绍到 <code>Frangipani</code> 的锁协议保证了多个服务器对同一个数据的更新请求会被串行执行。某个持有写锁且修改了数据的服务器需要先将修改的数据写回到 <code>Petal</code> 后才能释放锁，所以要么是该服务器在正常情况下数据更新完成后主动释放锁，要么是服务器异常后由异常恢复进程在数据更新完成后释放锁。这说明对于任意的数据块来说，整个系统中最多只可能有一条数据修改的日志还未完成。</p>
+<p>第二，<code>Frangipani</code> 确保了异常恢复进程只会处理异常服务器在持有锁之后但还未释放锁期间记录的日志。这是为了确保锁协议保证的更新串行化不会被破坏。<code>Frangipani</code> 使用了更强的条件限制来实现这一保证：异常恢复进程永远不会重新执行一个已经执行完成的数据更新。为了保证这一点，<code>Frangipani</code> 给每512字节的元数据块分配了一个版本号。而类似于文件夹的元数据有可能会跨多个数据块，所以也会有多个版本号。对于每个日志要修改的数据块，日志会记录修改的内容及新的版本号。在异常恢复时，恢复进程会比较当前元数据块最新的版本号和日志中记录的版本号，只有当日志中的版本号大于当前最新的版本号时，恢复进程才会执行重做日志。</p>
+<p>由于 <code>Frangipani</code> 记录更新日志时不会记录用户数据，而只有元数据块给版本号预留了空间。这就带来了一个潜在问题。如果某个数据块一开始被用于保存元数据，后来空间被释放，然后又被用来保存用户数据，那么恢复进程就不能正确的跳过依然引用了这个元数据块（现在的用户数据块）的日志，因为原来保存元数据块中的版本号信息已经被用户数据所覆盖，所以恢复进程就无法比较日志中的版本号的大小。<code>Frangipani</code> 通过要求被释放的元数据块只能用于保存新的元数据来避免这个问题。</p>
+<p>最后，<code>Frangipani</code> 保证在任一时刻只会有一个异常恢复进程在恢复重做某个异常服务器的日志。<code>Frangipani</code> 通过对日志文件的互斥锁来实现这一保证。</p>
+<p><code>Frangipani</code> 的日志和异常恢复机制假定当出现磁盘写异常时，单个扇区中的内容要么都是旧的，要么都是新的，而不会是两者的混合。如果某个磁盘扇区已损坏并且在读操作时返回 <code>CRC</code> 异常，那么 <code>Petal</code> 内置的副本机制通常能恢复对应的数据。如果某个扇区的副本都损坏了，或者 <code>Frangipani</code> 内部的数据结构由于软件 <code>bug</code> 造成损坏，则需要对元数据进行一致性检查以及需要一个恢复工具（例如 <code>Unix</code> 的 <code>fsck</code>）进行数据恢复。不过论文的作者写论文时还未实现这个工具。</p>
+<p><code>Frangipani</code> 的日志并不是为了给用户提供高层次的执行语义保证。它的目的是为了提高元数据更新的性能以及发生服务器异常时通过避免执行 <code>fsck</code> 这样的恢复工具来加快异常恢复速度。因为 <code>Frangipani</code> 的日志只会记录元数据的更新，不会记录用户数据，所以站在用户的视角来说，当系统发生异常时，文件系统的状态和异常发生前并不能保证一致。论文的作者并不是声明这样的语义是理想的，不过这个行为和标准的本地 <code>Unix</code> 文件系统的行为是一样的。在本地 <code>Unix</code> 文件系统和 <code>Frangipani</code> 中，用户都可以在合适的时间点调用 <code>fsync</code> 来确保更好的数据一致性保证。</p>
+<p><code>Frangipani</code> 所使用的日志技术最早被应用于数据库，并在之后应用到其他某些基于日志的系统中。<code>Frangipani</code> 本身不是个日志结构（<code>log-structured</code>）的文件系统；它不会将所有的数据都保存在日志中，而是将数据按约定维护在磁盘中，通过较少的日志 <code>Frangipani</code> 实现了较好的性能和异常恢复的原子性。和其他基于日志的文件系统不同，但是和例如 <code>Zebra</code> 这样的日志结构文件系统相同，<code>Frangipani</code> 也会保存多份日志。</p>
+<h2 id="同步和缓存一致性"><a class="markdownIt-Anchor" href="#同步和缓存一致性"></a> 同步和缓存一致性</h2>
+<p>由于会有多个 <code>Frangipani</code> 服务器修改 <code>Petal</code> 的共享数据，所以需要一个细致化的同步手段来确保各服务器读取到的数据是一致的，以及当系统负载增加或者添加新的服务器时能通过有效的并发手段来提高性能。<code>Frangipani</code> 使用多读一写的读写锁来实现必要的同步。当锁服务侦测到冲突的锁请求时，它会要求锁的持有者释放锁或者进行锁降级（写锁降级为读锁）来消除冲突。</p>
+<p>读锁允许一个 <code>Frangipani</code> 服务器从磁盘中读取相应的数据并缓存。如果该服务器被要求释放锁，则在释放锁前必须先清空缓存。写锁允许一个 <code>Frangipani</code> 服务器读取或者修改数据并将其缓存。只有当某个服务器持有写锁时，它所缓存的数据才有可能和磁盘上保存的数据不同。因此，如果持有写锁的服务器被要求释放写锁或者降级为读锁，则必须先将修改的数据写回到磁盘。如果该服务器降级为了读锁，则依然可以保留缓存，不过如果释放了锁则必须清空缓存。</p>
+<p>相比于释放写锁或者降级为读锁时将缓存中的数据写回到磁盘，还可以选择直接将缓存中的数据发送给请求方。不过出于简洁性考虑 <code>Frangipani</code> 并没有这么做。首先，在 <code>Frangipani</code> 的设计中，<code>Frangipani</code> 服务器之间无需通信。它们只会和 <code>Petal</code> 以及锁服务通信。第二，当某台服务器异常时，<code>Frangipani</code> 的设计保证了系统只需要处理异常服务器的日志即可。如果选择将未写入到磁盘中的数据直接发送给请求方，而接收方发生异常时，指向未持久化的数据的日志可能分散在了多台服务器中。这就给系统恢复和日志空间回收都带来了问题。</p>
+<p><code>Frangipani</code> 将磁盘数据结构拆分为了一个个逻辑段，每个逻辑段都对应一把锁。为了避免 <code>false-sharing</code>，<code>Frangipani</code> 确保了一个磁盘扇区不会保存超过1个可共享的数据结构。将磁盘数据结构拆分为可加锁的段是为了将锁的数量控制的足够小，同时又能避免正常情况下的锁竞争，从而使得锁服务不会成为系统的瓶颈。</p>
+<p>每个 <code>Frangipani</code> 服务器的日志都是一个可加锁的段，因为这些日志都是私有的。磁盘布局中的位图区域也切分为了一个个段，并且相互之间加了互斥锁，所以分配新文件时不会发生竞争，因为每个服务器都在自己持有的段内分配。还未分配给文件的数据块或者 <code>inode</code> 也同时被位图中的同一把锁保护，只是该位置的空间当前被标记为可用状态。最后，每个文件，文件夹，或者符号链接都是一个段；也就是说，<code>inode</code> 和其指向的数据都被同一把锁保护。这种每个文件一把锁的锁粒度对于作者所在的工作负载来说已经足够了，因为文件几乎很少会被并发的修改。而对于其他的工作负载来说则可能需要更细粒度的锁。</p>
+<p>有些操作会要求原子的更新被多把锁保护的磁盘数据结构。<code>Frangipani</code> 通过对锁全局排序以及使用两阶段获取锁来避免死锁。首先，某台服务器先确定需要获取哪些锁。这个过程中会涉及获取或者释放某些锁，例如查找文件夹中的某些文件名。然后，服务器对锁按照 <code>inode</code> 的地址排序然后依次获取锁。同时服务器会检查在第一阶段中读取的对象是否在第二阶段发生了修改，如果发生了修改，那么该服务器会释放所有的锁然后重新执行第一阶段。否则，该服务器就可以开始执行具体的操作，在缓存中修改某些数据并记录一条日志。在缓存中的数据写回到磁盘前，该服务器都会持有相关的锁。</p>
+<p>上述描述的缓存一致性协议类似于 <code>Echo</code>、<code>Andrew File System</code>、<code>DCE/DFS</code> 和 <code>Sprite</code> 中的客户端文件缓存协议。这里使用的避免死锁的技术和 <code>Echo</code> 类似。和 <code>Frangipani</code> 一样，<code>Oracle Parallel Server</code> 同样是将缓存中的数据写回到磁盘，而不是直接将缓存中的数据发送给下一个写锁的持有者。</p>
+<h2 id="锁服务"><a class="markdownIt-Anchor" href="#锁服务"></a> 锁服务</h2>
+<p><code>Frangipani</code> 只需要一小部分，通用的锁功能，并且不希望锁服务在日常操作中成为性能瓶颈，有很多种实现可以满足这些需求。在 <code>Frangipani</code> 项目中，一共尝试了三种不同的锁服务的实现，其他已有的锁服务也可以提供需要的功能，只是在其之上可能需要编写额外的代码来适配。</p>
+<p>锁服务提供了多读一写的读写锁。这里的锁不会用完就马上释放，只要没有其他客户端请求相同的锁，这把锁就会一直被某个客户端持有（这里锁服务的客户端指的是 <code>Frangipani</code> 服务器）。</p>
+<p>锁服务通过租约来处理客户端异常。当某个客户端请求锁服务时，它会先获取一个租约。该客户端获取的所有锁都和这个租约绑定。每个租约有一个过期时间，目前是锁创建或者延期后30秒过期。客户端在租约过期前必须先延期，否则锁服务会认为客户端发生了异常。</p>
+<p>网络异常会妨碍 <code>Frangipani</code> 服务器延长租约，即使 <code>Frangipani</code> 服务器没有发生异常。当某个 <code>Frangipani</code> 服务器无法延长租约时，它会释放所有的锁并清空缓存。如果缓存中的数据被修改了，那么该服务器会打开某个内部标记使得后续的客户端请求都返回一个错误。相应的文件系统必须取消挂载才能删除这个异常。<code>Frangipani</code> 使用这种粗暴的方式来报告异常从而避免了异常被忽略。</p>
+<p>第一版的锁服务实现使用了单节点中心化的服务器，所有的锁状态都保存在了内存中。这种设计对于 <code>Frangipani</code> 来说是足够的，因为 <code>Frangipani</code> 的日志中记录了足够的信息，所以即使锁服务发生异常丢失了所有的状态系统也能够恢复。不过，锁服务异常会导致严重的性能问题。</p>
+<p>第二版的锁服务将锁的状态保存在 <code>Petal</code> 中，每个对锁状态的修改都会先写到 <code>Petal</code> 中，然后才会返回给客户端。如果锁服务的主节点异常，那么会由某个备份节点读取 <code>Petal</code> 中的锁状态然后接管异常的主节点并继续提供服务。在这个设计下，异常恢复更加透明，不过日常操作的性能会低于第一种锁实现。作者还未完全实现所有异常的自动恢复就开始了第三种锁服务的实现。</p>
+<p>第三版的锁服务是分布式的，并且能很好的支持容错和性能。它由一组相互间协作的锁节点组成，同时每个 <code>Frangipani</code> 服务器内嵌了一个 <code>clerk</code> 模块。</p>
+<p>锁服务将锁以表（<code>tables</code>）的形式组织，每个表以 <code>ASCII</code> 字符串的形式命名。每个表中的锁以64位的整型命名。一个 <code>Frangipani</code> 文件系统只使用一个 <code>Petal</code> 虚拟磁盘，虽然多个 <code>Frangipani</code> 文件系统可以挂载到同一个机器上。每个文件系统都绑定了一个关于锁的表。当一个 <code>Frangipani</code> 文件系统挂载时，<code>Frangipani</code> 服务器会请求内嵌的 <code>clerk</code>，然后 <code>clerk</code> 就会打开绑定的锁表。当 <code>clerk</code> 成功打开锁表时，锁服务会返回一个租约标识符，这个租约标识符会在后续通信中使用。当文件系统取消挂载时，<code>clerk</code> 就会关闭锁表。</p>
+<p><code>clerk</code> 和锁节点间使用异步消息而不是 <code>RPC</code> 来通信，这样做能减少内存的使用并同时有着足够好的灵活性和性能。和锁相关的基础消息类型是 <code>request</code>，<code>grant</code>，<code>revoke</code> 和 <code>release</code>。<code>request</code> 和 <code>release</code> 消息是由 <code>clerk</code> 发送给锁节点，而 <code>grant</code> 和 <code>revoke</code> 消息则是由锁节点发送给 <code>clerk</code>。锁的升级和降级同样由这四种消息类型来处理。</p>
+<p>锁服务使用了支持容错，分布式的异常监测机制来检测锁节点的异常。这个机制同时也被用于 <code>Petal</code>。该机制基于各节点间定期的心跳交换，同时使用了共识算法来容忍网络分区。</p>
+<p>一把锁会在服务端和 <code>clerk</code> 侧都需要消耗内存。在当前的实现中，服务端会为每个锁分配112字节，每个 <code>clerk</code> 如果有进行中或者已分配的锁请求则额外还需要104字节。所以每个客户端每个锁最多使用232字节。为了避免长时间持有锁带来的内存消耗，<code>clerk</code> 会丢弃长时间（1小时）未使用的锁。</p>
+<p>一小部分全局且不经常修改的状态信息会由 <code>Lamport</code> 的 <code>Paxos</code> 算法复制到所有的锁服务器上。锁服务复用了为 <code>Petal</code> 实现的 <code>Paxos</code> 算法。全局的状态信息包括锁服务器列表，每个锁服务器负责的锁列表，以及打开还未关闭锁表的 <code>clerk</code> 列表。这些信息用于达成共识，即在各个锁服务器间重新分配锁，当某个锁服务器发生异常时能恢复某个锁的状态，以及协助 <code>Frangipani</code> 服务器的异常恢复。从效率考虑，所有的锁被划分到100个不同的锁组中（<code>lock groups</code>），然后以组的形式分配给锁服务器，而不是以单个锁的形式。</p>
+<p>有时候一把锁会被重新分配给其他的锁服务器，一方面是为了故障转移，另一方面是为了充分利用刚异常恢复的锁服务器，避免流量集中。当某个锁服务器被永久的添加到集群或者从集群中删除时，会发生类似的锁重分配。在这种情况下，所有的锁始终会被重分配，因为需要保证每台锁服务器持有的锁的数量是均衡的，锁重分配的次数要尽可能的少，以及每个锁都只会分配给一台锁服务器。锁的重分配也是由两阶段进行。在第一阶段，各个锁服务器丢弃保存在内部状态中的锁。第二阶段，锁服务器会和 <code>clerk</code> 通信，根据其所打开的锁表来重新分配锁。锁服务器根据 <code>clerk</code> 的锁表来重新生成锁的状态，同时通知 <code>clerk</code> 每把锁在重新分配后对应的锁服务器。</p>
+<p>当某个 <code>Frangipani</code> 服务器异常时，在正确的恢复操作执行前，它所持有的锁不能被释放。特别的，系统需要先处理异常 <code>Frangipani</code> 服务器的日志并将未持久化的元数据更新写入到 <code>Petal</code>。当 <code>Frangipani</code> 服务器的租约到期时，锁服务会通知另一台 <code>Frangipani</code> 服务器上的 <code>clerk</code> 来执行恢复操作，并撤销原来异常服务器持有的全部锁。负责恢复的 <code>clerk</code> 会获取一把异常服务器的日志的互斥锁。这把锁同样分配了一个租约，所以当负责恢复的服务器异常时锁服务会再找一台服务器重新开始恢复任务。</p>
+<p>一般来说，<code>Frangipani</code> 系统能够容忍网络分区，并在可能的情况下继续运行，否则就停止服务。特别的，<code>Petal</code> 可以在网络分区的情况下继续运行，只要大多数的 <code>Petal</code> 服务器依然存活并且相互之间可以通信，不过如果某些 <code>Petal</code> 虚拟磁盘在大多数的 <code>Petal</code> 服务器上没有备份的话，那么这些磁盘无法被继续访问。同样的，只要大多数的锁服务器依然存活并且相互之间可以通信，整个锁服务也依然可用。如果某个 <code>Frangipani</code> 服务器无法和锁服务通信，那么它将再也不能延长租约。此时锁服务会认为这个 <code>Frangipani</code> 服务器发生异常，然后会基于它的日志挑选一个新的 <code>Frangipani</code> 服务器发起恢复流程。如果某个 <code>Frangipani</code> 服务器无法和 <code>Petal</code> 通信，那么它将无法读取和写入虚拟磁盘。不管在哪种情况下，<code>Frangipani</code> 服务器都会拒绝后续受影响的文件系统的用户请求，直到网络分区恢复以及文件系统被重新挂载。</p>
+<p>当 <code>Frangipani</code> 服务器的租约过期时存在一个潜在的问题。如果服务器依然存活而只是由于网络原因造成无法和锁服务通信，那么这台服务器可能依然会在租约过期后访问 <code>Petal</code>。<code>Frangipani</code> 服务器会在写入 <code>Petal</code> 前检查租约是否依然有效（并确保在未来的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>秒内依然有效）。不过，<code>Petal</code> 并不会校验某个写入请求是否还在租约有效期内。所以，如果 <code>Frangipani</code> 服务器检查租约和写请求到达 <code>Petal</code> 的时间大于剩余租约的时间，那就会带来一个问题：当 <code>Petal</code> 收到写请求时，租约已经过期，该服务器持有的写锁已经分配给了其他服务器。<code>Frangipani</code> 为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>选择了一个足够大的值（15秒）来确保在正常情况下上述问题不会发生，不过依然不能确保一定不会发生。</p>
+<p>在未来 <code>Frangipani</code> 会尝试解决这个问题，论文给出了一个可能的解决方案。<code>Frangipani</code> 会给每一个 <code>Petal</code> 的写请求附加一个过期的时间戳。这个时间戳的值为生成写请求时的租约过期时间减去<br />
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>。这样 <code>Petal</code> 就可以忽略任何时间戳小于当前时间的写请求。只要 <code>Petal</code> 和 <code>Frangipani</code> 服务器的时钟在<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>内保持同步，<code>Petal</code> 就能够可靠的拒绝租约过期的写请求。</p>
+<p>另一种解决方案则不依赖时钟同步，但是需要将锁服务和 <code>Petal</code> 集成，并且将 <code>Frangipani</code> 服务器获取的租约标识符附加到写请求中，<code>Petal</code> 收到写请求后就可以根据租约标识符校验租约是否过期，从而拒绝过期的写请求。</p>
+<h2 id="添加和删除服务器"><a class="markdownIt-Anchor" href="#添加和删除服务器"></a> 添加和删除服务器</h2>
+<p>系统管理员有时需要添加或者删除 <code>Frangipani</code> 服务器。<code>Frangipani</code> 被设计成能够轻易的处理这些场景。</p>
+<p>添加一台服务器到运行中的系统只需要一点点的系统管理工作。新添加的服务器只需要知道使用哪块 <code>Petal</code> 虚拟磁盘以及锁服务的地址即可。新添加的服务器会和锁服务通信来获取租约，然后根据租约标识符决定使用哪部分的日志空间，然后就开始提供服务。系统管理员不需要修改其他服务器的配置，其他服务器能自动适配新服务器的上线。</p>
+<p>删除一台 <code>Frangipani</code> 服务器则更简单。可以直接关闭这台服务器。不过更可取的方式是让这台服务器先将未持久化的数据写入到 <code>Petal</code>，然后释放持有的锁，最后再停机，不过这不是强制要求的。当服务器异常停机时，如果后续该服务器持有的锁需要被使用，则系统会自动发起恢复流程，并最终使得共享磁盘的数据达成一致。同样的，系统管理员也不需要修改其他服务器的配置。</p>
+<p>如 <code>Petal</code> 的论文所描述，<code>Petal</code> 服务器同样可以无缝的添加和删除，锁服务器也同理。</p>
+<h2 id="备份"><a class="markdownIt-Anchor" href="#备份"></a> 备份</h2>
+<p><code>Petal</code> 的快照功能提供了一个简便的方法来备份一份完整的 <code>Frangipani</code> 文件系统快照。<code>Petal</code> 的客户端可以在任意时刻创建一个虚拟磁盘的快照。所创建的快照的虚拟磁盘和普通的虚拟磁盘一样，只不过它是只读的。实际快照实现时采用了写时复制（<code>copy-on-write</code>）技术来提高效率。<code>Petal</code> 创建的快照是崩溃一致的（<code>crash-consistent</code>）：也就是说，快照中保存的是在 <code>Petal</code> 虚拟磁盘中的数据，<code>Frangipani</code> 服务器内存中的数据不会记录到快照中。</p>
+<p>因此，我们可以简单的通过创建 <code>Petal</code> 快照并将其拷贝到磁带中来备份一个 <code>Frangipani</code> 文件系统。快照会包含所有的日志，所以可以将其复制到一个新的 <code>Petal</code> 虚拟磁盘中然后根据日志运行恢复程序来恢复一个 <code>Frangipani</code> 文件系统。归功于崩溃一致的特性，从快照中恢复系统后要解决的问题就简化成了和发生系统级别的停电后恢复系统所要解决的问题一样。</p>
+<p>可以对 <code>Frangipani</code> 稍作修改来改进这个恢复机制，即创建一个系统文件级别一致的快照，从而也无需执行恢复操作。可以让备份程序先强制要求所有的 <code>Frangipani</code> 服务器进入一个栅栏，这个功能可以由锁服务提供的全局锁来实现。每个 <code>Frangipani</code> 服务器以共享的模式获取这把锁然后执行修改操作，而备份程序以互斥的方式来处理请求。当 <code>Frangipani</code> 服务器收到请求要求释放锁时，它会阻塞所有新的修改数据的文件系统调用然后进入栅栏，接着清空缓存中已修改的数据，最后释放锁。当所有的 <code>Frangipani</code> 服务器进入栅栏后，备份程序会以互斥的模式获取锁，然后创建一个 <code>Petal</code> 快照并释放锁。之后各 <code>Frangipani</code> 就可以继续以共享的模式获取锁，然后恢复服务。</p>
+<p>在后一种方案下，一个 <code>Frangipani</code> 的快照可以无需进行恢复就直接挂载使用。用户就可以从新的磁盘卷中在线获取单个文件，或者将其以一个更方便的格式转储到磁带中而无需 <code>Frangipani</code> 参与数据恢复。新添加的卷必须以只读的格式挂载，因为底层的 <code>Petal</code> 快照是只读的。在未来作者可能扩展 <code>Petal</code> 的快照使其可写，或者在 <code>Petal</code> 之上再抽象一层来模拟写操作。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/thekkath-frangipani.pdf">Frangipani: A Scalable Distributed File System</a></li>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/frangipani-faq.txt">FAQ for Frangipani, Thekkath, Mann, Lee, SOSP 1997</a></li>
+<li><a target="_blank" rel="noopener" href="https://kb.synology.com/en-global/DSM/tutorial/What_is_file_system_consistent_snapshot">What is the difference between crash-consistent and file-system consistent snapshots?</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://frederick-s.github.io/2022/06/11/mit-6.824-frangipani/" title="MIT 6.824 - Frangipani: A Scalable Distributed File System">https://frederick-s.github.io/2022/06/11/mit-6.824-frangipani/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Paper/" rel="tag"># Paper</a>
+              <a href="/tags/MIT-6-824/" rel="tag"># MIT 6.824</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/04/engineering-culture/" rel="prev" title="工程师文化和实事求是">
+      <i class="fa fa-chevron-left"></i> 工程师文化和实事求是
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text"> 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text"> 系统结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text"> 组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text"> 安全和客户端&#x2F;服务器配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">2.3.</span> <span class="nav-text"> 讨论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E5%B8%83%E5%B1%80"><span class="nav-number">3.</span> <span class="nav-text"> 磁盘布局</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E5%92%8C%E6%81%A2%E5%A4%8D"><span class="nav-number">4.</span> <span class="nav-text"> 日志和恢复</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E5%92%8C%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">5.</span> <span class="nav-text"> 同步和缓存一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%81%E6%9C%8D%E5%8A%A1"><span class="nav-number">6.</span> <span class="nav-text"> 锁服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%92%8C%E5%88%A0%E9%99%A4%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">7.</span> <span class="nav-text"> 添加和删除服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%87%E4%BB%BD"><span class="nav-number">8.</span> <span class="nav-text"> 备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">9.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
