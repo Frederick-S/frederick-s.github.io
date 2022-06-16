@@ -19,3 +19,4 @@ date: 2022-02-13 15:39:40
 * [MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续）](/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/)
 * [MIT 6.824 - Lab 3 (2): 实现](/2022/06/04/mit-6.824-lab3-implementation/)
 * [MIT 6.824 - Frangipani: A Scalable Distributed File System](/2022/06/11/mit-6.824-frangipani/)
+* [MIT 6.824 - Spanner: Google’s Globally-Distributed Database](/2022/06/17/mit-6.824-spanner/)
