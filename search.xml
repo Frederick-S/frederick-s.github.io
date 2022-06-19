@@ -28,34 +28,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Add new list field in SharePoint App upgrade</title>
-    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
-    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
-<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
-<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>And it works. Hope it’s helpful.</p>
-<p>Reference:</p>
-<ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
-    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
-    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
-<p>The regular expression shows that it doesn’t allow float numbers.</p>
-]]></content>
-      <tags>
-        <tag>SharePoint Add-in</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Fail to resize SharePoint App Part if &quot;Chrome Type&quot; is &quot;None&quot; or &quot;Border Only&quot;</title>
     <url>/2015/09/10/fail-to-resize-sharepoint-app-part-if-chrome-type-is-none-or-border-only/</url>
     <content><![CDATA[<h2 id="issue"><a class="markdownIt-Anchor" href="#issue"></a> Issue</h2>
@@ -75,6 +47,34 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
 <h2 id="reference"><a class="markdownIt-Anchor" href="#reference"></a> Reference</h2>
 <ul>
 <li><a href="http://social.msdn.microsoft.com/Forums/en-US/ea4b1ab6-3d44-4792-bce2-79056269852a/dynamic-width-and-height-for-iframe-app-part?forum=appsforsharepoint">Dynamic Width and Height for iFrame (App Part)</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>You can only pass integers as parameters to resize SharePoint Add-in Client Web Part</title>
+    <url>/2016/06/16/you-can-only-pass-integers-as-parameters-to-resize-sharepoint-add-in-client-web-part/</url>
+    <content><![CDATA[<p>I tried to resize a Client Web Part with non integers as size, but it failed. And that’s why:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> regex = <span class="built_in">RegExp</span>(<span class="regexp">/(&lt;\s*[Mm]essage\s+[Ss]ender[Ii]d\s*=\s*([\dAaBbCcDdEdFf]&#123;8&#125;)(\d&#123;1,3&#125;)\s*&gt;[Rr]esize\s*\(\s*(\s*(\d*)\s*([^,\)\s\d]*)\s*,\s*(\d*)\s*([^,\)\s\d]*))?\s*\)\s*&lt;\/\s*[Mm]essage\s*&gt;)/</span>);</span><br><span class="line"><span class="keyword">var</span> results = regex.exec(e.data);</span><br><span class="line"><span class="keyword">if</span> (results == <span class="literal">null</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+<p>The regular expression shows that it doesn’t allow float numbers.</p>
+]]></content>
+      <tags>
+        <tag>SharePoint Add-in</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Add new list field in SharePoint App upgrade</title>
+    <url>/2015/12/21/add-new-list-field-in-sharepoint-app-upgrade/</url>
+    <content><![CDATA[<p>I’m learning how to upgrade SharePoint App, and I met a problem when I added a new list field in the upgrade.</p>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">document</a> mentioned that if you added a field to a content type in the feature, you should add an <code>AddContentTypeField</code> element to the <code>VersionRange</code> section. But there is no <code>ContentType</code> in my app, it only has a <code>ListDefinition</code>. I tried to add an <code>AddContentTypeField</code>, unfortunately it throws exception.</p>
+<p>So I tried another way. The document also mentioned that if you have changed a file that is referenced in an elements manifest file, you have to copy the <code>ElementManifest</code> element for the component from the <code>ElementManifests</code> section to the <code>ApplyElementManifests</code> section. When we added a new field to list, the <code>Schema.xml</code> is changed, although it’s not referenced in a <code>ElementManifest</code>, I still copied <code>MyList/Elements.xml</code> to <code>ApplyElementManifests</code>, so it looks like this:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">UpgradeActions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">VersionRange</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="tag">&lt;<span class="name">ElementManifest</span> <span class="attr">Location</span>=<span class="string">&quot;MyList\Elements.xml&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ApplyElementManifests</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">VersionRange</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">UpgradeActions</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>And it works. Hope it’s helpful.</p>
+<p>Reference:</p>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/office/dn265911(v=office.15).aspx">How to: Update app web components in SharePoint 2013</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -240,6 +240,22 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       </tags>
   </entry>
   <entry>
+    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
+    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
+    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
+<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
+<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>HTTP</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JaCoCo 配置 Maven 多模块覆盖率测试</title>
     <url>/2020/03/21/how-to-setup-jacoco-report-aggregation/</url>
     <content><![CDATA[<p>首先构建一个多模块的 <code>Maven</code> 项目，项目结构如下：</p>
@@ -265,22 +281,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
         <tag>Java</tag>
         <tag>JaCoCo</tag>
         <tag>Maven</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何解决访问外部图片返回 403 Forbidden 错误</title>
-    <url>/2020/03/16/how-to-fix-403-forbidden-on-image-urls/</url>
-    <content><![CDATA[<p>在某个 <code>Web</code> 应用中，引用了 <code>豆瓣读书</code> 的图片，大部分图片会无法显示并返回 <code>403 Forbidden</code> 错误，一个可能的原因是触发了 <code>豆瓣</code> 的图片防盗链机制。</p>
-<p>一般来说，防盗链机制会判断图片请求的 <code>Request Headers</code> 里的 <code>Referer</code> 字段的值是否是允许的地址，如果不是，则不允许访问相应的资源。所以，一种可能的解决办法是在 <code>HTML</code> 页面中设置 <code>Referrer-Policy</code> 为 <code>no-referrer</code>，在发送 <code>HTTP</code> 请求时不发送 <code>Referer</code> 信息：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;referrer&quot;</span> <span class="attr">content</span>=<span class="string">&quot;no-referrer&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
-<li><a href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>HTTP</tag>
       </tags>
   </entry>
   <entry>
@@ -601,18 +601,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
 ]]></content>
   </entry>
   <entry>
-    <title>野生 NHK NEWS EASY 客户端</title>
-    <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
-    <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
-<ul>
-<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy">Google Play</a></li>
-<li><a href="https://github.com/Frederick-S/nhk-easy-mobile">GitHub</a></li>
-</ul>
-<p><img src="/images/nhk-1.png" alt="alt" /></p>
-<p><img src="/images/nhk-2.png" alt="alt" /></p>
-]]></content>
-  </entry>
-  <entry>
     <title>如何使用 rsync 同步数据到其他服务器</title>
     <url>/2020/06/26/how-to-sync-data-to-remote-vps-with-rsync/</url>
     <content><![CDATA[<p>假设我们希望将 <code>server1</code> 下的 <code>/data1</code> 目录中的数据同步到 <code>server2</code> 下的 <code>/data2</code> 目录，首先需要建立 <code>server1</code> 和 <code>server2</code> 的免密登陆，在 <code>server1</code> 上执行 <code>ssh-keygen</code>，默认情况会在 <code>~/.ssh</code> 目录下生成 <code>id_rsa</code> 和 <code>id_rsa.pub</code> 两个文件，然后将 <code>~/.ssh/id_rsa.pub</code> 文件的内容复制到 <code>server2</code> 的 <code>~/.ssh/authorized_keys</code> 文件中即可。</p>
@@ -630,6 +618,35 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
 ]]></content>
       <tags>
         <tag>rsync</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>野生 NHK NEWS EASY 客户端</title>
+    <url>/2020/05/06/unofficial-client-for-nhk-news-web-easy/</url>
+    <content><![CDATA[<p>野生 NHK NEWS EASY 客户端，无广告，功能还比较单一，只上了 <code>Google Play</code>，<code>iOS</code> 没有通过：</p>
+<ul>
+<li><a href="https://play.google.com/store/apps/details?id=nhk.nhk_easy">Google Play</a></li>
+<li><a href="https://github.com/Frederick-S/nhk-easy-mobile">GitHub</a></li>
+</ul>
+<p><img src="/images/nhk-1.png" alt="alt" /></p>
+<p><img src="/images/nhk-2.png" alt="alt" /></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>如何在 Finder 中显示隐藏文件</title>
+    <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
+    <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
+<ol>
+<li>在终端中输入 <code>defaults write com.apple.finder AppleShowAllFiles YES</code>，然后重启 <code>Finder</code></li>
+<li>在 <code>Finder</code> 中使用快捷键 <code>Shift + Command + &quot;.&quot;</code></li>
+</ol>
+<p>参考：</p>
+<ul>
+<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Mac</tag>
       </tags>
   </entry>
   <entry>
@@ -653,23 +670,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       <tags>
         <tag>Java</tag>
         <tag>Maven</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>如何在 Finder 中显示隐藏文件</title>
-    <url>/2020/07/26/how-to-show-hidden-files-in-mac-finder/</url>
-    <content><![CDATA[<p><code>Finder</code> 默认并不显示隐藏文件，可以通过如下两种方式开启：</p>
-<ol>
-<li>在终端中输入 <code>defaults write com.apple.finder AppleShowAllFiles YES</code>，然后重启 <code>Finder</code></li>
-<li>在 <code>Finder</code> 中使用快捷键 <code>Shift + Command + &quot;.&quot;</code></li>
-</ol>
-<p>参考：</p>
-<ul>
-<li><a href="https://apple.stackexchange.com/questions/250638/how-to-reveal-dot-files-in-finder">How to reveal dot files in finder?</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Mac</tag>
       </tags>
   </entry>
   <entry>
@@ -908,6 +908,23 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       </tags>
   </entry>
   <entry>
+    <title>Python for/while else</title>
+    <url>/2021/08/08/python-for-while-else/</url>
+    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>借助 <code>for/while else</code> 可改写成：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Python heapq 自定义比较器</title>
     <url>/2021/07/31/python-heapq-custom-comparator/</url>
     <content><![CDATA[<p>使用 <code>Python</code> 的 <code>heapq</code> 模块时，如果处理的是较为复杂的数据结构，则需要实现自定义比较器来比较两个元素的大小。</p>
@@ -920,23 +937,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
 <h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
 <ul>
 <li><a href="https://stackoverflow.com/questions/8875706/heapq-with-custom-compare-predicate/8875823">heapq with custom compare predicate</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Python for/while else</title>
-    <url>/2021/08/08/python-for-while-else/</url>
-    <content><![CDATA[<p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<p>借助 <code>for/while else</code> 可改写成：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
-<p>参考：</p>
-<ul>
-<li><a href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
 </ul>
 ]]></content>
       <tags>
@@ -1050,49 +1050,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
         <tag>Data Structure</tag>
         <tag>Algorithm</tag>
         <tag>Binary Search Tree</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>二叉树非递归遍历</title>
-    <url>/2022/02/02/binary-tree-traverse-with-stack/</url>
-    <content><![CDATA[<p>二叉树的遍历直观的解法是使用递归求解，不过同样也可使用非递归方式求解。</p>
-<h2 id="前序遍历"><a class="markdownIt-Anchor" href="#前序遍历"></a> 前序遍历</h2>
-<p>先来看前序遍历的递归求解：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">preorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        values = []</span><br><span class="line"></span><br><span class="line">        self._preorder_traversal(root, values)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_preorder_traversal</span>(<span class="params">self, root: TreeNode, values: List[<span class="built_in">int</span>]</span>) -&gt; <span class="keyword">None</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">        values.append(root.val)</span><br><span class="line"></span><br><span class="line">        self._preorder_traversal(root.left, values)</span><br><span class="line">        self._preorder_traversal(root.right, values)</span><br></pre></td></tr></table></figure>
-<p>对于如下的二叉树：</p>
-<p><img src="/images/binary-tree.jpg" alt="alt" /></p>
-<p>其调用链为：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">_preorder_traversal(1)</span><br><span class="line">    _preorder_traversal(2)</span><br><span class="line">        _preorder_traversal(4)</span><br><span class="line">        _preorder_traversal(5)</span><br><span class="line">    _preorder_traversal(3)</span><br></pre></td></tr></table></figure>
-<p>可以看到越深的节点对应的函数调用越先返回，对应先进后出的模型，即栈，所以递归转非递归可借助栈实现。</p>
-<p>由于前序遍历是先访问根节点，所以对于每个子树，可以先将根节点入栈，然后依次弹出栈顶的节点，从而实现先访问根节点，然后将左右子树的根节点入栈，由于左子树需要先于右子树被访问，所以右子树的根节点要先入栈，然后再入栈左子树的根节点：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">preorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line">        values = []</span><br><span class="line">        stack = [root]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> stack:</span><br><span class="line">            current = stack.pop()</span><br><span class="line">            values.append(current.val)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> current.right:</span><br><span class="line">                stack.append(current.right)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> current.left:</span><br><span class="line">                stack.append(current.left)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
-<h2 id="中序遍历"><a class="markdownIt-Anchor" href="#中序遍历"></a> 中序遍历</h2>
-<p>在递归的方案下，前序遍历改为中序遍历只需改变 <code>values.append(root.val)</code> 的执行位置即可，而在非递归方案下，并不能通过直接改变 <code>values.append(current.val)</code> 的执行位置来实现，因为不管放到哪个位置，都会提前访问到根节点。</p>
-<p>中序遍历下，最左下方的节点是最先被访问的，沿着左子树的根节点这条线，等同于一个单链表的倒序访问，单链表的倒序如果用栈来实现则是将单链表的所有节点从链表头开始遍历依次放入栈，然后再依次出栈，类似的，只要当前节点存在左子树，则持续将左子树的根节点压入栈，这样下次出栈时，就会先访问最左下方的节点。当某个节点出栈时，由于上述的操作，它必然是某个子树的最左下方的节点，此时需要转到该节点的右子树重复上述流程从而访问右子树的全部节点：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        self.val = x</span><br><span class="line">        self.left = <span class="literal">None</span></span><br><span class="line">        self.right = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        values = []</span><br><span class="line">        stack = []</span><br><span class="line">        current = root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> current <span class="keyword">or</span> stack:</span><br><span class="line">            <span class="keyword">while</span> current:</span><br><span class="line">                stack.append(current)</span><br><span class="line">                current = current.left</span><br><span class="line"></span><br><span class="line">            current = stack.pop()</span><br><span class="line">            values.append(current.val)</span><br><span class="line">            current = current.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
-<p>虽然前序遍历的非递归方案不适用于中序遍历，不过中序遍历的递归方案可略微修改适用于前序遍历，只需将 <code>values.append(current.val)</code> 放在不断入栈左子树的循环中即可：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">preorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        values = []</span><br><span class="line">        stack = []</span><br><span class="line">        current = root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> current <span class="keyword">or</span> stack:</span><br><span class="line">            <span class="keyword">while</span> current:</span><br><span class="line">                values.append(current.val)</span><br><span class="line">                stack.append(current)</span><br><span class="line">                current = current.left</span><br><span class="line"></span><br><span class="line">            current = stack.pop()</span><br><span class="line">            current = current.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
-<h2 id="后序遍历"><a class="markdownIt-Anchor" href="#后序遍历"></a> 后序遍历</h2>
-<p>后序遍历和中序遍历相同，最先访问的都是最左下方的节点，所以对左子树不断入栈这段逻辑不变，不同的是当出栈时，当前出栈的节点有可能存在右子树，而右子树还还没有被访问，所以当前节点还不能出栈。因此，需要先判断栈顶的节点是否存在右子树，以及右子树是否被访问过，如果存在右子树且未被访问则转向右子树重复上述流程，否则可弹出栈顶节点。而判断栈顶的右子树是否被访问可通过比较栈顶的右子树和上一个被访问的节点来实现，如果两者相等，说明栈顶的右子树刚被访问过，否则未被访问过：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">postorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        prev = <span class="literal">None</span></span><br><span class="line">        current = root</span><br><span class="line">        stack = []</span><br><span class="line">        values = []</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> current <span class="keyword">or</span> stack:</span><br><span class="line">            <span class="keyword">while</span> current:</span><br><span class="line">                stack.append(current)</span><br><span class="line">                current = current.left</span><br><span class="line"></span><br><span class="line">            top = stack[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> top.right <span class="keyword">and</span> prev != top.right:</span><br><span class="line">                current = top.right</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                current = stack.pop()</span><br><span class="line">                values.append(current.val)</span><br><span class="line">                prev = current</span><br><span class="line">                current = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
-<h2 id="通用模板"><a class="markdownIt-Anchor" href="#通用模板"></a> 通用模板</h2>
-<p>上述各非递归方案各不相同，是否存在和递归方案类似的通用模板方案？<a href="https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals">这里</a> 给出了一种通用方案，首先需要额外引入一个数据结构来标记节点是否被访问过：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Pair</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> visited;</span><br><span class="line">    TreeNode node;</span><br><span class="line"></span><br><span class="line">    Pair(TreeNode node, <span class="keyword">boolean</span> visited) &#123;</span><br><span class="line">        <span class="keyword">this</span>.node = node;</span><br><span class="line">        <span class="keyword">this</span>.visited = visited;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在 <code>Python</code> 中，可简单通过元组来实现，对应模板代码为：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">xxxTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line">        </span><br><span class="line">        stack = [(root, <span class="literal">False</span>)]</span><br><span class="line">        values = []</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span> stack:</span><br><span class="line">            current, visited = stack.pop()</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> visited:</span><br><span class="line">                values.append(current.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 在这里处理左子树，右子树，根节点的入栈顺序</span></span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
-<p>对于三种遍历方式，上述模板方法仅在处理左子树，右子树，根节点的入栈顺序上不同，实际入栈顺序和遍历顺序相反：</p>
-<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 前序遍历</span></span><br><span class="line"><span class="keyword">if</span> current.right:</span><br><span class="line">    stack.append((current.right, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.left:</span><br><span class="line">    stack.append((current.left, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">stack.append((current, <span class="literal">True</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 中序遍历</span></span><br><span class="line"><span class="keyword">if</span> current.right:</span><br><span class="line">    stack.append((current.right, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">stack.append((current, <span class="literal">True</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.left:</span><br><span class="line">    stack.append((current.left, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 后序遍历</span></span><br><span class="line">stack.append((current, <span class="literal">True</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.right:</span><br><span class="line">    stack.append((current.right, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.left:</span><br><span class="line">    stack.append((current.left, <span class="literal">False</span>))</span><br></pre></td></tr></table></figure>
-<p>从出栈的角度来说，上述方法和理论遍历顺序并不一致，每个节点会入栈两次，第二次入栈时才会设置 <code>visited</code> 为 <code>True</code>，但从 <code>visited</code> 的角度来说顺序是和理论遍历顺序一致的。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a href="https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals">[Java] This simple template can be used for 3 traversals</a></li>
-<li><a href="https://leetcode.com/problems/binary-tree-postorder-traversal/discuss/45551/Preorder-Inorder-and-Postorder-Iteratively-Summarization">Preorder, Inorder, and Postorder Iteratively Summarization</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Data Structure</tag>
-        <tag>Algorithm</tag>
-        <tag>Binary Tree</tag>
       </tags>
   </entry>
   <entry>
@@ -1276,6 +1233,49 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
         <tag>MIT 6.824</tag>
         <tag>MapReduce</tag>
         <tag>Distributed Systems</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>二叉树非递归遍历</title>
+    <url>/2022/02/02/binary-tree-traverse-with-stack/</url>
+    <content><![CDATA[<p>二叉树的遍历直观的解法是使用递归求解，不过同样也可使用非递归方式求解。</p>
+<h2 id="前序遍历"><a class="markdownIt-Anchor" href="#前序遍历"></a> 前序遍历</h2>
+<p>先来看前序遍历的递归求解：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">preorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        values = []</span><br><span class="line"></span><br><span class="line">        self._preorder_traversal(root, values)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_preorder_traversal</span>(<span class="params">self, root: TreeNode, values: List[<span class="built_in">int</span>]</span>) -&gt; <span class="keyword">None</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">        values.append(root.val)</span><br><span class="line"></span><br><span class="line">        self._preorder_traversal(root.left, values)</span><br><span class="line">        self._preorder_traversal(root.right, values)</span><br></pre></td></tr></table></figure>
+<p>对于如下的二叉树：</p>
+<p><img src="/images/binary-tree.jpg" alt="alt" /></p>
+<p>其调用链为：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">_preorder_traversal(1)</span><br><span class="line">    _preorder_traversal(2)</span><br><span class="line">        _preorder_traversal(4)</span><br><span class="line">        _preorder_traversal(5)</span><br><span class="line">    _preorder_traversal(3)</span><br></pre></td></tr></table></figure>
+<p>可以看到越深的节点对应的函数调用越先返回，对应先进后出的模型，即栈，所以递归转非递归可借助栈实现。</p>
+<p>由于前序遍历是先访问根节点，所以对于每个子树，可以先将根节点入栈，然后依次弹出栈顶的节点，从而实现先访问根节点，然后将左右子树的根节点入栈，由于左子树需要先于右子树被访问，所以右子树的根节点要先入栈，然后再入栈左子树的根节点：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">preorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line">        values = []</span><br><span class="line">        stack = [root]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> stack:</span><br><span class="line">            current = stack.pop()</span><br><span class="line">            values.append(current.val)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> current.right:</span><br><span class="line">                stack.append(current.right)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> current.left:</span><br><span class="line">                stack.append(current.left)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
+<h2 id="中序遍历"><a class="markdownIt-Anchor" href="#中序遍历"></a> 中序遍历</h2>
+<p>在递归的方案下，前序遍历改为中序遍历只需改变 <code>values.append(root.val)</code> 的执行位置即可，而在非递归方案下，并不能通过直接改变 <code>values.append(current.val)</code> 的执行位置来实现，因为不管放到哪个位置，都会提前访问到根节点。</p>
+<p>中序遍历下，最左下方的节点是最先被访问的，沿着左子树的根节点这条线，等同于一个单链表的倒序访问，单链表的倒序如果用栈来实现则是将单链表的所有节点从链表头开始遍历依次放入栈，然后再依次出栈，类似的，只要当前节点存在左子树，则持续将左子树的根节点压入栈，这样下次出栈时，就会先访问最左下方的节点。当某个节点出栈时，由于上述的操作，它必然是某个子树的最左下方的节点，此时需要转到该节点的右子树重复上述流程从而访问右子树的全部节点：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        self.val = x</span><br><span class="line">        self.left = <span class="literal">None</span></span><br><span class="line">        self.right = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        values = []</span><br><span class="line">        stack = []</span><br><span class="line">        current = root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> current <span class="keyword">or</span> stack:</span><br><span class="line">            <span class="keyword">while</span> current:</span><br><span class="line">                stack.append(current)</span><br><span class="line">                current = current.left</span><br><span class="line"></span><br><span class="line">            current = stack.pop()</span><br><span class="line">            values.append(current.val)</span><br><span class="line">            current = current.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
+<p>虽然前序遍历的非递归方案不适用于中序遍历，不过中序遍历的递归方案可略微修改适用于前序遍历，只需将 <code>values.append(current.val)</code> 放在不断入栈左子树的循环中即可：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">preorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        values = []</span><br><span class="line">        stack = []</span><br><span class="line">        current = root</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> current <span class="keyword">or</span> stack:</span><br><span class="line">            <span class="keyword">while</span> current:</span><br><span class="line">                values.append(current.val)</span><br><span class="line">                stack.append(current)</span><br><span class="line">                current = current.left</span><br><span class="line"></span><br><span class="line">            current = stack.pop()</span><br><span class="line">            current = current.right</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
+<h2 id="后序遍历"><a class="markdownIt-Anchor" href="#后序遍历"></a> 后序遍历</h2>
+<p>后序遍历和中序遍历相同，最先访问的都是最左下方的节点，所以对左子树不断入栈这段逻辑不变，不同的是当出栈时，当前出栈的节点有可能存在右子树，而右子树还还没有被访问，所以当前节点还不能出栈。因此，需要先判断栈顶的节点是否存在右子树，以及右子树是否被访问过，如果存在右子树且未被访问则转向右子树重复上述流程，否则可弹出栈顶节点。而判断栈顶的右子树是否被访问可通过比较栈顶的右子树和上一个被访问的节点来实现，如果两者相等，说明栈顶的右子树刚被访问过，否则未被访问过：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">postorderTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        prev = <span class="literal">None</span></span><br><span class="line">        current = root</span><br><span class="line">        stack = []</span><br><span class="line">        values = []</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> current <span class="keyword">or</span> stack:</span><br><span class="line">            <span class="keyword">while</span> current:</span><br><span class="line">                stack.append(current)</span><br><span class="line">                current = current.left</span><br><span class="line"></span><br><span class="line">            top = stack[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> top.right <span class="keyword">and</span> prev != top.right:</span><br><span class="line">                current = top.right</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                current = stack.pop()</span><br><span class="line">                values.append(current.val)</span><br><span class="line">                prev = current</span><br><span class="line">                current = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
+<h2 id="通用模板"><a class="markdownIt-Anchor" href="#通用模板"></a> 通用模板</h2>
+<p>上述各非递归方案各不相同，是否存在和递归方案类似的通用模板方案？<a href="https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals">这里</a> 给出了一种通用方案，首先需要额外引入一个数据结构来标记节点是否被访问过：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Pair</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> visited;</span><br><span class="line">    TreeNode node;</span><br><span class="line"></span><br><span class="line">    Pair(TreeNode node, <span class="keyword">boolean</span> visited) &#123;</span><br><span class="line">        <span class="keyword">this</span>.node = node;</span><br><span class="line">        <span class="keyword">this</span>.visited = visited;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 <code>Python</code> 中，可简单通过元组来实现，对应模板代码为：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> List</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, val=<span class="number">0</span>, left=<span class="literal">None</span>, right=<span class="literal">None</span></span>):</span></span><br><span class="line">        self.val = val</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">xxxTraversal</span>(<span class="params">self, root: TreeNode</span>) -&gt; List[int]:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line">        </span><br><span class="line">        stack = [(root, <span class="literal">False</span>)]</span><br><span class="line">        values = []</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span> stack:</span><br><span class="line">            current, visited = stack.pop()</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> visited:</span><br><span class="line">                values.append(current.val)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 在这里处理左子树，右子树，根节点的入栈顺序</span></span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></table></figure>
+<p>对于三种遍历方式，上述模板方法仅在处理左子树，右子树，根节点的入栈顺序上不同，实际入栈顺序和遍历顺序相反：</p>
+<figure class="highlight py"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 前序遍历</span></span><br><span class="line"><span class="keyword">if</span> current.right:</span><br><span class="line">    stack.append((current.right, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.left:</span><br><span class="line">    stack.append((current.left, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">stack.append((current, <span class="literal">True</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 中序遍历</span></span><br><span class="line"><span class="keyword">if</span> current.right:</span><br><span class="line">    stack.append((current.right, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">stack.append((current, <span class="literal">True</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.left:</span><br><span class="line">    stack.append((current.left, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 后序遍历</span></span><br><span class="line">stack.append((current, <span class="literal">True</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.right:</span><br><span class="line">    stack.append((current.right, <span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> current.left:</span><br><span class="line">    stack.append((current.left, <span class="literal">False</span>))</span><br></pre></td></tr></table></figure>
+<p>从出栈的角度来说，上述方法和理论遍历顺序并不一致，每个节点会入栈两次，第二次入栈时才会设置 <code>visited</code> 为 <code>True</code>，但从 <code>visited</code> 的角度来说顺序是和理论遍历顺序一致的。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a href="https://leetcode.com/problems/binary-tree-preorder-traversal/discuss/1736072/Java-This-simple-template-can-be-used-for-3-traversals">[Java] This simple template can be used for 3 traversals</a></li>
+<li><a href="https://leetcode.com/problems/binary-tree-postorder-traversal/discuss/45551/Preorder-Inorder-and-Postorder-Iteratively-Summarization">Preorder, Inorder, and Postorder Iteratively Summarization</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Data Structure</tag>
+        <tag>Algorithm</tag>
+        <tag>Binary Tree</tag>
       </tags>
   </entry>
   <entry>
@@ -1989,6 +1989,273 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       </tags>
   </entry>
   <entry>
+    <title>MIT 6.824 - Lab 2 (1): Students&#39; Guide to Raft</title>
+    <url>/2022/05/06/mit-6.824-lab2-students-guide-to-raft/</url>
+    <content><![CDATA[<p><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。</p>
+<h2 id="实现-raft"><a class="markdownIt-Anchor" href="#实现-raft"></a> 实现 Raft</h2>
+<p>论文中的 <code>Figure 2</code> 和 <code>Figure 13</code> 描述了实现 <code>Raft</code> 的主要接口，以及各节点需要维护的状态和响应接口时的行为逻辑，所以在做 <code>Lab 2</code> 之前需要先充分理解这部分的内容。文中的建议是<strong>必须</strong>严格落实图中的每一句话，而不是仅仅实现了功能，否则就有可能遇到奇怪的问题或不正确的系统行为。</p>
+<p>文中举了三个例子。第一，每次收到 <code>AppendEntries</code> 或 <code>RequestVote</code> 请求就重置 <code>election timeout</code>，因为收到这两个请求说明存在主节点或者正在选主。不过，图中还有描述：</p>
+<blockquote>
+<p>If election timeout elapses without receiving AppendEntries RPC from current leader or granting vote to candidate: convert to candidate.</p>
+</blockquote>
+<p>重置 <code>election timeout</code> 有两个关键条件：<code>AppendEntries</code> 要求发送请求的主节点是当前任期的主节点；<code>RequestVote</code> 要求成功投出选票。</p>
+<p>先看第一个条件，假设当前任期的主节点异常，此时还有一个之前任期的主节点存活在不断发送 <code>AppendEntries</code> 请求，假设此时某个从节点马上要进入选主状态，但由于收到了 <code>AppendEntries</code> 请求又没有校验任期就重置了 <code>election timeout</code>，造成无主状态时间延长。这个场景下如果过期的主节点不实现下面的逻辑杀伤力倍增：</p>
+<blockquote>
+<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower</p>
+</blockquote>
+<p>如果不实现上面的逻辑，那么过期的主节点会一直是主节点，然后一直重置其他本来可以成为候选节点的从节点。</p>
+<p>再来看第二个条件，假设当前任期的主节点异常，各从节点准备进入选主状态，此时一个不可能成为主节点的从节点先变成了候选节点（该节点的日志相对于其他任何一个从节点来说都不够新，即最后一条日志的任期不够大，或者任期相同但是日志条数不够多），<code>RequestVote</code> 永远不会成功，如果各从节点一收到 <code>RequestVote</code> 就重置 <code>election timeout</code>，就会造成始终没有主节点的情况。</p>
+<p>第二个例子，从节点收到心跳 <code>AppendEntries</code> 后就直接返回 <code>success = true</code> 和重置 <code>election timeout</code>。重置 <code>election timeout</code> 的危害上面已经说过，充当心跳的 <code>AppendEntries</code> 是不带日志的请求，文中提到学生在实现时容易将心跳 <code>AppendEntries</code> 特殊对待，而不进行 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 的校验。从节点返回 <code>true</code> 时主节点就会认为从节点的日志和自己匹配，从而错误的认为某些日志已经复制到了从节点上，从而可以提交日志。不过看到这里可能会有疑问，为什么主节点会在心跳响应中提交日志？通过心跳更新 <code>nextIndex</code> 和 <code>matchIndex</code> 是合理的，如果过半数节点已复制的日志是之前任期的，论文中有描述这是不允许提交的；如果过半数节点已复制的日志是当前任期的，那么可能是之前带日志的 <code>AppendEntries</code> 请求中从节点实际已完成了日志的复制，但是主节点没有收到响应，所以在最新的心跳中提交日志。</p>
+<p>引申开来，假设系统中此时 <code>x = 1</code>，有个客户端发送了 <code>write x = 2</code> 的请求，主节点成功将日志复制到了过半数的节点上，但是还没有响应客户端就异常了。系统重新选主后，此时有个客户端发送请求 <code>read x</code>，<code>x</code> 应该返回多少？应该是2，因为在 <code>Raft</code> 层面，一条日志是否已提交只取决于是否在当前任期内复制到了过半数的节点上，而不是取决于客户端是否收到响应，而只要日志提交了就可以被应用到状态机。类似的场景可以想象一下平时填了某个表单，提交时提示系统异常，但是刷新页面后表单信息已更新。</p>
+<p>第三个例子，学生在实现 <code>AppendEntries</code> 时，可能将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志。同样的，图中也有描述：</p>
+<blockquote>
+<p>If an existing entry conflicts with a new one (same index but different terms), delete the existing entry and all that follow it.</p>
+</blockquote>
+<p>因为当前的 <code>AppendEntries</code> 可能是个过期的请求，假设请求中的日志只是当前从节点已提交的日志的某一段子集，那么如果从节点将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志就会丢失已提交的日志。</p>
+<h2 id="调试-raft"><a class="markdownIt-Anchor" href="#调试-raft"></a> 调试 Raft</h2>
+<p>调试是实验中最花时间的一个部分，文中列举了四个常见的问题：活锁，不正确或不完整的 <code>RPC</code> 实现，没有遵循论文中的 <code>Rules for Servers</code> 以及任期混淆。</p>
+<h3 id="活锁"><a class="markdownIt-Anchor" href="#活锁"></a> 活锁</h3>
+<p>出现活锁时，等同于各节点都在做无用功。选主是最容易出现活锁的场景，例如始终无法选出一个主节点，或者某个候选节点获得了足够的选票后，马上有另外一个节点发起选主，使得刚成为主节点的节点重新退回到从节点（某个节点成为主节点后，还没来得及发送心跳，刚投了票的某个节点 <code>election timeout</code> 到期，发起新的选主，由于它的任期加了1比当前的主节点的任期大，主节点收到 <code>RequestVote</code> 后发现自己的任期小，从而转为从节点）。</p>
+<p>常见的原因有以下几种：</p>
+<p>第一，没有严格按照 <code>Figure 2</code> 的要求重置 <code>election timeout</code>。重置 <code>election timeout</code> 仅限于几种情况：</p>
+<ol>
+<li>收到当前任期的主节点的 <code>AppendEntries</code> 请求（如果 <code>AppendEntries</code> 中的任期比自身的任期小，则忽略该请求）。</li>
+<li>开启一轮新的选主，这个属于 <code>election timeout</code> 到期，选主的同时需要重置一个新的随机值。</li>
+<li>在某轮选举中，将票投给了某个候选节点。</li>
+</ol>
+<p>第二，没有按照 <code>Fiture 2</code> 的要求开启选主。特别的，如果当前节点是候选节点，但是 <code>election timeout</code> 到期了，那么需要开启新的一轮选主。</p>
+<p>第三，没有遵循 <code>Rules for Servers</code> 的第二条：</p>
+<blockquote>
+<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower (§5.1)</p>
+</blockquote>
+<p>例如，当前节点已投票，按照 <code>Raft</code> 的要求，一个从节点在一个任期内只能投票一次，此时又收到了一个 <code>RequestVote</code> 请求，请求中的任期大于自身的任期，那么就需要再次投票并更新自身的任期，避免新的候选节点拿不到足够的选票。</p>
+<h3 id="不正确的-rpc-实现"><a class="markdownIt-Anchor" href="#不正确的-rpc-实现"></a> 不正确的 <code>RPC</code> 实现</h3>
+<p>这里总结了学生们过往在实现 <code>RPC</code> 接口时容易犯错的点：</p>
+<ul>
+<li>如果某一步要求 <code>reply false</code>，那么这说明需要立即回复 <code>false</code> 并返回，不要再执行后续的步骤。</li>
+<li>如果收到了一条 <code>AppendEntries</code> 请求，但是请求中的 <code>prevLogIndex</code> 比当前日志的最后一条的索引还要大，也要返回 <code>false</code>，这也属于日志不匹配。</li>
+<li>如前面描述，即使 <code>AppendEntries</code> 没有包含任何日志，接收方也需要校验 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>。</li>
+<li><code>AppendEntries</code> 中的第五步的 <code>min</code> 是有必要的，而且是和新日志中的最后一条日志的索引相比较，而不是当前日志的最后一条索引。
+<ul>
+<li>首先来看 <code>leaderCommit &lt; index of last new entry</code> 的情况，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 4, 5]</code>，<code>leaderCommit</code> 为3（索引按从1开始算），<code>S2</code> 为从节点，日志为 <code>[1, 2]</code>，那么 <code>S1</code> 需要将 <code>[3, 4, 5]</code> 发给 <code>S2</code>，<code>S2</code> 收到后 <code>index of last new entry</code> 是5，但是 <code>commitIndex</code> 只能更新到 <code>3</code>，也就是 <code>leaderCommit</code>，因为 <code>[4, 5]</code> 还没有提交。</li>
+<li>然后来看 <code>leaderCommit &gt; index of last new entry</code> 的情况，乍看之下好像不可能，因为对于主节点来说，在添加一条新日志的那个时刻，<code>leaderCommit</code> 肯定小于新的日志的索引，复制日志到从节点时这个关系也不会变。这里只能想到的是，<code>leaderCommit</code> 被并发修改了，因为主节点不会删除日志，所以 <code>index of last new entry</code> 不会变，当主节点和从节点的日志不匹配时，主从节点需要来回的就 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 达成一致（或者单纯就是因为执行的慢），在这个期间，可能过半数的节点已经达成了完成日志复制，主节点就可以提交这条日志，并更新 <code>leaderCommit</code>，所以在原先的 <code>AppendEntries</code> 中，如果 <code>leaderCommit</code> 引用的是全局变量，而 <code>entries[]</code> 是固定的，就会造成 <code>leaderCommit</code> 的值比 <code>entries[]</code> 的最后一条日志的索引还要大，这个时候从节点的 <code>commitIndex</code> 就需要取 <code>index of last new entry</code>。文中举了个例子说明为什么这时候不能取 <code>leaderCommit</code>，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 6]</code>，<code>leaderCommit</code> 为3，<code>S2</code> 为从节点，日志为 <code>[1, 2, 3, 4, 5]</code>，那么 <code>S1</code> 需要将 <code>[6]</code> 发给 <code>S2</code>，注意这里 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 校验通过，而论文中只提到校验不通过时才删除从节点的日志，所以这里就不会删除 <code>S2</code> 的 <code>[4, 5]</code>，又假设此时 <code>S1</code> 通过其他节点的交互将日志成功提交到了 <code>[1, 2, 3, 6, 7]</code>，<code>leaderCommit</code> 变为了第5个位置，<code>S2</code> 收到的 <code>AppendEntries</code> 中 <code>leaderCommit = 5</code>，<code>entries = [6]</code>，如果按照最新的 <code>leaderCommit</code> 更新就会造成把 <code>S2</code> 日志中的5归为已提交。</li>
+</ul>
+</li>
+<li>严格按照论文5.4节的描述来比较两个节点的日志哪个较新，不要只比较日志的长度。</li>
+</ul>
+<h3 id="未遵循-rules-for-servers"><a class="markdownIt-Anchor" href="#未遵循-rules-for-servers"></a> 未遵循 Rules for Servers</h3>
+<ul>
+<li>如果 <code>commitIndex &gt; lastApplied</code>，说明可以应用新的日志到状态机中。应用到状态机的顺序必须严格按照日志的顺序，可以由一个单独的线程顺序执行，也可以由多个线程并行执行，但各线程间必须确保不互相干扰，避免执行覆盖，对于同一个变量的不同写请求，多线程间必须按照日志的顺序写入。</li>
+<li>确保周期性的检查 <code>commitIndex &gt; lastApplied</code> 或者在 <code>commitIndex</code> 更新后检查（在 <code>matchIndex</code> 更新后）。这里并没有太明白这个问题，作者举了个例子，假设现在主节点发出了 <code>AppendEntries</code> 请求并同时检查 <code>commitIndex</code>，如果这条日志被过半数的节点复制了，那么需要等到主节点再添加一条新日志后才能应用上一条日志到状态机。不过根据这个例子也没有看出两者的关联，因为如果采用单线程顺序应用日志到状态机的方式，如果 <code>commitIndex &gt; lastApplied</code> 不满足，线程可以先睡眠然后再尝试，除此以外没有依赖其他条件。</li>
+<li>假设主节点发出 <code>AppendEntries</code> 请求然后被拒绝了，如果不是因为日志不一致被拒绝，那么这个主节点就必须马上转为从节点，且不能更新 <code>nextIndex</code>，因为这说明当前主节点的任期小于从节点。如果错误的更新了 <code>nextIndex</code>，而这个主节点在转为从节点后又当选了主节点，就会造成 <code>nextIndex</code> 和从节点永远不会匹配的情况（相当于错位了一格）。</li>
+<li>如果主节点发现某条过去任期的日志被大多数的节点复制了，但是自身的 <code>commitIndex</code> 却小于这条日志的索引，此时主节点也不能够更新 <code>commitIndex</code>，这个就是论文中 <code>Figure 8</code> 描述的问题，提交一条之前任期的日志存在被新一轮的主节点覆盖的风险。所以提交日之前需要判断 <code>log[N].term == currentTerm</code>。</li>
+</ul>
+<p>有一个常见的困惑是 <code>nextIndex</code> 和 <code>matchIndex</code> 的区别。你可能会观察到 <code>matchIndex = nextIndex - 1</code>，然后用 <code>nextIndex</code> 来替代 <code>matchIndex</code>，然而这是有风险的。举一个很明显的反例，假设某个节点被选为主节点，此时收到一个客户端请求并添加了一条日志，那么它发给从节点的 <code>nextIndex</code> 就是最后一条日志的下一条，而 <code>matchIndex</code> 显然不是 <code>nextIndex - 1</code>（新添加的日志的索引）。</p>
+<h3 id="任期混淆"><a class="markdownIt-Anchor" href="#任期混淆"></a> 任期混淆</h3>
+<p>任期混淆指的是节点收到了来自之前任期的 <code>RPC</code> 请求。<code>Figure 2</code> 清晰的描述了收到过期任期的请求应该怎么做，但是并没有说明收到过期任期的响应应该怎么做。一个简单的做法就是比较响应中的任期和当前的任期，如果相等则执行相应的逻辑，如果当前任期小则转为从节点（只有主节点、候选节点才能发请求，才有收到响应的可能），如果当前任期大则不处理。</p>
+<p>还有一个相关但不同的问题，假设主节点收到 <code>AppendEntries</code> 响应后设置 <code>matchIndex = nextIndex - 1</code> 或 <code>matchIndex = len(log)</code>，这都是不安全的，因为 <code>nextIndex</code> 和 <code>len(log)</code> 在这期间都有可能改变，正确的做法应该是使用原始请求中不变的参数，即 <code>matchIndex = prevLogIndex + len(entries[])</code>。</p>
+<h3 id="关于性能"><a class="markdownIt-Anchor" href="#关于性能"></a> 关于性能</h3>
+<p>实验中会要求实现两个关于性能方面的优化，一个是日志压缩，另一个是快速确认正确的 <code>prevLogIndex</code>。</p>
+<p>关于日志压缩需要注意几点：</p>
+<ul>
+<li>当执行快照时，需要确保快照中的状态和指定日志中的索引是严格对应的，即快照不能落后于日志，也不能超前。</li>
+<li>论文中并没有描述当节点异常然后恢复后应该如何处理快照。论文中要求创建完快照后，需要删除快照所对应的日志，而系统可能在删除日志前异常，那么系统恢复后会根据快照和日志进行重放。文中说系统可能会重放已经在快照中的日志，这里有点疑问，因为快照中包含了 <code>lastIncludedIndex</code> 和 <code>lastIncludedTerm</code>，和当前日志进行对比就能知道哪些日志已经在快照中了，从而可以跳过。</li>
+</ul>
+<p>论文中并没有详细描述如何快速确认正确的 <code>prevLogIndex</code>，这部分的逻辑可以参考 <a href="https://pdos.csail.mit.edu/6.824/notes/l-raft2.txt">6.824 2022 Lecture 7: Raft (2)</a> 或者文中的建议：</p>
+<ul>
+<li>如果从节点在 <code>prevLogIndex</code> 处没有日志，说明从节点的日志较短，则返回 <code>conflictIndex = len(log)</code> 以及 <code>conflictTerm = None</code>。</li>
+<li>如果从节点在 <code>prevLogIndex</code> 处有日志，但是日志对应的任期不匹配，那么返回 <code>conflictTerm = log[prevLogIndex].Term</code>，然后找到属于 <code>conflictTerm</code> 的第一条日志的索引。</li>
+<li>主节点收到 <code>conflictIndex/conflictTerm</code> 后，首先在日志中搜索 <code>conflictTerm</code>，如果找到有日志属于 <code>conflictTerm</code>，那么 <code>nextIndex</code> 需要更新为主节点中属于 <code>conflictTerm</code> 的最后一条日志的索引加1。</li>
+<li>如果主节点没有找到属于 <code>conflictTerm</code> 的日志，那么更新 <code>nextIndex</code> 为 <code>conflictIndex</code>。</li>
+</ul>
+<p>其中一个不完善的实现是只考虑 <code>conflictIndex</code> 而忽略了 <code>conflictTerm</code>，这样会简化实现，不过主从节点交互的次数会变多，因为如果考虑了 <code>conflictTerm</code>，那么一次性能跳过的日志会更多。</p>
+<p>最后一部分的 <code>Applications on top of Raft</code> 属于 <code>Lab 3</code> 的内容，即基于 <code>Raft</code> 构建应用，在 <code>Lab 2</code> 中暂不描述。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Distributed Systems</tag>
+        <tag>Go</tag>
+        <tag>Raft</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - Lab 2 (2): Raft Locking Advice</title>
+    <url>/2022/05/07/mit-6.824-lab2-raft-locking-advice/</url>
+    <content><![CDATA[<p><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a> 提供了些关于如何在 <code>Lab 2</code> 中使用锁的建议。</p>
+<h2 id="规则1"><a class="markdownIt-Anchor" href="#规则1"></a> 规则1</h2>
+<p>只要有多个 <code>goroutine</code> 访问同一份数据，并且至少有一个 <code>goroutine</code> 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 <code>Go</code> 的竞争检测（添加 <code>-race</code> 标记）来识别这类问题。</p>
+<h2 id="规则2"><a class="markdownIt-Anchor" href="#规则2"></a> 规则2</h2>
+<p>如果有多个数据需要作为一个整体被修改，为了避免其他的 <code>goroutine</code> 看到部分数据更新而造成不正确的行为，此时也需要加锁。例如：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
+<p>上面的代码需要同时更新 <code>rf.currentTerm</code> 和 <code>rf.state</code>，如果不加锁其他 <code>goroutine</code> 有可能看到更新后的任期，但是节点状态还未更新。同时，其他任何地方用到 <code>rf.currentTerm</code> 或者 <code>rf.state</code> 的地方也必须先持有锁，一是保证可见性，二是避免在多处同时修改 <code>rf.currentTerm</code> 或者 <code>rf.state</code>。</p>
+<h2 id="规则3"><a class="markdownIt-Anchor" href="#规则3"></a> 规则3</h2>
+<p>如果需要对某个数据做一系列读操作（或者读写混合），那么为了避免其他 <code>goroutine</code> 在中途修改数据，就需要对这一系列操作加锁。例如：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line"><span class="keyword">if</span> args.Term &gt; rf.currentTerm &#123;</span><br><span class="line">    rf.currentTerm = args.Term</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
+<p>上面的代码是典型的 <code>如果满足某个条件，那么就执行 xxx</code> 场景。如果不加锁，可能其他的 <code>goroutine</code> 将 <code>rf.currentTerm</code> 更新后，当前 <code>goroutine</code> 会将 <code>rf.currentTerm</code> 重置为 <code>args.Term</code>，在 <code>Raft</code> 中有可能造成任期倒退。</p>
+<p>在真实的 <code>Raft</code> 代码中加锁的粒度可能会更大，例如可能在整个 <code>RPC handler</code> 处理期间都持有锁。</p>
+<h2 id="规则4"><a class="markdownIt-Anchor" href="#规则4"></a> 规则4</h2>
+<p>不建议在等待某个事件时持有锁，例如从 <code>channel</code> 中读取数据，向 <code>channel</code> 发送数据，计时器等待，调用 <code>time.Sleep()</code>，或者发送一个 <code>RPC</code> 请求并等待响应结果。因为有可能造成死锁，文中举了两个节点互发 <code>RPC</code> 请求并希望获取对方持有的锁的例子，这是个典型的死锁场景。</p>
+<p>又或者某个 <code>goroutine</code> 先持有锁，但是使用 <code>time.Sleep</code> 来等待某个条件发生，其他的 <code>goroutine</code> 由于无法获取锁从而使得等待的条件永远无法成立，这个时候应该用 <code>sync.Cond</code>：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mu.Lock()</span><br><span class="line"></span><br><span class="line">while (!someCondition) &#123;</span><br><span class="line">    time.Sleep(time.Millisecond * <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mu.Unlock()</span><br></pre></td></tr></table></figure>
+<h2 id="规则5"><a class="markdownIt-Anchor" href="#规则5"></a> 规则5</h2>
+<p>当释放锁然后重新获取锁之后，某些释放锁之前成立的条件可能此时已经不成立。例如下面的候选节点获取选票的实现是不正确的：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line"><span class="keyword">for</span> &lt;each peer&gt; &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        rf.mu.Lock()</span><br><span class="line">        args.Term = rf.currentTerm</span><br><span class="line">        rf.mu.Unlock()</span><br><span class="line">        Call(<span class="string">&quot;Raft.RequestVote&quot;</span>, &amp;args, ...)</span><br><span class="line">        <span class="comment">// handle the reply...</span></span><br><span class="line">    &#125; ()</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
+<p>在每个 <code>goroutine</code> 中，重新获取锁后拿到的任期可能已经不是当初的任期。这里需要将 <code>goroutine</code> 中的 <code>rf.currentTerm</code> 提取到循环之外作为一个变量，然后在 <code>goroutine</code> 中访问这个变量。另外，在 <code>Call</code> 执行完成后，也需要再次获取锁并检查 <code>rf.currentTerm</code> 或其他变量是否还满足条件，例如需要检查下当前的任期是否还是最初的任期，如果不是那说明又开启了一轮选主或者已经有其他节点成为了主节点。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>MIT 6.824</tag>
+        <tag>Distributed Systems</tag>
+        <tag>Go</tag>
+        <tag>Raft</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MIT 6.824 - ZooKeeper: Wait-free coordination for Internet-scale systems</title>
+    <url>/2022/05/19/mit-6.824-zookeeper/</url>
+    <content><![CDATA[<h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p>大型分布式系统需要各式各样的协同。配置就是其中一种最基础的形式，在其最简单的形式中，配置只是一系列供系统使用的参数，而对于更复杂的系统来说，配置还可以动态更新。群组成员关系和选主同样在分布式系统中很常见：通常各进程需要知道哪些进程还存活，以及哪些进程在负责统一管理。另外，分布式锁作为一种强大的协调原语能够对临界资源提供互斥访问保护。</p>
+<p>一种实现协同的方式是为每一个不同的协同需求开发一个服务。例如，<code>Amazon Simple Queue Service</code> 专注于消息队列。同时也存在专门为了选主和配置所开发的服务。针对较强的原语开发的服务能够用于实现较弱一级的原语。例如，<code>Chubby</code> 是一个强同步性保证的锁服务。则可以借助锁来实现选主，群组成员关系等服务。</p>
+<p>相较于在服务端实现特定的协同原语，<code>ZooKeeper</code> 的作者选择暴露某些 <code>API</code> 来让应用开发者自行实现需要的原语。这种设计选择需要实现一个协同内核（<code>coordination kernel</code>）使得新原语的开发不需要修改核心服务端代码。这种方式能够适配应用程序对不同协同形式的需求，而不是让开发者受限于某几个固定的原语。</p>
+<p>在设计 <code>ZooKeeper</code> 的 <code>API</code> 时，设计者移除了阻塞原语，例如锁。一个协同服务的阻塞原语会导致某些问题，缓慢或出错的客户端会拖慢快速的客户端的性能。如果服务处理请求时需要依赖响应以及负责客户端的异常检测，那么服务的实现会变得更为复杂。因此，<code>ZooKeeper</code> 实现了一套 <code>API</code> 能够操作以类似文件系统的方式组织的无等待（<code>wait-free</code>）对象。实际上，<code>ZooKeeper</code> 的 <code>API</code> 类似于其他任何的文件系统，以及和去除了加锁（<code>lock</code>），打开（<code>open</code>），关闭（<code>close</code>）这些方法的 <code>Chubby</code> 类似。实现了无等待对象的 <code>ZooKeeper</code> 显著有别于其他基于阻塞原语（例如锁）的系统。</p>
+<p>虽然无等待这一特性对于性能和容错很重要，但是对于协同来说来不够。<code>ZooKeeper</code> 还需要对各操作提供其他保证。对客户端 <code>FIFO</code> 的操作保证和线性化写入的保证确保了服务的高效实现，同时也能够满足应用程序实现自定义协同原语的需求。实际上，利用 <code>ZooKeeper</code> 的 <code>API</code> 可以实现任意节点数量的共识算法。</p>
+<p><code>ZooKeeper</code> 服务通过服务器间的复制来实现高可用和性能。它的高性能使得大量客户端进程能通过协同内核来管理方方面面的协同需求。通过一种简单的管道架构来实现 <code>ZooKeeper</code> 使得服务在承受几百或上千的请求的同时依然保持着低延迟。这种管道方式天然的支持对同一个客户端的请求以 <code>FIFO</code> 的方式执行。对客户端请求的 <code>FIFO</code> 顺序执行的保证使得客户端能异步的提交请求。异步提交也使得客户端同一时间有多个操作。这个特性很有用，例如当某个客户端成为主节点后，它需要操作元数据然后更新。如果缺少了多操作同时进行的特性，那么这个主节点初始化的时间可能达到秒级的数量级而不是亚秒级。</p>
+<p>为了满足写入的线性化保证，<code>ZooKeeper</code> 实现了一个基于主节点的原子广播协议，即 <code>Zab</code>。典型的 <code>ZooKeeper</code> 应用属于读密集型应用，所以需要保证读操作的扩展性。<code>ZooKeeper</code> 的读操作由当前服务器完成，不涉及和其他服务器的交互，也不会使用 <code>Zab</code> 来保证读取的顺序性。</p>
+<p>在客户端缓存数据是提高读性能的重要手段。例如，客户端可以缓存当前主节点的信息而不是每次请求 <code>ZooKeeper</code>。<code>ZooKeeper</code> 同时提供了监听机制来协助客户端缓存数据而无需直接管理客户端的缓存。借助这个机制，客户端可以对某个数据进行更新监听，从而在数据更新时收到通知。而 <code>Chubby</code> 会直接管理客户端的缓存，它会阻塞某个数据的更新直到所有缓存了该数据的客户端都清除了缓存。在这个设计下，如果某个客户端运行缓慢或者出错，则会拖慢数据的更新。<code>Chubby</code> 使用租约来避免某个客户端永久的阻塞系统。不过，租约只是确保了运行缓慢或者出错的客户端对性能的影响的上限，而 <code>ZooKeeper</code> 的监听机制则是完全的避免了这个问题。</p>
+<p>本文主要介绍了 <code>ZooKeeper</code> 的设计和实现。借助 <code>ZooKeeper</code>，我们可以实现应用程序所需要的所有协同原语，即使只有写入是线性化保证的。为了验证这个设计，本文介绍了如何使用 <code>ZooKeeper</code> 来实现某些协同原语。</p>
+<p>本文的关键点如下：</p>
+<ul>
+<li>协同内核（<code>Coordination kernel</code>）：本文提出了一种供分布式系统使用的无等待、宽松一致性保证的协同服务。特别的，本文描述了一种协同内核的设计和实现，并且已经在很多重要的应用程序中使用来实现各种各样的协同服务。</li>
+<li>协同示例（<code>Coordination recipes</code>）：本文描述了如何使用 <code>ZooKeeper</code> 来实现高层次的协同原语，包括在分布式应用中经常用到的阻塞和强一致性的原语。</li>
+<li>使用协同的经验（<code>Experience with Coordination</code>）：本文分享了使用 <code>ZooKeeper</code> 的方式以及评估了其性能。</li>
+</ul>
+<h2 id="zookeeper-服务"><a class="markdownIt-Anchor" href="#zookeeper-服务"></a> ZooKeeper 服务</h2>
+<p>客户端通过 <code>ZooKeeper</code> 提供的客户端类库来向 <code>ZooKeeper</code> 提交请求。除了向客户端暴露 <code>ZooKeeper</code> 提供的 <code>API</code> 外，客户端类库还负责维护客户端和 <code>ZooKeeper</code> 服务器间的连接。</p>
+<p>本节会首先从高层次来介绍 <code>ZooKeeper</code> 服务，然后再讨论客户端和 <code>ZooKeeper</code> 交互的 <code>API</code>。</p>
+<p>术语：本文使用客户端（<code>client</code>）来表示使用 <code>ZooKeeper</code> 服务的一个用户；使用服务端（<code>server</code>）来表示 <code>ZooKeeper</code> 的服务提供者；使用 <code>znode</code> 来表示 <code>ZooKeeper</code> 的一个内存数据节点，这些数据节点以层次化的命名空间的形式所组织，即 <code>data tree</code>。同时，本文使用更新（<code>update</code>）和写入（<code>write</code>）来表示任何修改 <code>data tree</code> 状态的操作。客户端和 <code>ZooKeeper</code> 通过建立 <code>session</code> 进行连接，并且通过 <code>session handle</code> 发送请求。</p>
+<h3 id="服务概览"><a class="markdownIt-Anchor" href="#服务概览"></a> 服务概览</h3>
+<p><code>ZooKeeper</code> 将数据抽象成数据节点（<code>znodes</code>）后供客户端访问，所有数据节点以层次化的命名空间进行组织。<code>znodes</code> 是客户端可通过 <code>ZooKeeper</code> 的 <code>API</code> 操作的数据对象。层次化的命名空间通常被用于文件系统。因为用户已经习惯了这种抽象，所以 <code>ZooKeeper</code> 很自然的以这种方式来管理数据，另外这也能更好的管理应用程序的元数据。<code>ZooKeeper</code> 使用和标准 <code>UNIX</code> 文件系统命名一样的方式来表示一个 <code>znode</code>。例如，<code>A/B/C</code> 表示 <code>znode</code> <code>C</code> 的路径，并且 <code>C</code> 的父节点是 <code>B</code>，<code>B</code> 的父节点是 <code>A</code>。每个 <code>znode</code> 都会保存数据，而且除了临时节点之外的所有节点都可以有子节点。</p>
+<p>客户端可以创建两种类型的 <code>znode</code>：</p>
+<ul>
+<li>常规（<code>Regular</code>）：客户端可以显式的创建和删除常规节点。</li>
+<li>临时（<code>Ephemeral</code>）：客户端创建临时节点后，可以显式的删除，或者当客户端和 <code>ZooKeeper</code> 的 <code>session</code> 结束后（客户端主动断开连接或者由于异常失去连接）由系统自动删除。</li>
+</ul>
+<p>另外，客户端在创建一个 <code>znode</code> 时可以设置一个顺序标记。设置了顺序标记所创建的节点会在节点名称后追加一个单调递增的序号。如果 <code>n</code> 是一个新的 <code>znode</code>，<code>p</code> 是 <code>n</code> 的父节点，那么 <code>n</code> 的序号一定不会比在 <code>n</code> 之前所创建的 <code>p</code> 的子节点的序号小。</p>
+<p><code>ZooKeeper</code> 实现了监听器使得客户端能及时的收到数据修改的通知而无需轮询。当客户端发起一个读操作并设置监听时，这个读操作会和普通的读操作一样正常返回，不过当数据更新时，系统能通知客户端。监听器在单次 <code>session</code> 内只会被触发一次，一旦监听器被触发或者 <code>session</code> 关闭，该监听器就会被注销。监听器被触发表示监听的数据发生了修改，但是不会告知被修改后的值。例如，如果一个客户端在 <code>&quot;/foo&quot;</code> 被修改了两次之前执行了 <code>getData(&quot;/foo&quot;, true)</code>，那么客户端会收到一次通知表示 <code>&quot;/foo&quot;</code> 指向的数据被修改了。一些 <code>session</code> 级别的事件，例如连接丢失，也能通过监听回调通知给客户端，那么客户端就会知道监听通知可能会延迟。</p>
+<h4 id="数据模型"><a class="markdownIt-Anchor" href="#数据模型"></a> 数据模型</h4>
+<p><code>ZooKeeper</code> 的数据模型基本上等同于简化版 <code>API</code> 的文件系统，只能一次性读取或者写入全部数据；或者等同于是一个以层次结构组织键的键值表。层次结构的命名空间能够为不同的应用程序分配子命名空间，同时也方便为不同的子命名空间分配访问权限。同时 <code>ZooKeeper</code> 在客户端这层提供了文件夹的概念，能够用于构建高层次的原语。</p>
+<p>和文件系统中的文件不同，<code>znodes</code> 的设计目的并不是为了通用数据存储。相反，<code>znodes</code> 是作为客户端应用程序的抽象，典型场景是用于保存协同目的的元数据。在下图中有两个子树，其中一个用于应用程序1（<code>/app1</code>），另一个用于应用程序2（<code>/app2</code>）。应用程序1对应的子树实现了一个简单的群组成员关系协议：每个客户端 <code>p_i</code> 在 <code>/app1</code> 下会创建一个 <code>znode</code> <code>p_i</code>，只要客户端还存活，对应的节点就会存在，那么，根据 <code>/app1</code> 下的节点数量就能知道当前应用程序有多少个存活的进程能提供服务。</p>
+<p><img src="/images/zookeeper-1.png" alt="alt" /></p>
+<p>虽然 <code>znodes</code> 的设计目的不是为了通用数据存储，不过 <code>ZooKeeper</code> 也允许客户端在 <code>znode</code> 中保存数据，例如分布式计算需要用到的元数据或者配置信息。例如，在一个基于选主的应用中，一个刚启动的应用程序节点需要知道当前的主节点是谁。为了实现这个目的，可以让当前主节点将主节点的信息写入到某个约定的 <code>znode</code> 路径中。此外，<code>znode</code> 本身也提供了时间戳和版本号这样的元数据，使得客户端能够监控 <code>znodes</code> 的数据变化，从而根据 <code>znode</code> 的数据版本进行数据更新。</p>
+<h4 id="会话"><a class="markdownIt-Anchor" href="#会话"></a> 会话</h4>
+<p>一个客户端连接到 <code>ZooKeeper</code> 时会初始化一个 <code>session</code>。每一个 <code>session</code> 伴随着一个超时时间。如果在一个超时时间之内 <code>ZooKeeper</code> 没有收到来自客户端的任何请求，那么 <code>ZooKeeper</code> 就会认为这个客户端发生了异常。客户端可以主动通过关闭 <code>session handle</code> 来结束一个 <code>session</code> 或者 <code>ZooKeeper</code> 监测到客户端发生异常而自动关闭 <code>session</code>。在一个 <code>session</code> 内，客户端所观察到的系统状态变化和其提交的操作一一顺序对应。在一个 <code>session</code> 内，如果当前客户端连接的 <code>ZooKeeper</code> 节点发生异常，<code>ZooKeeper</code> 客户端类库能无缝的将其连接到一台新的 <code>ZooKeeper</code> 节点上，从而在各节点间完成持久化。</p>
+<h3 id="客户端-api"><a class="markdownIt-Anchor" href="#客户端-api"></a> 客户端 API</h3>
+<p><code>ZooKeeper</code> 提供了以下的核心 <code>API</code>：</p>
+<ul>
+<li><code>create(path, data, flags)</code>：创建一个路径为 <code>path</code> 的 <code>znode</code>，并将数据 <code>data[]</code> 保存其中，然后返回新建的 <code>znode</code> 的名称。<code>flags</code> 用于指定 <code>znode</code> 的类型：常规节点，临时节点，以及设置顺序标记。</li>
+<li><code>delete(path, version)</code>：如果指定路径 <code>path</code> 下的 <code>znode</code> 的版本号和 <code>version</code> 匹配，则删除该节点。</li>
+<li><code>exists(path, watch)</code>：如果指定路径 <code>path</code> 下的 <code>znode</code> 存在则返回 <code>true</code>，否则返回 <code>false</code>。如果 <code>watch</code> 为 <code>true</code>，则当 <code>znode</code> 的数据发生变化时，客户端会收到通知。</li>
+<li><code>getData(path, watch)</code>：获取指定路径 <code>path</code> 下的 <code>znode</code> 的数据和元数据，例如版本信息。<code>watch</code> 的功能和 <code>exists()</code> 中的 <code>watch</code> 的功能一致，只不过如果当前节点不存在，则 <code>watch</code> 不会生效。</li>
+<li><code>setData(path, data, version)</code>：如果指定路径 <code>path</code> 下的 <code>znode</code> 的版本号和 <code>version</code> 匹配，则将数据 <code>data[]</code> 写入到该节点。</li>
+<li><code>getChildren(path, watch)</code>：返回指定路径 <code>path</code> 下的 <code>znode</code> 的子节点的名称。</li>
+<li><code>sync(path)</code>：阻塞等待直到在操作开始时所有进行中的更新操作都同步到了当前客户端所连接的服务端。<code>path</code> 参数当前未使用。</li>
+</ul>
+<p><code>ZooKeeper</code> 通过 <code>API</code> 为每个方法提供了同步和异步两个版本。当应用程序希望执行单一 <code>ZooKeeper</code> 操作而且没有其他并发任务要执行时，可以选择调用同步方法。而如果应用程序希望同时执行多个 <code>ZooKeeper</code> 操作以及有其他任务需要并发执行时，可以选择调用异步方法。<code>ZooKeeper</code> 客户端类库保证了异步方法的回调顺序和提交请求的顺序一致。</p>
+<p><code>ZooKeeper</code> 不直接通过 <code>handles</code> 来访问 <code>znodes</code>。每个客户端请求会带上所要操作的 <code>znode</code> 的全路径。这不仅简化了 <code>API</code>（没有 <code>open()</code> 或者 <code>close()</code> 方法），同时服务端也不需要维护额外的状态。</p>
+<p>客户端对 <code>ZooKeeper</code> 每个更新操作都会带上一个期望的版本号，这就能实现按条件更新。如果当前 <code>znode</code> 的版本号和期望的版本号不一致，那么此次更新就会失败并返回版本不匹配错误。如果传入的版本号是-1，则表示不进行版本号校验。</p>
+<h3 id="zookeeper-的保证"><a class="markdownIt-Anchor" href="#zookeeper-的保证"></a> ZooKeeper 的保证</h3>
+<p><code>ZooKeeper</code> 有两个基本的顺序保证：</p>
+<ul>
+<li>线性化写入（<code>Linearizable writes</code>）：所有对 <code>ZooKeeper</code> 的状态修改都会按序串行化执行。</li>
+<li>先来先执行的客户端顺序（<code>FIFO client order</code>）：来自同一个客户端的所有请求会按照请求发送的顺序执行。</li>
+</ul>
+<p><code>ZooKeeper</code> 提出的线性化和 <code>Herlihy</code> 提出的线性化有所不同，<code>ZooKeeper</code> 的作者称之为 <code>A-linearizability</code>（<code>asynchronous linearizability</code>）。在 <code>Herlihy</code> 的线性化定义下，一个客户端只能有一个进行中的操作（一个客户端对应一个线程）。而在 <code>ZooKeeper</code> 中，一个客户端允许有多个进行中的操作，那么从设计上可以选择对多个进行中的任务不保证执行顺序，或者保证 <code>FIFO</code> 顺序。<code>ZooKeeper</code> 选择了后者。如果一系列操作的结果适用于 <code>linearizable</code> 的对象，那么也同时适用于 <code>A-linerizalbe</code> 的对象，因为 <code>A-linearizability</code> 本身就满足线性化。因为只有更新操作需要满足 <code>A-linerizalbe</code>，所以 <code>ZooKeeper</code> 的读操作可以直接通过本地副本执行。进一步使得添加新的服务器时能实现对服务的线性扩展。</p>
+<p>下面将通过一个场景示例来说明上述两个保证是如何交互的。某个系统需要选举一个主节点来分配任务给其他工作节点执行。每当新选举了一个主节点，它需要更新大量的配置参数并且当更新完成时通知其他的工作节点。这就带来了两个重要的需求：</p>
+<ul>
+<li>当主节点在更新配置参数时，其他工作节点不能使用还未更新完成的配置参数。</li>
+<li>如果主节点在配置参数更新完成前发生异常，其他工作节点也不能使用未更新完成的配置参数。</li>
+</ul>
+<p>类似 <code>Chubby</code> 提供的分布式锁能满足第一个需求，但是不足以满足第二个需求，因为当其他工作节点获取锁读取配置参数时，它并不能知道配置参数是否已更新完成。在 <code>ZooKeeper</code> 中，主节点可以在某个约定的路径创建一个 <code>ready</code> 节点，只有在 <code>ready</code> 节点存在的情况下，其他工作节点才可以认为配置参数已更新完成。在更新配置参数前，主节点会先删除 <code>ready</code> 节点，然后更新配置参数，最后再创建 <code>ready</code> 节点。所有这些操作都可以以管道的方式进行并异步提交请求，从而使得配置参数能快速更新。虽然一次更新操作的耗时是2毫秒的数量级，但是如果主节点需要阻塞的依次更新5000个配置参数的话则一共需要10秒才能完成；通过异步提交更新，所有的请求能在一秒内完成。因为 <code>ZooKeeper</code> 的顺序性保证，如果某个工作节点发现 <code>ready</code> 节点存在，那么就说明配置参数也必然更新完成了，因为 <code>ready</code> 节点的创建晚于配置参数的更新。如果主节点在配置参数更新完成前发生异常，那么也就不会创建 <code>ready</code> 节点，其他工作节点就知道配置参数更新未完成。</p>
+<p>不过上述方案还存在一个问题：如果某个工作节点此时看见 <code>ready</code> 节点存在，但是同时主节点删除了 <code>ready</code> 节点然后开始更新配置参数，那么工作节点就会读取到正在更新的配置参数。这个问题通过监听通知的顺序性保证来解决：如果客户端对某个节点 <code>A</code> 开启了监听，此时系统先对节点 <code>A</code> 进行了修改，然后对另一个节点 <code>B</code> 进行了修改，此时客户端发起了对节点 <code>B</code> 的读请求，那么 <code>ZooKeeper</code> 会保证客户端先收到节点 <code>A</code> 修改的异步通知。所以，如果客户端在判断 <code>ready</code> 节点是否存在时开启了监听，那么它就会在读取到修改中的配置参数前先收到 <code>ready</code> 节点修改的通知，从而可以中断配置参数的读取。</p>
+<p>如果客户端之间还有除了 <code>ZooKeeper</code> 之外的通信方式也会引发另一个问题。例如，两个客户端 <code>A</code> 和 <code>B</code> 通过 <code>ZooKeeper</code> 共享配置，然后通过其他某种方式通信。如果 <code>A</code> 修改了 <code>ZooKeeper</code> 中的配置然后告诉 <code>B</code>，那么 <code>B</code> 收到通知后读取 <code>ZooKeeper</code> 就期望能获取到修改后的配置。不过如果 <code>B</code> 连接的 <code>ZooKeeper</code> 副本落后于主节点，那么 <code>B</code> 可能无法读取到最新的配置。而采用写入 <code>ready</code> 节点再读取的方式能保证 <code>B</code> 读取到最新的配置。<code>ZooKeeper</code> 提供了 <code>sync</code> 方法来更高效的解决这个问题：如果 <code>sync</code> 请求之后有一个读请求，则 <code>ZooKeeper</code> 会暂缓这个读请求。<code>sync</code> 会同步在这之前进行中的写请求，而无需等待当前所有的待写入操作完成。这个原语类似于 <code>ISIS</code> 中的 <code>flush</code> 原语。</p>
+<p><code>ZooKeeper</code> 同时也有存活性（<code>liveness</code>）和持久性（<code>durability</code>）的保证：只要 <code>ZooKeeper</code> 集群中过半数的机器存活，那么访问 <code>ZooKeeper</code> 服务就没有问题；如果 <code>ZooKeeper</code> 成功响应了某个修改请求，只要过半数的机器在异常后最终能恢复，那么不管经历了多少次系统异常这个更新都不会丢失。</p>
+<h3 id="原语示例"><a class="markdownIt-Anchor" href="#原语示例"></a> 原语示例</h3>
+<p>本节描述了如何利用 <code>ZooKeeper</code> 的 <code>API</code> 来构建更强大的原语。对于 <code>ZooKeeper</code> 来说，它并不知晓这些原语的存在，因为这些原语是由客户端通过 <code>API</code> 自行实现的。一些通用的原语例如群组成员关系和配置管理都是无等待原语。对于其他原语如 <code>rendezvous</code>，客户端则需要等待某个事件发生。虽然 <code>ZooKeeper</code> 是无等待服务，客户端也同样可以实现阻塞的原语。<code>ZooKeeper</code> 的顺序保证可以高效的审视系统的状态，而监听机制则实现了高效的等待。</p>
+<h4 id="配置管理configuration-management"><a class="markdownIt-Anchor" href="#配置管理configuration-management"></a> 配置管理（Configuration Management）</h4>
+<p><code>ZooKeeper</code> 可以用于分布式系统中实现动态配置管理。在最简单的形式中，配置信息保存在一个 <code>znode</code> 中，例如 <code>z_c</code>。应用启动时会读取 <code>z_c</code> 的数据并设置监听状态。如果 <code>z_c</code> 的数据更新了，那么应用就会收到通知，然后就可以读取最新的配置，并继续设置监听状态。</p>
+<p>在这个例子以及其他大多数使用监听器的例子中，监听器确保了应用能获取到最新的数据。例如，如果某个监听 <code>z_c</code> 的应用收到了 <code>z_c</code> 的修改通知，而在这个应用读取 <code>z_c</code> 之前，<code>z_c</code> 又被修改了3次，那么这个应用不会再收到通知。这并不会影响应用的行为，因为 <code>ZooKeeper</code> 的变更通知不会返回更新后的数据，应用需要再次读取才能获得节点最新的数据，只通知一次已经使得应用知道当前节点的数据已经过期，没有必要重复通知。</p>
+<h4 id="rendezvous"><a class="markdownIt-Anchor" href="#rendezvous"></a> Rendezvous</h4>
+<p>有时候在分布式系统中并不能清晰的预知系统的最终配置是什么。例如，某个客户端可能会希望启动一个主节点和几个工作节点，不过由于节点的启动是由某个调度器执行，客户端并不能事先知道某些需要的信息，例如工作节点需要连接的主节点的地址和端口号。这个问题可以由客户端通过 <code>ZooKeeper</code> 创建一个 <code>rendezvous</code> 节点 <code>z_r</code> 来解决。客户端将 <code>z_r</code> 的全路径作为启动参数传给主节点和工作节点。当主节点启动后，它就将自己的地址和端口号写入到 <code>z_r</code> 中。当工作节点启动后，它就能从 <code>z_r</code> 中读取主节点的地址和端口号，并设置节点的监听状态。如果工作节点启动时主节点还未写入数据到 <code>z_r</code>，那么工作节点就会等待数据写入的通知。如果 <code>z_r</code> 是临时节点，那么创建 <code>z_r</code> 节点的客户端下线后，主节点和工作节点就能收到节点删除通知，并在完成资源清理后退出。</p>
+<h4 id="群组成员关系group-membership"><a class="markdownIt-Anchor" href="#群组成员关系group-membership"></a> 群组成员关系（Group Membership）</h4>
+<p>客户端可以利用临时节点的特性来实现群组成员关系管理。这里利用了可以通过监听临时节点来观测创建该节点的 <code>session</code> 状态的特性。首先创建一个节点 <code>z_g</code> 来表示群组。当群组中的某个进程启动时，它会在 <code>z_g</code> 下创建一个临时的子节点。如果每个进程都有唯一的命名或标识，那么这个命名或标识就可以作为 <code>ZooKeeper</code> 节点的名称；否则就可以在创建节点时设置 <code>SEQUENTIAL</code> 标记让 <code>ZooKeeper</code> 自动在节点名称后追加一个单调递增的数字，以保证名称的唯一性。各进程可以将进程相关的信息放到临时节点中，例如当前进程的地址和端口号。</p>
+<p>当进程在节点 <code>z_g</code> 下创建完临时进程后就可以正常启动。它不需要做其他任何事。如果这个进程发生异常或者主动结束，那么它所创建的临时节点也会自动被删除。</p>
+<p>各进程可以简单的通过查询 <code>z_g</code> 的所有子节点来获取当前群组成员的信息。如果某个进程想要监控群组成员的变化，那么它可以设置监听标记（通过 <code>getChildren(path, watch)</code> 方法设置 <code>watch</code>），然后在收到通知时更新群组信息。</p>
+<h4 id="简单锁simple-locks"><a class="markdownIt-Anchor" href="#简单锁simple-locks"></a> 简单锁（Simple Locks）</h4>
+<p>虽然 <code>ZooKeeper</code> 不是一个锁服务，但也可以用来实现锁。使用 <code>ZooKeeper</code> 的应用通常使用同步原语来适配其需求。本节通过使用 <code>ZooKeeper</code> 实现锁来展示可以通过 <code>ZooKeeper</code> 来实现各种各样的通用同步原语。</p>
+<p>最简单的锁实现借助于 <code>lock files</code>。使用一个 <code>znode</code> 来表示一把锁。为了获取锁，客户端会尝试以 <code>EPHEMERAL</code> 标记创建一个临时节点。如果创建成功，那么这个客户端就获得了锁。否则，客户端就会去读取这个 <code>znode</code> 并设置监听状态，从而当这个临时节点被删除时能收到通知。当持有锁的客户端发生异常或者主动删除该节点时，则代表释放了锁。其他监听的客户端就会收到通知并尝试重新创建临时节点来获取锁。</p>
+<p>虽然这种方式能实现锁，不过也存在几个问题。首先，它会造成羊群效应（<code>herd effect</code>）。如果有大量的客户端在等待释放锁，那么当锁被释放时，这些客户端都会被通知然后都会尝试获取锁，而实际上只会有一个客户端能获得锁。第二，这种方式只实现了互斥锁。下面两种原语展示了如何解决这两个问题。</p>
+<h4 id="没有羊群效应的简单锁simple-locks-without-herd-effect"><a class="markdownIt-Anchor" href="#没有羊群效应的简单锁simple-locks-without-herd-effect"></a> 没有羊群效应的简单锁（Simple Locks without Herd Effect）</h4>
+<p>首先定义节点 <code>l</code> 来实现锁。然后，将所有希望获取锁的客户端按照请求顺序排序，之后这些客户端就能按照请求的顺序获取锁。客户端希望获取锁时需要执行下面的操作：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;lock-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if n is lowest znode in C, exit</span><br><span class="line">4 p &#x3D; znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 2</span><br><span class="line"></span><br><span class="line">Unlock</span><br><span class="line">1 delete(n)</span><br></pre></td></tr></table></figure>
+<p>第一行 <code>SEQUENTIAL</code> 的标记用来将所有希望获取锁的客户端进行排序。每个客户端首先在节点 <code>l</code> 下创建一个临时顺序的子节点，然后获取 <code>l</code> 的所有子节点。之后在第三行判断自己创建的节点是否在所有子节点中有着最小的序号，如果是，则表示当前客户端获得了锁。如果不是，说明有其他序号更小的子节点存在，当前客户端需要排在这之后获取锁。然后客户端会尝试判断排在当前序号前的子节点是否存在，如果存在则设置监听状态等待前一个节点删除的通知，如果不存在，则继续回到第二行执行。每个客户端只监听排在自己前面的子节点避免了羊群效应，因为任何一个子节点删除的通知只会发给其中的一个客户端。每当客户端收到前面节点删除的通知时，需要再次获取 <code>l</code> 的所有子节点来判断自己是否是最小子节点（因为排在前面的子节点并不一定持有锁，可能是更前面的子节点持有锁。这里能否直接复用第一次请求 <code>getChildren</code> 的信息？实现起来会较麻烦些，因为需要挨个判断排在前面的子节点是否还存在，不如直接拉取一份最新的子节点信息）。</p>
+<p>释放锁就是简单的删除对应的临时节点 <code>n</code>。而通过 <code>EPHEMERAL</code> 创建节点能保证进程异常时自动释放锁或者放弃对锁的获取请求。</p>
+<p>这种锁实现有以下几个优势：</p>
+<ol>
+<li>一个节点的删除只会唤醒一个客户端，因为每个节点都只会被一个客户端监听，所以也不会有羊群效应。</li>
+<li>锁的获取和释放不依赖轮询或超时。</li>
+<li>使用这种方式创建锁使得可以通过查看 <code>ZooKeeper</code> 中的数据来监测锁竞争的数量，以及调试锁相关的问题。</li>
+</ol>
+<h4 id="读写锁readwrite-locks"><a class="markdownIt-Anchor" href="#读写锁readwrite-locks"></a> 读写锁（Read/Write Locks）</h4>
+<p>在前面锁的基础上稍加修改就能实现一个读写锁。释放锁的操作和前面的相同：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Write Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;write-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if n is lowest znode in C, exit</span><br><span class="line">4 p &#x3D; znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 2</span><br><span class="line"></span><br><span class="line">Read Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;read-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if no write znodes lower than n in C, exit</span><br><span class="line">4 p &#x3D; write znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 3</span><br></pre></td></tr></table></figure>
+<p>写锁是互斥锁，这里的实现和前面的锁的实现一模一样，只是改变了创建节点的名称。而由于读锁之间没有互斥，所以获取读锁时只需要检查有没有序号更小的写锁即可。另外，读锁实现时最后的 <code>goto</code> 直接跳到了第三行而没有到第二行，这个在 <a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a> 中也提到可能是个笔误。这里看起来会有羊群效应，即存在大量的客户端会监听某个写锁，当写锁被删除时这些客户端都会收到通知，不过这本身就是预期的行为，因为读锁之间没有互斥，写锁释放后就应该唤醒所有等待中的读锁。</p>
+<h4 id="双屏障double-barrier"><a class="markdownIt-Anchor" href="#双屏障double-barrier"></a> 双屏障（Double Barrier）</h4>
+<p>双屏障用于客户端在某个计算开始和结束时进行同步，当指定数量的进程加入到屏障中后，就可以开始各自的计算任务，每个进程在整个计算任务结束后就可以离开屏障。<code>MapReduce</code> 任务就是一个典型示例，<code>reduce</code> 任务的开始需要所有 <code>map</code> 任务的完成，当所有 <code>map</code> 任务完成后，各进程就可以进入屏障开始 <code>reduce</code> 任务，而整个 <code>MapRecuce</code> 任务的完成依赖所有 <code>reduce</code> 任务的完成，当所有 <code>reduce</code> 任务完成后，各进程就可以离开屏障。客户端可以使用一个 <code>znode</code> 来表示屏障，记作 <code>b</code>。每个进程在 <code>b</code> 下创建一个子节点来表示进入屏障，通过删除子节点来表示离开屏障。如果 <code>b</code> 下的子节点的数量超过了指定值，那么就允许开始执行计算任务。当 <code>b</code> 下的子节点都被删除后，进程就可以离开屏障。这里同样使用监听机制来高效的等待进入屏障和离开屏障的事件发生。一旦 <code>b</code> 下的子节点数量满足了阈值，创建最后一个子节点的进程会同时创建一个 <code>ready</code> 子节点，那么通过监听 <code>ready</code> 子节点是否存在就可以判断是否可以开始计算。另一方面，论文中提到通过监听某个特定的子节点来判断是否可以离开屏障，这里略显模糊，这个特定的子节点是谁创建的？创建了这个子节点的进程什么时候可以删除这个子节点？<a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a> 中提出了另一种方案，每个进程各自监听 <code>b</code> 下的子节点，并且在任务完成后删除所创建的节点，如果各进程发现 <code>b</code> 下没有子节点了，就说明可以离开屏障，整个计算任务已结束。</p>
+<h2 id="zookeeper-的实现"><a class="markdownIt-Anchor" href="#zookeeper-的实现"></a> ZooKeeper 的实现</h2>
+<p><code>ZooKeeper</code> 通过将数据复制到每台服务器上来实现服务的高可用。<code>ZooKeeper</code> 处理的服务器异常针对的是服务器宕机，且这些异常的服务器可能之后会恢复。下图展示了 <code>ZooKeeper</code> 服务的主要组件。当 <code>ZooKeeper</code> 服务收到一个请求时，会对这个请求进行预处理（<code>request processor</code>），如果这个请求需要各服务器协同完成（例如写请求），则会通过一致性协议处理（一种 <code>atomic broadcast</code> 的实现），最终 <code>ZooKeeper</code> 会将修改提交到各服务器副本中。而对于读请求，服务端则直接从本地数据库中读取数据然后返回给客户端。</p>
+<p><img src="/images/zookeeper-2.png" alt="alt" /></p>
+<p>上图中的复制数据库是包含了整个数据树（<code>data tree</code>）的内存数据库。每个 <code>znode</code> 默认最多保存 <code>1MB</code> 数据，不过这个值可以根据需要通过配置修改。从可恢复性考虑，<code>ZooKeeper</code> 会高效的将更新写入到磁盘，并且将更新写入到内存数据库前会先强制将数据刷新到磁盘中。类似于 <code>Chubby</code>，<code>ZooKeeper</code> 也会将提交的操作写入到重放日志中，并且会周期性的对内存数据库生成快照。</p>
+<p>每个 <code>ZooKeeper</code> 服务端都能对客户端提供服务。客户端只会连接一个服务端然后提交请求。在之前提到过，读请求会直接返回当前服务端本地的数据。而修改系统状态的请求、写请求则会交由一致性协议处理。</p>
+<p>作为一致性协议的一部分，客户端的写请求会转发给单台服务器，称之为主节点（<code>leader</code>）。其他的 <code>ZooKeeper</code> 服务器被称之为从节点（<code>followers</code>），从节点会收到来自主节点的状态更新请求，并就状态更新达成一致。</p>
+<h3 id="请求处理器request-processor"><a class="markdownIt-Anchor" href="#请求处理器request-processor"></a> 请求处理器（Request Processor）</h3>
+<p>由于 <code>ZooKeeper</code> 的消息层是原子的，它保证各副本的状态不会和主节点产生分歧，虽然在任一时间点有可能某些副本会比其他副本多提交一些事务。和客户端发送的请求不同，<code>ZooKeeper</code> 中的事务是幂等的。当主节点收到一个写请求时，它会先计算出系统提交了这个写请求后的系统状态，然后将其转化为一个能达到该系统状态的事务。这里之所以要先计算出将来的状态是因为当前可能存在未提交的事务。例如，当前客户端正在进行一个 <code>setData</code> 的条件更新，请求中的版本号和被修改的 <code>znode</code> 的某个未来的版本号所匹配，<code>ZooKeeper</code> 会生成一个 <code>setDataTXN</code> 事务，这个事务包含了更新后的数据，更新后的版本号，以及更新的时间戳。而如果发生了异常，例如 <code>setData</code> 期望的版本号不匹配或者要更新的 <code>znode</code> 不存在，则会生成一个 <code>errorTXN</code> 错误。</p>
+<h3 id="原子广播atomic-broadcast"><a class="markdownIt-Anchor" href="#原子广播atomic-broadcast"></a> 原子广播（Atomic Broadcast）</h3>
+<p>所有更新 <code>ZooKeeper</code> 状态的请求都会被转发给主节点。主节点会执行写请求然后将写请求通过 <code>Zab</code> 协议广播给所有的从节点，<code>Zab</code> 是一种原子的广播协议。当主节点就更新达成一致后，会返回结果给客户端。<code>Zab</code> 默认使用的是简单的大多数同意协议，所以只有过半数的节点存活时 <code>Zab</code> 和 <code>ZooKeeper</code> 才能正常工作（例如，由 <code>2f + 1</code> 个节点组成的 <code>ZooKeeper</code> 系统可以最多容忍 <code>f</code> 台节点异常）。</p>
+<p>为了提高系统的吞吐，<code>ZooKeeper</code> 会尽量保持请求处理管道满载运行。请求管道的不同部分可能有着几千个请求。因为系统状态变更依赖于之前的状态变更，所以 <code>Zab</code> 比常规的原子广播协议提供了更强的顺序保证。具体来说，<code>Zab</code> 保证了主节点广播的状态变更被分发执行的顺序和主节点发出广播的顺序一致，同时 <code>Zab</code> 会先将之前主节点的修改先发送给新的主节点，等到这些修改都执行完成后，新的主节点才能广播自己的修改。</p>
+<p>另外还有些实现细节有利于高性能。<code>ZooKeeper</code> 使用 <code>TCP</code> 协议来发送消息，所以消息的有序性天然得到了保证，这同时也简化了实现。<code>ZooKeeper</code> 使用 <code>Zab</code> 协议选择的主节点作为集群的主节点，这就使得创建事务的节点同时也能发起事务。<code>ZooKeeper</code> 使用日志来记录事务的发起，这同时也作为内存数据库的预写日志，从而避免了将消息写入到磁盘两次。</p>
+<p>在正常情况下 <code>Zab</code> 协议能按序发送所有消息，且每条消息只发送一次，不过由于 <code>Zab</code> 不会持久化已发送的消息的 <code>id</code>，所以在宕机恢复时可能会重复发送消息。因为 <code>ZooKeeper</code> 的事务是原子的，所以只要消息依然能保证有序发送，重复发送就没有问题。实际上，<code>ZooKeeper</code> 会要求 <code>Zab</code> 再次发送至少上次快照开始后的所有已发送的消息。</p>
+<h3 id="复制数据库replicated-database"><a class="markdownIt-Anchor" href="#复制数据库replicated-database"></a> 复制数据库（Replicated Database）</h3>
+<p>每个副本在内存中都有一份 <code>ZooKeeper</code> 状态的拷贝。当 <code>ZooKeeper</code> 宕机重启后，它需要能恢复到宕机前的状态。如果重新发送所有已发送的消息来恢复状态则需要较长时间，尤其是当服务器已经运行了一段时间之后，所以 <code>ZooKeeper</code> 周期性的对系统状态建立快照，并且只重新发送快照之后的所有消息。<code>ZooKeeper</code> 的快照被称之为 <code>fuzzy snapshots</code> 因为执行快照时不会加锁；<code>ZooKeeper</code> 会对数据树进行深度优先搜索，并且能原子的读取每个 <code>znode</code> 的数据和元数据，然后将其写入到磁盘中。这种方式生成的快照有可能包含部分在生成快照期间执行的事务的结果，最终生成的快照可能不会和任一时间点的 <code>ZooKeeper</code> 状态一致。不过由于状态更新是原子的，<code>ZooKeeper</code> 可以在后续恢复阶段重新按序执行已提交的事务。</p>
+<p>例如，当 <code>ZooKeeper</code> 开始执行快照时有两个节点 <code>/foo</code> 和 <code>/goo</code>，对应的节点值分别为 <code>f1</code> 和 <code>g1</code>，节点值的版本号都是1。此时，对系统状态的修改以 <code>&lt;transactionType, path, value, new-version&gt;</code> 的形式到达：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;SetDataTXN, &#x2F;foo, f2, 2&gt;</span><br><span class="line">&lt;SetDataTXN, &#x2F;goo, g2, 2&gt;</span><br><span class="line">&lt;SetDataTXN, &#x2F;foo, f3, 3&gt;</span><br></pre></td></tr></table></figure>
+<p>当系统执行了这些更新后，节点 <code>/foo</code> 的值变为 <code>f3</code>，对应版本号为3，而节点 <code>/goo</code> 的值变为 <code>g2</code>，对应版本号为2。不过，执行 <code>fuzzy snapshot</code> 后的快照中的节点 <code>/foo</code> 的值可能是 <code>f3</code>，而节点 <code>/goo</code> 的值可能是 <code>g1</code>，对应版本号分别为3和1，这并不是一个有效的 <code>ZooKeeper</code> 系统状态。如果服务器宕机后恢复，系统会先读取快照然后重新发送状态更新消息，由于消息执行的顺序性，最终系统的状态和宕机前的状态保存一致。</p>
+<h3 id="客户端-服务端交互client-server-interactions"><a class="markdownIt-Anchor" href="#客户端-服务端交互client-server-interactions"></a> 客户端-服务端交互（Client-Server Interactions）</h3>
+<p>当 <code>ZooKeeper</code> 处理了一个写请求时，它会给所有监听了该节点的客户端发送数据更新通知，并同时删除该节点的监听（因为监听只会触发一次）。服务端会按顺序处理写请求，而且同时不会并发的处理其他写请求或者读请求。这就保证了严格的监听通知顺序。不过服务端的监听通知是由各服务器自行负责，只有和当前服务器连接的客户端才会收到通知，其他客户端对同一节点的监听由其他服务器负责。</p>
+<p>读请求由当前客户端所连接的服务端直接读取内存中的数据返回。每个读请求处理时会标记上一个 <code>zxid</code>，这个 <code>zxid</code> 对应当前服务端所知道的最新的事务。这个 <code>zxid</code> 定义了读写操作之间的相对顺序。通过直接读取内存中的数据返回的方式来处理读请求，<code>ZooKeeper</code> 能保证非常好的读性能，因为这不涉及任何磁盘 <code>IO</code> 或者其他一致性协议。这个设计是满足读密集型应用对性能要求的关键点。</p>
+<p>直接从本地内存读取数据的一个缺点是不保证一定能读取到最新更新的数据，即可能返回过期的数据，即使当前节点的更新已经被 <code>ZooKeeper</code> 所提交，因为只要过半数的节点已完成数据更新就可以认为本次数据已提交，而当前节点可能还没有执行更新。对于必须保证读操作能读取到最新的数据的应用，<code>ZooKeeper</code> 提供了 <code>sync</code> 接口。<code>sync</code> 原语能异步执行，并且会由主节点将所有待写入的更新应用到当前副本中。如果希望读操作能读取到最新的数据，客户端需要在执行读操作前调用 <code>sync</code> 方法。<code>ZooKeeper</code> 对客户端操作的 <code>FIFO</code> 执行顺序保证以及 <code>sync</code> 写操作的全局顺序保证使得读操作在执行读时 <code>sync</code> 发起之前的所有写操作都已经应用到了当前服务器中。在 <code>ZooKeeper</code> 的实现中，执行 <code>sync</code> 操作时不需要原子广播协议，因为使用了基于主节点的算法，只需要将 <code>sync</code> 请求放在主节点和当前节点的请求队列的末尾即可。这种方式能正确工作的前提是当前的主节点依然是主节点。如果当前主节点还有进行中的事务并提交，那么从节点就可以认为当前主节点依然是主节点。如果主节点的请求队列为空，那么主节点就会先提交一个空的事务然后再发起 <code>sync</code> 请求。这样当主节点处于低负载运行时，不需要生成额外的广播请求。在 <code>ZooKeeper</code> 的实现中，主节点会有一段过期时间，所以主节点自己就能知道什么时候不再是主节点，从而不再发起空事务。</p>
+<p><code>ZooKeeper</code> 的服务器会以 <code>FIFO</code> 的顺序来处理客户端请求。响应结果中会附带上 <code>zxid</code>。即使客户端和服务端之间没有请求，在常规的心跳返回中也会附带上当前服务端所知道的最新的 <code>zxid</code>。如果客户端连接上了一台新的服务器，那么这个服务器会保证自己所知道的 <code>zxid</code> 不会比客户端的 <code>zxid</code> 旧。如果客户端发送的 <code>zxid</code> 更新，那么服务端在将自己本地的数据更新到最新前不会和客户端再建立连接。而 <code>ZooKeeper</code> 能保证客户端能连接上一台数据版本满足 <code>zxid</code> 的服务端，因为客户端连接到的服务器必然是过半数有着最新系统状态的服务器之一。这个行为对保证持久性来说至关重要。</p>
+<p><code>ZooKeeper</code> 使用超时来检测客户端的 <code>session</code> 异常。如果在 <code>session timeout</code> 期间没有一台服务器收到来自客户端的请求，那么主节点就会认为发生了异常。如果客户端发送请求的频率足够高，那么就不需要发送其他消息来告诉主节点没有异常。否则，在非活跃期间客户端会发送心跳来维持连接。如果客户端和某台服务器无法发送请求或者心跳，那么客户端会和另外一台服务器建立连接。为了避免客户端的 <code>session</code> 过期，<code>ZooKeeper</code> 客户端类库会在 <code>session</code> 空闲了 <code>s/3</code> 毫秒后发送心跳，并且如果在 <code>2s/3</code> 毫秒内没有收到响应则会连接上另外一台服务器，这里的 <code>s</code> 指的是 <code>session</code> 的过期时间，以毫秒为单位。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper.pdf">ZooKeeper: Wait-free coordination for Internet-scale systems</a></li>
+<li><a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Paper</tag>
+        <tag>MIT 6.824</tag>
+        <tag>Distributed Systems</tag>
+        <tag>ZooKeeper</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MIT 6.824 - In Search of an Understandable Consensus Algorithm (Extended Version)</title>
     <url>/2022/05/03/mit-6.824-raft/</url>
     <content><![CDATA[<h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
@@ -2335,135 +2602,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       </tags>
   </entry>
   <entry>
-    <title>MIT 6.824 - Lab 2 (1): Students&#39; Guide to Raft</title>
-    <url>/2022/05/06/mit-6.824-lab2-students-guide-to-raft/</url>
-    <content><![CDATA[<p><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。</p>
-<h2 id="实现-raft"><a class="markdownIt-Anchor" href="#实现-raft"></a> 实现 Raft</h2>
-<p>论文中的 <code>Figure 2</code> 和 <code>Figure 13</code> 描述了实现 <code>Raft</code> 的主要接口，以及各节点需要维护的状态和响应接口时的行为逻辑，所以在做 <code>Lab 2</code> 之前需要先充分理解这部分的内容。文中的建议是<strong>必须</strong>严格落实图中的每一句话，而不是仅仅实现了功能，否则就有可能遇到奇怪的问题或不正确的系统行为。</p>
-<p>文中举了三个例子。第一，每次收到 <code>AppendEntries</code> 或 <code>RequestVote</code> 请求就重置 <code>election timeout</code>，因为收到这两个请求说明存在主节点或者正在选主。不过，图中还有描述：</p>
-<blockquote>
-<p>If election timeout elapses without receiving AppendEntries RPC from current leader or granting vote to candidate: convert to candidate.</p>
-</blockquote>
-<p>重置 <code>election timeout</code> 有两个关键条件：<code>AppendEntries</code> 要求发送请求的主节点是当前任期的主节点；<code>RequestVote</code> 要求成功投出选票。</p>
-<p>先看第一个条件，假设当前任期的主节点异常，此时还有一个之前任期的主节点存活在不断发送 <code>AppendEntries</code> 请求，假设此时某个从节点马上要进入选主状态，但由于收到了 <code>AppendEntries</code> 请求又没有校验任期就重置了 <code>election timeout</code>，造成无主状态时间延长。这个场景下如果过期的主节点不实现下面的逻辑杀伤力倍增：</p>
-<blockquote>
-<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower</p>
-</blockquote>
-<p>如果不实现上面的逻辑，那么过期的主节点会一直是主节点，然后一直重置其他本来可以成为候选节点的从节点。</p>
-<p>再来看第二个条件，假设当前任期的主节点异常，各从节点准备进入选主状态，此时一个不可能成为主节点的从节点先变成了候选节点（该节点的日志相对于其他任何一个从节点来说都不够新，即最后一条日志的任期不够大，或者任期相同但是日志条数不够多），<code>RequestVote</code> 永远不会成功，如果各从节点一收到 <code>RequestVote</code> 就重置 <code>election timeout</code>，就会造成始终没有主节点的情况。</p>
-<p>第二个例子，从节点收到心跳 <code>AppendEntries</code> 后就直接返回 <code>success = true</code> 和重置 <code>election timeout</code>。重置 <code>election timeout</code> 的危害上面已经说过，充当心跳的 <code>AppendEntries</code> 是不带日志的请求，文中提到学生在实现时容易将心跳 <code>AppendEntries</code> 特殊对待，而不进行 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 的校验。从节点返回 <code>true</code> 时主节点就会认为从节点的日志和自己匹配，从而错误的认为某些日志已经复制到了从节点上，从而可以提交日志。不过看到这里可能会有疑问，为什么主节点会在心跳响应中提交日志？通过心跳更新 <code>nextIndex</code> 和 <code>matchIndex</code> 是合理的，如果过半数节点已复制的日志是之前任期的，论文中有描述这是不允许提交的；如果过半数节点已复制的日志是当前任期的，那么可能是之前带日志的 <code>AppendEntries</code> 请求中从节点实际已完成了日志的复制，但是主节点没有收到响应，所以在最新的心跳中提交日志。</p>
-<p>引申开来，假设系统中此时 <code>x = 1</code>，有个客户端发送了 <code>write x = 2</code> 的请求，主节点成功将日志复制到了过半数的节点上，但是还没有响应客户端就异常了。系统重新选主后，此时有个客户端发送请求 <code>read x</code>，<code>x</code> 应该返回多少？应该是2，因为在 <code>Raft</code> 层面，一条日志是否已提交只取决于是否在当前任期内复制到了过半数的节点上，而不是取决于客户端是否收到响应，而只要日志提交了就可以被应用到状态机。类似的场景可以想象一下平时填了某个表单，提交时提示系统异常，但是刷新页面后表单信息已更新。</p>
-<p>第三个例子，学生在实现 <code>AppendEntries</code> 时，可能将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志。同样的，图中也有描述：</p>
-<blockquote>
-<p>If an existing entry conflicts with a new one (same index but different terms), delete the existing entry and all that follow it.</p>
-</blockquote>
-<p>因为当前的 <code>AppendEntries</code> 可能是个过期的请求，假设请求中的日志只是当前从节点已提交的日志的某一段子集，那么如果从节点将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志就会丢失已提交的日志。</p>
-<h2 id="调试-raft"><a class="markdownIt-Anchor" href="#调试-raft"></a> 调试 Raft</h2>
-<p>调试是实验中最花时间的一个部分，文中列举了四个常见的问题：活锁，不正确或不完整的 <code>RPC</code> 实现，没有遵循论文中的 <code>Rules for Servers</code> 以及任期混淆。</p>
-<h3 id="活锁"><a class="markdownIt-Anchor" href="#活锁"></a> 活锁</h3>
-<p>出现活锁时，等同于各节点都在做无用功。选主是最容易出现活锁的场景，例如始终无法选出一个主节点，或者某个候选节点获得了足够的选票后，马上有另外一个节点发起选主，使得刚成为主节点的节点重新退回到从节点（某个节点成为主节点后，还没来得及发送心跳，刚投了票的某个节点 <code>election timeout</code> 到期，发起新的选主，由于它的任期加了1比当前的主节点的任期大，主节点收到 <code>RequestVote</code> 后发现自己的任期小，从而转为从节点）。</p>
-<p>常见的原因有以下几种：</p>
-<p>第一，没有严格按照 <code>Figure 2</code> 的要求重置 <code>election timeout</code>。重置 <code>election timeout</code> 仅限于几种情况：</p>
-<ol>
-<li>收到当前任期的主节点的 <code>AppendEntries</code> 请求（如果 <code>AppendEntries</code> 中的任期比自身的任期小，则忽略该请求）。</li>
-<li>开启一轮新的选主，这个属于 <code>election timeout</code> 到期，选主的同时需要重置一个新的随机值。</li>
-<li>在某轮选举中，将票投给了某个候选节点。</li>
-</ol>
-<p>第二，没有按照 <code>Fiture 2</code> 的要求开启选主。特别的，如果当前节点是候选节点，但是 <code>election timeout</code> 到期了，那么需要开启新的一轮选主。</p>
-<p>第三，没有遵循 <code>Rules for Servers</code> 的第二条：</p>
-<blockquote>
-<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower (§5.1)</p>
-</blockquote>
-<p>例如，当前节点已投票，按照 <code>Raft</code> 的要求，一个从节点在一个任期内只能投票一次，此时又收到了一个 <code>RequestVote</code> 请求，请求中的任期大于自身的任期，那么就需要再次投票并更新自身的任期，避免新的候选节点拿不到足够的选票。</p>
-<h3 id="不正确的-rpc-实现"><a class="markdownIt-Anchor" href="#不正确的-rpc-实现"></a> 不正确的 <code>RPC</code> 实现</h3>
-<p>这里总结了学生们过往在实现 <code>RPC</code> 接口时容易犯错的点：</p>
-<ul>
-<li>如果某一步要求 <code>reply false</code>，那么这说明需要立即回复 <code>false</code> 并返回，不要再执行后续的步骤。</li>
-<li>如果收到了一条 <code>AppendEntries</code> 请求，但是请求中的 <code>prevLogIndex</code> 比当前日志的最后一条的索引还要大，也要返回 <code>false</code>，这也属于日志不匹配。</li>
-<li>如前面描述，即使 <code>AppendEntries</code> 没有包含任何日志，接收方也需要校验 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>。</li>
-<li><code>AppendEntries</code> 中的第五步的 <code>min</code> 是有必要的，而且是和新日志中的最后一条日志的索引相比较，而不是当前日志的最后一条索引。
-<ul>
-<li>首先来看 <code>leaderCommit &lt; index of last new entry</code> 的情况，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 4, 5]</code>，<code>leaderCommit</code> 为3（索引按从1开始算），<code>S2</code> 为从节点，日志为 <code>[1, 2]</code>，那么 <code>S1</code> 需要将 <code>[3, 4, 5]</code> 发给 <code>S2</code>，<code>S2</code> 收到后 <code>index of last new entry</code> 是5，但是 <code>commitIndex</code> 只能更新到 <code>3</code>，也就是 <code>leaderCommit</code>，因为 <code>[4, 5]</code> 还没有提交。</li>
-<li>然后来看 <code>leaderCommit &gt; index of last new entry</code> 的情况，乍看之下好像不可能，因为对于主节点来说，在添加一条新日志的那个时刻，<code>leaderCommit</code> 肯定小于新的日志的索引，复制日志到从节点时这个关系也不会变。这里只能想到的是，<code>leaderCommit</code> 被并发修改了，因为主节点不会删除日志，所以 <code>index of last new entry</code> 不会变，当主节点和从节点的日志不匹配时，主从节点需要来回的就 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 达成一致（或者单纯就是因为执行的慢），在这个期间，可能过半数的节点已经达成了完成日志复制，主节点就可以提交这条日志，并更新 <code>leaderCommit</code>，所以在原先的 <code>AppendEntries</code> 中，如果 <code>leaderCommit</code> 引用的是全局变量，而 <code>entries[]</code> 是固定的，就会造成 <code>leaderCommit</code> 的值比 <code>entries[]</code> 的最后一条日志的索引还要大，这个时候从节点的 <code>commitIndex</code> 就需要取 <code>index of last new entry</code>。文中举了个例子说明为什么这时候不能取 <code>leaderCommit</code>，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 6]</code>，<code>leaderCommit</code> 为3，<code>S2</code> 为从节点，日志为 <code>[1, 2, 3, 4, 5]</code>，那么 <code>S1</code> 需要将 <code>[6]</code> 发给 <code>S2</code>，注意这里 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 校验通过，而论文中只提到校验不通过时才删除从节点的日志，所以这里就不会删除 <code>S2</code> 的 <code>[4, 5]</code>，又假设此时 <code>S1</code> 通过其他节点的交互将日志成功提交到了 <code>[1, 2, 3, 6, 7]</code>，<code>leaderCommit</code> 变为了第5个位置，<code>S2</code> 收到的 <code>AppendEntries</code> 中 <code>leaderCommit = 5</code>，<code>entries = [6]</code>，如果按照最新的 <code>leaderCommit</code> 更新就会造成把 <code>S2</code> 日志中的5归为已提交。</li>
-</ul>
-</li>
-<li>严格按照论文5.4节的描述来比较两个节点的日志哪个较新，不要只比较日志的长度。</li>
-</ul>
-<h3 id="未遵循-rules-for-servers"><a class="markdownIt-Anchor" href="#未遵循-rules-for-servers"></a> 未遵循 Rules for Servers</h3>
-<ul>
-<li>如果 <code>commitIndex &gt; lastApplied</code>，说明可以应用新的日志到状态机中。应用到状态机的顺序必须严格按照日志的顺序，可以由一个单独的线程顺序执行，也可以由多个线程并行执行，但各线程间必须确保不互相干扰，避免执行覆盖，对于同一个变量的不同写请求，多线程间必须按照日志的顺序写入。</li>
-<li>确保周期性的检查 <code>commitIndex &gt; lastApplied</code> 或者在 <code>commitIndex</code> 更新后检查（在 <code>matchIndex</code> 更新后）。这里并没有太明白这个问题，作者举了个例子，假设现在主节点发出了 <code>AppendEntries</code> 请求并同时检查 <code>commitIndex</code>，如果这条日志被过半数的节点复制了，那么需要等到主节点再添加一条新日志后才能应用上一条日志到状态机。不过根据这个例子也没有看出两者的关联，因为如果采用单线程顺序应用日志到状态机的方式，如果 <code>commitIndex &gt; lastApplied</code> 不满足，线程可以先睡眠然后再尝试，除此以外没有依赖其他条件。</li>
-<li>假设主节点发出 <code>AppendEntries</code> 请求然后被拒绝了，如果不是因为日志不一致被拒绝，那么这个主节点就必须马上转为从节点，且不能更新 <code>nextIndex</code>，因为这说明当前主节点的任期小于从节点。如果错误的更新了 <code>nextIndex</code>，而这个主节点在转为从节点后又当选了主节点，就会造成 <code>nextIndex</code> 和从节点永远不会匹配的情况（相当于错位了一格）。</li>
-<li>如果主节点发现某条过去任期的日志被大多数的节点复制了，但是自身的 <code>commitIndex</code> 却小于这条日志的索引，此时主节点也不能够更新 <code>commitIndex</code>，这个就是论文中 <code>Figure 8</code> 描述的问题，提交一条之前任期的日志存在被新一轮的主节点覆盖的风险。所以提交日之前需要判断 <code>log[N].term == currentTerm</code>。</li>
-</ul>
-<p>有一个常见的困惑是 <code>nextIndex</code> 和 <code>matchIndex</code> 的区别。你可能会观察到 <code>matchIndex = nextIndex - 1</code>，然后用 <code>nextIndex</code> 来替代 <code>matchIndex</code>，然而这是有风险的。举一个很明显的反例，假设某个节点被选为主节点，此时收到一个客户端请求并添加了一条日志，那么它发给从节点的 <code>nextIndex</code> 就是最后一条日志的下一条，而 <code>matchIndex</code> 显然不是 <code>nextIndex - 1</code>（新添加的日志的索引）。</p>
-<h3 id="任期混淆"><a class="markdownIt-Anchor" href="#任期混淆"></a> 任期混淆</h3>
-<p>任期混淆指的是节点收到了来自之前任期的 <code>RPC</code> 请求。<code>Figure 2</code> 清晰的描述了收到过期任期的请求应该怎么做，但是并没有说明收到过期任期的响应应该怎么做。一个简单的做法就是比较响应中的任期和当前的任期，如果相等则执行相应的逻辑，如果当前任期小则转为从节点（只有主节点、候选节点才能发请求，才有收到响应的可能），如果当前任期大则不处理。</p>
-<p>还有一个相关但不同的问题，假设主节点收到 <code>AppendEntries</code> 响应后设置 <code>matchIndex = nextIndex - 1</code> 或 <code>matchIndex = len(log)</code>，这都是不安全的，因为 <code>nextIndex</code> 和 <code>len(log)</code> 在这期间都有可能改变，正确的做法应该是使用原始请求中不变的参数，即 <code>matchIndex = prevLogIndex + len(entries[])</code>。</p>
-<h3 id="关于性能"><a class="markdownIt-Anchor" href="#关于性能"></a> 关于性能</h3>
-<p>实验中会要求实现两个关于性能方面的优化，一个是日志压缩，另一个是快速确认正确的 <code>prevLogIndex</code>。</p>
-<p>关于日志压缩需要注意几点：</p>
-<ul>
-<li>当执行快照时，需要确保快照中的状态和指定日志中的索引是严格对应的，即快照不能落后于日志，也不能超前。</li>
-<li>论文中并没有描述当节点异常然后恢复后应该如何处理快照。论文中要求创建完快照后，需要删除快照所对应的日志，而系统可能在删除日志前异常，那么系统恢复后会根据快照和日志进行重放。文中说系统可能会重放已经在快照中的日志，这里有点疑问，因为快照中包含了 <code>lastIncludedIndex</code> 和 <code>lastIncludedTerm</code>，和当前日志进行对比就能知道哪些日志已经在快照中了，从而可以跳过。</li>
-</ul>
-<p>论文中并没有详细描述如何快速确认正确的 <code>prevLogIndex</code>，这部分的逻辑可以参考 <a href="https://pdos.csail.mit.edu/6.824/notes/l-raft2.txt">6.824 2022 Lecture 7: Raft (2)</a> 或者文中的建议：</p>
-<ul>
-<li>如果从节点在 <code>prevLogIndex</code> 处没有日志，说明从节点的日志较短，则返回 <code>conflictIndex = len(log)</code> 以及 <code>conflictTerm = None</code>。</li>
-<li>如果从节点在 <code>prevLogIndex</code> 处有日志，但是日志对应的任期不匹配，那么返回 <code>conflictTerm = log[prevLogIndex].Term</code>，然后找到属于 <code>conflictTerm</code> 的第一条日志的索引。</li>
-<li>主节点收到 <code>conflictIndex/conflictTerm</code> 后，首先在日志中搜索 <code>conflictTerm</code>，如果找到有日志属于 <code>conflictTerm</code>，那么 <code>nextIndex</code> 需要更新为主节点中属于 <code>conflictTerm</code> 的最后一条日志的索引加1。</li>
-<li>如果主节点没有找到属于 <code>conflictTerm</code> 的日志，那么更新 <code>nextIndex</code> 为 <code>conflictIndex</code>。</li>
-</ul>
-<p>其中一个不完善的实现是只考虑 <code>conflictIndex</code> 而忽略了 <code>conflictTerm</code>，这样会简化实现，不过主从节点交互的次数会变多，因为如果考虑了 <code>conflictTerm</code>，那么一次性能跳过的日志会更多。</p>
-<p>最后一部分的 <code>Applications on top of Raft</code> 属于 <code>Lab 3</code> 的内容，即基于 <code>Raft</code> 构建应用，在 <code>Lab 2</code> 中暂不描述。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Distributed Systems</tag>
-        <tag>Go</tag>
-        <tag>Raft</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MIT 6.824 - Lab 2 (2): Raft Locking Advice</title>
-    <url>/2022/05/07/mit-6.824-lab2-raft-locking-advice/</url>
-    <content><![CDATA[<p><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a> 提供了些关于如何在 <code>Lab 2</code> 中使用锁的建议。</p>
-<h2 id="规则1"><a class="markdownIt-Anchor" href="#规则1"></a> 规则1</h2>
-<p>只要有多个 <code>goroutine</code> 访问同一份数据，并且至少有一个 <code>goroutine</code> 会修改数据，那么就需要对数据加锁保护。建议在测试时开启 <code>Go</code> 的竞争检测（添加 <code>-race</code> 标记）来识别这类问题。</p>
-<h2 id="规则2"><a class="markdownIt-Anchor" href="#规则2"></a> 规则2</h2>
-<p>如果有多个数据需要作为一个整体被修改，为了避免其他的 <code>goroutine</code> 看到部分数据更新而造成不正确的行为，此时也需要加锁。例如：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
-<p>上面的代码需要同时更新 <code>rf.currentTerm</code> 和 <code>rf.state</code>，如果不加锁其他 <code>goroutine</code> 有可能看到更新后的任期，但是节点状态还未更新。同时，其他任何地方用到 <code>rf.currentTerm</code> 或者 <code>rf.state</code> 的地方也必须先持有锁，一是保证可见性，二是避免在多处同时修改 <code>rf.currentTerm</code> 或者 <code>rf.state</code>。</p>
-<h2 id="规则3"><a class="markdownIt-Anchor" href="#规则3"></a> 规则3</h2>
-<p>如果需要对某个数据做一系列读操作（或者读写混合），那么为了避免其他 <code>goroutine</code> 在中途修改数据，就需要对这一系列操作加锁。例如：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line"><span class="keyword">if</span> args.Term &gt; rf.currentTerm &#123;</span><br><span class="line">    rf.currentTerm = args.Term</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
-<p>上面的代码是典型的 <code>如果满足某个条件，那么就执行 xxx</code> 场景。如果不加锁，可能其他的 <code>goroutine</code> 将 <code>rf.currentTerm</code> 更新后，当前 <code>goroutine</code> 会将 <code>rf.currentTerm</code> 重置为 <code>args.Term</code>，在 <code>Raft</code> 中有可能造成任期倒退。</p>
-<p>在真实的 <code>Raft</code> 代码中加锁的粒度可能会更大，例如可能在整个 <code>RPC handler</code> 处理期间都持有锁。</p>
-<h2 id="规则4"><a class="markdownIt-Anchor" href="#规则4"></a> 规则4</h2>
-<p>不建议在等待某个事件时持有锁，例如从 <code>channel</code> 中读取数据，向 <code>channel</code> 发送数据，计时器等待，调用 <code>time.Sleep()</code>，或者发送一个 <code>RPC</code> 请求并等待响应结果。因为有可能造成死锁，文中举了两个节点互发 <code>RPC</code> 请求并希望获取对方持有的锁的例子，这是个典型的死锁场景。</p>
-<p>又或者某个 <code>goroutine</code> 先持有锁，但是使用 <code>time.Sleep</code> 来等待某个条件发生，其他的 <code>goroutine</code> 由于无法获取锁从而使得等待的条件永远无法成立，这个时候应该用 <code>sync.Cond</code>：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">mu.Lock()</span><br><span class="line"></span><br><span class="line">while (!someCondition) &#123;</span><br><span class="line">    time.Sleep(time.Millisecond * <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mu.Unlock()</span><br></pre></td></tr></table></figure>
-<h2 id="规则5"><a class="markdownIt-Anchor" href="#规则5"></a> 规则5</h2>
-<p>当释放锁然后重新获取锁之后，某些释放锁之前成立的条件可能此时已经不成立。例如下面的候选节点获取选票的实现是不正确的：</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">rf.mu.Lock()</span><br><span class="line">rf.currentTerm += <span class="number">1</span></span><br><span class="line">rf.state = Candidate</span><br><span class="line"><span class="keyword">for</span> &lt;each peer&gt; &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        rf.mu.Lock()</span><br><span class="line">        args.Term = rf.currentTerm</span><br><span class="line">        rf.mu.Unlock()</span><br><span class="line">        Call(<span class="string">&quot;Raft.RequestVote&quot;</span>, &amp;args, ...)</span><br><span class="line">        <span class="comment">// handle the reply...</span></span><br><span class="line">    &#125; ()</span><br><span class="line">&#125;</span><br><span class="line">rf.mu.Unlock()</span><br></pre></td></tr></table></figure>
-<p>在每个 <code>goroutine</code> 中，重新获取锁后拿到的任期可能已经不是当初的任期。这里需要将 <code>goroutine</code> 中的 <code>rf.currentTerm</code> 提取到循环之外作为一个变量，然后在 <code>goroutine</code> 中访问这个变量。另外，在 <code>Call</code> 执行完成后，也需要再次获取锁并检查 <code>rf.currentTerm</code> 或其他变量是否还满足条件，例如需要检查下当前的任期是否还是最初的任期，如果不是那说明又开启了一轮选主或者已经有其他节点成为了主节点。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a href="https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt">Raft Locking Advice</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>MIT 6.824</tag>
-        <tag>Distributed Systems</tag>
-        <tag>Go</tag>
-        <tag>Raft</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MIT 6.824 - Lab 2 (3): 实现</title>
     <url>/2022/05/15/mit-6.824-lab2-implementation/</url>
     <content><![CDATA[<h2 id="准备工作"><a class="markdownIt-Anchor" href="#准备工作"></a> 准备工作</h2>
@@ -2534,144 +2672,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
         <tag>Distributed Systems</tag>
         <tag>Go</tag>
         <tag>Raft</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MIT 6.824 - ZooKeeper: Wait-free coordination for Internet-scale systems</title>
-    <url>/2022/05/19/mit-6.824-zookeeper/</url>
-    <content><![CDATA[<h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
-<p>大型分布式系统需要各式各样的协同。配置就是其中一种最基础的形式，在其最简单的形式中，配置只是一系列供系统使用的参数，而对于更复杂的系统来说，配置还可以动态更新。群组成员关系和选主同样在分布式系统中很常见：通常各进程需要知道哪些进程还存活，以及哪些进程在负责统一管理。另外，分布式锁作为一种强大的协调原语能够对临界资源提供互斥访问保护。</p>
-<p>一种实现协同的方式是为每一个不同的协同需求开发一个服务。例如，<code>Amazon Simple Queue Service</code> 专注于消息队列。同时也存在专门为了选主和配置所开发的服务。针对较强的原语开发的服务能够用于实现较弱一级的原语。例如，<code>Chubby</code> 是一个强同步性保证的锁服务。则可以借助锁来实现选主，群组成员关系等服务。</p>
-<p>相较于在服务端实现特定的协同原语，<code>ZooKeeper</code> 的作者选择暴露某些 <code>API</code> 来让应用开发者自行实现需要的原语。这种设计选择需要实现一个协同内核（<code>coordination kernel</code>）使得新原语的开发不需要修改核心服务端代码。这种方式能够适配应用程序对不同协同形式的需求，而不是让开发者受限于某几个固定的原语。</p>
-<p>在设计 <code>ZooKeeper</code> 的 <code>API</code> 时，设计者移除了阻塞原语，例如锁。一个协同服务的阻塞原语会导致某些问题，缓慢或出错的客户端会拖慢快速的客户端的性能。如果服务处理请求时需要依赖响应以及负责客户端的异常检测，那么服务的实现会变得更为复杂。因此，<code>ZooKeeper</code> 实现了一套 <code>API</code> 能够操作以类似文件系统的方式组织的无等待（<code>wait-free</code>）对象。实际上，<code>ZooKeeper</code> 的 <code>API</code> 类似于其他任何的文件系统，以及和去除了加锁（<code>lock</code>），打开（<code>open</code>），关闭（<code>close</code>）这些方法的 <code>Chubby</code> 类似。实现了无等待对象的 <code>ZooKeeper</code> 显著有别于其他基于阻塞原语（例如锁）的系统。</p>
-<p>虽然无等待这一特性对于性能和容错很重要，但是对于协同来说来不够。<code>ZooKeeper</code> 还需要对各操作提供其他保证。对客户端 <code>FIFO</code> 的操作保证和线性化写入的保证确保了服务的高效实现，同时也能够满足应用程序实现自定义协同原语的需求。实际上，利用 <code>ZooKeeper</code> 的 <code>API</code> 可以实现任意节点数量的共识算法。</p>
-<p><code>ZooKeeper</code> 服务通过服务器间的复制来实现高可用和性能。它的高性能使得大量客户端进程能通过协同内核来管理方方面面的协同需求。通过一种简单的管道架构来实现 <code>ZooKeeper</code> 使得服务在承受几百或上千的请求的同时依然保持着低延迟。这种管道方式天然的支持对同一个客户端的请求以 <code>FIFO</code> 的方式执行。对客户端请求的 <code>FIFO</code> 顺序执行的保证使得客户端能异步的提交请求。异步提交也使得客户端同一时间有多个操作。这个特性很有用，例如当某个客户端成为主节点后，它需要操作元数据然后更新。如果缺少了多操作同时进行的特性，那么这个主节点初始化的时间可能达到秒级的数量级而不是亚秒级。</p>
-<p>为了满足写入的线性化保证，<code>ZooKeeper</code> 实现了一个基于主节点的原子广播协议，即 <code>Zab</code>。典型的 <code>ZooKeeper</code> 应用属于读密集型应用，所以需要保证读操作的扩展性。<code>ZooKeeper</code> 的读操作由当前服务器完成，不涉及和其他服务器的交互，也不会使用 <code>Zab</code> 来保证读取的顺序性。</p>
-<p>在客户端缓存数据是提高读性能的重要手段。例如，客户端可以缓存当前主节点的信息而不是每次请求 <code>ZooKeeper</code>。<code>ZooKeeper</code> 同时提供了监听机制来协助客户端缓存数据而无需直接管理客户端的缓存。借助这个机制，客户端可以对某个数据进行更新监听，从而在数据更新时收到通知。而 <code>Chubby</code> 会直接管理客户端的缓存，它会阻塞某个数据的更新直到所有缓存了该数据的客户端都清除了缓存。在这个设计下，如果某个客户端运行缓慢或者出错，则会拖慢数据的更新。<code>Chubby</code> 使用租约来避免某个客户端永久的阻塞系统。不过，租约只是确保了运行缓慢或者出错的客户端对性能的影响的上限，而 <code>ZooKeeper</code> 的监听机制则是完全的避免了这个问题。</p>
-<p>本文主要介绍了 <code>ZooKeeper</code> 的设计和实现。借助 <code>ZooKeeper</code>，我们可以实现应用程序所需要的所有协同原语，即使只有写入是线性化保证的。为了验证这个设计，本文介绍了如何使用 <code>ZooKeeper</code> 来实现某些协同原语。</p>
-<p>本文的关键点如下：</p>
-<ul>
-<li>协同内核（<code>Coordination kernel</code>）：本文提出了一种供分布式系统使用的无等待、宽松一致性保证的协同服务。特别的，本文描述了一种协同内核的设计和实现，并且已经在很多重要的应用程序中使用来实现各种各样的协同服务。</li>
-<li>协同示例（<code>Coordination recipes</code>）：本文描述了如何使用 <code>ZooKeeper</code> 来实现高层次的协同原语，包括在分布式应用中经常用到的阻塞和强一致性的原语。</li>
-<li>使用协同的经验（<code>Experience with Coordination</code>）：本文分享了使用 <code>ZooKeeper</code> 的方式以及评估了其性能。</li>
-</ul>
-<h2 id="zookeeper-服务"><a class="markdownIt-Anchor" href="#zookeeper-服务"></a> ZooKeeper 服务</h2>
-<p>客户端通过 <code>ZooKeeper</code> 提供的客户端类库来向 <code>ZooKeeper</code> 提交请求。除了向客户端暴露 <code>ZooKeeper</code> 提供的 <code>API</code> 外，客户端类库还负责维护客户端和 <code>ZooKeeper</code> 服务器间的连接。</p>
-<p>本节会首先从高层次来介绍 <code>ZooKeeper</code> 服务，然后再讨论客户端和 <code>ZooKeeper</code> 交互的 <code>API</code>。</p>
-<p>术语：本文使用客户端（<code>client</code>）来表示使用 <code>ZooKeeper</code> 服务的一个用户；使用服务端（<code>server</code>）来表示 <code>ZooKeeper</code> 的服务提供者；使用 <code>znode</code> 来表示 <code>ZooKeeper</code> 的一个内存数据节点，这些数据节点以层次化的命名空间的形式所组织，即 <code>data tree</code>。同时，本文使用更新（<code>update</code>）和写入（<code>write</code>）来表示任何修改 <code>data tree</code> 状态的操作。客户端和 <code>ZooKeeper</code> 通过建立 <code>session</code> 进行连接，并且通过 <code>session handle</code> 发送请求。</p>
-<h3 id="服务概览"><a class="markdownIt-Anchor" href="#服务概览"></a> 服务概览</h3>
-<p><code>ZooKeeper</code> 将数据抽象成数据节点（<code>znodes</code>）后供客户端访问，所有数据节点以层次化的命名空间进行组织。<code>znodes</code> 是客户端可通过 <code>ZooKeeper</code> 的 <code>API</code> 操作的数据对象。层次化的命名空间通常被用于文件系统。因为用户已经习惯了这种抽象，所以 <code>ZooKeeper</code> 很自然的以这种方式来管理数据，另外这也能更好的管理应用程序的元数据。<code>ZooKeeper</code> 使用和标准 <code>UNIX</code> 文件系统命名一样的方式来表示一个 <code>znode</code>。例如，<code>A/B/C</code> 表示 <code>znode</code> <code>C</code> 的路径，并且 <code>C</code> 的父节点是 <code>B</code>，<code>B</code> 的父节点是 <code>A</code>。每个 <code>znode</code> 都会保存数据，而且除了临时节点之外的所有节点都可以有子节点。</p>
-<p>客户端可以创建两种类型的 <code>znode</code>：</p>
-<ul>
-<li>常规（<code>Regular</code>）：客户端可以显式的创建和删除常规节点。</li>
-<li>临时（<code>Ephemeral</code>）：客户端创建临时节点后，可以显式的删除，或者当客户端和 <code>ZooKeeper</code> 的 <code>session</code> 结束后（客户端主动断开连接或者由于异常失去连接）由系统自动删除。</li>
-</ul>
-<p>另外，客户端在创建一个 <code>znode</code> 时可以设置一个顺序标记。设置了顺序标记所创建的节点会在节点名称后追加一个单调递增的序号。如果 <code>n</code> 是一个新的 <code>znode</code>，<code>p</code> 是 <code>n</code> 的父节点，那么 <code>n</code> 的序号一定不会比在 <code>n</code> 之前所创建的 <code>p</code> 的子节点的序号小。</p>
-<p><code>ZooKeeper</code> 实现了监听器使得客户端能及时的收到数据修改的通知而无需轮询。当客户端发起一个读操作并设置监听时，这个读操作会和普通的读操作一样正常返回，不过当数据更新时，系统能通知客户端。监听器在单次 <code>session</code> 内只会被触发一次，一旦监听器被触发或者 <code>session</code> 关闭，该监听器就会被注销。监听器被触发表示监听的数据发生了修改，但是不会告知被修改后的值。例如，如果一个客户端在 <code>&quot;/foo&quot;</code> 被修改了两次之前执行了 <code>getData(&quot;/foo&quot;, true)</code>，那么客户端会收到一次通知表示 <code>&quot;/foo&quot;</code> 指向的数据被修改了。一些 <code>session</code> 级别的事件，例如连接丢失，也能通过监听回调通知给客户端，那么客户端就会知道监听通知可能会延迟。</p>
-<h4 id="数据模型"><a class="markdownIt-Anchor" href="#数据模型"></a> 数据模型</h4>
-<p><code>ZooKeeper</code> 的数据模型基本上等同于简化版 <code>API</code> 的文件系统，只能一次性读取或者写入全部数据；或者等同于是一个以层次结构组织键的键值表。层次结构的命名空间能够为不同的应用程序分配子命名空间，同时也方便为不同的子命名空间分配访问权限。同时 <code>ZooKeeper</code> 在客户端这层提供了文件夹的概念，能够用于构建高层次的原语。</p>
-<p>和文件系统中的文件不同，<code>znodes</code> 的设计目的并不是为了通用数据存储。相反，<code>znodes</code> 是作为客户端应用程序的抽象，典型场景是用于保存协同目的的元数据。在下图中有两个子树，其中一个用于应用程序1（<code>/app1</code>），另一个用于应用程序2（<code>/app2</code>）。应用程序1对应的子树实现了一个简单的群组成员关系协议：每个客户端 <code>p_i</code> 在 <code>/app1</code> 下会创建一个 <code>znode</code> <code>p_i</code>，只要客户端还存活，对应的节点就会存在，那么，根据 <code>/app1</code> 下的节点数量就能知道当前应用程序有多少个存活的进程能提供服务。</p>
-<p><img src="/images/zookeeper-1.png" alt="alt" /></p>
-<p>虽然 <code>znodes</code> 的设计目的不是为了通用数据存储，不过 <code>ZooKeeper</code> 也允许客户端在 <code>znode</code> 中保存数据，例如分布式计算需要用到的元数据或者配置信息。例如，在一个基于选主的应用中，一个刚启动的应用程序节点需要知道当前的主节点是谁。为了实现这个目的，可以让当前主节点将主节点的信息写入到某个约定的 <code>znode</code> 路径中。此外，<code>znode</code> 本身也提供了时间戳和版本号这样的元数据，使得客户端能够监控 <code>znodes</code> 的数据变化，从而根据 <code>znode</code> 的数据版本进行数据更新。</p>
-<h4 id="会话"><a class="markdownIt-Anchor" href="#会话"></a> 会话</h4>
-<p>一个客户端连接到 <code>ZooKeeper</code> 时会初始化一个 <code>session</code>。每一个 <code>session</code> 伴随着一个超时时间。如果在一个超时时间之内 <code>ZooKeeper</code> 没有收到来自客户端的任何请求，那么 <code>ZooKeeper</code> 就会认为这个客户端发生了异常。客户端可以主动通过关闭 <code>session handle</code> 来结束一个 <code>session</code> 或者 <code>ZooKeeper</code> 监测到客户端发生异常而自动关闭 <code>session</code>。在一个 <code>session</code> 内，客户端所观察到的系统状态变化和其提交的操作一一顺序对应。在一个 <code>session</code> 内，如果当前客户端连接的 <code>ZooKeeper</code> 节点发生异常，<code>ZooKeeper</code> 客户端类库能无缝的将其连接到一台新的 <code>ZooKeeper</code> 节点上，从而在各节点间完成持久化。</p>
-<h3 id="客户端-api"><a class="markdownIt-Anchor" href="#客户端-api"></a> 客户端 API</h3>
-<p><code>ZooKeeper</code> 提供了以下的核心 <code>API</code>：</p>
-<ul>
-<li><code>create(path, data, flags)</code>：创建一个路径为 <code>path</code> 的 <code>znode</code>，并将数据 <code>data[]</code> 保存其中，然后返回新建的 <code>znode</code> 的名称。<code>flags</code> 用于指定 <code>znode</code> 的类型：常规节点，临时节点，以及设置顺序标记。</li>
-<li><code>delete(path, version)</code>：如果指定路径 <code>path</code> 下的 <code>znode</code> 的版本号和 <code>version</code> 匹配，则删除该节点。</li>
-<li><code>exists(path, watch)</code>：如果指定路径 <code>path</code> 下的 <code>znode</code> 存在则返回 <code>true</code>，否则返回 <code>false</code>。如果 <code>watch</code> 为 <code>true</code>，则当 <code>znode</code> 的数据发生变化时，客户端会收到通知。</li>
-<li><code>getData(path, watch)</code>：获取指定路径 <code>path</code> 下的 <code>znode</code> 的数据和元数据，例如版本信息。<code>watch</code> 的功能和 <code>exists()</code> 中的 <code>watch</code> 的功能一致，只不过如果当前节点不存在，则 <code>watch</code> 不会生效。</li>
-<li><code>setData(path, data, version)</code>：如果指定路径 <code>path</code> 下的 <code>znode</code> 的版本号和 <code>version</code> 匹配，则将数据 <code>data[]</code> 写入到该节点。</li>
-<li><code>getChildren(path, watch)</code>：返回指定路径 <code>path</code> 下的 <code>znode</code> 的子节点的名称。</li>
-<li><code>sync(path)</code>：阻塞等待直到在操作开始时所有进行中的更新操作都同步到了当前客户端所连接的服务端。<code>path</code> 参数当前未使用。</li>
-</ul>
-<p><code>ZooKeeper</code> 通过 <code>API</code> 为每个方法提供了同步和异步两个版本。当应用程序希望执行单一 <code>ZooKeeper</code> 操作而且没有其他并发任务要执行时，可以选择调用同步方法。而如果应用程序希望同时执行多个 <code>ZooKeeper</code> 操作以及有其他任务需要并发执行时，可以选择调用异步方法。<code>ZooKeeper</code> 客户端类库保证了异步方法的回调顺序和提交请求的顺序一致。</p>
-<p><code>ZooKeeper</code> 不直接通过 <code>handles</code> 来访问 <code>znodes</code>。每个客户端请求会带上所要操作的 <code>znode</code> 的全路径。这不仅简化了 <code>API</code>（没有 <code>open()</code> 或者 <code>close()</code> 方法），同时服务端也不需要维护额外的状态。</p>
-<p>客户端对 <code>ZooKeeper</code> 每个更新操作都会带上一个期望的版本号，这就能实现按条件更新。如果当前 <code>znode</code> 的版本号和期望的版本号不一致，那么此次更新就会失败并返回版本不匹配错误。如果传入的版本号是-1，则表示不进行版本号校验。</p>
-<h3 id="zookeeper-的保证"><a class="markdownIt-Anchor" href="#zookeeper-的保证"></a> ZooKeeper 的保证</h3>
-<p><code>ZooKeeper</code> 有两个基本的顺序保证：</p>
-<ul>
-<li>线性化写入（<code>Linearizable writes</code>）：所有对 <code>ZooKeeper</code> 的状态修改都会按序串行化执行。</li>
-<li>先来先执行的客户端顺序（<code>FIFO client order</code>）：来自同一个客户端的所有请求会按照请求发送的顺序执行。</li>
-</ul>
-<p><code>ZooKeeper</code> 提出的线性化和 <code>Herlihy</code> 提出的线性化有所不同，<code>ZooKeeper</code> 的作者称之为 <code>A-linearizability</code>（<code>asynchronous linearizability</code>）。在 <code>Herlihy</code> 的线性化定义下，一个客户端只能有一个进行中的操作（一个客户端对应一个线程）。而在 <code>ZooKeeper</code> 中，一个客户端允许有多个进行中的操作，那么从设计上可以选择对多个进行中的任务不保证执行顺序，或者保证 <code>FIFO</code> 顺序。<code>ZooKeeper</code> 选择了后者。如果一系列操作的结果适用于 <code>linearizable</code> 的对象，那么也同时适用于 <code>A-linerizalbe</code> 的对象，因为 <code>A-linearizability</code> 本身就满足线性化。因为只有更新操作需要满足 <code>A-linerizalbe</code>，所以 <code>ZooKeeper</code> 的读操作可以直接通过本地副本执行。进一步使得添加新的服务器时能实现对服务的线性扩展。</p>
-<p>下面将通过一个场景示例来说明上述两个保证是如何交互的。某个系统需要选举一个主节点来分配任务给其他工作节点执行。每当新选举了一个主节点，它需要更新大量的配置参数并且当更新完成时通知其他的工作节点。这就带来了两个重要的需求：</p>
-<ul>
-<li>当主节点在更新配置参数时，其他工作节点不能使用还未更新完成的配置参数。</li>
-<li>如果主节点在配置参数更新完成前发生异常，其他工作节点也不能使用未更新完成的配置参数。</li>
-</ul>
-<p>类似 <code>Chubby</code> 提供的分布式锁能满足第一个需求，但是不足以满足第二个需求，因为当其他工作节点获取锁读取配置参数时，它并不能知道配置参数是否已更新完成。在 <code>ZooKeeper</code> 中，主节点可以在某个约定的路径创建一个 <code>ready</code> 节点，只有在 <code>ready</code> 节点存在的情况下，其他工作节点才可以认为配置参数已更新完成。在更新配置参数前，主节点会先删除 <code>ready</code> 节点，然后更新配置参数，最后再创建 <code>ready</code> 节点。所有这些操作都可以以管道的方式进行并异步提交请求，从而使得配置参数能快速更新。虽然一次更新操作的耗时是2毫秒的数量级，但是如果主节点需要阻塞的依次更新5000个配置参数的话则一共需要10秒才能完成；通过异步提交更新，所有的请求能在一秒内完成。因为 <code>ZooKeeper</code> 的顺序性保证，如果某个工作节点发现 <code>ready</code> 节点存在，那么就说明配置参数也必然更新完成了，因为 <code>ready</code> 节点的创建晚于配置参数的更新。如果主节点在配置参数更新完成前发生异常，那么也就不会创建 <code>ready</code> 节点，其他工作节点就知道配置参数更新未完成。</p>
-<p>不过上述方案还存在一个问题：如果某个工作节点此时看见 <code>ready</code> 节点存在，但是同时主节点删除了 <code>ready</code> 节点然后开始更新配置参数，那么工作节点就会读取到正在更新的配置参数。这个问题通过监听通知的顺序性保证来解决：如果客户端对某个节点 <code>A</code> 开启了监听，此时系统先对节点 <code>A</code> 进行了修改，然后对另一个节点 <code>B</code> 进行了修改，此时客户端发起了对节点 <code>B</code> 的读请求，那么 <code>ZooKeeper</code> 会保证客户端先收到节点 <code>A</code> 修改的异步通知。所以，如果客户端在判断 <code>ready</code> 节点是否存在时开启了监听，那么它就会在读取到修改中的配置参数前先收到 <code>ready</code> 节点修改的通知，从而可以中断配置参数的读取。</p>
-<p>如果客户端之间还有除了 <code>ZooKeeper</code> 之外的通信方式也会引发另一个问题。例如，两个客户端 <code>A</code> 和 <code>B</code> 通过 <code>ZooKeeper</code> 共享配置，然后通过其他某种方式通信。如果 <code>A</code> 修改了 <code>ZooKeeper</code> 中的配置然后告诉 <code>B</code>，那么 <code>B</code> 收到通知后读取 <code>ZooKeeper</code> 就期望能获取到修改后的配置。不过如果 <code>B</code> 连接的 <code>ZooKeeper</code> 副本落后于主节点，那么 <code>B</code> 可能无法读取到最新的配置。而采用写入 <code>ready</code> 节点再读取的方式能保证 <code>B</code> 读取到最新的配置。<code>ZooKeeper</code> 提供了 <code>sync</code> 方法来更高效的解决这个问题：如果 <code>sync</code> 请求之后有一个读请求，则 <code>ZooKeeper</code> 会暂缓这个读请求。<code>sync</code> 会同步在这之前进行中的写请求，而无需等待当前所有的待写入操作完成。这个原语类似于 <code>ISIS</code> 中的 <code>flush</code> 原语。</p>
-<p><code>ZooKeeper</code> 同时也有存活性（<code>liveness</code>）和持久性（<code>durability</code>）的保证：只要 <code>ZooKeeper</code> 集群中过半数的机器存活，那么访问 <code>ZooKeeper</code> 服务就没有问题；如果 <code>ZooKeeper</code> 成功响应了某个修改请求，只要过半数的机器在异常后最终能恢复，那么不管经历了多少次系统异常这个更新都不会丢失。</p>
-<h3 id="原语示例"><a class="markdownIt-Anchor" href="#原语示例"></a> 原语示例</h3>
-<p>本节描述了如何利用 <code>ZooKeeper</code> 的 <code>API</code> 来构建更强大的原语。对于 <code>ZooKeeper</code> 来说，它并不知晓这些原语的存在，因为这些原语是由客户端通过 <code>API</code> 自行实现的。一些通用的原语例如群组成员关系和配置管理都是无等待原语。对于其他原语如 <code>rendezvous</code>，客户端则需要等待某个事件发生。虽然 <code>ZooKeeper</code> 是无等待服务，客户端也同样可以实现阻塞的原语。<code>ZooKeeper</code> 的顺序保证可以高效的审视系统的状态，而监听机制则实现了高效的等待。</p>
-<h4 id="配置管理configuration-management"><a class="markdownIt-Anchor" href="#配置管理configuration-management"></a> 配置管理（Configuration Management）</h4>
-<p><code>ZooKeeper</code> 可以用于分布式系统中实现动态配置管理。在最简单的形式中，配置信息保存在一个 <code>znode</code> 中，例如 <code>z_c</code>。应用启动时会读取 <code>z_c</code> 的数据并设置监听状态。如果 <code>z_c</code> 的数据更新了，那么应用就会收到通知，然后就可以读取最新的配置，并继续设置监听状态。</p>
-<p>在这个例子以及其他大多数使用监听器的例子中，监听器确保了应用能获取到最新的数据。例如，如果某个监听 <code>z_c</code> 的应用收到了 <code>z_c</code> 的修改通知，而在这个应用读取 <code>z_c</code> 之前，<code>z_c</code> 又被修改了3次，那么这个应用不会再收到通知。这并不会影响应用的行为，因为 <code>ZooKeeper</code> 的变更通知不会返回更新后的数据，应用需要再次读取才能获得节点最新的数据，只通知一次已经使得应用知道当前节点的数据已经过期，没有必要重复通知。</p>
-<h4 id="rendezvous"><a class="markdownIt-Anchor" href="#rendezvous"></a> Rendezvous</h4>
-<p>有时候在分布式系统中并不能清晰的预知系统的最终配置是什么。例如，某个客户端可能会希望启动一个主节点和几个工作节点，不过由于节点的启动是由某个调度器执行，客户端并不能事先知道某些需要的信息，例如工作节点需要连接的主节点的地址和端口号。这个问题可以由客户端通过 <code>ZooKeeper</code> 创建一个 <code>rendezvous</code> 节点 <code>z_r</code> 来解决。客户端将 <code>z_r</code> 的全路径作为启动参数传给主节点和工作节点。当主节点启动后，它就将自己的地址和端口号写入到 <code>z_r</code> 中。当工作节点启动后，它就能从 <code>z_r</code> 中读取主节点的地址和端口号，并设置节点的监听状态。如果工作节点启动时主节点还未写入数据到 <code>z_r</code>，那么工作节点就会等待数据写入的通知。如果 <code>z_r</code> 是临时节点，那么创建 <code>z_r</code> 节点的客户端下线后，主节点和工作节点就能收到节点删除通知，并在完成资源清理后退出。</p>
-<h4 id="群组成员关系group-membership"><a class="markdownIt-Anchor" href="#群组成员关系group-membership"></a> 群组成员关系（Group Membership）</h4>
-<p>客户端可以利用临时节点的特性来实现群组成员关系管理。这里利用了可以通过监听临时节点来观测创建该节点的 <code>session</code> 状态的特性。首先创建一个节点 <code>z_g</code> 来表示群组。当群组中的某个进程启动时，它会在 <code>z_g</code> 下创建一个临时的子节点。如果每个进程都有唯一的命名或标识，那么这个命名或标识就可以作为 <code>ZooKeeper</code> 节点的名称；否则就可以在创建节点时设置 <code>SEQUENTIAL</code> 标记让 <code>ZooKeeper</code> 自动在节点名称后追加一个单调递增的数字，以保证名称的唯一性。各进程可以将进程相关的信息放到临时节点中，例如当前进程的地址和端口号。</p>
-<p>当进程在节点 <code>z_g</code> 下创建完临时进程后就可以正常启动。它不需要做其他任何事。如果这个进程发生异常或者主动结束，那么它所创建的临时节点也会自动被删除。</p>
-<p>各进程可以简单的通过查询 <code>z_g</code> 的所有子节点来获取当前群组成员的信息。如果某个进程想要监控群组成员的变化，那么它可以设置监听标记（通过 <code>getChildren(path, watch)</code> 方法设置 <code>watch</code>），然后在收到通知时更新群组信息。</p>
-<h4 id="简单锁simple-locks"><a class="markdownIt-Anchor" href="#简单锁simple-locks"></a> 简单锁（Simple Locks）</h4>
-<p>虽然 <code>ZooKeeper</code> 不是一个锁服务，但也可以用来实现锁。使用 <code>ZooKeeper</code> 的应用通常使用同步原语来适配其需求。本节通过使用 <code>ZooKeeper</code> 实现锁来展示可以通过 <code>ZooKeeper</code> 来实现各种各样的通用同步原语。</p>
-<p>最简单的锁实现借助于 <code>lock files</code>。使用一个 <code>znode</code> 来表示一把锁。为了获取锁，客户端会尝试以 <code>EPHEMERAL</code> 标记创建一个临时节点。如果创建成功，那么这个客户端就获得了锁。否则，客户端就会去读取这个 <code>znode</code> 并设置监听状态，从而当这个临时节点被删除时能收到通知。当持有锁的客户端发生异常或者主动删除该节点时，则代表释放了锁。其他监听的客户端就会收到通知并尝试重新创建临时节点来获取锁。</p>
-<p>虽然这种方式能实现锁，不过也存在几个问题。首先，它会造成羊群效应（<code>herd effect</code>）。如果有大量的客户端在等待释放锁，那么当锁被释放时，这些客户端都会被通知然后都会尝试获取锁，而实际上只会有一个客户端能获得锁。第二，这种方式只实现了互斥锁。下面两种原语展示了如何解决这两个问题。</p>
-<h4 id="没有羊群效应的简单锁simple-locks-without-herd-effect"><a class="markdownIt-Anchor" href="#没有羊群效应的简单锁simple-locks-without-herd-effect"></a> 没有羊群效应的简单锁（Simple Locks without Herd Effect）</h4>
-<p>首先定义节点 <code>l</code> 来实现锁。然后，将所有希望获取锁的客户端按照请求顺序排序，之后这些客户端就能按照请求的顺序获取锁。客户端希望获取锁时需要执行下面的操作：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;lock-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if n is lowest znode in C, exit</span><br><span class="line">4 p &#x3D; znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 2</span><br><span class="line"></span><br><span class="line">Unlock</span><br><span class="line">1 delete(n)</span><br></pre></td></tr></table></figure>
-<p>第一行 <code>SEQUENTIAL</code> 的标记用来将所有希望获取锁的客户端进行排序。每个客户端首先在节点 <code>l</code> 下创建一个临时顺序的子节点，然后获取 <code>l</code> 的所有子节点。之后在第三行判断自己创建的节点是否在所有子节点中有着最小的序号，如果是，则表示当前客户端获得了锁。如果不是，说明有其他序号更小的子节点存在，当前客户端需要排在这之后获取锁。然后客户端会尝试判断排在当前序号前的子节点是否存在，如果存在则设置监听状态等待前一个节点删除的通知，如果不存在，则继续回到第二行执行。每个客户端只监听排在自己前面的子节点避免了羊群效应，因为任何一个子节点删除的通知只会发给其中的一个客户端。每当客户端收到前面节点删除的通知时，需要再次获取 <code>l</code> 的所有子节点来判断自己是否是最小子节点（因为排在前面的子节点并不一定持有锁，可能是更前面的子节点持有锁。这里能否直接复用第一次请求 <code>getChildren</code> 的信息？实现起来会较麻烦些，因为需要挨个判断排在前面的子节点是否还存在，不如直接拉取一份最新的子节点信息）。</p>
-<p>释放锁就是简单的删除对应的临时节点 <code>n</code>。而通过 <code>EPHEMERAL</code> 创建节点能保证进程异常时自动释放锁或者放弃对锁的获取请求。</p>
-<p>这种锁实现有以下几个优势：</p>
-<ol>
-<li>一个节点的删除只会唤醒一个客户端，因为每个节点都只会被一个客户端监听，所以也不会有羊群效应。</li>
-<li>锁的获取和释放不依赖轮询或超时。</li>
-<li>使用这种方式创建锁使得可以通过查看 <code>ZooKeeper</code> 中的数据来监测锁竞争的数量，以及调试锁相关的问题。</li>
-</ol>
-<h4 id="读写锁readwrite-locks"><a class="markdownIt-Anchor" href="#读写锁readwrite-locks"></a> 读写锁（Read/Write Locks）</h4>
-<p>在前面锁的基础上稍加修改就能实现一个读写锁。释放锁的操作和前面的相同：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Write Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;write-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if n is lowest znode in C, exit</span><br><span class="line">4 p &#x3D; znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 2</span><br><span class="line"></span><br><span class="line">Read Lock</span><br><span class="line">1 n &#x3D; create(l + &quot;&#x2F;read-&quot;, EPHEMERAL|SEQUENTIAL)</span><br><span class="line">2 C &#x3D; getChildren(l, false)</span><br><span class="line">3 if no write znodes lower than n in C, exit</span><br><span class="line">4 p &#x3D; write znode in C ordered just before n</span><br><span class="line">5 if exists(p, true) wait for watch event</span><br><span class="line">6 goto 3</span><br></pre></td></tr></table></figure>
-<p>写锁是互斥锁，这里的实现和前面的锁的实现一模一样，只是改变了创建节点的名称。而由于读锁之间没有互斥，所以获取读锁时只需要检查有没有序号更小的写锁即可。另外，读锁实现时最后的 <code>goto</code> 直接跳到了第三行而没有到第二行，这个在 <a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a> 中也提到可能是个笔误。这里看起来会有羊群效应，即存在大量的客户端会监听某个写锁，当写锁被删除时这些客户端都会收到通知，不过这本身就是预期的行为，因为读锁之间没有互斥，写锁释放后就应该唤醒所有等待中的读锁。</p>
-<h4 id="双屏障double-barrier"><a class="markdownIt-Anchor" href="#双屏障double-barrier"></a> 双屏障（Double Barrier）</h4>
-<p>双屏障用于客户端在某个计算开始和结束时进行同步，当指定数量的进程加入到屏障中后，就可以开始各自的计算任务，每个进程在整个计算任务结束后就可以离开屏障。<code>MapReduce</code> 任务就是一个典型示例，<code>reduce</code> 任务的开始需要所有 <code>map</code> 任务的完成，当所有 <code>map</code> 任务完成后，各进程就可以进入屏障开始 <code>reduce</code> 任务，而整个 <code>MapRecuce</code> 任务的完成依赖所有 <code>reduce</code> 任务的完成，当所有 <code>reduce</code> 任务完成后，各进程就可以离开屏障。客户端可以使用一个 <code>znode</code> 来表示屏障，记作 <code>b</code>。每个进程在 <code>b</code> 下创建一个子节点来表示进入屏障，通过删除子节点来表示离开屏障。如果 <code>b</code> 下的子节点的数量超过了指定值，那么就允许开始执行计算任务。当 <code>b</code> 下的子节点都被删除后，进程就可以离开屏障。这里同样使用监听机制来高效的等待进入屏障和离开屏障的事件发生。一旦 <code>b</code> 下的子节点数量满足了阈值，创建最后一个子节点的进程会同时创建一个 <code>ready</code> 子节点，那么通过监听 <code>ready</code> 子节点是否存在就可以判断是否可以开始计算。另一方面，论文中提到通过监听某个特定的子节点来判断是否可以离开屏障，这里略显模糊，这个特定的子节点是谁创建的？创建了这个子节点的进程什么时候可以删除这个子节点？<a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a> 中提出了另一种方案，每个进程各自监听 <code>b</code> 下的子节点，并且在任务完成后删除所创建的节点，如果各进程发现 <code>b</code> 下没有子节点了，就说明可以离开屏障，整个计算任务已结束。</p>
-<h2 id="zookeeper-的实现"><a class="markdownIt-Anchor" href="#zookeeper-的实现"></a> ZooKeeper 的实现</h2>
-<p><code>ZooKeeper</code> 通过将数据复制到每台服务器上来实现服务的高可用。<code>ZooKeeper</code> 处理的服务器异常针对的是服务器宕机，且这些异常的服务器可能之后会恢复。下图展示了 <code>ZooKeeper</code> 服务的主要组件。当 <code>ZooKeeper</code> 服务收到一个请求时，会对这个请求进行预处理（<code>request processor</code>），如果这个请求需要各服务器协同完成（例如写请求），则会通过一致性协议处理（一种 <code>atomic broadcast</code> 的实现），最终 <code>ZooKeeper</code> 会将修改提交到各服务器副本中。而对于读请求，服务端则直接从本地数据库中读取数据然后返回给客户端。</p>
-<p><img src="/images/zookeeper-2.png" alt="alt" /></p>
-<p>上图中的复制数据库是包含了整个数据树（<code>data tree</code>）的内存数据库。每个 <code>znode</code> 默认最多保存 <code>1MB</code> 数据，不过这个值可以根据需要通过配置修改。从可恢复性考虑，<code>ZooKeeper</code> 会高效的将更新写入到磁盘，并且将更新写入到内存数据库前会先强制将数据刷新到磁盘中。类似于 <code>Chubby</code>，<code>ZooKeeper</code> 也会将提交的操作写入到重放日志中，并且会周期性的对内存数据库生成快照。</p>
-<p>每个 <code>ZooKeeper</code> 服务端都能对客户端提供服务。客户端只会连接一个服务端然后提交请求。在之前提到过，读请求会直接返回当前服务端本地的数据。而修改系统状态的请求、写请求则会交由一致性协议处理。</p>
-<p>作为一致性协议的一部分，客户端的写请求会转发给单台服务器，称之为主节点（<code>leader</code>）。其他的 <code>ZooKeeper</code> 服务器被称之为从节点（<code>followers</code>），从节点会收到来自主节点的状态更新请求，并就状态更新达成一致。</p>
-<h3 id="请求处理器request-processor"><a class="markdownIt-Anchor" href="#请求处理器request-processor"></a> 请求处理器（Request Processor）</h3>
-<p>由于 <code>ZooKeeper</code> 的消息层是原子的，它保证各副本的状态不会和主节点产生分歧，虽然在任一时间点有可能某些副本会比其他副本多提交一些事务。和客户端发送的请求不同，<code>ZooKeeper</code> 中的事务是幂等的。当主节点收到一个写请求时，它会先计算出系统提交了这个写请求后的系统状态，然后将其转化为一个能达到该系统状态的事务。这里之所以要先计算出将来的状态是因为当前可能存在未提交的事务。例如，当前客户端正在进行一个 <code>setData</code> 的条件更新，请求中的版本号和被修改的 <code>znode</code> 的某个未来的版本号所匹配，<code>ZooKeeper</code> 会生成一个 <code>setDataTXN</code> 事务，这个事务包含了更新后的数据，更新后的版本号，以及更新的时间戳。而如果发生了异常，例如 <code>setData</code> 期望的版本号不匹配或者要更新的 <code>znode</code> 不存在，则会生成一个 <code>errorTXN</code> 错误。</p>
-<h3 id="原子广播atomic-broadcast"><a class="markdownIt-Anchor" href="#原子广播atomic-broadcast"></a> 原子广播（Atomic Broadcast）</h3>
-<p>所有更新 <code>ZooKeeper</code> 状态的请求都会被转发给主节点。主节点会执行写请求然后将写请求通过 <code>Zab</code> 协议广播给所有的从节点，<code>Zab</code> 是一种原子的广播协议。当主节点就更新达成一致后，会返回结果给客户端。<code>Zab</code> 默认使用的是简单的大多数同意协议，所以只有过半数的节点存活时 <code>Zab</code> 和 <code>ZooKeeper</code> 才能正常工作（例如，由 <code>2f + 1</code> 个节点组成的 <code>ZooKeeper</code> 系统可以最多容忍 <code>f</code> 台节点异常）。</p>
-<p>为了提高系统的吞吐，<code>ZooKeeper</code> 会尽量保持请求处理管道满载运行。请求管道的不同部分可能有着几千个请求。因为系统状态变更依赖于之前的状态变更，所以 <code>Zab</code> 比常规的原子广播协议提供了更强的顺序保证。具体来说，<code>Zab</code> 保证了主节点广播的状态变更被分发执行的顺序和主节点发出广播的顺序一致，同时 <code>Zab</code> 会先将之前主节点的修改先发送给新的主节点，等到这些修改都执行完成后，新的主节点才能广播自己的修改。</p>
-<p>另外还有些实现细节有利于高性能。<code>ZooKeeper</code> 使用 <code>TCP</code> 协议来发送消息，所以消息的有序性天然得到了保证，这同时也简化了实现。<code>ZooKeeper</code> 使用 <code>Zab</code> 协议选择的主节点作为集群的主节点，这就使得创建事务的节点同时也能发起事务。<code>ZooKeeper</code> 使用日志来记录事务的发起，这同时也作为内存数据库的预写日志，从而避免了将消息写入到磁盘两次。</p>
-<p>在正常情况下 <code>Zab</code> 协议能按序发送所有消息，且每条消息只发送一次，不过由于 <code>Zab</code> 不会持久化已发送的消息的 <code>id</code>，所以在宕机恢复时可能会重复发送消息。因为 <code>ZooKeeper</code> 的事务是原子的，所以只要消息依然能保证有序发送，重复发送就没有问题。实际上，<code>ZooKeeper</code> 会要求 <code>Zab</code> 再次发送至少上次快照开始后的所有已发送的消息。</p>
-<h3 id="复制数据库replicated-database"><a class="markdownIt-Anchor" href="#复制数据库replicated-database"></a> 复制数据库（Replicated Database）</h3>
-<p>每个副本在内存中都有一份 <code>ZooKeeper</code> 状态的拷贝。当 <code>ZooKeeper</code> 宕机重启后，它需要能恢复到宕机前的状态。如果重新发送所有已发送的消息来恢复状态则需要较长时间，尤其是当服务器已经运行了一段时间之后，所以 <code>ZooKeeper</code> 周期性的对系统状态建立快照，并且只重新发送快照之后的所有消息。<code>ZooKeeper</code> 的快照被称之为 <code>fuzzy snapshots</code> 因为执行快照时不会加锁；<code>ZooKeeper</code> 会对数据树进行深度优先搜索，并且能原子的读取每个 <code>znode</code> 的数据和元数据，然后将其写入到磁盘中。这种方式生成的快照有可能包含部分在生成快照期间执行的事务的结果，最终生成的快照可能不会和任一时间点的 <code>ZooKeeper</code> 状态一致。不过由于状态更新是原子的，<code>ZooKeeper</code> 可以在后续恢复阶段重新按序执行已提交的事务。</p>
-<p>例如，当 <code>ZooKeeper</code> 开始执行快照时有两个节点 <code>/foo</code> 和 <code>/goo</code>，对应的节点值分别为 <code>f1</code> 和 <code>g1</code>，节点值的版本号都是1。此时，对系统状态的修改以 <code>&lt;transactionType, path, value, new-version&gt;</code> 的形式到达：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;SetDataTXN, &#x2F;foo, f2, 2&gt;</span><br><span class="line">&lt;SetDataTXN, &#x2F;goo, g2, 2&gt;</span><br><span class="line">&lt;SetDataTXN, &#x2F;foo, f3, 3&gt;</span><br></pre></td></tr></table></figure>
-<p>当系统执行了这些更新后，节点 <code>/foo</code> 的值变为 <code>f3</code>，对应版本号为3，而节点 <code>/goo</code> 的值变为 <code>g2</code>，对应版本号为2。不过，执行 <code>fuzzy snapshot</code> 后的快照中的节点 <code>/foo</code> 的值可能是 <code>f3</code>，而节点 <code>/goo</code> 的值可能是 <code>g1</code>，对应版本号分别为3和1，这并不是一个有效的 <code>ZooKeeper</code> 系统状态。如果服务器宕机后恢复，系统会先读取快照然后重新发送状态更新消息，由于消息执行的顺序性，最终系统的状态和宕机前的状态保存一致。</p>
-<h3 id="客户端-服务端交互client-server-interactions"><a class="markdownIt-Anchor" href="#客户端-服务端交互client-server-interactions"></a> 客户端-服务端交互（Client-Server Interactions）</h3>
-<p>当 <code>ZooKeeper</code> 处理了一个写请求时，它会给所有监听了该节点的客户端发送数据更新通知，并同时删除该节点的监听（因为监听只会触发一次）。服务端会按顺序处理写请求，而且同时不会并发的处理其他写请求或者读请求。这就保证了严格的监听通知顺序。不过服务端的监听通知是由各服务器自行负责，只有和当前服务器连接的客户端才会收到通知，其他客户端对同一节点的监听由其他服务器负责。</p>
-<p>读请求由当前客户端所连接的服务端直接读取内存中的数据返回。每个读请求处理时会标记上一个 <code>zxid</code>，这个 <code>zxid</code> 对应当前服务端所知道的最新的事务。这个 <code>zxid</code> 定义了读写操作之间的相对顺序。通过直接读取内存中的数据返回的方式来处理读请求，<code>ZooKeeper</code> 能保证非常好的读性能，因为这不涉及任何磁盘 <code>IO</code> 或者其他一致性协议。这个设计是满足读密集型应用对性能要求的关键点。</p>
-<p>直接从本地内存读取数据的一个缺点是不保证一定能读取到最新更新的数据，即可能返回过期的数据，即使当前节点的更新已经被 <code>ZooKeeper</code> 所提交，因为只要过半数的节点已完成数据更新就可以认为本次数据已提交，而当前节点可能还没有执行更新。对于必须保证读操作能读取到最新的数据的应用，<code>ZooKeeper</code> 提供了 <code>sync</code> 接口。<code>sync</code> 原语能异步执行，并且会由主节点将所有待写入的更新应用到当前副本中。如果希望读操作能读取到最新的数据，客户端需要在执行读操作前调用 <code>sync</code> 方法。<code>ZooKeeper</code> 对客户端操作的 <code>FIFO</code> 执行顺序保证以及 <code>sync</code> 写操作的全局顺序保证使得读操作在执行读时 <code>sync</code> 发起之前的所有写操作都已经应用到了当前服务器中。在 <code>ZooKeeper</code> 的实现中，执行 <code>sync</code> 操作时不需要原子广播协议，因为使用了基于主节点的算法，只需要将 <code>sync</code> 请求放在主节点和当前节点的请求队列的末尾即可。这种方式能正确工作的前提是当前的主节点依然是主节点。如果当前主节点还有进行中的事务并提交，那么从节点就可以认为当前主节点依然是主节点。如果主节点的请求队列为空，那么主节点就会先提交一个空的事务然后再发起 <code>sync</code> 请求。这样当主节点处于低负载运行时，不需要生成额外的广播请求。在 <code>ZooKeeper</code> 的实现中，主节点会有一段过期时间，所以主节点自己就能知道什么时候不再是主节点，从而不再发起空事务。</p>
-<p><code>ZooKeeper</code> 的服务器会以 <code>FIFO</code> 的顺序来处理客户端请求。响应结果中会附带上 <code>zxid</code>。即使客户端和服务端之间没有请求，在常规的心跳返回中也会附带上当前服务端所知道的最新的 <code>zxid</code>。如果客户端连接上了一台新的服务器，那么这个服务器会保证自己所知道的 <code>zxid</code> 不会比客户端的 <code>zxid</code> 旧。如果客户端发送的 <code>zxid</code> 更新，那么服务端在将自己本地的数据更新到最新前不会和客户端再建立连接。而 <code>ZooKeeper</code> 能保证客户端能连接上一台数据版本满足 <code>zxid</code> 的服务端，因为客户端连接到的服务器必然是过半数有着最新系统状态的服务器之一。这个行为对保证持久性来说至关重要。</p>
-<p><code>ZooKeeper</code> 使用超时来检测客户端的 <code>session</code> 异常。如果在 <code>session timeout</code> 期间没有一台服务器收到来自客户端的请求，那么主节点就会认为发生了异常。如果客户端发送请求的频率足够高，那么就不需要发送其他消息来告诉主节点没有异常。否则，在非活跃期间客户端会发送心跳来维持连接。如果客户端和某台服务器无法发送请求或者心跳，那么客户端会和另外一台服务器建立连接。为了避免客户端的 <code>session</code> 过期，<code>ZooKeeper</code> 客户端类库会在 <code>session</code> 空闲了 <code>s/3</code> 毫秒后发送心跳，并且如果在 <code>2s/3</code> 毫秒内没有收到响应则会连接上另外一台服务器，这里的 <code>s</code> 指的是 <code>session</code> 的过期时间，以毫秒为单位。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper.pdf">ZooKeeper: Wait-free coordination for Internet-scale systems</a></li>
-<li><a href="https://pdos.csail.mit.edu/6.824/papers/zookeeper-faq.txt">ZooKeeper FAQ</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Paper</tag>
-        <tag>MIT 6.824</tag>
-        <tag>Distributed Systems</tag>
-        <tag>ZooKeeper</tag>
       </tags>
   </entry>
   <entry>
@@ -2833,31 +2833,6 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       </tags>
   </entry>
   <entry>
-    <title>工程师文化和实事求是</title>
-    <url>/2022/06/04/engineering-culture/</url>
-    <content><![CDATA[<p>陈皓在 <a href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a> 中谈到工程师文化由两点组成：自由和效率。不过我认为可以再加一点，那就是实事求是。实事求是要求尊重客观事实，不弄虚作假，不过现实中往往大相径庭。</p>
-<h2 id="不尊重客观事实"><a class="markdownIt-Anchor" href="#不尊重客观事实"></a> 不尊重客观事实</h2>
-<p>福尔摩斯里有一句话：</p>
-<blockquote>
-<p>Once you eliminate the impossible, whatever remains, no matter how improbable, must be the truth.</p>
-</blockquote>
-<p>对应了软件开发中一个烂大街的场景：在尽可能的考虑了所有的因素之后，不管完成一个工程所需要的时间是多么的不符合非执行者的预期，最终完成这个工程的时间也只会只多不少。如果无法正视客观事实，则会使得工程从开始到结束都弥漫着自我焦虑。而工程实施时往往只会拙劣的采用10个女人1个月生10个孩子的方式，最终也容易造成工程的反复返工，不过这倒能在总结大会上提供丰富的演讲素材，以及时间紧、任务重的自我感动，然后下次一定。</p>
-<h2 id="避实就虚"><a class="markdownIt-Anchor" href="#避实就虚"></a> 避实就虚</h2>
-<p>优秀的团队能正视问题，如果一个团队在面对问题分析时首先想的是哪些问题该提，哪些问题不该提，哪些问题提了会赢得芳心，那这种问题分析就是表演作秀，最终也继续重蹈覆辙。</p>
-<h2 id="形式主义"><a class="markdownIt-Anchor" href="#形式主义"></a> 形式主义</h2>
-<p>陈皓在 <a href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a> 中关于工程师文化如何落地提到引入绩效考核，不过这可能会造成形式主义和和团队间无意义的攀比。例如，如果将 <code>Code Review</code> 作为考核指标，难免会出现：快到月末了，还需要再提20个 <code>comment</code>；某部门的人均 <code>comment</code> 有 <code>xx</code> 个，本部门才 <code>yy</code> 个，每个人努努力，提到 <code>zz</code> 个。</p>
-<h2 id="移花接木"><a class="markdownIt-Anchor" href="#移花接木"></a> 移花接木</h2>
-<p>在成果导向的规则下，如果通过 <code>A</code>，<code>B</code>，<code>C</code> 达成了 <code>D</code>，则直接对外宣称通过 <code>A</code> 达成了 <code>D</code>。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>杂谈</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>MIT 6.824 - Lab 3 (1): Students&#39; Guide to Raft（续）</title>
     <url>/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/</url>
     <content><![CDATA[<p><a href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。在 <a href="/2022/05/06/mit-6.824-lab2-students-guide-to-raft/">MIT 6.824 - Lab 2 (1): Students’ Guide to Raft</a> 中介绍了关于 <code>Lab 2</code> 的部分，本文将继续介绍关于 <code>Lab 3</code> 的部分。</p>
@@ -2926,6 +2901,31 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
         <tag>Distributed Systems</tag>
         <tag>Go</tag>
         <tag>Raft</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>工程师文化和实事求是</title>
+    <url>/2022/06/04/engineering-culture/</url>
+    <content><![CDATA[<p>陈皓在 <a href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a> 中谈到工程师文化由两点组成：自由和效率。不过我认为可以再加一点，那就是实事求是。实事求是要求尊重客观事实，不弄虚作假，不过现实中往往大相径庭。</p>
+<h2 id="不尊重客观事实"><a class="markdownIt-Anchor" href="#不尊重客观事实"></a> 不尊重客观事实</h2>
+<p>福尔摩斯里有一句话：</p>
+<blockquote>
+<p>Once you eliminate the impossible, whatever remains, no matter how improbable, must be the truth.</p>
+</blockquote>
+<p>对应了软件开发中一个烂大街的场景：在尽可能的考虑了所有的因素之后，不管完成一个工程所需要的时间是多么的不符合非执行者的预期，最终完成这个工程的时间也只会只多不少。如果无法正视客观事实，则会使得工程从开始到结束都弥漫着自我焦虑。而工程实施时往往只会拙劣的采用10个女人1个月生10个孩子的方式，最终也容易造成工程的反复返工，不过这倒能在总结大会上提供丰富的演讲素材，以及时间紧、任务重的自我感动，然后下次一定。</p>
+<h2 id="避实就虚"><a class="markdownIt-Anchor" href="#避实就虚"></a> 避实就虚</h2>
+<p>优秀的团队能正视问题，如果一个团队在面对问题分析时首先想的是哪些问题该提，哪些问题不该提，哪些问题提了会赢得芳心，那这种问题分析就是表演作秀，最终也继续重蹈覆辙。</p>
+<h2 id="形式主义"><a class="markdownIt-Anchor" href="#形式主义"></a> 形式主义</h2>
+<p>陈皓在 <a href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a> 中关于工程师文化如何落地提到引入绩效考核，不过这可能会造成形式主义和和团队间无意义的攀比。例如，如果将 <code>Code Review</code> 作为考核指标，难免会出现：快到月末了，还需要再提20个 <code>comment</code>；某部门的人均 <code>comment</code> 有 <code>xx</code> 个，本部门才 <code>yy</code> 个，每个人努努力，提到 <code>zz</code> 个。</p>
+<h2 id="移花接木"><a class="markdownIt-Anchor" href="#移花接木"></a> 移花接木</h2>
+<p>在成果导向的规则下，如果通过 <code>A</code>，<code>B</code>，<code>C</code> 达成了 <code>D</code>，则直接对外宣称通过 <code>A</code> 达成了 <code>D</code>。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>杂谈</tag>
       </tags>
   </entry>
   <entry>
