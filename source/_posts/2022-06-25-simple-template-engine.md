@@ -137,7 +137,7 @@ string result = template.Render();
 这里将 `text` 传入 `Template` 的构造函数后，会在构造函数中完成模板解析，后续的 `Render` 调用都不需要再执行模板解析。
 
 ### CodeBuilder
-`CodeBuilder` 用于辅助生成 `C#` 代码，`Template` 通过 `CodeBuilder` 添加代码行，以及管理缩进（原文的作者使用 `Python` 作为编译的目标语言所以这里需要维护正确的缩进，`C#` 则不需要），并最终通过 `CodeBuilder` 得到可执行代码。
+在介绍 `Template` 的实现之前，需要先了解下 `CodeBuilder`，`CodeBuilder` 用于辅助生成 `C#` 代码，`Template` 通过 `CodeBuilder` 添加代码行，以及管理缩进（原文的作者使用 `Python` 作为编译的目标语言所以这里需要维护正确的缩进，`C#` 则不需要），并最终通过 `CodeBuilder` 得到可执行代码。
 
 `CodeBuilder` 内部维护了一个类型为 `List<object>` 的变量 `Codes` 来表示代码行，这里的 `List` 容器类型不是字符串是因为 `CodeBuilder` 间可以嵌套，一个 `CodeBuilder` 可以作为一个完整的函数单元添加到另一个 `CodeBuilder` 中，并最终通过自定义的 `ToString` 方法来生成可执行代码：
 
@@ -193,7 +193,7 @@ public void Dedent()
 }
 ```
 
-`AddSection` 用于创建一个新的 `CodeBuilder` 对象，并将其添加到当前 `CodeBuilder` 的代码行中：
+`AddSection` 用于创建一个新的 `CodeBuilder` 对象，并将其添加到当前 `CodeBuilder` 的代码行中，后续对子 `CodeBuilder` 的修改都会反应到父 `CodeBuilder` 中：
 
 ```cs
 public CodeBuilder AddSection()
@@ -214,6 +214,24 @@ public override string ToString()
     return string.Join(string.Empty, this.Codes.Select(code => code.ToString()));
 }
 ```
+
+### Template 实现
+#### 编译
+模板引擎的模板解析阶段发生在 `Template` 的构造函数中：
+
+```cs
+public Template(string text, Dictionary<string, object> context)
+{
+    this.Context = context;
+    this.CodeBuilder = new CodeBuilder();
+    this.AllVariables = new HashSet<string>();
+    this.LoopVariables = new HashSet<string>();
+
+    this.Initialize(text);
+}
+```
+
+`Python` 版本的代码支持多个 `context`，会由构造函数统一合并为一个上下文对象，这里只简单实现仅支持一个 `context`；`AllVariables` 用于记录模板 `text` 中需要用到的变量名，例如 `userName`，然后在代码生成阶段就可以遍历 `AllVariables` 并通过 `var someName = Context[someName];` 生成局部变量；不过由于模板中的变量可能还会有循环语句用到的临时变量，这些变量会记录到 `LoopVariables` 中，最终代码生成阶段用到的变量为 `AllVariables - LoopVariables`。
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
