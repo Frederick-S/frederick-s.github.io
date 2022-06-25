@@ -106,7 +106,21 @@ public string Render(Dictionary<string, object> Context Context, Func<object, st
 }
 ```
 
-其中 `Context` 表示全局上下文，用于获取渲染需要的动态数据，例如例子中的 `userName`，`Render` 方法会先从 `Context` 中提取出模板中所有需要的变量。
+其中 `Context` 表示全局上下文，用于获取渲染需要的动态数据，例如例子中的 `userName`，`Render` 方法会先从 `Context` 中提取出模板中所有需要的变量；`ResolveDots` 是一个函数指针，用于执行点操作符调用；而变量的值都会通过 `Convert.ToString` 转为字符串。
+
+模板引擎的最终产物是一个字符串，所以在 `Render` 中先使用一个 `List` 保存每一行的渲染结果，最后再将 `List` 转换为字符串。
+
+`.NET` 编译器提供了 `Microsoft.CodeAnalysis.CSharp.Scripting` 包能够将某段字符串当做 `C#` 代码执行，所以最终模板引擎生成的代码将通过如下方式执行：
+
+```cs
+var code = "some code";
+var scriptOptions = ScriptOptions.Default.WithImports("System", "System.Collections.Generic");
+var script = CSharpScript.RunAsync(code, scriptOptions, yourCustomGlobals);
+
+return script.Result.ReturnValue.ToString();
+```
+
+## 模板引擎编写
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
