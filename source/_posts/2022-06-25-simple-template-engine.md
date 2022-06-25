@@ -73,7 +73,40 @@ tags:
 
 类似于编程语言的实现，模板引擎的解析也可以分为解释型和编译型两种。对于解释型来说，模板解析阶段需要生成某个特定的数据结构，然后在渲染阶段遍历该数据结构并执行所遇到的每一条指令；而对于编译型来说，模板解析阶段直接生成可执行代码，而渲染阶段则大大简化，直接执行代码即可。
 
-本文描述的模板引擎采用编译型的方式，原文的作者将模板编译为了 `Python` 代码，这里为了加深理解，实现了 `.NET Core` 版本的编译。
+本文描述的模板引擎采用编译型的方式，原文的作者将模板编译为了 `Python` 代码，这里为了进一步加深理解，实现了 `.NET Core` 版本的简单编译。
+
+## 编译为 C# 代码
+在介绍模板引擎实现之前，先来看一下模板引擎编译出的 `C#` 代码示例，对于如下的模板：
+
+```
+<p>Welcome, {{userName}}!</p>
+<p>Products:</p>
+<ul>
+{% for product in productList %}
+    <li>{{ product.Name }}:
+        {{ product.Price|FormatPrice }}</li>
+{% endfor %}
+</ul>
+```
+
+模板引擎会生成类似于下面的代码：
+
+```cs
+public string Render(Dictionary<string, object> Context Context, Func<object, string[], object> ResolveDots)
+{
+    var result = new List<string>();
+    var userName = Context["userName"];
+    var productList = Context["productList"];
+    result.AddRange(new List<string> {"<p>Welcome, ", Convert.ToString(userName), "!</p><p>Products:</p><ul>"});
+    foreach (var product in ConvertToEnumerable(productList)) {
+        result.AddRange(new List<string> {"<li>", Convert.ToString(ResolveDots(product, new [] { "Name" })), ":", Convert.ToString(FormatPrice(ResolveDots(product, new [] { "Price" }))), "</li>"});
+    }
+    result.Add("</ul>");
+    return string.Join(string.Empty, result);
+}
+```
+
+其中 `Context` 表示全局上下文，用于获取渲染需要的动态数据，例如例子中的 `userName`，`Render` 方法会先从 `Context` 中提取出模板中所有需要的变量。
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
