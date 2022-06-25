@@ -233,5 +233,27 @@ public Template(string text, Dictionary<string, object> context)
 
 `Python` 版本的代码支持多个 `context`，会由构造函数统一合并为一个上下文对象，这里只简单实现仅支持一个 `context`；`AllVariables` 用于记录模板 `text` 中需要用到的变量名，例如 `userName`，然后在代码生成阶段就可以遍历 `AllVariables` 并通过 `var someName = Context[someName];` 生成局部变量；不过由于模板中的变量可能还会有循环语句用到的临时变量，这些变量会记录到 `LoopVariables` 中，最终代码生成阶段用到的变量为 `AllVariables - LoopVariables`。
 
+接着我们再来看 `Initialize` 方法：
+
+```cs
+private void Initialize(string text)
+{
+    this.CodeBuilder.AddLine("var result = new List<string>();");
+
+    var variablesSection = this.CodeBuilder.AddSection();
+
+    // 解析 text
+
+    foreach (string variableName in new HashSet<string>(this.AllVariables.Except(this.LoopVariables)))
+    {
+        variablesSection.AddLine(string.Format("var {0} = Context[{1}];", variableName, this.ConvertToStringLiteral(variableName)));
+    }
+
+    this.CodeBuilder.AddLine("return string.Join(string.Empty, result);");
+}
+```
+
+`Initialize` 首先会通过 `CodeBuilder` 分配一个 `List` 保存所有的代码行，然后新建一个子 `CodeBuilder` 来保存所有的局部变量，解析 `text`，在完成 `text` 的解析后就能知道模板中使用了哪些变量，从而根据 `AllVariables - LoopVariables` 生成局部变量，最后将所有的代码行转成字符串。
+
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
