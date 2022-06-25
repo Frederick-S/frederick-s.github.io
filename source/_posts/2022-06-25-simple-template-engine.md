@@ -139,7 +139,7 @@ string result = template.Render();
 ### CodeBuilder
 在介绍 `Template` 的实现之前，需要先了解下 `CodeBuilder`，`CodeBuilder` 用于辅助生成 `C#` 代码，`Template` 通过 `CodeBuilder` 添加代码行，以及管理缩进（原文的作者使用 `Python` 作为编译的目标语言所以这里需要维护正确的缩进，`C#` 则不需要），并最终通过 `CodeBuilder` 得到可执行代码。
 
-`CodeBuilder` 内部维护了一个类型为 `List<object>` 的变量 `Codes` 来表示代码行，这里的 `List` 容器类型不是字符串是因为 `CodeBuilder` 间可以嵌套，一个 `CodeBuilder` 可以作为一个完整的函数单元添加到另一个 `CodeBuilder` 中，并最终通过自定义的 `ToString` 方法来生成可执行代码：
+`CodeBuilder` 内部维护了一个类型为 `List<object>` 的变量 `Codes` 来表示代码行，这里的 `List` 容器类型不是字符串是因为 `CodeBuilder` 间可以嵌套，一个 `CodeBuilder` 可以作为一个完整的逻辑单元添加到另一个 `CodeBuilder` 中，并最终通过自定义的 `ToString` 方法来生成可执行代码：
 
 ```cs
 public class CodeBuilder
@@ -170,7 +170,7 @@ public class CodeBuilder
 }
 ```
 
-`AddLine` 方法非常简单，即根据缩进空格数补齐空格后添加一行代码（这里 `C#` 版本保留了 `Python` 版本缩进的功能）：
+`CodeBuilder` 的 `AddLine` 方法非常简单，即根据缩进层级补齐空格后添加一行代码（这里 `C#` 版本保留了 `Python` 版本缩进的功能）：
 
 ```cs
 public void AddLine(string line)
@@ -277,7 +277,7 @@ private void FlushOutput(List<string> buffered)
 
 在解析 `text` 时，并不会处理完一个 `token` 就执行一次 `this.CodeBuilder.AddLine`，而是将多个 `token` 的处理结果批量的追加到最终的可执行代码中。
 
-接着，再回到 `Initialize` 方法中，由于模板中 `if`，`for` 可能存在嵌套，为了正确处理嵌套语句，这里引入一个栈 `var operationStack = new Stack<string>();` 来处理嵌套关系。例如，假设模板中存在 `{% if ... if ... endif endif}`，每次遇到 `if` 时则执行入栈，遇到 `endif` 时则执行出栈，如果出栈时栈为空则说明 `if` 语句不完整。
+接着，再回到 `Initialize` 方法中，由于模板中 `if`，`for` 可能存在嵌套，为了正确处理嵌套语句，这里引入一个栈 `var operationStack = new Stack<string>();` 来处理嵌套关系。例如，假设模板中存在 `{% if xxx %} {% if xxx %} {% endif %} {% endif %}`，每次遇到 `if` 时则执行入栈，遇到 `endif` 时则执行出栈，如果出栈时栈为空则说明 `if` 语句不完整，并抛出语法错误。
 
 那么，如何解析 `text` 呢？这里使用正则表达式来将 `text` 分割为 `token`：
 
