@@ -209,6 +209,158 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/05/06/mit-6.824-lab2-students-guide-to-raft/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/06/mit-6.824-lab2-students-guide-to-raft/" class="post-title-link" itemprop="url">MIT 6.824 - Lab 2 (1): Students' Guide to Raft</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-05-06 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-06T00:00:00+08:00">2022-05-06</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>10 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。</p>
+<h2 id="实现-raft"><a class="markdownIt-Anchor" href="#实现-raft"></a> 实现 Raft</h2>
+<p>论文中的 <code>Figure 2</code> 和 <code>Figure 13</code> 描述了实现 <code>Raft</code> 的主要接口，以及各节点需要维护的状态和响应接口时的行为逻辑，所以在做 <code>Lab 2</code> 之前需要先充分理解这部分的内容。文中的建议是<strong>必须</strong>严格落实图中的每一句话，而不是仅仅实现了功能，否则就有可能遇到奇怪的问题或不正确的系统行为。</p>
+<p>文中举了三个例子。第一，每次收到 <code>AppendEntries</code> 或 <code>RequestVote</code> 请求就重置 <code>election timeout</code>，因为收到这两个请求说明存在主节点或者正在选主。不过，图中还有描述：</p>
+<blockquote>
+<p>If election timeout elapses without receiving AppendEntries RPC from current leader or granting vote to candidate: convert to candidate.</p>
+</blockquote>
+<p>重置 <code>election timeout</code> 有两个关键条件：<code>AppendEntries</code> 要求发送请求的主节点是当前任期的主节点；<code>RequestVote</code> 要求成功投出选票。</p>
+<p>先看第一个条件，假设当前任期的主节点异常，此时还有一个之前任期的主节点存活在不断发送 <code>AppendEntries</code> 请求，假设此时某个从节点马上要进入选主状态，但由于收到了 <code>AppendEntries</code> 请求又没有校验任期就重置了 <code>election timeout</code>，造成无主状态时间延长。这个场景下如果过期的主节点不实现下面的逻辑杀伤力倍增：</p>
+<blockquote>
+<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower</p>
+</blockquote>
+<p>如果不实现上面的逻辑，那么过期的主节点会一直是主节点，然后一直重置其他本来可以成为候选节点的从节点。</p>
+<p>再来看第二个条件，假设当前任期的主节点异常，各从节点准备进入选主状态，此时一个不可能成为主节点的从节点先变成了候选节点（该节点的日志相对于其他任何一个从节点来说都不够新，即最后一条日志的任期不够大，或者任期相同但是日志条数不够多），<code>RequestVote</code> 永远不会成功，如果各从节点一收到 <code>RequestVote</code> 就重置 <code>election timeout</code>，就会造成始终没有主节点的情况。</p>
+<p>第二个例子，从节点收到心跳 <code>AppendEntries</code> 后就直接返回 <code>success = true</code> 和重置 <code>election timeout</code>。重置 <code>election timeout</code> 的危害上面已经说过，充当心跳的 <code>AppendEntries</code> 是不带日志的请求，文中提到学生在实现时容易将心跳 <code>AppendEntries</code> 特殊对待，而不进行 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 的校验。从节点返回 <code>true</code> 时主节点就会认为从节点的日志和自己匹配，从而错误的认为某些日志已经复制到了从节点上，从而可以提交日志。不过看到这里可能会有疑问，为什么主节点会在心跳响应中提交日志？通过心跳更新 <code>nextIndex</code> 和 <code>matchIndex</code> 是合理的，如果过半数节点已复制的日志是之前任期的，论文中有描述这是不允许提交的；如果过半数节点已复制的日志是当前任期的，那么可能是之前带日志的 <code>AppendEntries</code> 请求中从节点实际已完成了日志的复制，但是主节点没有收到响应，所以在最新的心跳中提交日志。</p>
+<p>引申开来，假设系统中此时 <code>x = 1</code>，有个客户端发送了 <code>write x = 2</code> 的请求，主节点成功将日志复制到了过半数的节点上，但是还没有响应客户端就异常了。系统重新选主后，此时有个客户端发送请求 <code>read x</code>，<code>x</code> 应该返回多少？应该是2，因为在 <code>Raft</code> 层面，一条日志是否已提交只取决于是否在当前任期内复制到了过半数的节点上，而不是取决于客户端是否收到响应，而只要日志提交了就可以被应用到状态机。类似的场景可以想象一下平时填了某个表单，提交时提示系统异常，但是刷新页面后表单信息已更新。</p>
+<p>第三个例子，学生在实现 <code>AppendEntries</code> 时，可能将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志。同样的，图中也有描述：</p>
+<blockquote>
+<p>If an existing entry conflicts with a new one (same index but different terms), delete the existing entry and all that follow it.</p>
+</blockquote>
+<p>因为当前的 <code>AppendEntries</code> 可能是个过期的请求，假设请求中的日志只是当前从节点已提交的日志的某一段子集，那么如果从节点将 <code>prevLogIndex</code> 之后的日志都替换为请求中的日志就会丢失已提交的日志。</p>
+<h2 id="调试-raft"><a class="markdownIt-Anchor" href="#调试-raft"></a> 调试 Raft</h2>
+<p>调试是实验中最花时间的一个部分，文中列举了四个常见的问题：活锁，不正确或不完整的 <code>RPC</code> 实现，没有遵循论文中的 <code>Rules for Servers</code> 以及任期混淆。</p>
+<h3 id="活锁"><a class="markdownIt-Anchor" href="#活锁"></a> 活锁</h3>
+<p>出现活锁时，等同于各节点都在做无用功。选主是最容易出现活锁的场景，例如始终无法选出一个主节点，或者某个候选节点获得了足够的选票后，马上有另外一个节点发起选主，使得刚成为主节点的节点重新退回到从节点（某个节点成为主节点后，还没来得及发送心跳，刚投了票的某个节点 <code>election timeout</code> 到期，发起新的选主，由于它的任期加了1比当前的主节点的任期大，主节点收到 <code>RequestVote</code> 后发现自己的任期小，从而转为从节点）。</p>
+<p>常见的原因有以下几种：</p>
+<p>第一，没有严格按照 <code>Figure 2</code> 的要求重置 <code>election timeout</code>。重置 <code>election timeout</code> 仅限于几种情况：</p>
+<ol>
+<li>收到当前任期的主节点的 <code>AppendEntries</code> 请求（如果 <code>AppendEntries</code> 中的任期比自身的任期小，则忽略该请求）。</li>
+<li>开启一轮新的选主，这个属于 <code>election timeout</code> 到期，选主的同时需要重置一个新的随机值。</li>
+<li>在某轮选举中，将票投给了某个候选节点。</li>
+</ol>
+<p>第二，没有按照 <code>Fiture 2</code> 的要求开启选主。特别的，如果当前节点是候选节点，但是 <code>election timeout</code> 到期了，那么需要开启新的一轮选主。</p>
+<p>第三，没有遵循 <code>Rules for Servers</code> 的第二条：</p>
+<blockquote>
+<p>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower (§5.1)</p>
+</blockquote>
+<p>例如，当前节点已投票，按照 <code>Raft</code> 的要求，一个从节点在一个任期内只能投票一次，此时又收到了一个 <code>RequestVote</code> 请求，请求中的任期大于自身的任期，那么就需要再次投票并更新自身的任期，避免新的候选节点拿不到足够的选票。</p>
+<h3 id="不正确的-rpc-实现"><a class="markdownIt-Anchor" href="#不正确的-rpc-实现"></a> 不正确的 <code>RPC</code> 实现</h3>
+<p>这里总结了学生们过往在实现 <code>RPC</code> 接口时容易犯错的点：</p>
+<ul>
+<li>如果某一步要求 <code>reply false</code>，那么这说明需要立即回复 <code>false</code> 并返回，不要再执行后续的步骤。</li>
+<li>如果收到了一条 <code>AppendEntries</code> 请求，但是请求中的 <code>prevLogIndex</code> 比当前日志的最后一条的索引还要大，也要返回 <code>false</code>，这也属于日志不匹配。</li>
+<li>如前面描述，即使 <code>AppendEntries</code> 没有包含任何日志，接收方也需要校验 <code>prevLogIndex</code> 和 <code>prevLogTerm</code>。</li>
+<li><code>AppendEntries</code> 中的第五步的 <code>min</code> 是有必要的，而且是和新日志中的最后一条日志的索引相比较，而不是当前日志的最后一条索引。
+<ul>
+<li>首先来看 <code>leaderCommit &lt; index of last new entry</code> 的情况，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 4, 5]</code>，<code>leaderCommit</code> 为3（索引按从1开始算），<code>S2</code> 为从节点，日志为 <code>[1, 2]</code>，那么 <code>S1</code> 需要将 <code>[3, 4, 5]</code> 发给 <code>S2</code>，<code>S2</code> 收到后 <code>index of last new entry</code> 是5，但是 <code>commitIndex</code> 只能更新到 <code>3</code>，也就是 <code>leaderCommit</code>，因为 <code>[4, 5]</code> 还没有提交。</li>
+<li>然后来看 <code>leaderCommit &gt; index of last new entry</code> 的情况，乍看之下好像不可能，因为对于主节点来说，在添加一条新日志的那个时刻，<code>leaderCommit</code> 肯定小于新的日志的索引，复制日志到从节点时这个关系也不会变。这里只能想到的是，<code>leaderCommit</code> 被并发修改了，因为主节点不会删除日志，所以 <code>index of last new entry</code> 不会变，当主节点和从节点的日志不匹配时，主从节点需要来回的就 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 达成一致（或者单纯就是因为执行的慢），在这个期间，可能过半数的节点已经达成了完成日志复制，主节点就可以提交这条日志，并更新 <code>leaderCommit</code>，所以在原先的 <code>AppendEntries</code> 中，如果 <code>leaderCommit</code> 引用的是全局变量，而 <code>entries[]</code> 是固定的，就会造成 <code>leaderCommit</code> 的值比 <code>entries[]</code> 的最后一条日志的索引还要大，这个时候从节点的 <code>commitIndex</code> 就需要取 <code>index of last new entry</code>。文中举了个例子说明为什么这时候不能取 <code>leaderCommit</code>，假设 <code>S1</code> 为主节点，日志为 <code>[1, 2, 3, 6]</code>，<code>leaderCommit</code> 为3，<code>S2</code> 为从节点，日志为 <code>[1, 2, 3, 4, 5]</code>，那么 <code>S1</code> 需要将 <code>[6]</code> 发给 <code>S2</code>，注意这里 <code>prevLogIndex</code> 和 <code>prevLogTerm</code> 校验通过，而论文中只提到校验不通过时才删除从节点的日志，所以这里就不会删除 <code>S2</code> 的 <code>[4, 5]</code>，又假设此时 <code>S1</code> 通过其他节点的交互将日志成功提交到了 <code>[1, 2, 3, 6, 7]</code>，<code>leaderCommit</code> 变为了第5个位置，<code>S2</code> 收到的 <code>AppendEntries</code> 中 <code>leaderCommit = 5</code>，<code>entries = [6]</code>，如果按照最新的 <code>leaderCommit</code> 更新就会造成把 <code>S2</code> 日志中的5归为已提交。</li>
+</ul>
+</li>
+<li>严格按照论文5.4节的描述来比较两个节点的日志哪个较新，不要只比较日志的长度。</li>
+</ul>
+<h3 id="未遵循-rules-for-servers"><a class="markdownIt-Anchor" href="#未遵循-rules-for-servers"></a> 未遵循 Rules for Servers</h3>
+<ul>
+<li>如果 <code>commitIndex &gt; lastApplied</code>，说明可以应用新的日志到状态机中。应用到状态机的顺序必须严格按照日志的顺序，可以由一个单独的线程顺序执行，也可以由多个线程并行执行，但各线程间必须确保不互相干扰，避免执行覆盖，对于同一个变量的不同写请求，多线程间必须按照日志的顺序写入。</li>
+<li>确保周期性的检查 <code>commitIndex &gt; lastApplied</code> 或者在 <code>commitIndex</code> 更新后检查（在 <code>matchIndex</code> 更新后）。这里并没有太明白这个问题，作者举了个例子，假设现在主节点发出了 <code>AppendEntries</code> 请求并同时检查 <code>commitIndex</code>，如果这条日志被过半数的节点复制了，那么需要等到主节点再添加一条新日志后才能应用上一条日志到状态机。不过根据这个例子也没有看出两者的关联，因为如果采用单线程顺序应用日志到状态机的方式，如果 <code>commitIndex &gt; lastApplied</code> 不满足，线程可以先睡眠然后再尝试，除此以外没有依赖其他条件。</li>
+<li>假设主节点发出 <code>AppendEntries</code> 请求然后被拒绝了，如果不是因为日志不一致被拒绝，那么这个主节点就必须马上转为从节点，且不能更新 <code>nextIndex</code>，因为这说明当前主节点的任期小于从节点。如果错误的更新了 <code>nextIndex</code>，而这个主节点在转为从节点后又当选了主节点，就会造成 <code>nextIndex</code> 和从节点永远不会匹配的情况（相当于错位了一格）。</li>
+<li>如果主节点发现某条过去任期的日志被大多数的节点复制了，但是自身的 <code>commitIndex</code> 却小于这条日志的索引，此时主节点也不能够更新 <code>commitIndex</code>，这个就是论文中 <code>Figure 8</code> 描述的问题，提交一条之前任期的日志存在被新一轮的主节点覆盖的风险。所以提交日之前需要判断 <code>log[N].term == currentTerm</code>。</li>
+</ul>
+<p>有一个常见的困惑是 <code>nextIndex</code> 和 <code>matchIndex</code> 的区别。你可能会观察到 <code>matchIndex = nextIndex - 1</code>，然后用 <code>nextIndex</code> 来替代 <code>matchIndex</code>，然而这是有风险的。举一个很明显的反例，假设某个节点被选为主节点，此时收到一个客户端请求并添加了一条日志，那么它发给从节点的 <code>nextIndex</code> 就是最后一条日志的下一条，而 <code>matchIndex</code> 显然不是 <code>nextIndex - 1</code>（新添加的日志的索引）。</p>
+<h3 id="任期混淆"><a class="markdownIt-Anchor" href="#任期混淆"></a> 任期混淆</h3>
+<p>任期混淆指的是节点收到了来自之前任期的 <code>RPC</code> 请求。<code>Figure 2</code> 清晰的描述了收到过期任期的请求应该怎么做，但是并没有说明收到过期任期的响应应该怎么做。一个简单的做法就是比较响应中的任期和当前的任期，如果相等则执行相应的逻辑，如果当前任期小则转为从节点（只有主节点、候选节点才能发请求，才有收到响应的可能），如果当前任期大则不处理。</p>
+<p>还有一个相关但不同的问题，假设主节点收到 <code>AppendEntries</code> 响应后设置 <code>matchIndex = nextIndex - 1</code> 或 <code>matchIndex = len(log)</code>，这都是不安全的，因为 <code>nextIndex</code> 和 <code>len(log)</code> 在这期间都有可能改变，正确的做法应该是使用原始请求中不变的参数，即 <code>matchIndex = prevLogIndex + len(entries[])</code>。</p>
+<h3 id="关于性能"><a class="markdownIt-Anchor" href="#关于性能"></a> 关于性能</h3>
+<p>实验中会要求实现两个关于性能方面的优化，一个是日志压缩，另一个是快速确认正确的 <code>prevLogIndex</code>。</p>
+<p>关于日志压缩需要注意几点：</p>
+<ul>
+<li>当执行快照时，需要确保快照中的状态和指定日志中的索引是严格对应的，即快照不能落后于日志，也不能超前。</li>
+<li>论文中并没有描述当节点异常然后恢复后应该如何处理快照。论文中要求创建完快照后，需要删除快照所对应的日志，而系统可能在删除日志前异常，那么系统恢复后会根据快照和日志进行重放。文中说系统可能会重放已经在快照中的日志，这里有点疑问，因为快照中包含了 <code>lastIncludedIndex</code> 和 <code>lastIncludedTerm</code>，和当前日志进行对比就能知道哪些日志已经在快照中了，从而可以跳过。</li>
+</ul>
+<p>论文中并没有详细描述如何快速确认正确的 <code>prevLogIndex</code>，这部分的逻辑可以参考 <a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/notes/l-raft2.txt">6.824 2022 Lecture 7: Raft (2)</a> 或者文中的建议：</p>
+<ul>
+<li>如果从节点在 <code>prevLogIndex</code> 处没有日志，说明从节点的日志较短，则返回 <code>conflictIndex = len(log)</code> 以及 <code>conflictTerm = None</code>。</li>
+<li>如果从节点在 <code>prevLogIndex</code> 处有日志，但是日志对应的任期不匹配，那么返回 <code>conflictTerm = log[prevLogIndex].Term</code>，然后找到属于 <code>conflictTerm</code> 的第一条日志的索引。</li>
+<li>主节点收到 <code>conflictIndex/conflictTerm</code> 后，首先在日志中搜索 <code>conflictTerm</code>，如果找到有日志属于 <code>conflictTerm</code>，那么 <code>nextIndex</code> 需要更新为主节点中属于 <code>conflictTerm</code> 的最后一条日志的索引加1。</li>
+<li>如果主节点没有找到属于 <code>conflictTerm</code> 的日志，那么更新 <code>nextIndex</code> 为 <code>conflictIndex</code>。</li>
+</ul>
+<p>其中一个不完善的实现是只考虑 <code>conflictIndex</code> 而忽略了 <code>conflictTerm</code>，这样会简化实现，不过主从节点交互的次数会变多，因为如果考虑了 <code>conflictTerm</code>，那么一次性能跳过的日志会更多。</p>
+<p>最后一部分的 <code>Applications on top of Raft</code> 属于 <code>Lab 3</code> 的内容，即基于 <code>Raft</code> 构建应用，在 <code>Lab 2</code> 中暂不描述。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/05/03/mit-6.824-raft/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1682,157 +1834,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/27/how-to-publich-java-package-to-maven-central-repo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/02/27/how-to-publich-java-package-to-maven-central-repo/" class="post-title-link" itemprop="url">发布 JAR 包到 Maven 中央仓库</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-02-27 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-27T00:00:00+08:00">2022-02-27</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>7.2k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>12 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><code>Sonatype OSSRH (OSS Repository Hosting)</code> 提供了 <code>JAR</code> 包发布服务，并支持自动将 <code>JAR</code> 包同步到 <code>Maven</code> 中央仓库，所以我们将 <code>JAR</code> 包发布到 <code>Sonatype OSSRH</code> 即可。</p>
-<h2 id="创建-sonatype-工单"><a class="markdownIt-Anchor" href="#创建-sonatype-工单"></a> 创建 Sonatype 工单</h2>
-<p>第一步在 <a target="_blank" rel="noopener" href="https://issues.sonatype.org/secure/Signup!default.jspa">Sonatype</a> 上注册一个账号，创建成功后在上面创建一个 <code>Issue</code>，<code>Project</code> 选择 <code>Community Support - Open Source Project Repository Hosting (OSSRH)</code>，<code>Issue Type</code> 选择 <code>New Project</code>：</p>
-<p><img src="/images/sonatype.png" alt="alt" /></p>
-<p>这里要注意的是 <code>Group Id</code> 的填写，根据 <a target="_blank" rel="noopener" href="https://central.sonatype.org/publish/requirements/coordinates/">Coordinates</a> 的描述，这里分两种情况：</p>
-<ol>
-<li>你拥有某个域名，如 <code>example.com</code></li>
-<li>你没有域名，但是你的代码托管在了某个代码托管服务上，如 <code>GitHub</code></li>
-</ol>
-<p>对于第一种情况，你的 <code>Group Id</code> 可以是任何以 <code>com.example</code> 为前缀的字符串，如 <code>com.example.myawesomeproject</code>。不过，<code>Sonatype</code> 会要求你证明确实拥有 <code>example.com</code> 域名，你需要在你的域名注册商那创建一条 <code>TXT</code> 记录，其内容就是你创建的 <code>Issue</code> 的工单号，如 <code>OSSRH-12345</code>，具体步骤可参考 <a target="_blank" rel="noopener" href="https://central.sonatype.org/faq/how-to-set-txt-record/">How do I set the TXT record needed to prove ownership of my Web Domain?</a>。</p>
-<p>对于第二种情况，以 <code>GitHub</code> 为例，你的 <code>Group Id</code> 必须是 <code>io.github.myusername</code>，<code>myusername</code> 是你的 <code>GitHub</code> 账户名或者是组织名，类似的，为了证明你对 <code>myusername</code> 的所有权，你需要在 <code>myusername</code> 下创建一个公开的仓库，仓库名称为你所创建 <code>Issue</code> 的工单号，如 <code>OSSRH-12345</code>，认证完成之后你就可以删掉这个仓库。<code>Sonatype</code> 所支持的代码托管服务如下：</p>
-<table>
-<thead>
-<tr>
-<th>Service</th>
-<th>Example groupId</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GitHub</td>
-<td>io.github.myusername</td>
-</tr>
-<tr>
-<td>GitLab</td>
-<td>io.gitlab.myusername</td>
-</tr>
-<tr>
-<td>Gitee</td>
-<td>io.gitee.myusername</td>
-</tr>
-<tr>
-<td>Bitbucket</td>
-<td>io.bitbucket.myusername</td>
-</tr>
-<tr>
-<td>SourceForge</td>
-<td>io.sourceforge.myusername</td>
-</tr>
-</tbody>
-</table>
-<p>工单示例可参考 <a target="_blank" rel="noopener" href="https://issues.sonatype.org/browse/OSSRH-78488">Publish my open source java package</a>。</p>
-<h2 id="安装-gpg"><a class="markdownIt-Anchor" href="#安装-gpg"></a> 安装 GPG</h2>
-<p><code>GPG</code> 用于对所发布的包进行签名，在 <a target="_blank" rel="noopener" href="https://www.gnupg.org/download/index.html">GnuPG</a> 根据自己的操作系统下载 <code>GPG</code> 安装包，安装完成后执行 <code>gpg --full-gen-key</code> 生成秘钥对，选择默认选项即可，生成秘钥对时会要求输入姓名、邮箱、注释和密码，其中密码在发布阶段会用到，秘钥生成信息类似如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pub   rsa3072 2022-02-26 [SC]</span><br><span class="line">      E892F685E5EA9005E0A2DE31F0F732425A15D81D</span><br><span class="line">uid                      examplename &lt;examplename@example.com&gt;</span><br><span class="line">sub   rsa3072 2022-02-26 [E]</span><br></pre></td></tr></table></figure>
-<p>其中 <code>E892F685E5EA9005E0A2DE31F0F732425A15D81D</code> 是秘钥的 <code>ID</code>，然后我们需要将公钥分发到公共的秘钥服务器上，这样 <code>Sonatype</code> 就可以通过这个公钥来验证我们所发布包的签名是否正确：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --keyserver keyserver.ubuntu.com --send-keys E892F685E5EA9005E0A2DE31F0F732425A15D81D</span><br></pre></td></tr></table></figure>
-<p>这里选择的公共秘钥服务器是 <code>keyserver.ubuntu.com</code>，也可以选择其他服务器，如 <code>keys.openpgp.org</code> 或者 <code>pgp.mit.edu</code>。</p>
-<h2 id="配置-settingsxml"><a class="markdownIt-Anchor" href="#配置-settingsxml"></a> 配置 settings.xml</h2>
-<p>为了将包发到 <code>Sonatype OSSRH</code>，需要在 <code>Maven</code> 的 <code>settings.xml</code> 中配置用户信息，即在 <code>servers</code> 下添加如下信息，这里的 <code>your-jira-id</code> 和 <code>your-jira-pwd</code> 对应第一步创建的账号和密码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;server&gt;</span><br><span class="line">    &lt;id&gt;ossrh&lt;&#x2F;id&gt;</span><br><span class="line">    &lt;username&gt;your-jira-id&lt;&#x2F;username&gt;</span><br><span class="line">    &lt;password&gt;your-jira-pwd&lt;&#x2F;password&gt;</span><br><span class="line">&lt;&#x2F;server&gt;</span><br></pre></td></tr></table></figure>
-<p>另外，为了在打包时对文件进行签名还需要在 <code>profiles</code> 下添加如下信息，这里的 <code>the_pass_phrase</code> 为生成 <code>GPG</code> 秘钥时设置的密码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;profile&gt;</span><br><span class="line">    &lt;id&gt;ossrh&lt;&#x2F;id&gt;</span><br><span class="line">    &lt;activation&gt;</span><br><span class="line">    &lt;activeByDefault&gt;true&lt;&#x2F;activeByDefault&gt;</span><br><span class="line">    &lt;&#x2F;activation&gt;</span><br><span class="line">    &lt;properties&gt;</span><br><span class="line">    &lt;gpg.executable&gt;gpg&lt;&#x2F;gpg.executable&gt;</span><br><span class="line">    &lt;gpg.passphrase&gt;the_pass_phrase&lt;&#x2F;gpg.passphrase&gt;</span><br><span class="line">    &lt;&#x2F;properties&gt;</span><br><span class="line">&lt;&#x2F;profile&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="配置-pomxml"><a class="markdownIt-Anchor" href="#配置-pomxml"></a> 配置 pom.xml</h2>
-<p>最后是配置 <code>pom.xml</code>，首先我们需要告诉 <code>Maven</code> 将包部署到 <code>Sonatype OSSRH</code>，需要增加一个 <code>nexus-staging-maven-plugin</code> 插件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;distributionManagement&gt;</span><br><span class="line">  &lt;snapshotRepository&gt;</span><br><span class="line">    &lt;id&gt;ossrh&lt;&#x2F;id&gt;</span><br><span class="line">    &lt;url&gt;https:&#x2F;&#x2F;s01.oss.sonatype.org&#x2F;content&#x2F;repositories&#x2F;snapshots&lt;&#x2F;url&gt;</span><br><span class="line">  &lt;&#x2F;snapshotRepository&gt;</span><br><span class="line">&lt;&#x2F;distributionManagement&gt;</span><br><span class="line">&lt;build&gt;</span><br><span class="line">  &lt;plugins&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.sonatype.plugins&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;nexus-staging-maven-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;1.6.7&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;extensions&gt;true&lt;&#x2F;extensions&gt;</span><br><span class="line">      &lt;configuration&gt;</span><br><span class="line">        &lt;serverId&gt;ossrh&lt;&#x2F;serverId&gt;</span><br><span class="line">        &lt;nexusUrl&gt;https:&#x2F;&#x2F;s01.oss.sonatype.org&#x2F;&lt;&#x2F;nexusUrl&gt;</span><br><span class="line">        &lt;autoReleaseAfterClose&gt;true&lt;&#x2F;autoReleaseAfterClose&gt;</span><br><span class="line">      &lt;&#x2F;configuration&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">  &lt;&#x2F;plugins&gt;</span><br><span class="line">&lt;&#x2F;build&gt;</span><br></pre></td></tr></table></figure>
-<p>然后是配置 <code>Javadoc</code> 和源码插件，如果最后的 <code>JAR</code> 包没有包含 <code>Javadoc</code> 和源码，<code>Sonatype</code> 会不允许通过：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">  &lt;plugins&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.apache.maven.plugins&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;maven-source-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;2.2.1&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;executions&gt;</span><br><span class="line">        &lt;execution&gt;</span><br><span class="line">          &lt;id&gt;attach-sources&lt;&#x2F;id&gt;</span><br><span class="line">          &lt;goals&gt;</span><br><span class="line">            &lt;goal&gt;jar-no-fork&lt;&#x2F;goal&gt;</span><br><span class="line">          &lt;&#x2F;goals&gt;</span><br><span class="line">        &lt;&#x2F;execution&gt;</span><br><span class="line">      &lt;&#x2F;executions&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.apache.maven.plugins&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;maven-javadoc-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;2.9.1&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;executions&gt;</span><br><span class="line">        &lt;execution&gt;</span><br><span class="line">          &lt;id&gt;attach-javadocs&lt;&#x2F;id&gt;</span><br><span class="line">          &lt;goals&gt;</span><br><span class="line">            &lt;goal&gt;jar&lt;&#x2F;goal&gt;</span><br><span class="line">          &lt;&#x2F;goals&gt;</span><br><span class="line">        &lt;&#x2F;execution&gt;</span><br><span class="line">      &lt;&#x2F;executions&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">  &lt;&#x2F;plugins&gt;</span><br><span class="line">&lt;&#x2F;build&gt;</span><br></pre></td></tr></table></figure>
-<p>不过上述配置不适合 <code>Kotlin</code> 项目，会提示 <code>Missing: no javadoc jar found in folder '/com/example/username/awesomeproject'</code>，需要将 <code>maven-javadoc-plugin</code> 替换为 <code>dokka-maven-plugin</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;build&gt;</span><br><span class="line">  &lt;plugins&gt;</span><br><span class="line">    &lt;plugin&gt;</span><br><span class="line">        &lt;groupId&gt;org.jetbrains.dokka&lt;&#x2F;groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;dokka-maven-plugin&lt;&#x2F;artifactId&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">            &lt;execution&gt;</span><br><span class="line">                &lt;phase&gt;package&lt;&#x2F;phase&gt;</span><br><span class="line">                &lt;id&gt;attach-javadocs-dokka&lt;&#x2F;id&gt;</span><br><span class="line">                &lt;goals&gt;</span><br><span class="line">                    &lt;goal&gt;javadocJar&lt;&#x2F;goal&gt;</span><br><span class="line">                &lt;&#x2F;goals&gt;</span><br><span class="line">            &lt;&#x2F;execution&gt;</span><br><span class="line">        &lt;&#x2F;executions&gt;</span><br><span class="line">    &lt;&#x2F;plugin&gt;</span><br><span class="line">  &lt;&#x2F;plugins&gt;</span><br><span class="line">&lt;&#x2F;build&gt;</span><br></pre></td></tr></table></figure>
-<p>最后，剩下补充一些元数据，这个也是必填项，包括：</p>
-<ul>
-<li>项目名称，描述和地址</li>
-<li>许可证信息</li>
-<li>开发者信息</li>
-<li>源码地址</li>
-</ul>
-<p>完整的示例可参考：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;project xmlns&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0&quot;</span><br><span class="line">xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0 http:&#x2F;&#x2F;maven.apache.org&#x2F;maven-v4_0_0.xsd&quot;&gt;</span><br><span class="line">  &lt;modelVersion&gt;4.0.0&lt;&#x2F;modelVersion&gt;</span><br><span class="line"></span><br><span class="line">  &lt;groupId&gt;com.simpligility.training&lt;&#x2F;groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;ossrh-demo&lt;&#x2F;artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.0&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;packaging&gt;jar&lt;&#x2F;packaging&gt;</span><br><span class="line"></span><br><span class="line">  &lt;name&gt;ossrh-demo&lt;&#x2F;name&gt;</span><br><span class="line">  &lt;description&gt;A demo for deployment to the Central Repository via OSSRH&lt;&#x2F;description&gt;</span><br><span class="line">  &lt;url&gt;http:&#x2F;&#x2F;github.com&#x2F;simpligility&#x2F;ossrh-demo&lt;&#x2F;url&gt;</span><br><span class="line"></span><br><span class="line">  &lt;licenses&gt;</span><br><span class="line">    &lt;license&gt;</span><br><span class="line">      &lt;name&gt;The Apache Software License, Version 2.0&lt;&#x2F;name&gt;</span><br><span class="line">      &lt;url&gt;http:&#x2F;&#x2F;www.apache.org&#x2F;licenses&#x2F;LICENSE-2.0.txt&lt;&#x2F;url&gt;</span><br><span class="line">    &lt;&#x2F;license&gt;</span><br><span class="line">  &lt;&#x2F;licenses&gt;</span><br><span class="line"></span><br><span class="line">  &lt;developers&gt;</span><br><span class="line">    &lt;developer&gt;</span><br><span class="line">      &lt;name&gt;Manfred Moser&lt;&#x2F;name&gt;</span><br><span class="line">      &lt;email&gt;manfred@sonatype.com&lt;&#x2F;email&gt;</span><br><span class="line">      &lt;organization&gt;Sonatype&lt;&#x2F;organization&gt;</span><br><span class="line">      &lt;organizationUrl&gt;http:&#x2F;&#x2F;www.sonatype.com&lt;&#x2F;organizationUrl&gt;</span><br><span class="line">    &lt;&#x2F;developer&gt;</span><br><span class="line">  &lt;&#x2F;developers&gt;</span><br><span class="line"></span><br><span class="line">  &lt;scm&gt;</span><br><span class="line">    &lt;connection&gt;scm:git:git:&#x2F;&#x2F;github.com&#x2F;simpligility&#x2F;ossrh-demo.git&lt;&#x2F;connection&gt;</span><br><span class="line">    &lt;developerConnection&gt;scm:git:ssh:&#x2F;&#x2F;github.com:simpligility&#x2F;ossrh-demo.git&lt;&#x2F;developerConnection&gt;</span><br><span class="line">    &lt;url&gt;http:&#x2F;&#x2F;github.com&#x2F;simpligility&#x2F;ossrh-demo&#x2F;tree&#x2F;master&lt;&#x2F;url&gt;</span><br><span class="line">  &lt;&#x2F;scm&gt;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;project&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="发包"><a class="markdownIt-Anchor" href="#发包"></a> 发包</h2>
-<p>执行 <code>mvn clean deploy</code> 即可发包，如果执行成功，在提交的工单中会自动增加一条回复：</p>
-<blockquote>
-<p>Central sync is activated for com.example.awesomeproject. After you successfully release, your component will be available to the public on Central <a target="_blank" rel="noopener" href="https://repo1.maven.org/maven2/">https://repo1.maven.org/maven2/</a>, typically within 30 minutes, though updates to <a target="_blank" rel="noopener" href="https://search.maven.org">https://search.maven.org</a> can take up to four hours.</p>
-</blockquote>
-<p>也就是30分钟内即可从 <code>Maven</code> 中央仓库下载 <code>JAR</code> 包，不过要想能在 <code>search.maven.org</code> 搜索到你的 <code>JAR</code> 包，需要等待至多4个小时。</p>
-<p>另外，因为配置 <code>nexus-staging-maven-plugin</code> 时指定了 <code>autoReleaseAfterClose</code> 为 <code>true</code>，所以发包后不需要去 <code>https://oss.sonatype.org/#stagingRepositories</code> 手动执行 <code>close</code> 和 <code>release</code> 操作。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://dzone.com/articles/publish-your-artifacts-to-maven-central">How to Publish Your Artifacts to Maven Central</a></li>
-<li><a target="_blank" rel="noopener" href="https://central.sonatype.org/publish/requirements/coordinates/">Coordinates</a></li>
-<li><a target="_blank" rel="noopener" href="https://central.sonatype.org/publish/requirements/gpg/">GPG</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1902,14 +1903,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-count">45</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
