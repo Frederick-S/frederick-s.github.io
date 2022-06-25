@@ -253,7 +253,29 @@ private void Initialize(string text)
 }
 ```
 
-`Initialize` 首先会通过 `CodeBuilder` 分配一个 `List` 保存所有的代码行，然后新建一个子 `CodeBuilder` 来保存所有的局部变量，解析 `text`，在完成 `text` 的解析后就能知道模板中使用了哪些变量，从而根据 `AllVariables - LoopVariables` 生成局部变量，最后将所有的代码行转成字符串。
+`Initialize` 首先会通过 `CodeBuilder` 分配一个 `List` 保存所有的代码行，然后新建一个子 `CodeBuilder` 来保存所有的局部变量，接着解析 `text`，在完成 `text` 的解析后就能知道模板中使用了哪些变量，从而根据 `AllVariables - LoopVariables` 生成局部变量，最后将所有的代码行转成字符串。
+
+同时，原文作者在这里有一个优化，相比于在生成的代码中不断的调用 `result.Add(xxx)`，从性能上考虑可以将多个操作合并为一个即 `result.AddRange(new List<string> { xxx })`，从而引出了辅助变量 `buffered` 和辅助方法 `FlushOutput`：
+
+```cs
+var buffered = new List<string>();
+
+private void FlushOutput(List<string> buffered)
+{
+    if (buffered.Count == 1)
+    {
+        this.CodeBuilder.AddLine(string.Format("result.Add({0});", buffered[0]));
+    }
+    else if (buffered.Count > 1)
+    {
+        this.CodeBuilder.AddLine(string.Format("result.AddRange(new List<string> {{{0}}});", string.Join(", ", buffered)));
+    }
+
+    buffered.Clear();
+}
+```
+
+在解析 `text` 时，并不会处理完一个 `token` 就执行一次 `this.CodeBuilder.AddLine`，而是将多个 `token` 的处理结果批量的追加到最终的可执行代码中。
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
