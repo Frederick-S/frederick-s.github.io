@@ -277,5 +277,34 @@ private void FlushOutput(List<string> buffered)
 
 在解析 `text` 时，并不会处理完一个 `token` 就执行一次 `this.CodeBuilder.AddLine`，而是将多个 `token` 的处理结果批量的追加到最终的可执行代码中。
 
+接着，再回到 `Initialize` 方法中，由于模板中 `if`，`for` 可能存在嵌套，为了正确处理嵌套语句，这里引入一个栈 `var operationStack = new Stack<string>();` 来处理嵌套关系。例如，假设模板中存在 `{% if ... if ... endif endif}`，每次遇到 `if` 时则执行入栈，遇到 `endif` 时则执行出栈，如果出栈时栈为空则说明 `if` 语句不完整。
+
+那么，如何解析 `text` 呢？这里使用正则表达式来将 `text` 分割为 `token`：
+
+```cs
+private static Regex tokenPattern = new Regex("(?s)({{.*?}}|{%.*?%}|{#.*?#})", RegexOptions.Compiled);
+var tokens = tokenPattern.Split(text);
+```
+
+例如对于模板：
+
+```
+<ol>{% for number in numbers %}<li>{{ number }}</li>{% endfor %}</ol>
+```
+
+分割后的 `tokens` 为：
+
+```
+[
+    '<ol>',
+    '{% for number in numbers %}',
+    '<li>',
+    '{{ number }}',
+    '</li>',
+    '{% endfor %}',
+    '</ol>'
+]
+```
+
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
