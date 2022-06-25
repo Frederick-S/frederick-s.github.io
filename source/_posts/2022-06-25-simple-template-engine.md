@@ -494,5 +494,10 @@ else
 }
 ```
 
+## 总结
+以上就实现了一个简易的模板引擎，虽然还有很多高级的功能没有实现，但已足够作为一个引导式的教程。
+
+完整的代码可参考原作者的 [代码](https://github.com/aosabook/500lines/tree/master/template-engine/code) 及 `C#` 版的 [SimpleTemplate](https://github.com/read-and-code/SimpleTemplate)。
+
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
