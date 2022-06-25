@@ -401,5 +401,98 @@ else if (token.StartsWith("{%"))
 }
 ```
 
+最后剩下的情况就按照单纯的字符串处理：
+
+```cs
+else
+{
+    if (!string.IsNullOrEmpty(token))
+    {
+        buffered.Add(this.ConvertToStringLiteral(token));
+    }
+}
+```
+
+#### 编译表达式
+前面提到处理 `token` 时有时候需要对表达式求值，表达式分三种情况，第一种是管道流：
+
+```cs
+if (expression.Contains("|"))
+{
+    var pipes = expression.Split('|');
+    var code = this.EvaluateExpression(pipes[0]);
+
+    foreach (var function in pipes.ToList().GetRange(1, pipes.Length - 1))
+    {
+        code = string.Format("{0}({1})", function, code);
+    }
+
+    return code;
+}
+```
+
+首先根据 `|` 切分，数组的第一个元素是一个子表达式，递归调用即可；数组后面的元素表示的是要调用哪一个预定义的函数（要支持这些函数需要在最终生成的代码中有定义），例如 `FormatPrice`，本质上是个函数调用，直接拼接即可。
+
+第二种是点操作符：
+
+```cs
+else if (expression.Contains("."))
+{
+    var dots = expression.Split('.');
+    var code = this.EvaluateExpression(dots[0]);
+    var arguments = dots.ToList().GetRange(1, dots.Length - 1).Select(x => this.ConvertToStringLiteral(x)).ToArray();
+
+    return string.Format("ResolveDots({0}, {1})", code, string.Format("new [] {{ {0} }}", string.Join(", ", arguments)));
+}
+```
+
+首先按照 `.` 进行分割，数组的第一个元素是一个子表达式，递归调用即可；数组后面的元素作为一系列的链式点操作符调用的参数，交由辅助函数 `ResolveDots` 处理：
+
+```cs
+private object ResolveDots(object value, string[] arguments)
+{
+    foreach (string argument in arguments)
+    {
+        var members = value.GetType().GetMember(argument);
+
+        // Suppose there is only one member
+        var member = members[0];
+
+        switch (member.MemberType)
+        {
+            case MemberTypes.Property:
+                value = ((PropertyInfo)member).GetValue(value);
+
+                break;
+            case MemberTypes.Field:
+                value = ((FieldInfo)member).GetValue(value);
+
+                break;
+            case MemberTypes.Method:
+                value = ((MethodInfo)member).Invoke(value, null);
+
+                break;
+            default:
+                throw new TemplateRuntimeException(string.Format("Unsupported member type {0}", member.MemberType));
+        }
+    }
+
+    return value;
+}
+```
+
+`ResolveDots` 通过反射判断点操作符对应的是属性还是方法，继而执行相应的调用。
+
+第三种就是单纯的变量，直接输出即可：
+
+```cs
+else
+{
+    this.AddVariable(expression, this.AllVariables);
+
+    return expression;
+}
+```
+
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
