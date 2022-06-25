@@ -110,7 +110,7 @@ public string Render(Dictionary<string, object> Context Context, Func<object, st
 
 模板引擎的最终产物是一个字符串，所以在 `Render` 中先使用一个 `List` 保存每一行的渲染结果，最后再将 `List` 转换为字符串。
 
-`.NET` 编译器提供了 `Microsoft.CodeAnalysis.CSharp.Scripting` 包能够将某段字符串当做 `C#` 代码执行，所以最终模板引擎生成的代码将通过如下方式执行：
+`.NET` 编译器提供了 `Microsoft.CodeAnalysis.CSharp.Scripting` 包来将某段字符串当做 `C#` 代码执行，所以最终模板引擎生成的代码将通过如下方式执行：
 
 ```cs
 var code = "some code";
@@ -121,6 +121,99 @@ return script.Result.ReturnValue.ToString();
 ```
 
 ## 模板引擎编写
+### Template
+`Template` 是整个模板引擎的核心类，它首先通过模板和全局上下文初始化一个实例，然后调用 `Render` 方法来渲染模板：
+
+```cs
+var context = new Dictionary<string, object>()
+{
+    { "numbers", new[] { 1, 2, 3 } },
+};
+string text = @"<ol>{% for number in numbers %}<li>{{ number }}</li>{% endfor %}</ol>";
+Template template = new Template(text, context);
+string result = template.Render();
+```
+
+这里将 `text` 传入 `Template` 的构造函数后，会在构造函数中完成模板解析，后续的 `Render` 调用都不需要再执行模板解析。
+
+### CodeBuilder
+`CodeBuilder` 用于辅助生成 `C#` 代码，`Template` 通过 `CodeBuilder` 添加代码行，以及管理缩进（原文的作者使用 `Python` 作为编译的目标语言所以这里需要维护正确的缩进，`C#` 则不需要），并最终通过 `CodeBuilder` 得到可执行代码。
+
+`CodeBuilder` 内部维护了一个类型为 `List<object>` 的变量 `Codes` 来表示代码行，这里的 `List` 容器类型不是字符串是因为 `CodeBuilder` 间可以嵌套，一个 `CodeBuilder` 可以作为一个完整的函数单元添加到另一个 `CodeBuilder` 中，并最终通过自定义的 `ToString` 方法来生成可执行代码：
+
+```cs
+public class CodeBuilder
+{
+    private const int IndentStep = 4;
+
+    public CodeBuilder()
+        : this(0)
+    {
+    }
+
+    public CodeBuilder(int indentLevel)
+    {
+        this.Codes = new List<object>();
+        this.IndentLevel = indentLevel;
+    }
+
+    private List<object> Codes
+    {
+        get;
+    }
+
+    private int IndentLevel
+    {
+        get;
+        set;
+    }
+}
+```
+
+`AddLine` 方法非常简单，即根据缩进空格数补齐空格后添加一行代码（这里 `C#` 版本保留了 `Python` 版本缩进的功能）：
+
+```cs
+public void AddLine(string line)
+{
+    this.Codes.AddRange(new List<object> { new string(' ', this.IndentLevel), line, "\n" });
+}
+```
+
+`Indent` 和 `Dedent` 用于维护方法需要的缩进：
+
+```cs
+public void Indent()
+{
+    this.IndentLevel += IndentStep;
+}
+
+public void Dedent()
+{
+    this.IndentLevel -= IndentStep;
+}
+```
+
+`AddSection` 用于创建一个新的 `CodeBuilder` 对象，并将其添加到当前 `CodeBuilder` 的代码行中：
+
+```cs
+public CodeBuilder AddSection()
+{
+    CodeBuilder section = new CodeBuilder(this.IndentLevel);
+
+    this.Codes.Add(section);
+
+    return section;
+}
+```
+
+最后重写了 `ToString()` 方法来生成可执行代码：
+
+```cs
+public override string ToString()
+{
+    return string.Join(string.Empty, this.Codes.Select(code => code.ToString()));
+}
+```
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
