@@ -308,7 +308,98 @@ var tokens = tokenPattern.Split(text);
 ]
 ```
 
-然后我们就可以遍历 `tokens` 处理了。
+然后我们就可以遍历 `tokens` 处理了，每种 `token` 对应一种策略，如果是注释，则忽略：
+
+```cs
+if (token.StartsWith("{#"))
+{
+    continue;
+}
+```
+
+如果是变量，则解析变量的表达式（表达式解析会在后面介绍）的值，然后再将其转为字符串：
+
+```cs
+else if (token.StartsWith("{{"))
+{
+    string expression = this.EvaluateExpression(token.Substring(2, token.Length - 4).Trim());
+
+    buffered.Add(string.Format("Convert.ToString({0})", expression));
+}
+```
+
+而如果是 `{%` 则是最复杂的场景，需要对 `if` 和 `for` 分别处理，并结合 `operationStack` 判断是否存在语法错误：
+
+```cs
+else if (token.StartsWith("{%"))
+{
+    // 执行 if，for 语句前先将 buffered 中的语句写到 CodeBuilder 中
+    this.FlushOutput(buffered);
+
+    // 将 {% %} 间的内容首尾去除空格后按照空格分割
+    var words = token.Substring(2, token.Length - 4).Trim().Split();
+
+    if (words[0] == "if")
+    {
+        // 只支持 if xxx 的形式
+        if (words.Length != 2)
+        {
+            this.SyntaxError(string.Format("Don't understand if, token: {0}", token));
+        }
+
+        // 入栈，表示 if 语句的开始，需要有对应的出栈
+        operationStack.Push("if");
+
+        // if 条件也需要对表达式求值，C# 的 if 没有 Python 那么灵活，所以这里定义了一个 IsTure 方法来将表达式转为 bool 值
+        this.CodeBuilder.AddLine(string.Format("if (IsTrue({0})) {{", this.EvaluateExpression(words[1])));
+        this.CodeBuilder.Indent();
+    }
+    else if (words[0] == "for")
+    {
+        // 只支持 for xxx in xxx 的形式
+        if (words.Length != 4 || words[2] != "in")
+        {
+            this.SyntaxError(string.Format("Don't understand for, token: {0}", token));
+        }
+
+        // 入栈，表示 for 语句的开始，需要有对应的出栈
+        operationStack.Push("for");
+
+        // 记录遇到的循环变量
+        this.AddVariable(words[1], this.LoopVariables);
+
+        // 这里定义了 ConvertToEnumerable 方法将循环的对象转为可迭代的对象，同时也需要对表达式求值
+        this.CodeBuilder.AddLine(string.Format("foreach (var {0} in ConvertToEnumerable({1})) {{", words[1], this.EvaluateExpression(words[3])));
+        this.CodeBuilder.Indent();
+    }
+    else if (words[0].StartsWith("end"))
+    {
+        if (words.Length != 1)
+        {
+            this.SyntaxError(string.Format("Don't understand end, token: {0}", token));
+        }
+
+        var endWhat = words[0].Substring(3);
+
+        // 没有配对的开始语句
+        if (operationStack.Count == 0)
+        {
+            this.SyntaxError(string.Format("Too many ends, token: {0}", token));
+        }
+
+        var startWhat = operationStack.Pop();
+
+        // 开始和结束的语句不匹配，例如 if 以 endfor 结束
+        if (startWhat != endWhat)
+        {
+            this.SyntaxError(string.Format("Mismatched end tag, token: {0}", token));
+        }
+
+        this.CodeBuilder.AddLine("}");
+        this.CodeBuilder.Dedent();
+    }
+}
+```
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
