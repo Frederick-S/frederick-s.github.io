@@ -179,7 +179,7 @@ public void AddLine(string line)
 }
 ```
 
-`Indent` 和 `Dedent` 用于维护方法需要的缩进：
+`Indent` 和 `Dedent` 用于管理 `Python` 代码的缩进层级：
 
 ```cs
 public void Indent()
