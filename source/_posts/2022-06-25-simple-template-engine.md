@@ -286,6 +286,8 @@ private static Regex tokenPattern = new Regex("(?s)({{.*?}}|{%.*?%}|{#.*?#})", R
 var tokens = tokenPattern.Split(text);
 ```
 
+其中正则表达式中的 `(?s)` 使得 `.` 能够匹配换行符。
+
 例如对于模板：
 
 ```
@@ -305,6 +307,8 @@ var tokens = tokenPattern.Split(text);
     '</ol>'
 ]
 ```
+
+然后我们就可以遍历 `tokens` 处理了。
 
 ## 参考
 * [A Template Engine](https://aosabook.org/en/500L/a-template-engine.html)
