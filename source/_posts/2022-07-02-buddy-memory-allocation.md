@@ -1,0 +1,30 @@
+title: 'Buddy Memory Allocation'
+tags:
+- Memory Allocation
+---
+
+## 介绍
+`Buddy Memory Allocation` 是内存分配算法的一种，它假定内存的大小为$2^N$（`N` 为整数），并且总是以2的幂次方为单位分配或者释放内存。
+
+## 算法
+假设某个线程需要申请 `m` 字节内存，`Buddy Memory Allocation` 会先在当前所有的空闲空间中找到最小的空间满足$2^k \geq m$，如果$2^k$的一半依然大于等于 `m`，说明当前分配的空间过大，则继续将$2^k$对半分（分裂后的这两块内存区域就成为了互为兄弟关系（`buddies`）），不断重复上述操作，直到找到最小的 `p`（$p \leq k$）满足$2^{p - 1} < m \leq 2^p$。
+
+下图描述了从16字节中分配3字节的过程：
+
+1. 初始状态整个内存只有16字节，是可分配的最小空间；不过由于16字节的一半大于3字节，所以将16字节拆分为两个8字节
+2. 同理一个8字节的一半依然大于3字节，继续将其中一个8字节拆分为两个4字节
+3. 4字节的一半比3字节小，所以4字节就是可分配的最小内存空间
+
+![alt](/images/buddy-1.png)
+
+当某个线程需要释放$2^k$的内存时，`Buddy Memory Allocation` 会尝试将这个内存空间及其相邻的兄弟空间一起合并得到一个$2^{k + 1}$大小的空间，然后一直重复此操作，直到某块内存空间无法和其兄弟空间合并，无法合并的情况有三种：
+
+1. 当前分配的内存空间大小为整个内存空间的大小，所以也就没有兄弟空间
+2. 兄弟空间已分配
+3. 兄弟空间已局部分配
+
+![alt](/images/buddy-2.png)
+
+## 参考
+* [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
+* [Buddy Methods](https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Buddy.html#buddy-methods)
