@@ -235,7 +235,7 @@ public class BlockList {
 
 而第一个 `Block` 的内存起始位置也就等于所有哨兵节点的大小之和。
 
-### 内存分配
+### 内存管理
 #### 初始化
 定义 `Allocator` 负责内存的分配和回收，本质上是对 `Block` 的管理，即 `Block` 的分裂和合并：
 
@@ -270,6 +270,81 @@ public class Allocator {
 ```
 
 在这个例子中，我们假设系统最大能支持的内存大小为$2^{16}$个字节，由于哨兵节点也需要占用一部分内存，所以在构造函数中初始化 `Memory` 的大小为所有哨兵节点占用的内存大小加上 $2^{16}$ 个字节。同时，系统可分配的 `Block` 的大小分别为$2^1$，$2^2$，...，$2^{15}$，$2^{16}$，对应需要初始化16个双向链表，这里简单的使用数组来保存这16个双向链表，并初始化对应哨兵头节点的内存起始地址。同时，整个系统在初始状态只有一个 `Block`，大小为$2^{16}$。
+
+#### 内存分配
+如前面所述，内存分配的第一步是找到满足用户内存需求的最小的 `Block`，然后如果 `Block` 过大则继续将 `Block` 进行分裂：
+
+```java
+public int alloc(int size) {
+    Block block = null;
+
+    for (int i = 0; i < MAX_SIZE_CLASS; i++) {
+        BlockList blockList = this.blockLists[i];
+
+        // 找到满足用户内存需求的最小的 Block
+        if (!blockList.hasAvailableBlock(size)) {
+            continue;
+        }
+
+        block = blockList.getFirst();
+
+        // 尝试将 block 分裂
+        block = this.split(block, size);
+
+        // 将 block 标记为已使用
+        block.setUsed();
+
+        break;
+    }
+
+    if (block == null) {
+        throw new RuntimeException("memory is full");
+    }
+
+    // 这里没有返回 block 的起始地址，因为 block 的起始地址指向的是元数据，实际需要返回用户数据的起始地址
+    return block.getUserAddress();
+}
+
+private Block split(Block block, int size) {
+    int sizeClass = block.getSizeClass();
+
+    // 只要 block 的一半（减去元数据占据的空间后）仍能容纳 size，则持续将 block 分裂
+    // 由于 block 本身需要存储元数据，每个 block 至少需要 2^MIN_SIZE_CLASS 字节
+    while (sizeClass > MIN_SIZE_CLASS && Block.getActualSize(sizeClass - 1) >= size) {
+        int newSizeClass = sizeClass - 1;
+
+        // 将 block 分裂为两个，取第一个继续分裂
+        Block[] buddies = this.splitToBuddies(block, newSizeClass);
+        block = buddies[0];
+        sizeClass = newSizeClass;
+    }
+
+    // 将 block 从空闲链表中删除
+    block.removeFromList();
+
+    return block;
+}
+
+private Block[] splitToBuddies(Block block, int sizeClass) {
+    block.removeFromList();
+    Block[] buddies = new Block[2];
+
+    for (int i = 0; i < 2; i++) {
+        int address = block.getAddress() + (1 << sizeClass) * i;
+        buddies[i] = new Block(address, this.memory);
+        buddies[i].setFree();
+        buddies[i].setSizeClass(sizeClass);
+    }
+
+    for (int i = 1; i >= 0; i--) {
+        this.blockLists[sizeClass - 1].insertFront(buddies[i]);
+    }
+
+    return buddies;
+}
+```
+
+#### 内存回收
 
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
