@@ -162,6 +162,79 @@ public Block getNext() {
 }
 ```
 
+### BlockList
+`BlockList` 表示一个双向链表，为了实现方便，内部使用了一个哨兵头节点来作为双向链表的头节点：
+
+```java
+package buddy;
+
+import java.util.Objects;
+
+public class BlockList {
+    private final Block head;
+    private final int sizeClass;
+
+    public BlockList(int address, Memory memory, int sizeClass) {
+        if (address < 0 || address >= memory.getSize()) {
+            throw new IllegalArgumentException("invalid address");
+        }
+
+        Objects.requireNonNull(memory, "memory cannot be null");
+
+        if (sizeClass <= 0) {
+            throw new IllegalArgumentException("invalid sizeClass");
+        }
+
+        this.head = new Block(address, memory);
+        this.head.setSizeClass(sizeClass);
+        this.sizeClass = sizeClass;
+    }
+
+    public void clear() {
+        this.head.setNext(this.head);
+        this.head.setPrev(this.head);
+    }
+
+    public boolean isEmpty() {
+        return this.head.getNext().equals(this.head);
+    }
+
+    public Block getFirst() {
+        if (this.isEmpty()) {
+            throw new RuntimeException("list must not be empty");
+        }
+
+        return this.head.getNext();
+    }
+
+    public void insertFront(Block block) {
+        this.head.insertAfter(block);
+    }
+
+    public boolean hasAvailableBlock(int size) {
+        return !this.isEmpty() && Block.getActualSize(this.sizeClass) >= size;
+    }
+
+    public int length() {
+        int length = 0;
+        Block block = this.head.getNext();
+
+        while (!block.equals(this.head)) {
+            length += 1;
+            block = block.getNext();
+        }
+
+        return length;
+    }
+}
+```
+
+由于需要通过哨兵头节点访问下一个可用的内存块，所以每个哨兵头节点就需要知道下一个 `Block` 的内存起始地址，因此同样需要将哨兵头节点的信息保存在内存中，对于内存大小为$2^N$的系统来说，一共需要保存 `N` 个哨兵头节点的信息，整个内存也就分为两部分：
+
+![alt](/images/buddy-5.png)
+
+而第一个 `Block` 的内存起始位置也就等于所有哨兵节点的大小之和。
+
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
 * [Buddy Methods](https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Buddy.html#buddy-methods)
