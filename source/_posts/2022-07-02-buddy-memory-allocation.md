@@ -32,6 +32,61 @@ tags:
 
 ![alt](/images/buddy-2.png)
 
+## 实现
+### 内存
+这里使用一个 `byte` 数组来表示内存，数组的索引就是内存地址，并封装为一个 `Memory` 类：
+
+```java
+public class Memory {
+    private final byte[] memory;
+
+    public Memory(int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size should be greater than zero");
+        }
+
+        this.memory = new byte[size];
+    }
+}
+```
+
+同时，`Memory` 类还支持 `bool` 和 `int32` 类型的数据读写，从实现的简化考虑，`bool` 值的读写以一个 `byte` 为单位；而 `int32` 的读写以4个 `byte` 为单位：
+
+```java
+public void setBool(int address, boolean value) {
+    checkAddress(address);
+
+    this.memory[address] = value ? (byte) 1 : (byte) 0;
+}
+
+public boolean getBool(int address) {
+    checkAddress(address);
+
+    return this.memory[address] == (byte) 1;
+}
+
+public void setInt32(int address, int value) {
+    checkAddress(address);
+
+    byte[] bytes = ByteBuffer.allocate(Constant.INT32_SIZE).putInt(value).array();
+    setByteArray(address, bytes);
+}
+
+public int getInt32(int address) {
+    checkAddress(address);
+
+    if (address + Constant.INT32_SIZE > this.memory.length) {
+        throw new IllegalArgumentException("address overflow");
+    }
+
+    byte[] bytes = new byte[Constant.INT32_SIZE];
+
+    System.arraycopy(this.memory, address, bytes, 0, Constant.INT32_SIZE);
+
+    return ByteBuffer.wrap(bytes).getInt();
+}
+```
+
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
 * [Buddy Methods](https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Buddy.html#buddy-methods)
