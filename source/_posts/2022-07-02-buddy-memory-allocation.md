@@ -34,7 +34,7 @@ tags:
 
 ## 实现
 ### 内存
-这里使用一个 `byte` 数组来表示内存，数组的索引就是内存地址，并封装为一个 `Memory` 类：
+首先定义一个 `Memory` 类来表示内存，其内部使用一个 `byte` 数组来存储数据，数组的索引就是内存地址：
 
 ```java
 public class Memory {
@@ -86,6 +86,17 @@ public int getInt32(int address) {
     return ByteBuffer.wrap(bytes).getInt();
 }
 ```
+
+### Block
+定义 `Block` 表示系统所分配的内存块，下图展示了一个 `Block` 在内存中的布局：
+
+![alt](/images/buddy-3.png)
+
+第一个字节表示当前内存块是否被使用；第2到5字节表示 `sizeClass`，用来计算当前内存块所占据的内存的大小，即$2^{sizeClass}$；第6到9字节表示前一个空闲内存块的地址；第10到13字节表示后一个空闲内存块的地址；从第14字节开始就是用户数据。当然，这只是一种很粗犷的布局方式，实际应用中的布局必然比这个精炼。
+
+这里需要前一个/后一个空闲内存块的地址是因为将相同大小的内存块通过链表的方式串联在一起，来快速找到某个指定大小的内存块。因为 `Buddy Memory Allocation` 始终以$2^k$大小分配内存，假设系统的最大内存为$2^N$，则可以建立 `N` 个链表，每个链表表示可用的内存块，如下图所示：
+
+![alt](/images/buddy-4.png)
 
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
