@@ -163,7 +163,7 @@ public Block getNext() {
 ```
 
 ### BlockList
-`BlockList` 表示一个双向链表，为了实现方便，内部使用了一个哨兵头节点来作为双向链表的头节点：
+`BlockList` 表示一个双向链表，为了实现方便，内部使用了一个哨兵头节点来作为双向链表的头节点，新节点的插入采用头插法的方式：
 
 ```java
 package buddy;
@@ -234,6 +234,42 @@ public class BlockList {
 ![alt](/images/buddy-5.png)
 
 而第一个 `Block` 的内存起始位置也就等于所有哨兵节点的大小之和。
+
+### 内存分配
+#### 初始化
+定义 `Allocator` 负责内存的分配和回收，本质上是对 `Block` 的管理，即 `Block` 的分裂和合并：
+
+```java
+public class Allocator {
+    private final Memory memory;
+    private final BlockList[] blockLists;
+
+    private static final int MIN_SIZE_CLASS = 4;
+    private static final int MAX_SIZE_CLASS = 16;
+
+    public Allocator() {
+        int allHeadSentinelSize = this.getMemoryOffset();
+        int maxMemorySize = (1 << MAX_SIZE_CLASS) + allHeadSentinelSize;
+        this.memory = new Memory(maxMemorySize);
+        this.blockLists = new BlockList[MAX_SIZE_CLASS];
+
+        for (int i = 0; i < MAX_SIZE_CLASS; i++) {
+            int sizeClass = i + 1;
+            int headSentinelAddress = Constant.HEAD_SENTINEL_SIZE * i;
+            this.blockLists[i] = new BlockList(headSentinelAddress, this.memory, sizeClass);
+            this.blockLists[i].clear();
+        }
+
+        // The single full block
+        Block block = new Block(allHeadSentinelSize, this.memory);
+        block.setSizeClass(MAX_SIZE_CLASS);
+        block.setFree();
+        this.blockLists[MAX_SIZE_CLASS - 1].insertFront(block);
+    }
+}
+```
+
+在这个例子中，我们假设系统最大能支持的内存大小为$2^{16}$个字节，由于哨兵节点也需要占用一部分内存，所以在构造函数中初始化 `Memory` 的大小为所有哨兵节点占用的内存大小加上 $2^{16}$ 个字节。同时，系统可分配的 `Block` 的大小分别为$2^1$，$2^2$，...，$2^{15}$，$2^{16}$，对应需要初始化16个双向链表，这里简单的使用数组来保存这16个双向链表，并初始化对应哨兵头节点的内存起始地址。同时，整个系统在初始状态只有一个 `Block`，大小为$2^{16}$。
 
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
