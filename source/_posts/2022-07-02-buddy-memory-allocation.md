@@ -88,15 +88,79 @@ public int getInt32(int address) {
 ```
 
 ### Block
-定义 `Block` 表示系统所分配的内存块，下图展示了一个 `Block` 在内存中的布局：
+定义 `Block` 表示系统所分配的内存块，其中 `address` 表示该 `Block` 的起始内存地址：
+
+```java
+public class Block {
+    private final int address;
+    private final Memory memory;
+
+    public Block(int address, Memory memory) {
+        if (address < 0 || address >= memory.getSize()) {
+            throw new IllegalArgumentException("invalid address");
+        }
+
+        Objects.requireNonNull(memory, "memory should not be null");
+
+        this.address = address;
+        this.memory = memory;
+    }
+}
+```
+
+下图展示了一个 `Block` 在内存中的布局：
 
 ![alt](/images/buddy-3.png)
 
-第一个字节表示当前内存块是否被使用；第2到5字节表示 `sizeClass`，用来计算当前内存块所占据的内存的大小，即$2^{sizeClass}$；第6到9字节表示前一个空闲内存块的地址；第10到13字节表示后一个空闲内存块的地址；从第14字节开始就是用户数据。当然，这只是一种很粗犷的布局方式，实际应用中的布局必然比这个精炼。
+一个 `Block` 除了包含用户数据外还需要保存元数据，所以每个 `Block` 占据的内存会大于用户实际申请的内存；元数据中的第一个字节表示当前内存块是否被使用；第2到5字节表示 `sizeClass`，用来计算当前内存块所占据的内存的大小，即$2^{sizeClass}$；第6到9字节表示前一个空闲内存块的地址；第10到13字节表示后一个空闲内存块的地址；从第14字节开始就是用户数据。当然，这只是一种很粗犷的布局方式，实际应用中的布局必然比这个精炼。
 
-这里需要前一个/后一个空闲内存块的地址是因为将相同大小的内存块通过链表的方式串联在一起，来快速找到某个指定大小的内存块。因为 `Buddy Memory Allocation` 始终以$2^k$大小分配内存，假设系统的最大内存为$2^N$，则可以建立 `N` 个链表，每个链表表示可用的内存块，如下图所示：
+这里需要前一个/后一个空闲内存块的地址是因为将相同大小的内存块通过双向链表的方式串联在一起，从而能快速找到以及删除某个指定大小的内存块。因为 `Buddy Memory Allocation` 始终以$2^k$大小分配内存，假设系统的最大内存为$2^N$，则可以建立 `N` 个双向链表，每个双向链表表示当前大小下可用的内存块，如下图所示：
 
 ![alt](/images/buddy-4.png)
+
+`Block` 通过 `Memory` 类提供的 `bool`，`int32` 数据的读写功能来实现对元数据的读写：
+
+```java
+public void setUsed() {
+    this.memory.setBool(this.address, true);
+}
+
+public boolean isUsed() {
+    return this.memory.getBool(this.address);
+}
+
+public void setFree() {
+    this.memory.setBool(this.address, false);
+}
+
+public void setSizeClass(int sizeClass) {
+    this.memory.setInt32(this.address + Constant.OFFSET_SIZE_CLASS, sizeClass);
+}
+
+public int getSizeClass() {
+    return this.memory.getInt32(this.address + Constant.OFFSET_SIZE_CLASS);
+}
+
+public void setPrev(Block block) {
+    this.memory.setInt32(this.address + Constant.OFFSET_PREV, block.getAddress());
+}
+
+public Block getPrev() {
+    int address = this.memory.getInt32(this.address + Constant.OFFSET_PREV);
+
+    return address == -1 ? null : new Block(address, this.memory);
+}
+
+public void setNext(Block block) {
+    this.memory.setInt32(this.address + Constant.OFFSET_NEXT, block.address);
+}
+
+public Block getNext() {
+    int address = this.memory.getInt32(this.address + Constant.OFFSET_NEXT);
+
+    return address == -1 ? null : new Block(address, this.memory);
+}
+```
 
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
