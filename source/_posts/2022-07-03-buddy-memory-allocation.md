@@ -390,7 +390,7 @@ public void merge(Block block) {
 ```
 
 ## 总结
-完整的代码可参考原作者的 [代码](https://github.com/kunigami/blog-examples/blob/master/buddy-algorithm/buddy_algorithm.py) 及 `Java` 版本的 [buddy-memory-allocation](https://github.com/Frederick-S/buddy-memory-allocation)。
+以上仅作为 `Buddy Memory Allocation` 算法的示例，不具有实际应用意义，例如完全没有考虑线程安全。完整的代码可参考原作者的 [代码](https://github.com/kunigami/blog-examples/blob/master/buddy-algorithm/buddy_algorithm.py) 及 `Java` 版本的 [buddy-memory-allocation](https://github.com/Frederick-S/buddy-memory-allocation)。
 
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
