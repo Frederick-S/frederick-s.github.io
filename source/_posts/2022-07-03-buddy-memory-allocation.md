@@ -53,18 +53,21 @@ public class Memory {
 同时，`Memory` 类还支持 `bool` 和 `int32` 类型的数据读写，从实现的简化考虑，`bool` 值的读写以一个 `byte` 为单位；而 `int32` 的读写以4个 `byte` 为单位：
 
 ```java
+// 在给定的地址设置布尔值，占据一字节
 public void setBool(int address, boolean value) {
     checkAddress(address);
 
     this.memory[address] = value ? (byte) 1 : (byte) 0;
 }
 
+// 根据给定的地址读取布尔值，读取一字节
 public boolean getBool(int address) {
     checkAddress(address);
 
     return this.memory[address] == (byte) 1;
 }
 
+// 在给定的地址设置 int32，占据4字节
 public void setInt32(int address, int value) {
     checkAddress(address);
 
@@ -72,6 +75,7 @@ public void setInt32(int address, int value) {
     setByteArray(address, bytes);
 }
 
+// 根据给定的地址读取 int32，读取4字节
 public int getInt32(int address) {
     checkAddress(address);
 
@@ -88,7 +92,7 @@ public int getInt32(int address) {
 ```
 
 ### Block
-定义 `Block` 表示系统所分配的内存块，其中 `address` 表示该 `Block` 的起始内存地址：
+定义 `Block` 表示系统所分配的内存块，其中 `address` 表示该 `Block` 的起始内存地址，同时 `Block` 借助 `Memory` 对内存实现读写操作：
 
 ```java
 public class Block {
@@ -121,40 +125,49 @@ public class Block {
 `Block` 通过 `Memory` 类提供的 `bool`，`int32` 数据的读写功能来实现对元数据的读写：
 
 ```java
+// 将 block 标记为已使用
 public void setUsed() {
     this.memory.setBool(this.address, true);
 }
 
+// 当前 block 是否已使用
 public boolean isUsed() {
     return this.memory.getBool(this.address);
 }
 
+// 释放当前 block
 public void setFree() {
     this.memory.setBool(this.address, false);
 }
 
+// 设置 sizeClass
 public void setSizeClass(int sizeClass) {
     this.memory.setInt32(this.address + Constant.OFFSET_SIZE_CLASS, sizeClass);
 }
 
+// 获取当前 block 的 sizeClass
 public int getSizeClass() {
     return this.memory.getInt32(this.address + Constant.OFFSET_SIZE_CLASS);
 }
 
+// 设置前一个空闲的 block
 public void setPrev(Block block) {
     this.memory.setInt32(this.address + Constant.OFFSET_PREV, block.getAddress());
 }
 
+// 获取前一个空闲的 block
 public Block getPrev() {
     int address = this.memory.getInt32(this.address + Constant.OFFSET_PREV);
 
     return address == -1 ? null : new Block(address, this.memory);
 }
 
+// 设置后一个空闲的 block
 public void setNext(Block block) {
     this.memory.setInt32(this.address + Constant.OFFSET_NEXT, block.address);
 }
 
+// 获取后一个空闲的 block
 public Block getNext() {
     int address = this.memory.getInt32(this.address + Constant.OFFSET_NEXT);
 
