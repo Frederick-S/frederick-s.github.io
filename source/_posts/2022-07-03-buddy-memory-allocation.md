@@ -330,12 +330,14 @@ private Block[] splitToBuddies(Block block, int sizeClass) {
     Block[] buddies = new Block[2];
 
     for (int i = 0; i < 2; i++) {
+        // 更新分裂后的 block 的起始地址和 sizeClass，并标记为可用
         int address = block.getAddress() + (1 << sizeClass) * i;
         buddies[i] = new Block(address, this.memory);
         buddies[i].setFree();
         buddies[i].setSizeClass(sizeClass);
     }
 
+    // 这里从后往前遍历 buddies 插入到双链表中是因为最后返回给用户的是第一个 buddy
     for (int i = 1; i >= 0; i--) {
         this.blockLists[sizeClass - 1].insertFront(buddies[i]);
     }
@@ -345,6 +347,47 @@ private Block[] splitToBuddies(Block block, int sizeClass) {
 ```
 
 #### 内存回收
+应用程序要求释放内存时，提交的是用户数据的起始地址，需要先将其转为 `Block` 的起始地址（减去 `Block` 元数据的占用空间大小即可），然后尝试将 `Block` 和其兄弟合并：
+
+```java
+public void free(int userAddress) {
+    // 根据用户数据地址得到 Block 的起始地址
+    Block block = Block.fromUserAddress(userAddress, this.memory);
+    block.setFree();
+
+    // 尝试将 block 和其兄弟合并
+    this.merge(block);
+}
+
+public void merge(Block block) {
+    int sizeClass = block.getSizeClass();
+
+    // 最多只能合并到 MAX_SIZE_CLASS - 1
+    while (sizeClass < MAX_SIZE_CLASS) {
+        // 得到兄弟 block
+        Block buddy = this.getBuddy(block, sizeClass);
+
+        // 兄弟 block 正在被使用或者已分裂为更小的 block，则不能合并
+        if (buddy.isUsed() || buddy.getSizeClass() != sizeClass) {
+            break;
+        }
+
+        // 将兄弟 block 从空闲链表中删除
+        buddy.removeFromList();
+
+        // 如果兄弟 block 的起始地址比 block 的起始地址小，说明当前的 block 是右兄弟，由于合并后需要得到整个 block 的起始地址，因此将 block 指向 buddy
+        if (block.getAddress() > buddy.getAddress()) {
+            block = buddy;
+        }
+
+        sizeClass += 1;
+    }
+
+    // 设置合并后的 sizeClass
+    block.setSizeClass(sizeClass);
+    this.blockLists[sizeClass - 1].insertFront(block);
+}
+```
 
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
