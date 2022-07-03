@@ -272,6 +272,7 @@ public class Allocator {
         this.memory = new Memory(maxMemorySize);
         this.blockLists = new BlockList[MAX_SIZE_CLASS];
 
+        // 初始化空闲列表
         for (int i = 0; i < MAX_SIZE_CLASS; i++) {
             int sizeClass = i + 1;
             int headSentinelAddress = Constant.HEAD_SENTINEL_SIZE * i;
@@ -324,6 +325,7 @@ public int alloc(int size) {
     return block.getUserAddress();
 }
 
+// 将 Block 分裂（如果能分裂的话），返回分裂后的左兄弟
 private Block split(Block block, int size) {
     int sizeClass = block.getSizeClass();
 
