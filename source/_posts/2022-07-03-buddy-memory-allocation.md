@@ -412,9 +412,21 @@ public void merge(Block block) {
 
 这里有个关键的问题在于如何根据 `block` 的地址知道其兄弟 `block` 的地址？因为一个 `block` 会被分为左兄弟和右兄弟两个内存块，如果当前 `block` 是左兄弟，则右兄弟的地址为 `block.getAddress() + 1 << sizeClass`，如果当前 `block` 是右兄弟，则左兄弟的地址为 `block.getAddress() - 1 << sizeClass`。然而由于缺失位置信息我们并不能知道一个 `block` 是左兄弟还是右兄弟。
 
-原作者在这里巧妙的在不引入额外的元数据的情况下解决了这个问题。首先，对于某个 `sizeClass` 为 `k` 的内存块来说，它的起始地址一定是$C2^k$，其中 `C` 为整数。这里使用数学归纳法来证明，假设系统内存最多支持$2^N$个字节，则初始状态下整个系统只有一个内存块，`k` 就等于 `N`，该内存块的起始地址为0，满足$C2^k$，取 `C = 0` 即可。假设某个 `sizeClass` 为 `k` 的内存块的起始地址满足$C2^k$，则需要进一步证明分裂后的两个内存块的起始地址为$C'2^{k - 1}$。而分裂后的内存块的起始地址分别为$C2^k$和$C2^k + 2^{k - 1}$，又$C2^k = (2C)2^{k - 1}$，$C2^k + 2^{k - 1} = (2C+ 1)2^{k - 1}$，证明完毕。
+原作者在这里巧妙的在不引入额外的元数据的情况下解决了这个问题。首先，对于某个 `sizeClass` 为 `k` 的内存块来说，它的起始地址一定是$C2^k$，其中 `C` 为整数。这里使用数学归纳法来证明，假设系统内存最多支持$2^N$个字节，则初始状态下整个系统只有一个内存块，`k` 就等于 `N`，该内存块的起始地址为0，满足$C2^k$，取 `C = 0` 即可。假设某个 `sizeClass` 为 `k` 的内存块的起始地址满足$C2^k$，则需要进一步证明分裂后的两个内存块的起始地址为$C'2^{k - 1}$。而分裂后的内存块的起始地址分别为$C2^k$和$C2^k + 2^{k - 1}$，又$C2^k = (2C)2^{k - 1}$，$C2^k + 2^{k - 1} = (2C+ 1)2^{k - 1}$，证明完毕。同时，由这些公式可以发现，对于左兄弟内存块来说，`C` 是偶数，而对于右兄弟内存块来说 `C` 是奇数。更进一步来说，左右兄弟内存块的地址差异仅在于从低位往高位数的第 `k + 1` 位不同。
 
-然后我们就可以通过位运算来计算兄弟内存块的起始地址，对于$2^k$大小的内存块来说，两个兄弟内存块的起始地址分别为$C2^k$和$C2^k + 2^k = (C + 1)2^k$，由于$2^k$的二进制表示为1后面跟着 `k` 个0，所以对于$C2^k$来说，其二进制表示中从低位往高位数的第 `k + 1` 位有可能是1（如 `C = 1`），也有可能是0（如 `C = 2`），不管是哪种情况，$C2^k$再加上$2^k$后的二进制表示中从低位往高位数的第 `k + 1` 位必然和$C2^k$不同，也就是说两个兄弟内存块的地址的最低位不同。因此我们就可以将内存块的地址和 `1 << sizeClass`（也就是$2^k$）进行异或运算，得到的地址就是对应兄弟内存块的地址。
+因此，根据某个兄弟内存块的地址推算出另一个兄弟内存块的地址只需要将当前内存块的地址从低位往高位数第 `k + 1` 位反转即可。这种涉及反转比特位的操作就可以使用异或运算，我们可以将内存块的地址和 `1 << sizeClass`（也就是$2^k$）进行异或运算，得到的地址就是对应兄弟内存块的地址。
+
+另外，由于哨兵头节点的存在，`Memory` 内部的数组大小不是严格的$2^k$，在计算兄弟内存块的地址时，可以先将当前内存块的地址减去哨兵头节点的大小之和，计算出兄弟内存块的地址之后，再加回偏移量：
+
+```java
+private Block getBuddy(Block block, int sizeClass) {
+    int virtualAddress = block.getAddress() - this.getMemoryOffset();
+    int buddyVirtualAddress = virtualAddress ^ (1 << sizeClass);
+    int buddyAddress = buddyVirtualAddress + this.getMemoryOffset();
+
+    return new Block(buddyAddress, this.memory);
+}
+```
 
 ## 总结
 以上仅作为 `Buddy Memory Allocation` 算法的示例，不具有实际应用意义，例如完全没有考虑线程安全。完整的代码可参考原作者的 [代码](https://github.com/kunigami/blog-examples/blob/master/buddy-algorithm/buddy_algorithm.py) 及 `Java` 版本的 [buddy-memory-allocation](https://github.com/Frederick-S/buddy-memory-allocation)。
