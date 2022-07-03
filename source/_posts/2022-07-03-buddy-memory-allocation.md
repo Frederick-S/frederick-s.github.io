@@ -176,7 +176,7 @@ public Block getNext() {
 ```
 
 ### BlockList
-`BlockList` 表示一个双向链表，为了实现方便，内部使用了一个哨兵头节点来作为双向链表的头节点，新节点的插入采用头插法的方式：
+`BlockList` 表示一个双向链表，用于存储某个 `sizeClass` 下的所有空闲内存块，为了实现方便，内部使用了一个哨兵头节点来作为双向链表的头节点，新节点的插入采用头插法的方式：
 
 ```java
 package buddy;
@@ -203,15 +203,18 @@ public class BlockList {
         this.sizeClass = sizeClass;
     }
 
+    // 清空列表，将头节点指向自身
     public void clear() {
         this.head.setNext(this.head);
         this.head.setPrev(this.head);
     }
 
+    // 列表是否为空
     public boolean isEmpty() {
         return this.head.getNext().equals(this.head);
     }
 
+    // 获取头节点的后一个节点
     public Block getFirst() {
         if (this.isEmpty()) {
             throw new RuntimeException("list must not be empty");
@@ -220,14 +223,17 @@ public class BlockList {
         return this.head.getNext();
     }
 
+    // 头插法插入一个 block
     public void insertFront(Block block) {
         this.head.insertAfter(block);
     }
 
+    // 当前列表是否有空闲的内存块，以及该内存块是否能容纳 size 大小的数据
     public boolean hasAvailableBlock(int size) {
         return !this.isEmpty() && Block.getActualSize(this.sizeClass) >= size;
     }
 
+    // 所有空闲内存块的数量，不包含哨兵头节点
     public int length() {
         int length = 0;
         Block block = this.head.getNext();
