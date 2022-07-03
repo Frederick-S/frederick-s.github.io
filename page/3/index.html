@@ -209,6 +209,133 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/03/13/cf-and-of-flag/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/13/cf-and-of-flag/" class="post-title-link" itemprop="url">CF 和 OF 标志位</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-03-13 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-13T00:00:00+08:00">2022-03-13</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>看汇编语言时看到，标志寄存器中 <code>CF</code> 标志位表示无符号数运算时是否向最高有效位外的更高位产生进位或借位，而 <code>OF</code> 标志位表示有符号数运算时是否产生溢出。这里存在两个疑问：</p>
+<ol>
+<li>对于 <code>CPU</code> 来说，它并不区分处理的是无符号数还是有符号数，那什么时候设置 <code>CF</code>，什么时候设置 <code>OF</code> 呢</li>
+<li><code>CF</code> 表示进位时也是一种溢出，能否和 <code>OF</code> 共用一个</li>
+</ol>
+<h2 id="cf"><a class="markdownIt-Anchor" href="#cf"></a> CF</h2>
+<p>首先来看 <code>CF</code> 进位的例子，这里我们以8位无符号数为例，其最大值为255，那么计算 <code>255 + 1</code> 则会产生进位。可以通过一段简单的汇编代码进行验证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $255, %al</span><br><span class="line">    add $1, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+<p>在上述代码中，<code>al</code> 是一个8位寄存器，是 <code>eax</code> 寄存器的低8位，这里首先将255放到 <code>al</code> 寄存器内，然后对 <code>al</code> 寄存器中的值加1并放回到 <code>al</code> 寄存器中，即实现 <code>255 +1</code> 的运算。</p>
+<p>最后的 <code>int $0x80</code> 中的 <code>int</code> 表示 <code>interrupt</code>，即中断，当发生一个中断时会有一个与之对应的中断处理程序来处理，这里的 <code>$0x80</code> 就是声明由哪个中断处理程序处理，在 <code>Linux</code> 中，<code>$0x80</code> 对应的是操作系统内核，用于发起一个系统调用，而具体发起哪个系统调用则由 <code>eax</code> 中的值决定，这就是 <code>movl $1, %eax</code> 的作用，1对应的系统调用是 <code>exit</code>，用于退出程序，而程序退出时会伴有一个状态码，这个状态码的值来自于 <code>ebx</code>，也就是 <code>movl $0, %ebx</code> 的作用，这里使用0来表示程序正常退出。</p>
+<p>接下来我们借助 <code>gdb</code> 来观察程序运行时 <code>CF</code> 的值的变化。首先将上述代码保存为 <code>demo.s</code> 后进行编译：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">as demo.s -o demo.o -gstabs+</span><br></pre></td></tr></table></figure>
+<p>这里的 <code>-gstabs+</code> 表示生成机器码时同时生成调试信息，如果没有这个选项后续 <code>gdb</code> 加载时会提示 <code>(No debugging symbols found in ./demo)</code>。</p>
+<p>然后进行链接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ld demo.o -o demo</span><br></pre></td></tr></table></figure>
+<p>这个时候就可以通过 <code>gdb</code> 加载生成的可执行文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb .&#x2F;demo</span><br></pre></td></tr></table></figure>
+<p><img src="/images/cf-of-1.png" alt="alt" /></p>
+<p>然后输入 <code>break 4</code> 在代码第四行设置一个断点，即 <code>mov $255, %al</code> 处，最后输入 <code>run</code> 开始调试执行：</p>
+<p><img src="/images/cf-of-2.png" alt="alt" /></p>
+<p>此时可输入 <code>layout reg</code> 来观察各寄存器内的值，我们需要关注的是 <code>eflags</code> 寄存器，它展示了哪些标志位生效了：</p>
+<p><img src="/images/cf-of-3.png" alt="alt" /></p>
+<p>或者通过执行 <code>info registers eflags</code> 来查看 <code>eflags</code> 的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) info registers eflags</span><br><span class="line">eflags         0x202               [ IF ]</span><br></pre></td></tr></table></figure>
+<p>目前只有一个 <code>IF</code> 标志位，它用于表示是否响应中断。</p>
+<p>接着，输入 <code>next</code> 来执行当前断点所在处的指令，可以看到，执行后 <code>rax</code> 寄存器内的值变成了255（<code>rax</code> 是64位 <code>CPU</code> 下的一个通用寄存器，32位 <code>CPU</code> 下对应为 <code>eax</code>）：</p>
+<p><img src="/images/cf-of-4.png" alt="alt" /></p>
+<p>再输入一次 <code>next</code> 来执行加法运算，此时 <code>rax</code> 中的值变为了0（实际的二进制结果应该是100000000，因为 <code>al</code> 寄存器最多只能表示8位，所以最高位的1无法表示，最终结果为0），<code>eflags</code> 中出现了 <code>CF</code> 标志位，说明发生了进位：</p>
+<p><img src="/images/cf-of-5.png" alt="alt" /></p>
+<p><code>rax</code> 中的值为0也说明了加法运算后产生的进位并不会体现在比参与运算的寄存器位数更多的寄存器中，否则 <code>rax</code> 中的值应该是256。</p>
+<p>再来看借位，将程序稍加修改执行一个 <code>1 - 2</code> 的运算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $1, %al</span><br><span class="line">    sub $2, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+<p>最后 <code>rax</code> 中的值为255（存在高位借位的情况下最后的二进制结果为11111111，解释为无符号数为255），<code>eflags</code> 中同样出现了 <code>CF</code> 标志位。</p>
+<p><img src="/images/cf-of-6.png" alt="alt" /></p>
+<p>所以，<code>CF</code> 的标记取决于两个二进制数的运算是否产生进位或借位。</p>
+<h2 id="of"><a class="markdownIt-Anchor" href="#of"></a> OF</h2>
+<p>有符号数的溢出分两种情况，一种是运算结果应该是正数却返回负数，另一种是运算结果应该是负数却返回正数。</p>
+<p>首先来看两个正数运算得到负数的例子，同样对代码稍加修改实现 <code>127 + 1</code> 的运算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $127, %al</span><br><span class="line">    add $1, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+<p>最后 <code>rax</code> 中的值为128（对应二进制表示为10000000，以有符号数的角度来看，其值为-128，即两个正数相加得到一个负数），<code>eflags</code> 中出现了 <code>OF</code> 标志位，说明发生了溢出：</p>
+<p><img src="/images/cf-of-7.png" alt="alt" /></p>
+<p>从有符号数的角度来看，参与运算的两个数的符号位都是0，相加后符号位却是1，所以 <code>OF</code> 设置为1。</p>
+<p>再来看两个负数运算得到正数的例子，再次对代码稍加修改实现 <code>-128 - 1</code> 的运算，-128的二进制补码表示为10000000，即无符号数角度下的128，-1的二进制补码表示为11111111，即无符号数角度下的255：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.globl _start</span><br><span class="line">_start:</span><br><span class="line">    mov $128, %al</span><br><span class="line">    add $255, %al</span><br><span class="line">    movl $1, %eax</span><br><span class="line">    movl $0, %ebx</span><br><span class="line">    int $0x80</span><br></pre></td></tr></table></figure>
+<p>最后 <code>rax</code> 中的值为127（对应二进制表示为01111111，以有符号数的角度来看，其值为127，即两个负数相加得到一个正数），<code>eflags</code> 中出现了 <code>OF</code> 标志位，说明发生了溢出：</p>
+<p><img src="/images/cf-of-8.png" alt="alt" /></p>
+<p>从有符号数的角度来看，参与运算的两个数的符号位都是1，相加后符号位却是0，所以 <code>OF</code> 设置为1。</p>
+<p>所以，<code>OF</code> 的标记取决于运算结果的符号位是否发生变化，这里的变化指的是两个相同符号位的数的运算结果是一个不同符号位的数。</p>
+<h2 id="比较"><a class="markdownIt-Anchor" href="#比较"></a> 比较</h2>
+<p>注意到前面有符号数 <code>-128 - 1</code> 运算的例子中，最后 <code>CF</code> 和 <code>OF</code> 都被设置为了1，说明 <code>CF</code> 和 <code>OF</code> 并不是互斥的关系，在这个例子中即发生了进位又发生了符号位的变更，也就是说如果满足了设置 <code>CF</code> 的条件，那么 <code>CF</code> 就是1，如果满足了设置 <code>OF</code> 的条件，那么 <code>OF</code> 就是1。因此，回到文章开头的问题，<code>CPU</code> 并不是去判断该设置 <code>CF</code> 还是 <code>OF</code>，而是只要条件满足就会设置对应的标志位，而具体应该关注哪个标志位，则交由编译器去判断，因为对 <code>CPU</code> 而言它处理的只是比特运算，只有编译器知道当前的运算数是无符号数还是有符号数。</p>
+<p>另外，<code>CF</code> 和 <code>OF</code> 也不能合二为一，无法相互替代，例如两个无符号数相加 <code>CF</code> 有可能是0，但是 <code>OF</code> 却是1，如 <code>127 + 1</code>；两个有符号数相加 <code>OF</code> 有可能是0，但是 <code>CF</code> 却是1，如 <code>-1 - 1</code>。也有可能 <code>CF</code> 和 <code>OF</code> 都是1，如有符号数运算 <code>-128 - 1</code>。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt">The CARRY flag and OVERFLOW flag in binary arithmetic</a></li>
+<li><a target="_blank" rel="noopener" href="https://niranjanmr.wordpress.com/2016/01/20/eflags-registers/">Eflags Registers</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/1817577/what-does-int-0x80-mean-in-assembly-code">What does “int 0x80” mean in assembly code?</a></li>
+<li>汇编语言（第4版），王爽</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/27/how-to-publich-java-package-to-maven-central-repo/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1187,88 +1314,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/08/08/python-for-while-else/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/08/08/python-for-while-else/" class="post-title-link" itemprop="url">Python for/while else</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-08-08 00:00:00" itemprop="dateCreated datePublished" datetime="2021-08-08T00:00:00+08:00">2021-08-08</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>435</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>和常见的语言不同，<code>Python</code> 的 <code>for/while</code> 可以配合 <code>else</code> 使用。简单来说，当 <code>for/while</code> 循环体中没有执行 <code>break</code> 时，就会执行 <code>else</code> 中的代码。假设需要判断数组中是否存在某个数，如果不存在的话则抛出异常，一种可能的写法是：</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line">found = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        found = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> found:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<p>借助 <code>for/while else</code> 可改写成：</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">target = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5</span>):</span><br><span class="line">    <span class="keyword">if</span> i == target:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">&#x27;not found&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<p>虽然代码少了几行，但是对于不熟悉该语法特性的人来说可能无法一眼看穿代码的意图。</p>
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/9979970/why-does-python-use-else-after-for-and-while-loops">Why does python use ‘else’ after for and while loops?</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1334,14 +1383,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-count">71</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-count">46</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
