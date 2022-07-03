@@ -389,6 +389,9 @@ public void merge(Block block) {
 }
 ```
 
+## 总结
+完整的代码可参考原作者的 [代码](https://github.com/kunigami/blog-examples/blob/master/buddy-algorithm/buddy_algorithm.py) 及 `Java` 版本的 [buddy-memory-allocation](https://github.com/Frederick-S/buddy-memory-allocation)。
+
 ## 参考
 * [Buddy Memory Allocation](https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html)
 * [Buddy Methods](https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Buddy.html#buddy-methods)
