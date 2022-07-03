@@ -368,7 +368,7 @@ private Block[] splitToBuddies(Block block, int sizeClass) {
 ```
 
 #### 内存回收
-应用程序要求释放内存时，提交的是用户数据的起始地址，需要先将其转为 `Block` 的起始地址（减去 `Block` 元数据的占用空间大小即可），然后尝试将 `Block` 和其兄弟合并：
+应用程序要求释放内存时，提交的是用户数据的起始地址，需要先将其转为 `Block` 的起始地址（减去 `Block` 元数据的占用空间大小即可），然后尝试将 `Block` 和其兄弟合并，并将合并后的 `Block` 加入到空闲列表中：
 
 ```java
 public void free(int userAddress) {
@@ -409,6 +409,10 @@ public void merge(Block block) {
     this.blockLists[sizeClass - 1].insertFront(block);
 }
 ```
+
+这里有个关键的问题在于如何根据 `block` 的地址知道其兄弟 `block` 的地址？因为一个 `block` 会被分为左兄弟和右兄弟两个内存块，如果当前 `block` 是左兄弟，则右兄弟的地址为 `block.getAddress() + 1 << sizeClass`，如果当前 `block` 是右兄弟，则左兄弟的地址为 `block.getAddress() - 1 << sizeClass`。然而由于缺失位置信息我们并不能知道一个 `block` 是左兄弟还是右兄弟。
+
+原作者在这里巧妙的在不引入额外的元数据的情况下解决了这个问题。首先，对于某个 `sizeClass` 为 `k` 的内存块来说，它的起始地址一定是$C2^k$，其中 `C` 为整数。这里使用数学归纳法来证明，假设系统内存最多支持$2^N$个字节，则初始状态下整个系统只有一个内存块，`k` 就等于 `N`，该内存块的起始地址为0，满足$C2^k$，取 `C = 0` 即可。假设某个 `sizeClass` 为 `k` 的内存块的起始地址满足$C2^k$，则需要进一步证明分裂后的两个内存块的起始地址为$C'2^{k - 1}$。而分裂后的内存块的起始地址分别为$C2^k$和$C2^k + 2^{k - 1}$，又$C2^k = (2C)2^{k - 1}$，$C2^k + 2^{k - 1} = (2C+ 1)2^{k - 1}$，证明完毕。
 
 ## 总结
 以上仅作为 `Buddy Memory Allocation` 算法的示例，不具有实际应用意义，例如完全没有考虑线程安全。完整的代码可参考原作者的 [代码](https://github.com/kunigami/blog-examples/blob/master/buddy-algorithm/buddy_algorithm.py) 及 `Java` 版本的 [buddy-memory-allocation](https://github.com/Frederick-S/buddy-memory-allocation)。
