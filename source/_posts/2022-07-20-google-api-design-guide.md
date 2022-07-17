@@ -55,7 +55,7 @@ POST /users/{userId}/mails
 }
 ```
 
-可以看到，面向资源的接口设计体现了资源间的层级关系。
+可以看到，面向资源的接口设计体现了资源间的层级关系。一般而言，对于 `RESTful` 接口来说，请求 `URL` 中只会包含资源的名称（名词），而不会包含对资源的操作（动词），`HTTP` 的请求方法就对应了资源的标准操作方法。
 
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
