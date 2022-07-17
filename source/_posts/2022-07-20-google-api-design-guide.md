@@ -28,5 +28,34 @@ tags:
 * 一个资源集合包含了一系列相同类型的资源，例如，一个用户拥有一个联系人资源集合
 * 一个资源包含了若干的状态，同时也包含了0个或者多个子资源。每个子资源可以是一个单一资源或者是资源集合
 
+以创建邮件接口为例，传统的接口设计可能是如下的方式：
+
+```http
+POST /createMail
+
+{
+    "userId": 123,
+    "title:" "Title",
+    "from": "from@example.com"
+    "to": "to@example.com",
+    "body": "Body"
+}
+```
+
+而面向资源的接口设计则可能为：
+
+```http
+POST /users/{userId}/mails
+
+{
+    "title:" "Title",
+    "from": "from@example.com"
+    "to": "to@example.com",
+    "body": "Body"
+}
+```
+
+可以看到，面向资源的接口设计体现了资源间的层级关系。
+
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
