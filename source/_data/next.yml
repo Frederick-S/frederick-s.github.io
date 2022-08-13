@@ -8,6 +8,7 @@ menu:
   #sitemap: /sitemap.xml || sitemap
   #commonweal: /404/ || heartbeat
   about: /about/ || fas fa-user
+  赞赏: /sponsor/ || fas fa-heart
   RSS: atom.xml || fas fa-rss
 
 github_banner:
