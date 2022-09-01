@@ -64,5 +64,12 @@ POST /users/{userId}/mails
 2. 所有父资源的 `ID`
 3. `API` 服务名，如 `gmail.googleapis.com`
 
+
+
+TODO:
+1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
+2. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
+
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
+* [What’s the best RESTful method to return total number of items in an object?](https://stackoverflow.com/questions/3715981/what-s-the-best-restful-method-to-return-total-number-of-items-in-an-object)
