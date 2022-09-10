@@ -14,7 +14,7 @@ tags:
 ### 创建 Cluster service role
 创建 `EKS` 集群时需要绑定一个 `IAM` 角色，因为 `Kubernetes` 的 `control plane` 需要管理集群内的资源，所以需要有相应的操作权限。
 
-首先进入 [IAM 控制台](https://console.aws.amazon.com/iam/)，选择左侧 `Access management` 下的 `Roles`，点击 `Create Role`。在 `Trusted entity type` 下选择 `AWS service`，然后在 `Use cases for other AWS services` 下选择 `EKS`，接着选择 `EKS - Cluster` 并点击 `Next`。在 `Add permissions` 这步直接点击 `Next`。在最后一步设置所创建的角色的名字，如 `eksClusterRole`，最后点击 `Create Role`。
+首先进入 [IAM 控制台](https://console.aws.amazon.com/iam/)，选择左侧 `Access management` 下的 `Roles`，点击 `Create role`。在 `Trusted entity type` 下选择 `AWS service`，然后在 `Use cases for other AWS services` 下选择 `EKS`，接着选择 `EKS - Cluster` 并点击 `Next`。在 `Add permissions` 这步直接点击 `Next`。在最后一步设置所创建的角色的名字，如 `eksClusterRole`，最后点击 `Create role`。
 
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
