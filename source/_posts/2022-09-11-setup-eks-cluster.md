@@ -32,6 +32,8 @@ tags:
 ### 创建 Node group
 在集群详情的 `Compute` 下点击 `Add node group` 来创建 `Node group`，在第一步 `Configure node group` 中设置 `node group` 的名称及绑定在之前步骤中所创建的 `Node IAM role`。在第二步 `Set compute and scaling configuration` 是配置节点的类型和数量等信息，作为教程都采用默认配置。第三步 `Specify networking` 同样采用默认配置。最后在第四步的 `Review and create` 点击 `Create` 完成创建。
 
+最后当所创建的 `Node group` 的状态变为 `Active` 以及该 `Node group` 下的 `Node` 的状态变为 `Ready` 时说明节点创建成功。此时再查看集群详情下 `Resources` 的 `coredns` 的 `Pod` 已成功分配了 `Node` 运行。
+
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
 * [Creating the Amazon EKS node IAM role](https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html#create-worker-node-role)
