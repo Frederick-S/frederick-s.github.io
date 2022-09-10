@@ -5,12 +5,16 @@ tags:
 - EKS
 ---
 
+## 介绍
 `EKS`（`Amazon Elastic Kubernetes Service`）是 `AWS` 提供的 `Kubernetes` 服务，它能大大减轻创建和维护 `Kubernetes` 集群的负担。
 
 ## 创建 EKS 集群
-有两种方式来创建 `EKS` 集群，一种是使用本地的 `eksctl` 程序；另一种是通过 `AWS` 的管理后台（`AWS Management Console`），这里选择通过 `AWS` 的管理后台来创建。
+有两种方式来创建 `EKS` 集群，一种是使用本地的 `eksctl` 程序；另一种是通过 `AWS` 的管理后台（`AWS Management Console`），这里选择通过 `AWS` 的管理后台来创建 `EKS` 集群。
 
-### a
+### 创建 Cluster service role
+创建 `EKS` 集群时需要绑定一个 `IAM` 角色，因为 `Kubernetes` 的 `control plane` 需要管理集群内的资源，所以需要有相应的操作权限。
+
+首先进入 [IAM 控制台](https://console.aws.amazon.com/iam/)，选择左侧 `Access management` 下的 `Roles`，点击 `Create Role`。在 `Trusted entity type` 下选择 `AWS service`，然后在 `Use cases for other AWS services` 下选择 `EKS`，接着选择 `EKS - Cluster` 并点击 `Next`。在 `Add permissions` 这步直接点击 `Next`。在最后一步设置所创建的角色的名字，如 `eksClusterRole`，最后点击 `Create Role`。
 
 ## 参考
-* [xx](xx)
+* [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
