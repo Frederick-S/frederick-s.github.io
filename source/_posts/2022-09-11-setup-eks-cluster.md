@@ -19,5 +19,8 @@ tags:
 ### 创建集群
 我们通过 `AWS` 管理后台中的 `Amazon Elastic Kubernetes Service` 界面来创建集群，第一步的 `Configure cluster` 主要设置集群的名称，如 `my-cluster`，以及绑定在之前步骤中所创建的 `Cluster service role`。第二步的 `Specify networking` 这里基本都保持默认，只是将 `Cluster endpoint access` 设置为 `Public and private`。第三步的 `Configure logging` 可以暂时不开启日志监控。最后在第四步的 `Review and create` 点击 `Create` 创建集群。
 
+## 创建 Node group
+当集群的状态变为 `Active` 后就表示集群创建成功，不过此时集群中还没有任何 `Node`，所以系统级别的 `Pod` 还无法正常工作，比如查看某个 `coredns` 的 `Pod` 会显示 `FailedScheduling`，因为 `no nodes available to schedule pods`。
+
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
