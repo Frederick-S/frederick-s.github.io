@@ -30,7 +30,7 @@ tags:
 这里同样也是通过 [IAM 控制台](https://console.aws.amazon.com/iam/) 来创建角色，在 `Trusted entity type` 下选择 `AWS service`，在 `Use case` 下选择 `EC2`，然后点击 `Next`。在第二步的 `Add permissions` 需要添加 `AmazonEKSWorkerNodePolicy`，`AmazonEC2ContainerRegistryReadOnly` 和 `AmazonEKS_CNI_Policy` 三个权限，虽然文档中说不建议将 `AmazonEKS_CNI_Policy` 权限添加到 `Node IAM role` 上，不过这里作为示例教程将三个权限都绑定在了 `Node IAM role` 上。最后也是点击 `Create role` 创建角色。
 
 ### 创建 Node group
-在 `Compute` 下点击 `Add node group` 来创建 `Node group`，在第一步 `Configure node group` 中设置 `node group` 的名称及绑定在之前步骤中所创建的 `Node IAM role`。在第二步 `Set compute and scaling configuration` 是配置节点的类型和数量等信息，作为教程都采用默认配置。第三步 `Specify networking` 同样采用默认配置。最后在第四步的 `Review and create` 点击 `Create` 完成创建。
+在集群详情的 `Compute` 下点击 `Add node group` 来创建 `Node group`，在第一步 `Configure node group` 中设置 `node group` 的名称及绑定在之前步骤中所创建的 `Node IAM role`。在第二步 `Set compute and scaling configuration` 是配置节点的类型和数量等信息，作为教程都采用默认配置。第三步 `Specify networking` 同样采用默认配置。最后在第四步的 `Review and create` 点击 `Create` 完成创建。
 
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
