@@ -41,7 +41,7 @@ tags:
 
 > When you create an Amazon EKS cluster, the AWS Identity and Access Management (IAM) entity user or role, such as a federated user that creates the cluster, is automatically granted system:masters permissions in the cluster's role-based access control (RBAC) configuration in the Amazon EKS control plane.
 
-一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账号所以直接使用了 `root`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确：
+一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账号所以直接使用了 `root`，否则就需要使用 `IAM` 用户的 `AWS Access Key ID` 和 `AWS Secret Access Key`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确：
 
 ```
 {
@@ -51,7 +51,7 @@ tags:
 }
 ```
 
-然后运行 `aws eks update-kubeconfig --region us-west-2 --name my-cluster` 来更新本地的 `kubeconfig`，其中 `us-west-2` 需要修改为实际的 `AWS Region`，`my-cluster` 需要修改为实际的集群名称。最后就可以通过 `kubectl get all` 来验证能否访问集群，如果没有问题就会输出如下内容：
+然后运行 `aws eks update-kubeconfig --region us-west-2 --name my-cluster` 来更新本地的 `kubeconfig`，其中 `us-west-2` 需要修改为实际的 `AWS Region`，`my-cluster` 需要修改为实际的集群名称。最后就可以通过 `kubectl get all` 来验证能否访问集群，如果没有问题就会输出如下类似内容：
 
 ```
 NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
