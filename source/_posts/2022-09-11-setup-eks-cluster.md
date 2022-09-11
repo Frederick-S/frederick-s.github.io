@@ -41,7 +41,7 @@ tags:
 
 > When you create an Amazon EKS cluster, the AWS Identity and Access Management (IAM) entity user or role, such as a federated user that creates the cluster, is automatically granted system:masters permissions in the cluster's role-based access control (RBAC) configuration in the Amazon EKS control plane.
 
-一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账号所以直接使用了 `root`，否则就需要使用 `IAM` 用户的 `AWS Access Key ID` 和 `AWS Secret Access Key`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确：
+一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账号所以直接使用了 `root`，反之就需要使用 `IAM` 用户的 `AWS Access Key ID` 和 `AWS Secret Access Key`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确：
 
 ```
 {
