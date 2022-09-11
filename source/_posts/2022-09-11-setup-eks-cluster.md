@@ -129,6 +129,10 @@ mapUsers: |
 curl -o aws-auth-cm.yaml https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/aws-auth-cm.yaml
 ```
 
+将其中的 `<ARN of instance role (not instance profile)>` 替换为之前创建的 `Node IAM role`，然后执行 `kubectl apply -f aws-auth-cm.yaml` 应用修改，执行 `kubectl get nodes --watch` 观察是否所有的节点的状态都变为了 `Ready`。
+
+接着删除本地的 `~/.kube/config` 来验证权限是否生效。重新运行 `aws configure` 来设置某个 `IAM` 用户的信息，因为我们要重新执行 `aws eks update-kubeconfig --region us-west-2 --name my-cluster` 来生成新的 `~/.kube/config`，这里要求当前 `IAM` 用户拥有 `DescribeCluster` 的权限，这个权限是 `AWS` 层面的资源访问权限，而不是 `EKS` 集群的权限，添加权限后可能需要等待几分钟才会生效。当重新生成了 `~/.kube/config` 文件之后，就可以继续通过 `kubectl get all` 验证访问权限是否生效。
+
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
 * [Creating the Amazon EKS node IAM role](https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html#create-worker-node-role)
