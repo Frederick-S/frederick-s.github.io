@@ -37,8 +37,19 @@ tags:
 ## 连接 EKS 集群
 日常需要通过 `kubectl` 管理集群，所以需要先在本地配置访问 `EKS` 集群的权限。`kubectl` 本质上是和 `Kubernetes API server` 打交道，而创建集群时 `Cluster endpoint access` 部分选择的是 `Public and private`，所以在这个场景下能够从公网管理 `EKS` 集群。
 
-首先需要安装 [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 和 [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)。
+首先需要安装 [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 和 [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)。然后在本地通过 `aws configure` 来设置 `AWS Access Key ID` 和 `AWS Secret Access Key`。根据 [Enabling IAM user and role access to your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) 的描述，创建集群的账号会自动授予集群的 `system:masters` 权限，本文是通过 `AWS` 的管理后台创建集群，当前登录的账号为 `root`，所以 `aws configure` 需要设置为 `root` 的 `AWS Access Key ID` 和 `AWS Secret Access Key`：
+
+> When you create an Amazon EKS cluster, the AWS Identity and Access Management (IAM) entity user or role, such as a federated user that creates the cluster, is automatically granted system:masters permissions in the cluster's role-based access control (RBAC) configuration in the Amazon EKS control plane.
+
+一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账号所以直接使用了 `root`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确。然后运行 `aws eks update-kubeconfig --region us-west-2 --name my-cluster` 来更新本地的 `kubeconfig`，其中 `us-west-2` 需要修改为实际的 `AWS Region`，`my-cluster` 需要修改为实际的集群名称。最后就可以通过 `kubectl get all` 来验证能否访问集群，如果没有问题就会输出如下内容：
+
+```
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   175m
+```
 
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
 * [Creating the Amazon EKS node IAM role](https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html#create-worker-node-role)
+* [Enabling IAM user and role access to your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html)
+* [kubectl error You must be logged in to the server (Unauthorized) when accessing EKS cluster](https://stackoverflow.com/questions/50791303/kubectl-error-you-must-be-logged-in-to-the-server-unauthorized-when-accessing)
