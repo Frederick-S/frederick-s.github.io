@@ -37,6 +37,8 @@ tags:
 ## 连接 EKS 集群
 日常需要通过 `kubectl` 管理集群，所以需要先在本地配置访问 `EKS` 集群的权限。`kubectl` 本质上是和 `Kubernetes API server` 打交道，而创建集群时 `Cluster endpoint access` 部分选择的是 `Public and private`，所以在这个场景下能够从公网管理 `EKS` 集群。
 
+首先需要安装 [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 和 [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)。
+
 ## 参考
 * [Creating the Amazon EKS cluster role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role)
 * [Creating the Amazon EKS node IAM role](https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html#create-worker-node-role)
