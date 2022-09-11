@@ -37,11 +37,11 @@ tags:
 ## 连接 EKS 集群
 日常需要通过 `kubectl` 管理集群，所以需要先在本地配置访问 `EKS` 集群的权限。`kubectl` 本质上是和 `Kubernetes API server` 打交道，而创建集群时 `Cluster endpoint access` 部分选择的是 `Public and private`，所以在这个场景下能够从公网管理 `EKS` 集群。
 
-首先需要安装 [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 和 [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)。然后在本地通过 `aws configure` 来设置 `AWS Access Key ID` 和 `AWS Secret Access Key`。根据 [Enabling IAM user and role access to your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) 的描述，创建集群的账号会自动授予集群的 `system:masters` 权限，本文是通过 `AWS` 的管理后台创建集群，当前登录的账号为 `root`，所以 `aws configure` 需要设置为 `root` 的 `AWS Access Key ID` 和 `AWS Secret Access Key`：
+首先需要安装 [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 和 [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html)。然后在本地通过 `aws configure` 来设置 `AWS Access Key ID` 和 `AWS Secret Access Key`。根据 [Enabling IAM user and role access to your cluster](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html) 的描述，创建集群的账户会自动授予集群的 `system:masters` 权限，本文是通过 `AWS` 的管理后台创建集群，当前登录的账户为 `root`，所以 `aws configure` 需要设置为 `root` 的 `AWS Access Key ID` 和 `AWS Secret Access Key`：
 
 > When you create an Amazon EKS cluster, the AWS Identity and Access Management (IAM) entity user or role, such as a federated user that creates the cluster, is automatically granted system:masters permissions in the cluster's role-based access control (RBAC) configuration in the Amazon EKS control plane.
 
-一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账号所以直接使用了 `root`，反之就需要使用 `IAM` 用户的 `AWS Access Key ID` 和 `AWS Secret Access Key`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确：
+一般公司生产环境中的 `AWS` 是不会直接使用 `root` 账户登录的，而是创建 `IAM` 用户，由于这里是个人的 `AWS` 账户所以直接使用了 `root`，反之就需要使用 `IAM` 用户的 `AWS Access Key ID` 和 `AWS Secret Access Key`。设置完成之后可以通过 `aws sts get-caller-identity` 来验证当前用户是否设置正确：
 
 ```
 {
@@ -56,6 +56,77 @@ tags:
 ```
 NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 service/kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   175m
+```
+
+## 设置其他用户的集群访问权限
+创建集群的账户可能权限较高，所以需要单独给某些账户开通集群的访问权限。可以通过 `kubectl describe -n kube-system configmap/aws-auth` 查看当前的权限分配情况：
+
+```
+Name:         aws-auth
+Namespace:    kube-system
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+mapRoles:
+----
+- groups:
+  - system:bootstrappers
+  - system:nodes
+  rolearn: arn:aws:iam::123:role/AmazonEKSNodeRole
+  username: system:node:{{EC2PrivateDNSName}}
+
+
+BinaryData
+====
+
+Events:  <none>
+```
+
+假设我们需要授予某个 `IAM` 用户 `eks` `system:masters` 的角色，首先运行 `kubectl edit -n kube-system configmap/aws-auth`：
+
+```
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  mapRoles: |
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: arn:aws:iam::123:role/AmazonEKSNodeRole
+      username: system:node:{{EC2PrivateDNSName}}
+  mapUsers: |
+    - groups:
+      - system:masters
+      userarn: arn:aws:iam::123:user/eks
+      username: eks
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-09-11T06:33:38Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "33231"
+  uid: 6b186686-548c-4c99-9f65-0381da1366a4
+```
+
+这里在 `data` 下新增了 `mapUsers`，授予用户 `eks` `system:masters` 的角色：
+
+```
+mapUsers: |
+  - groups:
+    - system:masters
+    userarn: arn:aws:iam::123:user/eks
+    username: eks
+```
+
+保存后可以通过 `kubectl describe configmap -n kube-system aws-auth` 验证改动是否生效。然后下载 `aws-auth-cm.yaml`：
+
+```
+curl -o aws-auth-cm.yaml https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/aws-auth-cm.yaml
 ```
 
 ## 参考
