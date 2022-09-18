@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="挂载磁盘 在创建 AWS 的 EC2 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 lsblk 来查看可用的块设备： 12345678910NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSloop0          7:0    0 22.2M  1 loop &#x2F;snap&#x2F;amazon-ssm-agent&#x2F;5657loop1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS EC2 挂载磁盘">
+<meta property="og:url" content="https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="挂载磁盘 在创建 AWS 的 EC2 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 lsblk 来查看可用的块设备： 12345678910NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSloop0          7:0    0 22.2M  1 loop &#x2F;snap&#x2F;amazon-ssm-agent&#x2F;5657loop1">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-09-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-17T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="AWS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>AWS EC2 挂载磁盘 | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-J1NC2B33VK');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Übung macht den Meister</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-mit-6.824">
+
+    <a href="/mit-6.824/" rel="section"><i class="fas fa-landmark fa-fw"></i>MIT 6.824</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-赞赏">
+
+    <a href="/sponsor/" rel="section"><i class="fas fa-heart fa-fw"></i>赞赏</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AWS EC2 挂载磁盘
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-09-18 00:00:00" itemprop="dateCreated datePublished" datetime="2022-09-18T00:00:00+08:00">2022-09-18</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="挂载磁盘"><a class="markdownIt-Anchor" href="#挂载磁盘"></a> 挂载磁盘</h2>
+<p>在创建 <code>AWS</code> 的 <code>EC2</code> 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 <code>lsblk</code> 来查看可用的块设备：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS</span><br><span class="line">loop0          7:0    0 22.2M  1 loop /snap/amazon-ssm-agent/5657</span><br><span class="line">loop1          7:1    0   49M  1 loop /snap/core18/2406</span><br><span class="line">loop2          7:2    0 57.8M  1 loop /snap/core20/1498</span><br><span class="line">loop3          7:3    0 38.7M  1 loop /snap/snapd/15909</span><br><span class="line">loop4          7:4    0 71.8M  1 loop /snap/lxd/22927</span><br><span class="line">nvme1n1      259:0    0    8G  0 disk</span><br><span class="line">nvme0n1      259:1    0    8G  0 disk</span><br><span class="line">├─nvme0n1p1  259:2    0  7.9G  0 part /</span><br><span class="line">└─nvme0n1p15 259:3    0   99M  0 part /boot/efi</span><br></pre></td></tr></table></figure>
+<p>其中的 <code>nvme1n1</code> 就是新添加的磁盘，目前还未挂载到系统中，而 <code>nvme0n1</code> 则是根设备并且有两个分区。</p>
+<blockquote>
+<p><code>lsblk</code> 的输出结果会移除设备路径中的 <code>/dev/</code> 前缀，所以设备 <code>nvme1n1</code> 的完整路径为 <code>/dev/nvme1n1</code>。</p>
+</blockquote>
+<p>然后，我们需要在 <code>nvme1n1</code> 之上创建文件系统才能使用，执行 <code>sudo file -s /dev/nvme1n1</code> 显示 <code>nvme1n1</code> 还没有文件系统：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme1n1: data</span><br></pre></td></tr></table></figure>
+<p>而如果我们查看 <code>sudo file -s /dev/nvme0n1</code> 则会显示：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme0n1: DOS/MBR boot sector; partition 1 : ID=0xee, start-CHS (0x0,0,2), end-CHS (0x3ff,255,63), startsector 1, 16777215 sectors, extended partition table (last)</span><br></pre></td></tr></table></figure>
+<p>执行 <code>sudo mkfs -t xfs /dev/nvme1n1</code> 来为 <code>nvme1n1</code> 创建文件系统，其中 <code>xfs</code> 表示文件系统的类型：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">meta-data=/dev/nvme1n1           isize=512    agcount=8, agsize=262144 blks</span><br><span class="line">         =                       sectsz=512   attr=2, projid32bit=1</span><br><span class="line">         =                       crc=1        finobt=1, sparse=1, rmapbt=0</span><br><span class="line">         =                       reflink=1    bigtime=0 inobtcount=0</span><br><span class="line">data     =                       bsize=4096   blocks=2097152, imaxpct=25</span><br><span class="line">         =                       sunit=1      swidth=1 blks</span><br><span class="line">naming   =version 2              bsize=4096   ascii-ci=0, ftype=1</span><br><span class="line"><span class="built_in">log</span>      =internal <span class="built_in">log</span>           bsize=4096   blocks=2560, version=2</span><br><span class="line">         =                       sectsz=512   sunit=1 blks, lazy-count=1</span><br><span class="line">realtime =none                   extsz=4096   blocks=0, rtextents=0</span><br></pre></td></tr></table></figure>
+<p>接着，我们就可以创建一个文件夹用来挂载磁盘，例如 <code>sudo mkdir /data</code>。最后将 <code>/dev/nvme1n1</code> 挂载到 <code>/data</code> 上：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount /dev/nvme1n1 /data</span><br></pre></td></tr></table></figure>
+<p>此时如果查看 <code>df -h</code> 就会包含 <code>/dev/nvme1n1</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Filesystem       Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/root        7.6G  1.6G  6.1G  21% /</span><br><span class="line">tmpfs            926M     0  926M   0% /dev/shm</span><br><span class="line">tmpfs            371M 1000K  370M   1% /run</span><br><span class="line">tmpfs            5.0M     0  5.0M   0% /run/lock</span><br><span class="line">/dev/nvme0n1p15   98M  5.1M   93M   6% /boot/efi</span><br><span class="line">tmpfs            186M  4.0K  186M   1% /run/user/1000</span><br><span class="line">/dev/nvme1n1     8.0G   90M  8.0G   2% /data</span><br></pre></td></tr></table></figure>
+<h2 id="系统启动自动挂载磁盘"><a class="markdownIt-Anchor" href="#系统启动自动挂载磁盘"></a> 系统启动自动挂载磁盘</h2>
+<p>当前的磁盘挂载信息会在系统启动后丢失，如果希望系统启动后自动挂载磁盘则需要向 <code>/etc/fstab</code> 中添加一条记录。</p>
+<p>安全起见先备份下 <code>/etc/fstab</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /etc/fstab /etc/fstab.orig</span><br></pre></td></tr></table></figure>
+<p>然后运行 <code>sudo blkid</code> 来查看设备 <code>/dev/nvme1n1</code> 的 <code>UUID</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme0n1p1: LABEL=<span class="string">&quot;cloudimg-rootfs&quot;</span> UUID=<span class="string">&quot;15ea47e1-ef7d-4928-9dbe-ffaf0e743653&quot;</span> BLOCK_SIZE=<span class="string">&quot;4096&quot;</span> TYPE=<span class="string">&quot;ext4&quot;</span> PARTUUID=<span class="string">&quot;1957f80e-a338-441c-a0e0-ed1575eefda3&quot;</span></span><br><span class="line">/dev/nvme0n1p15: LABEL_FATBOOT=<span class="string">&quot;UEFI&quot;</span> LABEL=<span class="string">&quot;UEFI&quot;</span> UUID=<span class="string">&quot;68E7-1A63&quot;</span> BLOCK_SIZE=<span class="string">&quot;512&quot;</span> TYPE=<span class="string">&quot;vfat&quot;</span> PARTUUID=<span class="string">&quot;1eeb08ab-0afd-4477-bd53-4389a42db8f6&quot;</span></span><br><span class="line">/dev/loop1: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop4: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop2: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop0: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/nvme1n1: UUID=<span class="string">&quot;aa81c000-325c-40b7-ba4c-598ec2c824e0&quot;</span> BLOCK_SIZE=<span class="string">&quot;512&quot;</span> TYPE=<span class="string">&quot;xfs&quot;</span></span><br><span class="line">/dev/loop3: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br></pre></td></tr></table></figure>
+<p>最后向 <code>/etc/fstab</code> 添加一条记录：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UUID=aa81c000-325c-40b7-ba4c-598ec2c824e0  /data  xfs  defaults,nofail  0  2</span><br></pre></td></tr></table></figure>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html">Make an Amazon EBS volume available for use on Linux</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/" title="AWS EC2 挂载磁盘">https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AWS/" rel="tag"># AWS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/11/setup-eks-cluster/" rel="prev" title="创建 EKS 集群">
+      <i class="fa fa-chevron-left"></i> 创建 EKS 集群
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%82%E8%BD%BD%E7%A3%81%E7%9B%98"><span class="nav-number">1.</span> <span class="nav-text"> 挂载磁盘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E8%87%AA%E5%8A%A8%E6%8C%82%E8%BD%BD%E7%A3%81%E7%9B%98"><span class="nav-number">2.</span> <span class="nav-text"> 系统启动自动挂载磁盘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
