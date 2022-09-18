@@ -34,7 +34,7 @@ nvme0n1      259:1    0    8G  0 disk
 /dev/nvme0n1: DOS/MBR boot sector; partition 1 : ID=0xee, start-CHS (0x0,0,2), end-CHS (0x3ff,255,63), startsector 1, 16777215 sectors, extended partition table (last)
 ```
 
-执行 `sudo mkfs -t xfs /dev/nvme1n1` 来为 `nvme1n1` 创建文件系统：
+执行 `sudo mkfs -t xfs /dev/nvme1n1` 来为 `nvme1n1` 创建文件系统，其中 `xfs` 表示文件系统的类型：
 
 ```sh
 meta-data=/dev/nvme1n1           isize=512    agcount=8, agsize=262144 blks
@@ -55,7 +55,18 @@ realtime =none                   extsz=4096   blocks=0, rtextents=0
 sudo mount /dev/nvme1n1 /data
 ```
 
-此时如果查看 `df -h` 则
+此时如果查看 `df -h` 就会包含 `/dev/nvme1n1`：
+
+```sh
+Filesystem       Size  Used Avail Use% Mounted on
+/dev/root        7.6G  1.6G  6.1G  21% /
+tmpfs            926M     0  926M   0% /dev/shm
+tmpfs            371M 1000K  370M   1% /run
+tmpfs            5.0M     0  5.0M   0% /run/lock
+/dev/nvme0n1p15   98M  5.1M   93M   6% /boot/efi
+tmpfs            186M  4.0K  186M   1% /run/user/1000
+/dev/nvme1n1     8.0G   90M  8.0G   2% /data
+```
 
 ## 参考
 * [Make an Amazon EBS volume available for use on Linux](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html)
