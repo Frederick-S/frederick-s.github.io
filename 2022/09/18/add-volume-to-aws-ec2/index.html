@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"frederick-s.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="挂载磁盘 在创建 AWS 的 EC2 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 lsblk 来查看可用的块设备： 12345678910NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSloop0          7:0    0 22.2M  1 loop &#x2F;snap&#x2F;amazon-ssm-agent&#x2F;5657loop1">
+  <meta name="description" content="挂载磁盘 在创建 AWS 的 EC2 实例时如果添加了额外的磁盘则需要手动挂载到系统中。 首先运行 lsblk 来查看可用的块设备： 12345678910NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSloop0          7:0    0 22.2M  1 loop &#x2F;snap&#x2F;amazon-ssm-agent&#x2F;5657loop1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AWS EC2 挂载磁盘">
 <meta property="og:url" content="https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="挂载磁盘 在创建 AWS 的 EC2 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 lsblk 来查看可用的块设备： 12345678910NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSloop0          7:0    0 22.2M  1 loop &#x2F;snap&#x2F;amazon-ssm-agent&#x2F;5657loop1">
+<meta property="og:description" content="挂载磁盘 在创建 AWS 的 EC2 实例时如果添加了额外的磁盘则需要手动挂载到系统中。 首先运行 lsblk 来查看可用的块设备： 12345678910NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTSloop0          7:0    0 22.2M  1 loop &#x2F;snap&#x2F;amazon-ssm-agent&#x2F;5657loop1">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-09-17T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-09-17T16:00:00.000Z">
@@ -270,9 +270,10 @@
 
       
         <h2 id="挂载磁盘"><a class="markdownIt-Anchor" href="#挂载磁盘"></a> 挂载磁盘</h2>
-<p>在创建 <code>AWS</code> 的 <code>EC2</code> 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 <code>lsblk</code> 来查看可用的块设备：</p>
+<p>在创建 <code>AWS</code> 的 <code>EC2</code> 实例时如果添加了额外的磁盘则需要手动挂载到系统中。</p>
+<p>首先运行 <code>lsblk</code> 来查看可用的块设备：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS</span><br><span class="line">loop0          7:0    0 22.2M  1 loop /snap/amazon-ssm-agent/5657</span><br><span class="line">loop1          7:1    0   49M  1 loop /snap/core18/2406</span><br><span class="line">loop2          7:2    0 57.8M  1 loop /snap/core20/1498</span><br><span class="line">loop3          7:3    0 38.7M  1 loop /snap/snapd/15909</span><br><span class="line">loop4          7:4    0 71.8M  1 loop /snap/lxd/22927</span><br><span class="line">nvme1n1      259:0    0    8G  0 disk</span><br><span class="line">nvme0n1      259:1    0    8G  0 disk</span><br><span class="line">├─nvme0n1p1  259:2    0  7.9G  0 part /</span><br><span class="line">└─nvme0n1p15 259:3    0   99M  0 part /boot/efi</span><br></pre></td></tr></table></figure>
-<p>其中的 <code>nvme1n1</code> 就是新添加的磁盘，目前还未挂载到系统中，而 <code>nvme0n1</code> 则是根设备并且有两个分区。</p>
+<p>其中的 <code>nvme1n1</code> 是本次新添加的磁盘，目前还未挂载到系统中，而 <code>nvme0n1</code> 则是根设备并且有两个分区。</p>
 <blockquote>
 <p><code>lsblk</code> 的输出结果会移除设备路径中的 <code>/dev/</code> 前缀，所以设备 <code>nvme1n1</code> 的完整路径为 <code>/dev/nvme1n1</code>。</p>
 </blockquote>
@@ -294,6 +295,7 @@
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme0n1p1: LABEL=<span class="string">&quot;cloudimg-rootfs&quot;</span> UUID=<span class="string">&quot;15ea47e1-ef7d-4928-9dbe-ffaf0e743653&quot;</span> BLOCK_SIZE=<span class="string">&quot;4096&quot;</span> TYPE=<span class="string">&quot;ext4&quot;</span> PARTUUID=<span class="string">&quot;1957f80e-a338-441c-a0e0-ed1575eefda3&quot;</span></span><br><span class="line">/dev/nvme0n1p15: LABEL_FATBOOT=<span class="string">&quot;UEFI&quot;</span> LABEL=<span class="string">&quot;UEFI&quot;</span> UUID=<span class="string">&quot;68E7-1A63&quot;</span> BLOCK_SIZE=<span class="string">&quot;512&quot;</span> TYPE=<span class="string">&quot;vfat&quot;</span> PARTUUID=<span class="string">&quot;1eeb08ab-0afd-4477-bd53-4389a42db8f6&quot;</span></span><br><span class="line">/dev/loop1: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop4: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop2: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop0: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/nvme1n1: UUID=<span class="string">&quot;aa81c000-325c-40b7-ba4c-598ec2c824e0&quot;</span> BLOCK_SIZE=<span class="string">&quot;512&quot;</span> TYPE=<span class="string">&quot;xfs&quot;</span></span><br><span class="line">/dev/loop3: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br></pre></td></tr></table></figure>
 <p>最后向 <code>/etc/fstab</code> 添加一条记录：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UUID=aa81c000-325c-40b7-ba4c-598ec2c824e0  /data  xfs  defaults,nofail  0  2</span><br></pre></td></tr></table></figure>
+<p>可以通过先取消挂载 <code>/data</code> 即 <code>sudo umount /data</code> 然后再挂载 <code>sudo mount -a</code> 来验证自动挂载是否生效。</p>
 <h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html">Make an Amazon EBS volume available for use on Linux</a></li>
