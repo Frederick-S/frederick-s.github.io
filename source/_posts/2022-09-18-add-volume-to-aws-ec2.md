@@ -3,6 +3,7 @@ tags:
 - AWS
 ---
 
+## 挂载磁盘
 在创建 `AWS` 的 `EC2` 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 `lsblk` 来查看可用的块设备：
 
 ```sh
@@ -66,6 +67,34 @@ tmpfs            5.0M     0  5.0M   0% /run/lock
 /dev/nvme0n1p15   98M  5.1M   93M   6% /boot/efi
 tmpfs            186M  4.0K  186M   1% /run/user/1000
 /dev/nvme1n1     8.0G   90M  8.0G   2% /data
+```
+
+## 系统启动自动挂载磁盘
+当前的磁盘挂载信息会在系统启动后丢失，如果希望系统启动后自动挂载磁盘则需要向 `/etc/fstab` 中添加一条记录。
+
+安全起见先备份下 `/etc/fstab`：
+
+```sh
+sudo cp /etc/fstab /etc/fstab.orig
+```
+
+然后运行 `sudo blkid` 来查看设备 `/dev/nvme1n1` 的 `UUID`：
+
+```sh
+/dev/nvme0n1p1: LABEL="cloudimg-rootfs" UUID="15ea47e1-ef7d-4928-9dbe-ffaf0e743653" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="1957f80e-a338-441c-a0e0-ed1575eefda3"
+/dev/nvme0n1p15: LABEL_FATBOOT="UEFI" LABEL="UEFI" UUID="68E7-1A63" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="1eeb08ab-0afd-4477-bd53-4389a42db8f6"
+/dev/loop1: TYPE="squashfs"
+/dev/loop4: TYPE="squashfs"
+/dev/loop2: TYPE="squashfs"
+/dev/loop0: TYPE="squashfs"
+/dev/nvme1n1: UUID="aa81c000-325c-40b7-ba4c-598ec2c824e0" BLOCK_SIZE="512" TYPE="xfs"
+/dev/loop3: TYPE="squashfs"
+```
+
+最后向 `/etc/fstab` 添加一条记录：
+
+```sh
+UUID=aa81c000-325c-40b7-ba4c-598ec2c824e0  /data  xfs  defaults,nofail  0  2
 ```
 
 ## 参考
