@@ -4,7 +4,9 @@ tags:
 ---
 
 ## 挂载磁盘
-在创建 `AWS` 的 `EC2` 实例时如果添加了额外的磁盘则需要手动挂载到系统中。首先运行 `lsblk` 来查看可用的块设备：
+在创建 `AWS` 的 `EC2` 实例时如果添加了额外的磁盘则需要手动挂载到系统中。
+
+首先运行 `lsblk` 来查看可用的块设备：
 
 ```sh
 NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
@@ -19,7 +21,7 @@ nvme0n1      259:1    0    8G  0 disk
 └─nvme0n1p15 259:3    0   99M  0 part /boot/efi
 ```
 
-其中的 `nvme1n1` 就是新添加的磁盘，目前还未挂载到系统中，而 `nvme0n1` 则是根设备并且有两个分区。
+其中的 `nvme1n1` 是本次新添加的磁盘，目前还未挂载到系统中，而 `nvme0n1` 则是根设备并且有两个分区。
 
 > `lsblk` 的输出结果会移除设备路径中的 `/dev/` 前缀，所以设备 `nvme1n1` 的完整路径为 `/dev/nvme1n1`。
 
@@ -96,6 +98,8 @@ sudo cp /etc/fstab /etc/fstab.orig
 ```sh
 UUID=aa81c000-325c-40b7-ba4c-598ec2c824e0  /data  xfs  defaults,nofail  0  2
 ```
+
+可以通过先取消挂载 `/data` 即 `sudo umount /data` 然后再执行 `sudo mount -a` 来验证自动挂载是否生效。
 
 ## 参考
 * [Make an Amazon EBS volume available for use on Linux](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html)
