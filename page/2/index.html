@@ -214,6 +214,135 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/30/mit-6.824-lab3-students-guide-to-raft-part-2/" class="post-title-link" itemprop="url">MIT 6.824 - Lab 3 (1): Students' Guide to Raft（续）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-05-30 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-30T00:00:00+08:00">2022-05-30</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 是 <a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/">MIT 6.824: Distributed Systems</a> 之前的助教写给学生看的实验生存指南。在 <a href="/2022/05/06/mit-6.824-lab2-students-guide-to-raft/">MIT 6.824 - Lab 2 (1): Students’ Guide to Raft</a> 中介绍了关于 <code>Lab 2</code> 的部分，本文将继续介绍关于 <code>Lab 3</code> 的部分。</p>
+<p>在 <code>Lab 3</code> 中，我们需要实现一个基于 <code>Raft</code> 的 <code>Key-Value</code> 数据库，本文描述了某些对实现可能有帮助的细节。</p>
+<h2 id="提交客户端操作"><a class="markdownIt-Anchor" href="#提交客户端操作"></a> 提交客户端操作</h2>
+<p>实现客户端请求时可能会先直接发一个请求给客户端所认为的主节点，然后对应的服务端等待 <code>Raft</code> 应用日志，接着服务端执行客户端的请求逻辑，最后再把结果返回给客户端。这种方式适合单客户端的系统，不过不适合多客户端并发的系统。在多客户端请求下，每个客户端请求都有可能修改系统状态，即使各 <code>Raft</code> 节点的日志保持一致，由于各客户端请求间可能相互交替执行，服务端本地状态可能和 <code>Raft</code> 节点的最新日志不一致，除非使用全局的锁隔离各客户端请求，不过系统会退化为串行程序。</p>
+<p>文中建议将服务端当做状态机处理，每个客户端的请求本质上都是将状态机从一个状态转变为另一个状态。服务端中有一个专门的线程来处理客户端请求，该线程每次获取一个客户端请求，然后将其提交给 <code>Raft</code>，之后收到 <code>Raft</code> 应用日志的通知后，按顺序将客户端命令应用到服务端的本地状态机中，这里虽然看起来也是串行处理客户端请求，不过由于 <code>Raft.Start()</code> 方法会立即返回，当有大量请求时，<code>Raft</code> 在实现时会批量发送日志。这个线程是整个服务端中唯一能修改本地状态机的地方，所以服务端的 <code>RPC</code> 就简化为了向任务队列中提交任务，并且当 <code>applyCh</code> 接收到可以执行的日志时，将日志所对应的命令应用到本地状态机中，然后响应客户端。</p>
+<p>不过，这也带来了一个问题：什么时候知道某个客户端请求执行完成了？这在一切正常的情况下非常简单，因为我们是按序将客户端请求提交给 <code>Raft</code>，所以最后从 <code>applyCh</code> 中出来的日志的顺序就是提交客户端请求的顺序。不过，当前客户端所通信的服务端有可能在中途不再是主节点，所以客户端所发送的日志有可能被丢弃，此时客户端需要能够知道发生了异常，然后尝试换一个服务端。</p>
+<p>一个简单的方法是记录提交客户端请求时 <code>Raft</code> 返回的日志索引，然后从 <code>applyCh</code> 收到对应索引的日志时，判断该条日志是否对应最初的客户端请求（可以向 <code>ApplyMsg.Command</code> 添加额外的信息来标识是否是当初的请求）。如果不是同一条请求，则说明发生了异常。</p>
+<h2 id="识别重复请求"><a class="markdownIt-Anchor" href="#识别重复请求"></a> 识别重复请求</h2>
+<p>因为客户端异常重试的机制存在，所以服务端需要能识别出重复的客户端请求：例如某个客户端发送 <code>APPEND</code> 请求，当前服务端成功执行但是客户端没有收到响应，客户端会选择一个新的服务端发送请求，新的服务端需要确保 <code>APPEND</code> 请求不会被执行两次。因此，每个客户端请求需要一个唯一的标识，使得服务端能够识别已经执行的请求。另外，由于客户端会选择不同的服务端发送请求，各服务端需要对已执行的客户端请求达成共识。</p>
+<p>有很多方法来为客户端请求生成唯一的标识符。一种简单并且相对有效的方法是先给每个客户端分配一个唯一的标识符，然后给每一个请求附带一个递增的序列号。如果某个客户端重新发送请求，则会复用之前的请求序列号。各服务端需要维护每个客户端最新的请求序列号，如果服务端发现客户端的请求序列号已处理，则直接忽略该请求。</p>
+<h2 id="难以定位的边界条件"><a class="markdownIt-Anchor" href="#难以定位的边界条件"></a> 难以定位的边界条件</h2>
+<p>如果按照上述的方式实现，有可能会遇到两个难以定位的问题。</p>
+<h3 id="重复出现的日志索引"><a class="markdownIt-Anchor" href="#重复出现的日志索引"></a> 重复出现的日志索引</h3>
+<p><code>Raft.Start()</code> 会返回所添加的日志的索引，不过在实际实现时可能会认为这个索引不会重复返回，或者遇到重复的索引时会认为前一个相同索引的日志所对应的请求已经执行失败。不过实际上这两种看法都不正确，即使没有个任何一个服务端发生异常。</p>
+<p>假设有 <code>S1</code> 到 <code>S5</code> 五个节点，一开始 <code>S1</code> 是主节点，并且没有日志，然后系统发生以下交互：</p>
+<ol>
+<li><code>S1</code> 收到两个客户端请求 <code>C1</code> 和 <code>C2</code></li>
+<li><code>S1</code> 分别返回日志索引1和2给 <code>C1</code> 和 <code>C2</code></li>
+<li><code>S1</code> 发送包含了 <code>C1</code> 和 <code>C2</code> 的 <code>AppendEntries</code> 请求给其他从节点，其中 <code>S2</code> 收到请求，其余节点均未收到</li>
+<li><code>S3</code> 成为候选节点</li>
+<li><code>S1</code> 和 <code>S2</code> 不会投票给 <code>S3</code>，但是 <code>S4</code> 和 <code>S5</code> 会，所以 <code>S3</code> 成为新的主节点</li>
+<li><code>S3</code> 收到新的客户端请求 <code>C3</code></li>
+<li><code>S3</code> 调用 <code>Start()</code> 方法并返回日志索引1给 <code>C3</code></li>
+<li><code>S3</code> 发送包含 <code>C3</code> 的 <code>AppendEntries</code> 请求给 <code>S1</code>，<code>S1</code> 丢弃 <code>C1</code> 和 <code>C2</code> 的日志后添加 <code>C3</code></li>
+<li><code>S3</code> 在给其他从节点发送 <code>AppendEntries</code> 请求前发生异常</li>
+<li><code>S1</code> 成为候选节点，由于它的日志最新，所以再次成为主节点</li>
+<li><code>S1</code> 收到新的客户端请求 <code>C4</code></li>
+<li><code>S1</code> 调用 <code>Start()</code> 方法并返回日志索引2给 <code>C4</code>（在之前的步骤中，日志索引2也返回给了 <code>C2</code>）</li>
+<li><code>S1</code> 在给其他从节点发送 <code>AppendEntries</code> 请求前发生异常，此时 <code>S2</code> 成为候选节点</li>
+<li><code>S1</code> 和 <code>S3</code> 不会投票给 <code>S2</code>，但是 <code>S4</code> 和 <code>S5</code> 会，所以 <code>S2</code> 成为新的主节点</li>
+<li><code>S2</code> 收到新的客户端请求 <code>C5</code></li>
+<li><code>S2</code> 调用 <code>Start()</code> 方法并返回日志索引3给 <code>C5</code></li>
+<li><code>S2</code> 成功将 <code>AppendEntries</code> 请求发送给其他所有从节点，在后续的心跳中，<code>leaderCommit = 3</code></li>
+</ol>
+<p>最终 <code>S2</code> 的日志为 <code>[C1, C2, C5]</code>，此时所有节点在索引位置2处的日志为 <code>C2</code>，这就为开头的两个观点提供了反例：<code>Start()</code> 方法可能返回重复的日志索引，以及遇到重复的索引时不代表前一个相同索引的日志所对应的请求已经执行失败。</p>
+<h3 id="四方死锁"><a class="markdownIt-Anchor" href="#四方死锁"></a> 四方死锁</h3>
+<p>课程的另一个助教 <a target="_blank" rel="noopener" href="https://stebalien.com/">Steven Allen</a> 发现在实现 <code>Lab 3</code> 时很容易遇到一个四方死锁问题。</p>
+<p>不管具体的 <code>Raft</code> 代码如何实现，一般来说都会有一个类似于 <code>Raft.Start()</code> 的方法来使得应用程序添加日志，以及很有可能有一个单独的线程将位于 <code>[lastApplied + 1, commitIndex]</code> 范围内的日志通过 <code>apply()</code> 方法发送给应用程序（<a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a> 这篇文章写于2016年，在最新的课程中 <code>Raft</code> 通过 <code>applyCh</code> 来发送日志）。这两个方法很可能都需要持有锁 <code>a</code>。而在应用程序中，很可能会在某个 <code>RPC</code> 中调用 <code>Raft.Start()</code> 方法，然后同样可能有个线程会等待 <code>Raft</code> 的日志应用通知，当这个线程收到通知后，就可以响应客户端。由于这两个方法需要通信（例如，<code>RPC</code> 方法需要知道什么时候客户端请求执行完成），所以很可能也都需要持有锁 <code>b</code>。</p>
+<p>上述的方法用 <code>Go</code> 描述如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *App)</span> <span class="title">RPC</span><span class="params">(args <span class="keyword">interface</span>&#123;&#125;, reply <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    a.mutex.Lock()</span><br><span class="line">    i := a.raft.Start(args)</span><br><span class="line">    <span class="comment">// update some data structure so that apply knows to poke us later</span></span><br><span class="line">    a.mutex.Unlock()</span><br><span class="line">    <span class="comment">// wait for apply to poke us</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Raft)</span> <span class="title">Start</span><span class="params">(cmd <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">    r.mutex.Lock()</span><br><span class="line">    <span class="comment">// do things to start agreement on this new command</span></span><br><span class="line">    <span class="comment">// store index in the log where cmd was placed</span></span><br><span class="line">    r.mutex.Unlock()</span><br><span class="line">    <span class="keyword">return</span> index</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *App)</span> <span class="title">apply</span><span class="params">(index <span class="keyword">int</span>, cmd <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">    a.mutex.Lock()</span><br><span class="line">    <span class="keyword">switch</span> cmd := cmd.(<span class="keyword">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> GetArgs:</span><br><span class="line">        <span class="comment">// do the get</span></span><br><span class="line">	<span class="comment">// see who was listening for this index</span></span><br><span class="line">	<span class="comment">// poke them all with the result of the operation</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    a.mutex.Unlock()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Raft)</span> <span class="title">AppendEntries</span><span class="params">(...)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    r.mutex.Lock()</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">for</span> r.lastApplied &lt; r.commitIndex &#123;</span><br><span class="line">      r.lastApplied++</span><br><span class="line">      r.app.apply(r.lastApplied, r.log[r.lastApplied])</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    r.mutex.Unlock()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设此时系统处于以下状态：</p>
+<ul>
+<li><code>App.RPC</code> 获取锁 <code>a.mutex</code> 然后调用 <code>Raft.Start</code></li>
+<li><code>Raft.Start</code> 正在等待锁 <code>r.mutex</code></li>
+<li><code>Raft.AppendEntries</code> 持有锁 <code>r.mutex</code>，然后调用 <code>App.apply</code></li>
+</ul>
+<p>此时就发生了死锁，因为：</p>
+<ul>
+<li><code>Raft.AppendEntries</code> 在 <code>App.apply</code> 返回前无法释放锁 <code>r.mutex</code></li>
+<li><code>App.apply</code> 在获取锁 <code>a.mutex</code> 前无法返回</li>
+<li><code>a.mutex</code> 在 <code>App.RPC</code> 返回前无法被释放</li>
+<li><code>App.RPC</code> 在 <code>Raft.Start</code> 返回前无法返回</li>
+<li><code>Raft.Start</code> 在获取锁 <code>r.mutex</code> 前无法返回</li>
+<li><code>Raft.Start</code> 需要等待 <code>Raft.AppendEntries</code> 释放锁 <code>r.mutex</code></li>
+</ul>
+<p>有几种方法来避免死锁。其中最简单的就是在 <code>App.RPC</code> 中，调用 <code>a.raft.Start</code> 之后再尝试获取锁。不过这可能会带来个问题，在 <code>a.raft.Start(args)</code> 和 <code>a.mutex.Lock()</code> 执行之间可能触发 <code>app.Apply</code>，造成错失日志通知。所以另一种方法是从 <code>Raft.AppendEntries</code> 中分离出 <code>r.app.apply</code>，由一个单独的线程来调用 <code>r.app.apply</code>，这就保证了服务端不会错过日志的通知，同时又避免了死锁。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://thesquareplanet.com/blog/students-guide-to-raft/">Students’ Guide to Raft</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/05/25/mit-6.824-chain-replication/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1957,113 +2086,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/04/04/mit-6.824-lab1-go-rpc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/04/mit-6.824-lab1-go-rpc/" class="post-title-link" itemprop="url">MIT 6.824 - Lab 1 (4): Go RPC</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-04-04 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-04T00:00:00+08:00">2022-04-04</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>2.8k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>5 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><code>Lab 1</code> 虽然是个单机器多线程、多进程的程序，但主节点和工作节点的交互依然通过 <code>RPC</code> 实现，<code>Go</code> 本身也提供了开箱即用的 <code>RPC</code> 功能，下面将通过一个简单的求和服务来了解在 <code>Go</code> 中如何实现一个 <code>RPC</code> 服务。</p>
-<h2 id="定义请求体和响应体"><a class="markdownIt-Anchor" href="#定义请求体和响应体"></a> 定义请求体和响应体</h2>
-<p>请求体和响应体都非常简单，<code>SumRequest</code> 中包含要求和的两个数字，<code>SumReply</code> 中存放求和的结果：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> pb</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">	A <span class="keyword">int</span></span><br><span class="line">	B <span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> SumReply <span class="keyword">struct</span> &#123;</span><br><span class="line">	Result <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="服务端"><a class="markdownIt-Anchor" href="#服务端"></a> 服务端</h2>
-<p>首先定义服务类 <code>SumService</code> 和提供的方法：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SumService <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(sumService *SumService)</span> <span class="title">Sum</span><span class="params">(sumRequest *pb.SumRequest, sumReplay *pb.SumReply)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	sumReplay.Result = sumRequest.A + sumRequest.B</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>SumService</code> 只有一个 <code>Sum</code> 方法，接收 <code>SumRequest</code> 和 <code>SumReply</code> 两个参数，求和后将结果放回到 <code>SumReply</code> 中（<code>Sum</code> 的方法签名必须是这样的形式，即两个入参和一个 <code>error</code> 类型的出参，具体规则见下文描述）。</p>
-<p>然后进行服务注册：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sumService := &amp;SumService&#123;&#125;</span><br><span class="line">rpc.Register(sumService)</span><br><span class="line">rpc.HandleHTTP()</span><br></pre></td></tr></table></figure>
-<p>通过 <code>rpc.Register</code> 这个方法可以知道，一个服务类及其提供的方法必须满足以下条件才能注册成功：</p>
-<ol>
-<li>服务类必须是公共的</li>
-<li>服务类提供的方法必须是公共的</li>
-<li>服务类提供的方法入参必须是两个，一个表示请求，一个表示响应（从编码的角度来说方法入参是两个，但是实际代码是判断是否等于3个，因为在这种场景下定义的方法的第一个入参类似于 <code>Java</code> 中的 <code>this</code>）</li>
-<li>服务类提供的方法的第一个参数类型必须是公共的或者是 <code>Go</code> 内置的数据类型</li>
-<li>服务类提供的方法的第二个参数类型也必须是公共的或者是 <code>Go</code> 内置的数据类型，且必须是指针类型</li>
-<li>服务类提供的方法的出参个数只能是1个</li>
-<li>服务类提供的方法的出参类型必须是 <code>error</code></li>
-</ol>
-<p>而 <code>rpc.HandleHTTP()</code> 表示通过 <code>HTTP</code> 作为客户端和服务端间的通信协议，当客户端发起一个 <code>RPC</code> 调用时，本质上是将要调用的方法和参数包装成一个 <code>HTTP</code> 请求，服务端收到 <code>HTTP</code> 请求后，解码出要调用的本地方法名称和入参，然后调用本地方法，在本地方法调用完成后再将结果写入到 <code>HTTP</code> 响应中，客户端收到响应后，再解析出远程调用的结果。</p>
-<p><code>rpc.HandleHTTP()</code> 本质上是个 <code>HTTP</code> 路由注册，实际上是调用 <code>Handle(pattern string, handler Handler)</code> 方法，当请求路由匹配 <code>pattern</code> 时，会调用对应的 <code>handler</code> 执行，对于 <code>Go RPC</code> 来说，固定路由路径是 <code>/_goRPC_</code>。</p>
-<p>所以，在完成 <code>HTTP</code> 路由注册后，还需要配合开启一个 <code>HTTP</code> 服务，这样才能接受远程服务调用：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">listener, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;listen error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Listening on port 1234&quot;</span>)</span><br><span class="line">http.Serve(listener, <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure>
-<p><code>http.Serve</code> 方法中对于每一个客户端的连接，最终会分配一个 <code>goroutine</code> 来调用 <code>Handler</code> 的 <code>ServeHTTP(ResponseWriter, *Request)</code> 方法来处理，对于 <code>Go</code> 的 <code>RPC</code> 包来说，则可以实现该方法来处理 <code>RPC</code> 请求：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ServeHTTP implements an http.Handler that answers RPC requests.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(server *Server)</span> <span class="title">ServeHTTP</span><span class="params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> req.Method != <span class="string">&quot;CONNECT&quot;</span> &#123;</span><br><span class="line">		w.Header().Set(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;text/plain; charset=utf-8&quot;</span>)</span><br><span class="line">		w.WriteHeader(http.StatusMethodNotAllowed)</span><br><span class="line">		io.WriteString(w, <span class="string">&quot;405 must CONNECT\n&quot;</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	conn, _, err := w.(http.Hijacker).Hijack()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Print(<span class="string">&quot;rpc hijacking &quot;</span>, req.RemoteAddr, <span class="string">&quot;: &quot;</span>, err.Error())</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	io.WriteString(conn, <span class="string">&quot;HTTP/1.0 &quot;</span>+connected+<span class="string">&quot;\n\n&quot;</span>)</span><br><span class="line">	server.ServeConn(conn)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="客户端"><a class="markdownIt-Anchor" href="#客户端"></a> 客户端</h2>
-<p>对于客户端来说，发起远程方法调用前需要先和服务端建立连接：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">client, err := rpc.DialHTTP(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:1234&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;dialing:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">defer</span> client.Close()</span><br></pre></td></tr></table></figure>
-<p>该方法同时返回了一个 <code>RPC</code> 客户端类，内部同时负责对 <code>RPC</code> 请求的编码和解码。</p>
-<p>然后通过 <code>client.Call</code> 来发起远程调用：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sumRequest := &amp;pb.SumRequest&#123;</span><br><span class="line">	A: <span class="number">1</span>,</span><br><span class="line">	B: <span class="number">2</span>,</span><br><span class="line">&#125;</span><br><span class="line">sumReply := &amp;pb.SumReply&#123;&#125;</span><br><span class="line">err = client.Call(<span class="string">&quot;SumService.Sum&quot;</span>, sumRequest, sumReply)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(<span class="string">&quot;call error:&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">&quot;Result:&quot;</span>, sumReply.Result)</span><br></pre></td></tr></table></figure>
-<p>这里的调用一共有三个参数，第一个是被调用的远程方法名，需要是 <code>类名.方法名</code> 的形式，后两个则是远程方法的约定入参。</p>
-<p>完整的代码可参考 <a target="_blank" rel="noopener" href="https://github.com/Frederick-S/go-rpc-demo">go-rpc-demo</a>。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2133,7 +2155,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">74</span>
+          <span class="site-state-item-count">75</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
