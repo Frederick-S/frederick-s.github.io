@@ -5,7 +5,7 @@ tags:
 
 `AWS` `EC2` 的监控页面默认没有显示内存使用率，需要搭配 `CloudWatch` 配置使用。
 
-由于需要在 `EC2` 上安装 `CloudWatch agent` 来上报监控数据到 `CloudWatch`，所以需要先为 `EC2` 配置 `IAM` 角色来授予需要的权限。创建 `IAM` 角色时，在第一步的 `Trusted entity type` 选择 `AWS service`，`Use case` 选择 `EC2`；在第二步的 `Permissions policies` 添加 `CloudWatchFullAccess`，更多细节可参考 [Create IAM roles and users for use with CloudWatch agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-iam-roles-for-cloudwatch-agent-commandline.html)。
+由于需要在 `EC2` 上安装 `CloudWatch agent` 来上报监控数据到 `CloudWatch`，所以需要先为 `EC2` 配置 `IAM` 角色来授予需要的权限。创建 `IAM` 角色时，在第一步的 `Trusted entity type` 选择 `AWS service`，`Use case` 选择 `EC2`；在第二步的 `Permissions policies` 添加 `CloudWatchAgentServerPolicy` 即可。更多细节可参考 [Create IAM roles and users for use with CloudWatch agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-iam-roles-for-cloudwatch-agent-commandline.html)。
 
 接着，在 [Download and configure the CloudWatch agent using the command line](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/download-cloudwatch-agent-commandline.html) 中根据实际 `EC2` 的操作系统下载和安装 `CloudWatch agent`，这里以 `ARM64` 的 `Ubuntu` 系统为例：
 
