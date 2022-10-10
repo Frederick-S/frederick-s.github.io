@@ -80,7 +80,7 @@ EC2RoleRequestError: no EC2 instance role found
 caused by: EC2MetadataError: failed to make EC2Metadata request
 ```
 
-最后，本文只监控了内存使用率，如果想要添加更多的监控，可以参考 [Metrics collected by the CloudWatch agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-collected-by-CloudWatch-agent.html) 添加相应的指标。
+最后，如果想要添加更多的监控指标，可以参考 [Metrics collected by the CloudWatch agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-collected-by-CloudWatch-agent.html) 添加相应的指标。
 
 ## 参考
 * [How to monitor memory usage on AWS EC2 ??](https://lepczynski.it/en/aws_en/how-to-monitor-memory-usage-on-aws-ec2/)
