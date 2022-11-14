@@ -243,6 +243,7 @@ private void Initialize(string text)
     var variablesSection = this.CodeBuilder.AddSection();
 
     // 解析 text
+    // ...
 
     foreach (string variableName in new HashSet<string>(this.AllVariables.Except(this.LoopVariables)))
     {
