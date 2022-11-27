@@ -93,6 +93,51 @@ POST /users/{userId}/mails
 2. 指明了版本号，`v3`
 3. 对资源名称进行了 `URL` 转义
 
+对于资源定义来说，第一个字段应该命名为 `name`，类型为字符串，用于表示资源的名称，以下是 `gRPC` 服务的定义：
+
+```
+// 图书馆服务
+service LibraryService {
+  // 获取一本书
+  rpc GetBook(GetBookRequest) returns (Book) {
+    option (google.api.http) = {
+      get: "/v1/{name=shelves/*/books/*}"
+    };
+  };
+
+  // 创建一本书
+  rpc CreateBook(CreateBookRequest) returns (Book) {
+    option (google.api.http) = {
+      post: "/v1/{parent=shelves/*}/books"
+      body: "book"
+    };
+  };
+}
+
+// 资源定义
+message Book {
+  // 资源名称，必须以 "shelves/*/books/*" 的形式。
+  // 例如，"shelves/shelf1/books/book2"。
+  string name = 1;
+
+  // ... 其他属性
+}
+
+// 获取书籍请求
+message GetBookRequest {
+  // 资源名称，例如 "shelves/shelf1/books/book2"。
+  string name = 1;
+}
+
+// 创建书籍请求
+message CreateBookRequest {
+  // 父资源的名称，例如 "shelves/shelf1"。
+  string parent = 1;
+  // 需要创建的资源实体，客户端不允许设置 `Book.name` 属性。
+  Book book = 2;
+}
+```
+
 ## 标准方法
 
 
