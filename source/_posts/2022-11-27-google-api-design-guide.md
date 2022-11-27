@@ -88,7 +88,10 @@ POST /users/{userId}/mails
 
 > 对于 `Google` 的服务来说，资源集合 `ID` 还会经常出现在自动生成的客户端类库代码中，所以它们的命名也必须是合法的 `C/C++` 标识符。
 
-完整的资源名称是协议无关的，虽然它看起来像 `RESTful` 服务的 `HTTP` 接口请求路径，但本质上这是两个东西。
+完整的资源名称是协议无关的，虽然它看起来像 `RESTful` 服务的 `HTTP` 接口请求路径，但本质上这是两个东西。实际的资源请求还需要附带版本号，协议等信息，例如对于资源名称 `//calendar.googleapis.com/users/john smith/events/123`，实际的 `RESTful` 请求路径可能是 `https://calendar.googleapis.com/v3/users/john%20smith/events/123`，和原本的资源名称相比有三点不同：
+1. 指明了具体的协议，`HTTPS`
+2. 指明了版本号，`v3`
+3. 对资源名称进行了 `URL` 转义
 
 ## 标准方法
 
