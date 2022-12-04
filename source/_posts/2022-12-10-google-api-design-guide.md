@@ -147,6 +147,28 @@ message CreateBookRequest {
 4. 限制了 `API` 设计的灵活性，如提供可复用的 `API` 接口
 
 ## 标准方法
+`Google APIs` 设计了5种标准方法：
+
+1. `List`
+2. `Get`
+3. `Create`
+4. `Update`
+5. `Delete`
+
+标准方法的作用在于为大多数的场景提供统一、易用的接口，超过 70% 的 `Google APIs` 都是标准方法。下表是标准方法和 `HTTP` 请求方法的映射：
+
+|标准方法   |`HTTP` 请求方法映射   |`HTTP` 请求体   |`HTTP` 响应体   |
+|---|---|---|---|
+|List   |Get <资源集合 `URL`>   |无   |资源集合   |
+|Get   |GET <资源 `URL`>   |无   |资源   |
+|Create   |POST <资源集合 `URL`>   |资源   |资源   |
+|Update   |PUT 或者 PATCH <资源 `URL`>   |资源   |资源   |
+|Delete   |DELETE <资源 `URL`>   |无   |空   |
+
+> `HTTP` 响应体返回的资源可能不会包含资源的全部字段，例如客户端请求时可以指定只返回需要的字段。
+> 如果 `Delete` 操作不是立即删除资源，例如只是更新资源的某个字段标记或者是创建一个 [长时间运行任务](https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto) 来删除资源，则 `HTTP` 响应体应该包含修改后的资源或者任务信息。
+
+### List
 
 
 TODO:
