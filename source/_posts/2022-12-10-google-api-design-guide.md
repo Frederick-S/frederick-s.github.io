@@ -147,7 +147,7 @@ message CreateBookRequest {
 4. 限制了 `API` 设计的灵活性，如提供可复用的 `API` 接口
 
 ## 标准方法
-`Google APIs` 设计了5种标准方法：
+标准方法的作用在于为大多数的服务场景提供统一、易用的接口，超过 70% 的 `Google APIs` 都是标准方法。`Google APIs` 设计了5种标准方法：
 
 1. `List`
 2. `Get`
@@ -155,7 +155,7 @@ message CreateBookRequest {
 4. `Update`
 5. `Delete`
 
-标准方法的作用在于为大多数的场景提供统一、易用的接口，超过 70% 的 `Google APIs` 都是标准方法。下表是标准方法和 `HTTP` 请求方法的映射：
+下表是标准方法和 `HTTP` 请求方法的映射：
 
 |标准方法   |`HTTP` 请求方法映射   |`HTTP` 请求体   |`HTTP` 响应体   |
 |---|---|---|---|
@@ -169,7 +169,7 @@ message CreateBookRequest {
 > 如果 `Delete` 操作不是立即删除资源，例如只是更新资源的某个字段标记或者是创建一个 [长时间运行任务](https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto) 来删除资源，则 `HTTP` 响应体应该包含修改后的资源或者任务信息。
 
 ### List
-
+`List` 接口用于返回一系列同类的资源，同时该接口支持额外的参数从而只返回匹配的资源。
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
