@@ -176,40 +176,44 @@ message CreateBookRequest {
 `List` 方法和 `HTTP` 请求的映射关系如下：
 
 * `List` 方法必须对应 `HTTP` 的 `GET` 请求
-* `List` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源集合名称）应该和 `HTTP` 的请求路径匹配，如果相匹配，则 `HTTP` 请求路径的最后一个段必须是字面量（即资源集合的 `ID`）
+* `List` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源集合名称）应该和 `HTTP` 的请求路径匹配，如果相匹配，则 `HTTP` 请求路径的最后一个段必须是字面量（即资源集合 `ID`）
 * `List` 方法的 `RPC` 请求参数的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
 * 对应的 `HTTP` 请求无请求体；`List` 的 `API` 定义中不允许声明 `body` 语句
 * `HTTP` 响应体应该包含一组资源及可选的元数据信息
 
+例如：
+
 ```
 // 获取书架上的书
 rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
-  // List method maps to HTTP GET.
+  // List 方法映射为 HTTP GET 请求
   option (google.api.http) = {
-    // The `parent` captures the parent resource name, such as "shelves/shelf1".
+    // parent 对应父资源的名称，如 shelves/shelf1
     get: "/v1/{parent=shelves/*}/books"
   };
 }
 
+// 获取书籍集合请求
 message ListBooksRequest {
-  // The parent resource name, for example, "shelves/shelf1".
+  // 父资源的名称，如shelves/shelf1
   string parent = 1;
 
-  // The maximum number of items to return.
+  // 返回资源的最大个数
   int32 page_size = 2;
 
-  // The next_page_token value returned from a previous List request, if any.
+  // 返回第几页的资源集合，其值为前一个 List 请求返回的 next_page_token 字段
   string page_token = 3;
 }
 
+// 获取书籍集合响应
 message ListBooksResponse {
   // The field name should match the noun "books" in the method name.  There
   // will be a maximum number of items returned based on the page_size field
   // in the request.
+  // 返回的书籍资源集合，该字段名应该和方法名中的 Books 相匹配。其数量上限由 ListBooksRequest 中的 page_size 决定
   repeated Book books = 1;
 
-  // Token to retrieve the next page of results, or empty if there are no
-  // more results in the list.
+  // 下一页资源集合的页码信息，用于获取下一页的资源集合；没有下一页时为空
   string next_page_token = 2;
 }
 ```
