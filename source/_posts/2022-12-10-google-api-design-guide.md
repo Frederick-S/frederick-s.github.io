@@ -169,7 +169,50 @@ message CreateBookRequest {
 > 如果 `Delete` 操作不是立即删除资源，例如只是更新资源的某个字段标记或者是创建一个 [长时间运行任务](https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto) 来删除资源，则 `HTTP` 响应体应该包含修改后的资源或者任务信息。
 
 ### List
-`List` 接口用于返回一系列同类的资源，同时该接口支持额外的参数从而只返回匹配的资源。
+`List` 方法用于返回一系列同类的资源，同时该接口支持额外的参数从而允许只返回匹配的资源。它适合用于获取有限大小、未缓存的单一资源集合，对于更复杂的场景则可以考虑使用自定义方法中的 `Search` 接口。
+
+如果想要批量获取资源，例如入参一组资源 `ID` 来返回每个资源 `ID` 所对应的资源，则应该考虑实现 `BatchGet` 的自定义方法，而不是在 `List` 方法上扩展。
+
+`List` 方法和 `HTTP` 请求的映射关系如下：
+
+* `List` 方法必须对应 `HTTP` 的 `GET` 请求
+* `List` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源集合名称）应该和 `HTTP` 的请求路径匹配，如果相匹配，则 `HTTP` 请求路径的最后一个段必须是字面量（即资源集合的 `ID`）
+* `List` 方法的 `RPC` 请求参数的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
+* 对应的 `HTTP` 请求无请求体；`List` 的 `API` 定义中不允许声明 `body` 语句
+* `HTTP` 响应体应该包含一组资源及可选的元数据信息
+
+```
+// 获取书架上的书
+rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
+  // List method maps to HTTP GET.
+  option (google.api.http) = {
+    // The `parent` captures the parent resource name, such as "shelves/shelf1".
+    get: "/v1/{parent=shelves/*}/books"
+  };
+}
+
+message ListBooksRequest {
+  // The parent resource name, for example, "shelves/shelf1".
+  string parent = 1;
+
+  // The maximum number of items to return.
+  int32 page_size = 2;
+
+  // The next_page_token value returned from a previous List request, if any.
+  string page_token = 3;
+}
+
+message ListBooksResponse {
+  // The field name should match the noun "books" in the method name.  There
+  // will be a maximum number of items returned based on the page_size field
+  // in the request.
+  repeated Book books = 1;
+
+  // Token to retrieve the next page of results, or empty if there are no
+  // more results in the list.
+  string next_page_token = 2;
+}
+```
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
