@@ -207,9 +207,6 @@ message ListBooksRequest {
 
 // 获取书籍集合响应
 message ListBooksResponse {
-  // The field name should match the noun "books" in the method name.  There
-  // will be a maximum number of items returned based on the page_size field
-  // in the request.
   // 返回的书籍资源集合，该字段名应该和方法名中的 Books 相匹配。其数量上限由 ListBooksRequest 中的 page_size 决定
   repeated Book books = 1;
 
@@ -217,6 +214,9 @@ message ListBooksResponse {
   string next_page_token = 2;
 }
 ```
+
+### Get
+
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
