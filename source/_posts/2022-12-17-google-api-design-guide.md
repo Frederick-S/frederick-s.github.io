@@ -246,7 +246,13 @@ message GetBookRequest {
 ```
 
 ### Create
+`Create` 方法接收一个父资源名称，一个资源实体，以及其他的参数来在指定的父资源下创建一个新的资源，并返回创建的资源。
 
+如果某个 `API` 服务支持创建资源，则应当为每一类的资源创建对应的 `Create` 方法。
+
+`Create` 方法和 `HTTP` 请求的映射关系如下：
+
+* `Create` 方法必须对应 `HTTP` 的 `POST` 请求
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
