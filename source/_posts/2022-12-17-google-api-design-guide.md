@@ -178,7 +178,7 @@ message CreateBookRequest {
 * `List` 方法必须对应 `HTTP` 的 `GET` 请求
 * `List` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源集合名称）应该和 `HTTP` 的请求路径匹配，如果相匹配，则 `HTTP` 请求路径的最后一个段必须是字面量（即资源集合 `ID`）
 * `List` 方法的 `RPC` 请求参数的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
-* 对应的 `HTTP` 请求无请求体；`List` 的 `API` 定义中不允许声明 `body` 语句
+* 对应的 `HTTP` 请求无请求体；`List` 方法的 `API` 定义中不允许声明 `body` 语句
 * `HTTP` 响应体应该包含一组资源及可选的元数据信息
 
 例如：
@@ -216,6 +216,36 @@ message ListBooksResponse {
 ```
 
 ### Get
+`Get` 方法接收一个资源名称及其他参数来返回某个指定的资源。
+
+`Get` 方法和 `HTTP` 请求的映射关系如下：
+
+* `Get` 方法必须对应 `HTTP` 的 `GET` 请求
+* `Get` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源名称）应该和 `HTTP` 的请求路径匹配
+* `Get` 方法的 `RPC` 请求参数的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
+* 对应的 `HTTP` 请求无请求体；`Get` 方法的 `API` 定义中不允许声明 `body` 语句
+* `Get` 方法返回的资源实体应该和 `HTTP` 的整个响应体相匹配
+
+例如：
+
+```
+// 获取一本书
+rpc GetBook(GetBookRequest) returns (Book) {
+  // Get 方法映射为 HTTP GET 请求，资源名称映射到请求路径，无请求体
+  option (google.api.http) = {
+    // 所请求的资源名称，如 shelves/shelf1/books/book2
+    get: "/v1/{name=shelves/*/books/*}"
+  };
+}
+
+// 获取单个书籍请求
+message GetBookRequest {
+  // 所请求的资源名称，如 shelves/shelf1/books/book2
+  string name = 1;
+}
+```
+
+### Create
 
 
 TODO:
