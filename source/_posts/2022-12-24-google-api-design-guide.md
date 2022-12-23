@@ -254,7 +254,7 @@ message GetBookRequest {
 
 * `Create` 方法必须对应 `HTTP` 的 `POST` 请求
 * `Create` 方法的 `RPC` 请求消息体应当包含一个 `parent` 字段用于表示所创建的资源的父资源的名称
-* `Create` 方法的 `RPC` 请求消息体中表示资源的实体字段应当和 `HTTP` 请求体中的字段相对应。如果 `Create` 方法定义中标注了 `google.api.http`，则必须声明 `body: "<resource_field>"` 语句
+* `Create` 方法的 `RPC` 请求消息体中表示资源实体的各字段应当和 `HTTP` 请求体中的字段相对应。如果 `Create` 方法定义中标注了 `google.api.http`，则必须声明 `body: "<resource_field>"` 语句
 * `Create` 方法的 `RPC` 请求消息体可能包含一个 `<resource>_id` 字段来允许调用方指定所创建的资源的 `id`。这个字段可能会包含在资源字段实体内
 * `Create` 方法的其余参数应当和 `URL` 的查询参数相匹配
 * `Create` 方法返回的资源实体应该和 `HTTP` 的整个响应体相匹配
