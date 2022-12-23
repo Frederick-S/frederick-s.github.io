@@ -176,8 +176,8 @@ message CreateBookRequest {
 `List` 方法和 `HTTP` 请求的映射关系如下：
 
 * `List` 方法必须对应 `HTTP` 的 `GET` 请求
-* `List` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源集合名称）应该和 `HTTP` 的请求路径匹配，如果相匹配，则 `HTTP` 请求路径的最后一个段必须是字面量（即资源集合 `ID`）
-* `List` 方法的 `RPC` 请求参数的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
+* `List` 方法的 `RPC` 请求消息体的 `name` 字段（也就是资源集合名称）应该和 `HTTP` 的请求路径匹配，如果相匹配，则 `HTTP` 请求路径的最后一个段必须是字面量（即资源集合 `ID`）
+* `List` 方法的 `RPC` 请求消息体的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
 * 对应的 `HTTP` 请求无请求体；`List` 方法的 `API` 定义中不允许声明 `body` 语句
 * `HTTP` 响应体应该包含一组资源及可选的元数据信息
 
@@ -221,8 +221,8 @@ message ListBooksResponse {
 `Get` 方法和 `HTTP` 请求的映射关系如下：
 
 * `Get` 方法必须对应 `HTTP` 的 `GET` 请求
-* `Get` 方法的 `RPC` 请求参数的 `name` 字段（也就是资源名称）应该和 `HTTP` 的请求路径匹配
-* `Get` 方法的 `RPC` 请求参数的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
+* `Get` 方法的 `RPC` 请求消息体的 `name` 字段（也就是资源名称）应该和 `HTTP` 的请求路径匹配
+* `Get` 方法的 `RPC` 请求消息体的其他字段应该和 `HTTP` 请求路径的查询参数相匹配
 * 对应的 `HTTP` 请求无请求体；`Get` 方法的 `API` 定义中不允许声明 `body` 语句
 * `Get` 方法返回的资源实体应该和 `HTTP` 的整个响应体相匹配
 
@@ -253,6 +253,11 @@ message GetBookRequest {
 `Create` 方法和 `HTTP` 请求的映射关系如下：
 
 * `Create` 方法必须对应 `HTTP` 的 `POST` 请求
+* `Create` 方法的 `RPC` 请求消息体应当包含一个 `parent` 字段用于表示所创建的资源的父资源的名称
+* `Create` 方法的 `RPC` 请求消息体中表示资源的实体字段应当和 `HTTP` 请求体中的字段相对应。如果 `Create` 方法定义中标注了 `google.api.http`，则必须声明 `body: "<resource_field>"` 语句
+* `Create` 方法的 `RPC` 请求消息体可能包含一个 `<resource>_id` 字段来允许调用方指定所创建的资源的 `id`。这个字段可能会包含在资源字段实体内
+* `Create` 方法的其余参数应当和 `URL` 的查询参数相匹配
+* `Create` 方法返回的资源实体应该和 `HTTP` 的整个响应体相匹配
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
