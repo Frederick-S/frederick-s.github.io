@@ -354,7 +354,7 @@ message UpdateBookRequest {
 ### Delete
 `Delete` 方法接受一个资源名称和其他参数来删除或者计划删除某个指定的资源。`Delete` 方法返回的消息体类型应当为 `google.protobuf.Empty`。
 
-服务调用方不应该依赖 `Delete` 方法返回的任何信息，因为 `Delete` 方法不能被重复调用。
+服务调用方不应该依赖 `Delete` 方法返回的任何信息，因为 `Delete` 方法被重复调用时不一定每次都返回相同的信息。
 
 `Delete` 方法和 `HTTP` 请求的映射关系如下：
 
@@ -366,8 +366,29 @@ message UpdateBookRequest {
 * 如果 `Delete` 方法在实现时是创建一个 [长时间运行任务](https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto) 来删除资源，则该方法返回的消息体应当为对应的任务信息
 * 如果 `Delete` 方法在实现时仅将资源标记为删除而不是物理删除，则该方法应当返回更新后的资源
 
+`Delete` 方法应当是幂等的，但并不要求每次都返回相同的信息。对同一个资源的多个 `Delete` 请求应当使得该资源（最终）被删除，不过只有第一个成功删除资源的请求应当返回相应的成功信息，其余的请求应当返回 `google.rpc.Code.NOT_FOUND` 错误码。
+
+接口定义示例：
+
+```
+// 删除一本书
+rpc DeleteBook(DeleteBookRequest) returns (google.protobuf.Empty) {
+  // Delete 方法对应 HTTP 的 DELETE 请求，资源名称映射到请求路径，无 HTTP 请求体
+  option (google.api.http) = {
+    // 请求路径包含了需要删除的资源名称，例如 shelves/shelf1/books/book2
+    delete: "/v1/{name=shelves/*/books/*}"
+  };
+}
+
+// 删除书籍请求
+message DeleteBookRequest {
+  // 需要被删除的资源名称，如 shelves/shelf1/books/book2
+  string name = 1;
+}
+```
+
 TODO:
-2. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
+1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
