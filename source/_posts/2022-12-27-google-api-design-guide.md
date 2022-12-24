@@ -286,7 +286,7 @@ message CreateBookRequest {
   string book_id = 3;
 
   // 需要创建的资源
-  // 字段名称需要和方法中的名词对应，即 book -> Book
+  // 字段名称需要和 RPC 方法中的名词对应，即 book -> Book
   Book book = 2;
 }
 
@@ -305,7 +305,15 @@ message CreateShelfRequest {
 ```
 
 ### Update
+`Update` 方法接收一个资源实体，以及其他的参数来更新指定的资源及其属性，并返回更新后的资源。
 
+资源的可变属性应当能够通过 `Update` 方法修改，除非该属性包含资源的名称或父资源的名称。资源重命名或者将资源移动到另一个父资源下都不允许在 `Update` 方法中实现，而应当由自定义方法来实现。
+
+`Update` 方法和 `HTTP` 请求的映射关系如下：
+
+* 标准的 `Update` 方法应该能够支持更新资源的部分属性，并通过 `update_mask` 字段来指明需要更新的属性，对应的 `HTTP` 请求方法为 `PATCH`。资源实体中标注为 `Output only` 的属性应该在资源更新时忽略
+* 如果要求 `Update` 方法实现更为高级的局部更新语义则应当将其作为自定义方法来实现，例如追加新值到资源的某个列表类型的属性上
+* 如果 `Update` 方法不支持局部属性更新，则对应的 `HTTP` 请求方法必须是 `PUT`。不过不建议 `Update` 方法仅支持全局更新，因为后续如果为资源添加新的属性则可能会有后向兼容问题
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
