@@ -181,7 +181,7 @@ message CreateBookRequest {
 * 对应的 `HTTP` 请求无请求体；`List` 方法的 `API` 定义中不允许声明 `body` 语句
 * `HTTP` 响应体应该包含一组资源及可选的元数据信息
 
-例如：
+接口定义示例：
 
 ```
 // 获取书架上的书
@@ -226,7 +226,7 @@ message ListBooksResponse {
 * 对应的 `HTTP` 请求无请求体；`Get` 方法的 `API` 定义中不允许声明 `body` 语句
 * `Get` 方法返回的资源实体应该和 `HTTP` 的整个响应体相匹配
 
-例如：
+接口定义示例：
 
 ```
 // 获取一本书
@@ -260,6 +260,52 @@ message GetBookRequest {
 * `Create` 方法返回的资源实体应该和 `HTTP` 的整个响应体相匹配
 
 如果 `Create` 方法允许由调用方指定所创建的资源的名称，并且该资源已经存在，则该请求应当作失败处理并返回错误码 `ALREADY_EXISTS`；或者由服务端重新生成一个资源名称，并返回创建的资源，同时接口文档应当清晰的标注最终创建的资源的名称有可能和调用方传入的资源名称不同。
+
+`Create` 方法的 `RPC` 请求消息体中必须包含资源实体，这样当资源实体的定义发生变更时，就无需同时变更请求消息体的定义。如果资源实体中的某些字段无法由客户端设置，则必须将其标注为 `Output only` 字段。
+
+接口定义示例：
+
+```
+// 在书架上创建一本书
+rpc CreateBook(CreateBookRequest) returns (Book) {
+  // Create 方法对应 HTTP 的 POST 请求，URL 请求路径为资源集合名称
+  // HTTP 请求体中包含需要创建的资源
+  option (google.api.http) = {
+    // parent 对应父资源的名称，如 shelves/1
+    post: "/v1/{parent=shelves/*}/books"
+    body: "book"
+  };
+}
+
+// 创建书籍请求
+message CreateBookRequest {
+  // 父资源名称
+  string parent = 1;
+
+  // 资源 id
+  string book_id = 3;
+
+  // 需要创建的资源
+  // 字段名称需要和方法中的名词对应，即 book -> Book
+  Book book = 2;
+}
+
+// 创建一个书架
+rpc CreateShelf(CreateShelfRequest) returns (Shelf) {
+  option (google.api.http) = {
+    post: "/v1/shelves"
+    body: "shelf"
+  };
+}
+
+// 创建书架请求
+message CreateShelfRequest {
+  Shelf shelf = 1;
+}
+```
+
+### Update
+
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
