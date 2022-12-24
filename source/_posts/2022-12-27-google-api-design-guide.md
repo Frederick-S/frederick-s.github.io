@@ -314,6 +314,43 @@ message CreateShelfRequest {
 * 标准的 `Update` 方法应该能够支持更新资源的部分属性，并通过 `update_mask` 字段来指明需要更新的属性，对应的 `HTTP` 请求方法为 `PATCH`。资源实体中标注为 `Output only` 的属性应该在资源更新时忽略
 * 如果要求 `Update` 方法实现更为高级的局部更新语义则应当将其作为自定义方法来实现，例如追加新值到资源的某个列表类型的属性上
 * 如果 `Update` 方法不支持局部属性更新，则对应的 `HTTP` 请求方法必须是 `PUT`。不过不建议 `Update` 方法仅支持全局更新，因为后续如果为资源添加新的属性则可能会有后向兼容问题
+* `Update` 方法的 `RPC` 请求消息体中表示资源名称的字段值必须和 `URL` 中的请求路径相匹配。这个资源名称字段可能包含在资源实体内
+* `Update` 方法的 `RPC` 请求消息体中表示资源实体的各字段必须和 `HTTP` 请求体中的字段相对应
+* `Update` 方法的其余参数必须和 `URL` 的查询参数相匹配
+* `Update` 方法的返回结果必须是更新后的资源实体
+
+> `Update` 方法的返回结果必须是更新后的资源实体看起来是多此一举，但是某些资源的属性必须由服务端来更新，例如资源的更新时间，或者对于 `Git` 服务来说文件更新后的版本号等等，这些属性更新后也需要返回给客户端。
+
+如果后端服务允许客户端指定资源名称则 `Update` 方法允许客户端调用时发送一个不存在的资源名称，然后服务端会自动创建一个新的资源。否则，`Update` 方法应当作失败处理并返回 `NOT_FOUND` 的错误码（如果这是唯一的错误的话）。
+
+即使 `Update` 方法本身支持新建资源也应当提供额外的 `Create` 方法，否则服务的使用者可能会感到迷惑。
+
+接口定义示例：
+
+```
+// 更新一本书
+rpc UpdateBook(UpdateBookRequest) returns (Book) {
+  // Update 方法对应 HTTP 的 PATCH 请求，资源名称映射到请求路径
+  // 资源实体包含在 HTTP 请求体中
+  option (google.api.http) = {
+    // 请求路径包含了需要更的资源名称
+    patch: "/v1/{book.name=shelves/*/books/*}"
+    body: "book"
+  };
+}
+
+// 更新书籍请求
+message UpdateBookRequest {
+  // 需要更新的书籍
+  Book book = 1;
+
+  // 指定需要更新的书籍属性，具体定义见 https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+  FieldMask update_mask = 2;
+}
+```
+
+### Delete
+
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
