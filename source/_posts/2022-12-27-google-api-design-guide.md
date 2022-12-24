@@ -333,7 +333,7 @@ rpc UpdateBook(UpdateBookRequest) returns (Book) {
   // Update 方法对应 HTTP 的 PATCH 请求，资源名称映射到请求路径
   // 资源实体包含在 HTTP 请求体中
   option (google.api.http) = {
-    // 请求路径包含了需要更的资源名称
+    // 请求路径包含了需要更新的资源名称
     patch: "/v1/{book.name=shelves/*/books/*}"
     body: "book"
   };
@@ -350,7 +350,9 @@ message UpdateBookRequest {
 ```
 
 ### Delete
+`Delete` 方法接受一个资源名称和其他参数来删除或者计划删除某个指定的资源。`Delete` 方法返回的消息体类型应当为 `google.protobuf.Empty`。
 
+服务调用方不应该依赖 `Delete` 方法返回的任何信息，因为 `Delete` 方法不能被重复调用。
 
 TODO:
 1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
