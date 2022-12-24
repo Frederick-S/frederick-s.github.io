@@ -356,6 +356,16 @@ message UpdateBookRequest {
 
 服务调用方不应该依赖 `Delete` 方法返回的任何信息，因为 `Delete` 方法不能被重复调用。
 
+`Delete` 方法和 `HTTP` 请求的映射关系如下：
+
+* `Delete` 方法必须对应 `HTTP` 的 `DELETE` 请求
+* `Delete` 方法的 `RPC` 请求消息体中表示资源名称的字段值应当和 `URL` 中的请求路径相匹配
+* `Delete` 方法的其余参数应当和 `URL` 的查询参数相匹配
+* 对应的 `HTTP` 请求无请求体；`Delete` 方法的 `API` 定义中不允许声明 `body` 语句
+* 如果 `Delete` 方法在实现时是立即删除资源则该方法返回的消息体为空
+* 如果 `Delete` 方法在实现时是创建一个 [长时间运行任务](https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto) 来删除资源，则该方法返回的消息体应当为对应的任务信息
+* 如果 `Delete` 方法在实现时仅将资源标记为删除而不是物理删除，则该方法应当返回更新后的资源
+
 TODO:
 2. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
