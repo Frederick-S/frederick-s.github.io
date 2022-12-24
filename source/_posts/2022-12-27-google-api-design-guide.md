@@ -319,8 +319,9 @@ message CreateShelfRequest {
 * `Update` 方法的其余参数必须和 `URL` 的查询参数相匹配
 * `Update` 方法的返回结果必须是更新后的资源实体
 
-> `Update` 方法的返回结果必须是更新后的资源实体看起来是多此一举，但是某些资源的属性必须由服务端来更新，例如资源的更新时间，或者对于 `Git` 服务来说文件更新后的版本号等等，这些属性更新后也需要返回给客户端。
 > 既然 URL 中已经有了资源名称，为什么请求体里面还要再传一遍资源名称？关于这一点不同的服务有不同的实现，例如 `DigitalOcean` 的更新接口就不要求请求体中再传一遍 `id`：[Update an App](https://docs.digitalocean.com/reference/api/api-reference/#operation/apps_update)。
+
+> `Update` 方法的返回结果必须是更新后的资源实体看起来是多此一举，但是某些资源的属性必须由服务端来更新，例如资源的更新时间，或者对于 `Git` 服务来说文件更新后的版本号等等，这些属性更新后也需要返回给客户端。
 
 如果后端服务允许客户端指定资源名称则 `Update` 方法允许客户端调用时发送一个不存在的资源名称，然后服务端会自动创建一个新的资源。否则，`Update` 方法应当作失败处理并返回 `NOT_FOUND` 的错误码（如果这是唯一的错误的话）。
 
@@ -356,7 +357,6 @@ message UpdateBookRequest {
 服务调用方不应该依赖 `Delete` 方法返回的任何信息，因为 `Delete` 方法不能被重复调用。
 
 TODO:
-1. 资源更新，/resources/id，实体里就不需要id，见digitalocean api
 2. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
 ## 参考
