@@ -12,5 +12,5 @@ kubectl create deployment hello-arm --image=registry.k8s.io/echoserver-arm:1.8
 
 不过帖子中也有人提到换了镜像之后依然无效，所以也不一定对所有人有用。
 
-## 参考
+参考：
 * [Cannot connect to service from localhost on M1 Mac](https://github.com/kubernetes/minikube/issues/12036)
