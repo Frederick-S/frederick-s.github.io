@@ -413,6 +413,46 @@ https://service.name/v1/some/resource/name:customVerb
 * 如果自定义方法对应的 `HTTP` 请求方法允许 `HTTP` 请求体（如 `POST`，`PUT`，`PATCH` 或者自定义的 `HTTP` 方法），则该自定义方法的 `HTTP` 配置中必须声明 `body: "*"` 语句，并且 `RPC` 消息体中的剩余字段应当和 `HTTP` 请求体中的字段相匹配
 * 如果自定义方法对应的 `HTTP` 请求方法不接受 `HTTP` 请求体（如 `GET`，`DELETE`），则该自定义方法的 `HTTP` 配置中不允许声明 `body` 语句，并且 `RPC` 消息体中的剩余字段应当和 `URL` 的查询参数相匹配
 
+接口定义示例：
+
+```
+// 服务级别的自定义方法
+rpc Watch(WatchRequest) returns (WatchResponse) {
+  // 对应 HTTP 的 POST 请求，所有请求参数都来自于 HTTP 的请求体
+  option (google.api.http) = {
+    post: "/v1:watch"
+    body: "*"
+  };
+}
+
+// 资源集合级别的自定义方法
+rpc ClearEvents(ClearEventsRequest) returns (ClearEventsResponse) {
+  option (google.api.http) = {
+    post: "/v3/events:clear"
+    body: "*"
+  };
+}
+
+// 资源级别的自定义方法
+rpc CancelEvent(CancelEventRequest) returns (CancelEventResponse) {
+  option (google.api.http) = {
+    post: "/v3/{name=events/*}:cancel"
+    body: "*"
+  };
+}
+
+// 一个批量获取资源的自定义方法
+rpc BatchGetEvents(BatchGetEventsRequest) returns (BatchGetEventsResponse) {
+  // 对应 HTTP 的 GET 请求
+  option (google.api.http) = {
+    get: "/v3/events:batchGet"
+  };
+}
+```
+
+### 使用场景
+
+
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
