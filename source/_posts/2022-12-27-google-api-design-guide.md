@@ -647,6 +647,37 @@ message Book {
 
 长时间运行操作可以通过 `Operation.metadata` 字段来反馈其运行进展。`API` 在实现时应当为 `Operation.metadata` 定义消息类型，即使在一开始的实现中不会填充 `metadata` 字段。
 
+### List 方法分页
+支持 `List` 方法的资源集合应当支持分页功能，即使该方法返回的结果集很小。
+
+因为如果一开始 `List` 方法不支持分页，后续增加分页功能就会使得原有 `API` 的行为不一致。客户端在不知道 `List` 方法使用分页的情况下依然会认为该方法返回的是完整的资源集合，而实际上有可能只是返回了第一页的资源。
+
+> 为了兼容旧的逻辑，只能将分页信息设为非必要字段。
+
+为了支持 `List` 方法的分页功能，`API` 应当：
+
+* 在 `List` 方法的请求消息中定义 `string` 类型的 `page_token` 字段。客户端通过该字段来获取指定某页的资源
+* 在 `List` 方法的请求消息中定义 `int32` 类型的 `page_size` 字段。客户端通过该字段来指定每页返回的最大数据量。对于服务端来说，可能会为客户端传入的 `page_size` 大小设置一个上限。如果 `page_size` 的值为0，则由服务端来决定需要返回多少数据
+* 在 `List` 方法的响应消息中定义 `string` 类型的 `next_page_token` 字段。客户端通过该字段来获取下一页的资源，如果 `next_page_token` 的值为 `""`，则表示没有下一页的资源
+
+接口定义示例：
+```
+rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
+
+message ListBooksRequest {
+  string parent = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListBooksResponse {
+  repeated Book books = 1;
+  string next_page_token = 2;
+}
+```
+
+所有分页的实现可能会在响应消息中增加一个 `int32` 类型的 `total_size` 字段来表示资源的总个数。
+
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
