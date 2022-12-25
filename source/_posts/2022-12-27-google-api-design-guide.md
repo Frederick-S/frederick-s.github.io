@@ -566,6 +566,33 @@ message Error {
 #### 客户端类库映射
 不同的编程语言对于错误处理有着不同的准则，客户端类库会尽量去适配这些准则，例如 `google-cloud-go` 遇到错误时会返回和 `google.rpc.Status` 实现了同样接口的错误，而 `google-cloud-java` 则会直接抛出异常。
 
+### 错误处理
+下表列出了 `google.rpc.Code` 定义的所有错误码：
+
+|HTTP   |gRPC   |
+|---|---|---|
+|200   |OK   |   
+|400   |INVALID_ARGUMENT   |   
+|400   |FAILED_PRECONDITION   |   
+|400   |OUT_OF_RANGE   |   
+|401   |UNAUTHENTICATED   |   
+|401   |UNAUTHENTICATED   |   
+|403   |PERMISSION_DENIED   |   
+|404   |NOT_FOUND   |   
+|409   |ABORTED   |   
+|409   |ALREADY_EXISTS   |   
+|429   |RESOURCE_EXHAUSTED   |   
+|499   |CANCELLED   |   
+|500   |DATA_LOSS   |   
+|500   |UNKNOWN   |   
+|500   |INTERNAL   |   
+|501   |NOT_IMPLEMENTED   |   
+|502   |N/A   |   
+|503   |UNAVAILABLE   |   
+|504   |DEADLINE_EXCEEDED   |   
+
+> Google APIs 可能会并发的检查 API 请求是否满足条件，返回某个错误码不代表其他条件都符合要求，应用代码不应该依赖条件检查的顺序。
+
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
