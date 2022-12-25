@@ -507,6 +507,59 @@ message Status {
 * `QuotaFailure`：描述为什么配额分配失败了，可能随错误码 `Code.RESOURCE_EXHAUSTED` 返回
 * `BadRequest`：客户端请求参数非法，可能随错误码 `Code.INVALID_ARGUMENT` 返回
 
+### 错误映射
+`Google APIs` 会被不同的编程环境访问，每个环境有自己的错误处理方式，所以需要将前面描述的错误模型对各个编程环境进行适配和映射。
+
+#### HTTP 映射
+对于 `HTTP` 接口来说，出于后向兼容性的考虑，`Google APIs` 定义了如下的错误模型：
+
+```
+// 适用于 JSON HTTP 接口的错误模型
+message Error {
+  // 废弃字段，仅用于 v1 格式的错误
+  message ErrorProto {}
+  // 和 `google.rpc.Status 有着相同的语义，出于和 Google API Client
+  // Libraries 后向兼容的考虑多了额外的 status 和 errors 字段
+  message Status {
+    // 错误码，同时也是 HTTP 状态码，对应 google.rpc.Status.code
+    int32 code = 1;
+    // 错误信息，对应 google.rpc.Status.message
+    string message = 2;
+    // 废弃字段，仅用于 v1 格式的错误
+    repeated ErrorProto errors = 3;
+    // 错误码的枚举值，对应 google.rpc.Status.code
+    google.rpc.Code status = 4;
+    // 错误详情，对应 google.rpc.Status.details
+    repeated google.protobuf.Any details = 5;
+  }
+  // 实际的错误消息体，之所以要额外包一层也是出于和 Google API Client
+  // Libraries 后向兼容的考虑，同时对于开发人员来说错误信息的可读性更高
+  Status error = 1;
+}
+```
+
+具体示例：
+
+```
+{
+  "error": {
+    "code": 400,
+    "message": "API key not valid. Please pass a valid API key.",
+    "status": "INVALID_ARGUMENT",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+        "reason": "API_KEY_INVALID",
+        "domain": "googleapis.com",
+        "metadata": {
+          "service": "translate.googleapis.com"
+        }
+      }
+    ]
+  }
+}
+```
+
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
