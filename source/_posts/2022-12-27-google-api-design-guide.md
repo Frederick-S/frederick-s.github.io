@@ -458,16 +458,16 @@ rpc BatchGetEvents(BatchGetEventsRequest) returns (BatchGetEventsResponse) {
 
 > 对于 `RESTful` 服务的争论中最常提到的例子就是如何使用 `RESTful` 接口表示注册/登陆？注册/登陆并不适合作为标准方法来实现，使用自定义方法会更好。一般而言，标准方法的应当实现尽量简单直白，一旦需要对标准方法扩展处理额外的逻辑，就需要考虑是否使用自定义方法更合适。
 
-## 异常处理
-异常处理是 `RESTful` 又一个争论的点，即业务异常可能有很多，`HTTP` 的状态码根本不够，以及业务的状态码不应该和协议层的状态码相混淆。
+## 错误处理
+错误处理是 `RESTful` 又一个争论的点，即业务错误可能有很多，`HTTP` 的状态码根本不够，以及业务的状态码不应该和协议层的状态码相混淆。
 
-### 异常模型
-`Google API` 将异常统一封装为 [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto)：
+### 错误模型
+`Google API` 将错误统一封装为 [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto)：
 
 ```
 package google.rpc;
 
-// 适用于不同编程环境的统一异常模型，包括 REST 接口和 RPC 接口
+// 适用于不同编程环境的统一错误模型，包括 REST 接口和 RPC 接口
 message Status {
   // 错误码，具体错误码的定义见 google.rpc.Code
   int32 code = 1;
@@ -480,7 +480,7 @@ message Status {
 }
 ```
 
-由于大部分的 `Google APIs` 都是面向资源的设计，异常处理同样遵循了这样的设计，即使用一系列的标准异常来应对大多数的资源异常场景。例如使用标准的 `google.rpc.Code.NOT_FOUND` 异常来统一表示某个资源不存在，而不是为每一个资源定义一个 `SOME_RESOURCE_NOT_FOUND` 异常。
+由于大部分的 `Google APIs` 都是面向资源的设计，错误处理同样遵循了这样的设计，即使用一系列的标准错误来应对大多数的资源错误场景。例如使用标准的 `google.rpc.Code.NOT_FOUND` 错误来统一表示某个资源不存在，而不是为每一个资源定义一个 `SOME_RESOURCE_NOT_FOUND` 错误。
 
 #### 错误码
 `Google APIs` 必须使用 [google.rpc.Code](https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto) 中定义的错误码，不允许独自额外定义错误码。
@@ -496,6 +496,16 @@ message Status {
 > 错误信息可能会随时变动，应用开发人员不应该强依赖错误信息。
 
 #### 错误详情
+`Google APIs` 定义了一些列标准的 [错误详情](https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto)，这些错误详情覆盖了大部分的错误场景，例如配额分配失败以及无效的参数等等。和错误码一样，开发人员应当尽可能的优先使用标准的错误详情。
+
+只有当错误详情有助于应用代码处理错误的情况下才应该考虑引入新的错误详情。如果当前错误只能由人工处理，则应依据错误信息由开发人员处理，而不是引入额外的错误详情。
+
+以下是一些错误详情类型的例子：
+
+* `ErrorInfo`：提供稳定又可扩展的结构化错误信息
+* `RetryInfo`：告诉客户端什么时候可以对一个失败的请求进行重试，可能随错误码 `Code.UNAVAILABLE` 或者 `Code.ABORTED` 返回
+* `QuotaFailure`：描述为什么配额分配失败了，可能随错误码 `Code.RESOURCE_EXHAUSTED` 返回
+* `BadRequest`：客户端请求参数非法，可能随错误码 `Code.INVALID_ARGUMENT` 返回
 
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
