@@ -867,6 +867,46 @@ message Book {
 ```
 
 ### 单例资源
+当只有一个资源存在于某个父资源下（或服务，如果没有父资源的话）时，则可以使用单例资源。
+
+标准方法的 `Create` 和 `Delete` 方法对单例资源无效，单例资源一般随着父资源的创建而创建，
+随着父资源的删除而删除。单例资源必须通过标准方法的 `Get` 和 `Update` 方法来访问，以及其他适合的自定义方法。
+
+例如，每一个 `User` 资源可以有一个单例的 `Settings` 资源：
+
+```
+rpc GetSettings(GetSettingsRequest) returns (Settings) {
+  option (google.api.http) = {
+    get: "/v1/{name=users/*/settings}"
+  };
+}
+
+rpc UpdateSettings(UpdateSettingsRequest) returns (Settings) {
+  option (google.api.http) = {
+    patch: "/v1/{settings.name=users/*/settings}"
+    body: "settings"
+  };
+}
+
+[...]
+
+message Settings {
+  string name = 1;
+  // 省略其他字段
+}
+
+message GetSettingsRequest {
+  string name = 1;
+}
+
+message UpdateSettingsRequest {
+  Settings settings = 1;
+  // 支持局部更新
+  FieldMask update_mask = 2;
+}
+```
+
+### 流式半关闭
 
 
 ## 参考
