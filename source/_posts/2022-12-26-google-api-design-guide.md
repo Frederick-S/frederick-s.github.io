@@ -907,7 +907,9 @@ message UpdateSettingsRequest {
 ```
 
 ### 流式半关闭
+对于任何的双向或者客户端流式 `API`，服务端应该依赖由 `RPC` 系统提供、客户端发起的半关闭来完成客户端流。没有必要额外的定义一个完成的消息。
 
+任何在客户端发起半关闭前想要发送的消息都必须定义为请求消息体的一部分。
 
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
