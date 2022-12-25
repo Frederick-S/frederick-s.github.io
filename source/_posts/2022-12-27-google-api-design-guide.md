@@ -621,6 +621,32 @@ message Error {
 #### 错误重现
 如果通过日志分析和监控无法解决错误，则应该尝试通过简单、可重复的测试来重现错误。
 
+## 设计模式
+### 空响应
+标准方法中的 `Delete` 方法应当返回 `google.protobuf.Empty`，除非 `Delete` 执行的是软删除，此时应当返回更新后的资源实体。
+
+对于自定义方法来说，应当返回各自的 `XxxResponse` 消息体，因为即使该方法现在没有数据返回随着时间的推移有很大的可能会返回额外的字段。
+
+### 范围表示
+表示范围的字段应当使用左闭右开的区间，并以 `[start_xxx, end_xxx)` 的形式命名，例如 `[start_key, end_key)` 或者 `[start_time, end_time)`。`API` 应当避免其他形式的范围表示，如 `(index, count)` 或者 `[first, last]`。
+
+### 资源标签
+在面向资源的 `API` 设计下，资源的模式由 `API` 决定。为了让客户端能够给资源添加自定义的元数据（例如标记某台虚拟机为数据库服务器），资源定义中应当添加一个 `map<string, string> labels` 字段，例如：
+
+```
+message Book {
+  string name = 1;
+  map<string, string> labels = 2;
+}
+```
+
+### 长时间运行操作
+如果某个 `API` 方法需要很长时间才能完成，则该方法应该设计成返回一个长时间运行操作资源给客户端，客户端可以通过这个资源来跟踪方法的执行进展及获取执行结果。[Operation](https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto) 定义了标准的接口来处理长时间运行操作，各 `API` 不允许自行定义额外的长时间运行操作接口以避免不一致。
+
+长时间运行操作资源必须以响应消息体的方式返回给客户端，并且该操作的任何直接结果都应该反应到 `API` 中。例如，如果有一个长时间运行操作用于创建资源，即使该资源未创建完成，`LIST` 和 `GET` 标准方法也应该返回该资源，只是该资源会被标记为暂未就绪。当长时间操作完成时，`Operation.response` 字段应当包含该操作的执行结果。
+
+长时间运行操作可以通过 `Operation.metadata` 字段来反馈其运行进展。`API` 在实现时应当为 `Operation.metadata` 定义消息类型，即使在一开始的实现中不会填充 `metadata` 字段。
+
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
