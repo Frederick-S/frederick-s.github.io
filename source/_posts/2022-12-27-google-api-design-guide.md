@@ -825,8 +825,8 @@ message ListBooksRequest {
 GET https://library.googleapis.com/v1/shelves/shelf1/books?view=BASIC
 ```
 
-TODO:
-1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
+### ETags
+`ETag` 用于客户端进行条件请求，例如客户端获取了某个资源后将其缓存，下次再请求相同的资源时可以先请求判断 `ETag` 是否发生变化，如果 `ETag` 没有发生变化则无需再次请求资源。为了支持 `ETag`，应当在资源定义时添加 `etag` 字段，同时其语义应当同 `ETag` 的常见用法保持一致。
 
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
