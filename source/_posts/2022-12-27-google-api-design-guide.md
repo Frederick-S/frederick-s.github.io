@@ -780,7 +780,50 @@ GET https://library.googleapis.com/v1/shelves/123?$fields=name
 ```
 
 ### 资源视图
+为了减少网络传输，可以允许客户端指定需要返回资源的某个视图而不是完整的资源数据，这需要在请求消息体中增加一个额外的参数，该参数要求：
 
+* 应该是 `enum` 类型
+* 必须命名为 `view`
+
+枚举类型的每一个值都定义了应当返回资源的哪部分数据。具体返回哪部分数据由实现决定并且应当在文档中标注。
+
+接口定义示例：
+
+```
+package google.example.library.v1;
+
+service Library {
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
+    option (google.api.http) = {
+      get: "/v1/{name=shelves/*}/books"
+    }
+  };
+}
+
+enum BookView {
+  // 未定义，等同于 BASIC
+  BOOK_VIEW_UNSPECIFIED = 0;
+
+  // 默认视图，仅返回作者，标题，ISBN 和书籍 ID
+  BASIC = 1;
+
+  // 完整视图，返回书籍的全部数据，包括书籍的内容
+  FULL = 2;
+}
+
+message ListBooksRequest {
+  string name = 1;
+
+  // 指定需要返回书籍的哪个视图
+  BookView view = 2;
+}
+```
+
+客户端就可以通过如下的方式调用：
+
+```
+GET https://library.googleapis.com/v1/shelves/shelf1/books?view=BASIC
+```
 
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
