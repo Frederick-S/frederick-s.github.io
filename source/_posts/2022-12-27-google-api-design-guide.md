@@ -456,7 +456,31 @@ rpc BatchGetEvents(BatchGetEventsRequest) returns (BatchGetEventsResponse) {
 * 重启一台虚拟机：其中一种反直觉的设计是在重启资源集合下创建一个重启资源，这属于生搬硬套；或者为虚拟机增加一个状态字段，重启操作就等价于资源的局部更新操作，即将虚拟机的状态由 `RUNNING` 改为 `RESTARTING`，虽然看似合理但是增加了使用人员的心智负担，例如除了这两种状态之外还有其他什么状态？另一方面也增加了接口实现的复杂度，标准方法的 `Update` 接口需要额外针对状态字段进行逻辑处理，违背了单一职责原则
 * 批处理：对于性能敏感的场景而言，提供批处理的自定义方法比一系列独立的标准方法可能有着更好的性能
 
-> 对于 `RESTful` 服务的争论中最常提到的例子就是如何使用 `RESTful` 接口表示注册/登陆？注册/登陆并不适合作为标准方法来实现，使用自定义方法会更好。一般而言，标准方法的实现尽量简单直白，一旦需要对标准方法扩展处理额外的逻辑，就需要考虑是否使用自定义方法更合适。
+> 对于 `RESTful` 服务的争论中最常提到的例子就是如何使用 `RESTful` 接口表示注册/登陆？注册/登陆并不适合作为标准方法来实现，使用自定义方法会更好。一般而言，标准方法的应当实现尽量简单直白，一旦需要对标准方法扩展处理额外的逻辑，就需要考虑是否使用自定义方法更合适。
+
+## 异常处理
+异常处理是 `RESTful` 又一个争论的点，即业务异常可能有很多，`HTTP` 的状态码根本不够，以及业务的状态码不应该和协议层的状态码相混淆。
+
+### 异常模型
+`Google API` 将异常统一封装为 [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto)：
+
+```
+package google.rpc;
+
+// 适用于不同编程环境的统一异常模型，包括 REST 接口和 RPC 接口
+message Status {
+  // 错误码，具体错误码的定义见 google.rpc.Code
+  int32 code = 1;
+
+  // 错误信息，对错误原因的描述以及可能的修复方式
+  string message = 2;
+
+  // 错误的详细信息，开发人员可以通过详细信息找到一些有用的信息
+  repeated google.protobuf.Any details = 3;
+}
+```
+
+由于大部分的 `Google APIs` 都是面向资源的设计，异常处理同样遵循了这样的设计，即使用一系列的标准异常来应对大多数的资源异常场景。例如使用标准的 `google.rpc.Code.NOT_FOUND` 异常来统一表示某个资源不存在，而不是为每一个资源定义一个 `SOME_RESOURCE_NOT_FOUND` 异常。
 
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
