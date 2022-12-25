@@ -841,6 +841,34 @@ GET https://library.googleapis.com/v1/shelves/shelf1/books?view=BASIC
 W/"1a2b3c4d5ef"
 ```
 
+需要注意的是，引号也是 `ETag` 的一部分，所以如果 `ETag` 在 `JSON` 中表示需要对引号进行转义：
+
+```
+// 强
+{ "etag": "\"1a2f3e4d5b6c7c\"", "name": "...", ... }
+// 弱
+{ "etag": "W/\"1a2b3c4d5ef\"", "name": "...", ... }
+```
+
+### 输出字段
+一个资源的某些字段可能不允许客户端设置而只能由服务端返回，这些字段应当需要额外标注。
+
+需要注意的是如果仅作为输出的字段在请求消息体中设置了，或者包含在了 `google.protobuf.FieldMask` 中，服务端也必须接受该请求而不是返回错误，只不过服务端在处理时需要忽略这些输出字段。之所以要这么做是因为客户端经常会复用某个接口返回的资源，将其作为另一个接口的输入，例如客户端可能会先请求获取一个 `Book` 资源，将其修改后再调用 `UPDATE` 方法。如果服务端对输出字段进行校验，则要求客户端进行额外的处理来删除这些输出字段。
+
+接口示例如下：
+
+```
+import "google/api/field_behavior.proto";
+
+message Book {
+  string name = 1;
+  Timestamp create_time = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+```
+
+### 单例资源
+
+
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
 * [What’s the best RESTful method to return total number of items in an object?](https://stackoverflow.com/questions/3715981/what-s-the-best-restful-method-to-return-total-number-of-items-in-an-object)
