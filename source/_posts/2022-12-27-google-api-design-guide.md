@@ -749,6 +749,39 @@ enum Isolation {
 Isolation level = 1;
 ```
 
+在某些情况下可能使用某个惯用名表示枚举0值，例如 `google.rpc.Code.OK` 是错误码不存在时的默认值，它在语义上等价于 `UNSPECIFIED`。
+
+### 语法规则
+在某些场景下，需要为特定的数据格式定义简单的语法，例如允许接受的文本输入。为了在各 `API` 间提供一致的开发体验，`API` 设计者必须使用如下的 `Extended Backus-Naur Form (EBNF)` 的变种来定义语法：
+
+```
+Production  = name "=" [ Expression ] ";" ;
+Expression  = Alternative { "|" Alternative } ;
+Alternative = Term { Term } ;
+Term        = name | TOKEN | Group | Option | Repetition ;
+Group       = "(" Expression ")" ;
+Option      = "[" Expression "]" ;
+Repetition  = "{" Expression "}" ;
+```
+
+### 整数类型
+设计 `API` 时应当避免使用无符号整型例如 `uint32` 和 `fixed32`，因为某些重要的编程语言或者系统不能很好的支持无符号整型，例如 `Java`，`JavaScript` 和 `OpenAPI`，并且它们很大可能会造成整型溢出错误。另一个问题是不同的 `API` 可能将同一个值各自解析为不同的无符号整型或者带符号整型。
+
+在某些场景下类型为带符号整型的字段值如果是负数则没有意义，例如大小，超时时间等等；`API` 设计者可能会用-1（并且只有-1）来表示特殊的含义，例如文件结束符（`EOF`），无限的超时时间，无限的配额或者未知的年龄等等。这种用法必须明确的在接口文档中标注以避免迷惑。同时 `API` 设计者也应当标注当整型数值为0时的系统行为，如果它不是非常直白明了的话。
+
+### 局部响应
+在某些情况下，客户端可能只希望获取资源的部分属性。`Google API` 通过 `FieldMask` 来支持这一场景。
+
+对于任意 `Google API` 的 `REST` 接口，客户端都可以传入额外的 `$fields` 参数来表明需要获取哪些字段：
+
+```
+GET https://library.googleapis.com/v1/shelves?$fields=shelves.name
+GET https://library.googleapis.com/v1/shelves/123?$fields=name
+```
+
+### 资源视图
+
+
 TODO:
 1. 分页返回结果，github api返回结果没有包含分页信息，以及总数信息
 
