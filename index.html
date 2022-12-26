@@ -396,7 +396,7 @@
 </table>
 <blockquote>
 <p><code>HTTP</code> 响应体返回的资源可能不会包含资源的全部字段，例如客户端请求时可以指定只返回需要的字段。<br />
-如果 <code>Delete</code> 操作不是立即删除资源，例如只是更新资源的某个字段标记或者是创建一个 <a target="_blank" rel="noopener" href="https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto">长时间运行任务</a> 来删除资源，则 <code>HTTP</code> 响应体应该包含修改后的资源或者任务信息。</p>
+如果 <code>Delete</code> 操作不是立即删除资源，例如只是更新资源的某个字段标记删除或者是创建一个 <a target="_blank" rel="noopener" href="https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto">长时间运行任务</a> 来删除资源，则 <code>HTTP</code> 响应体应该包含修改后的资源或者任务信息。</p>
 </blockquote>
 <h3 id="list"><a class="markdownIt-Anchor" href="#list"></a> List</h3>
 <p><code>List</code> 方法用于返回一系列同类的资源，同时该接口支持额外的参数从而允许只返回匹配的资源。它适合用于获取有限大小、未缓存的单一资源集合，对于更复杂的场景则可以考虑使用自定义方法中的 <code>Search</code> 接口。</p>
@@ -505,7 +505,7 @@
 <li>批处理：对于性能敏感的场景而言，提供批处理的自定义方法比一系列独立的标准方法可能有着更好的性能</li>
 </ul>
 <blockquote>
-<p>对于 <code>RESTful</code> 服务的争论中最常提到的例子就是如何使用 <code>RESTful</code> 接口表示注册/登陆？注册/登陆并不适合作为标准方法来实现，使用自定义方法会更好。一般而言，标准方法的应当实现尽量简单直白，一旦需要对标准方法扩展处理额外的逻辑，就需要考虑是否使用自定义方法更合适。</p>
+<p>对于 <code>RESTful</code> 服务的争论中最常提到的例子就是如何使用 <code>RESTful</code> 接口表示注册/登陆？注册/登陆并不适合作为标准方法来实现，使用自定义方法会更好。一般而言，标准方法的实现应当尽量简单直白，一旦需要对标准方法扩展处理额外的逻辑，就需要考虑是否使用自定义方法更合适。</p>
 </blockquote>
 <h2 id="错误处理"><a class="markdownIt-Anchor" href="#错误处理"></a> 错误处理</h2>
 <p>错误处理是 <code>RESTful</code> 又一个争论的点，即业务错误可能有很多，<code>HTTP</code> 的状态码根本不够，以及业务的状态码不应该和协议层的状态码相混淆。</p>
@@ -649,14 +649,14 @@
 <p>如果当前服务依赖于其他服务，则不应该直接将其他服务的错误返回给客户端。在进行错误转换时建议：</p>
 <ul>
 <li>隐藏实现的细节及机密的信息</li>
-<li>调整负责该错误的一方，例如当前服务从其他服务收到 <code>INVALID_ARGUMENT</code> 时则返回 <code>INTERNAL</code> 给客户端</li>
+<li>调整负责该错误的一方，例如当前服务从其他服务收到 <code>INVALID_ARGUMENT</code> 错误时则返回 <code>INTERNAL</code> 错误给客户端</li>
 </ul>
 <h4 id="错误重现"><a class="markdownIt-Anchor" href="#错误重现"></a> 错误重现</h4>
 <p>如果通过日志分析和监控无法解决错误，则应该尝试通过简单、可重复的测试来重现错误。</p>
 <h2 id="设计模式"><a class="markdownIt-Anchor" href="#设计模式"></a> 设计模式</h2>
 <h3 id="空响应"><a class="markdownIt-Anchor" href="#空响应"></a> 空响应</h3>
 <p>标准方法中的 <code>Delete</code> 方法应当返回 <code>google.protobuf.Empty</code>，除非 <code>Delete</code> 执行的是软删除，此时应当返回更新后的资源实体。</p>
-<p>对于自定义方法来说，应当返回各自的 <code>XxxResponse</code> 消息体，因为即使该方法现在没有数据返回随着时间的推移有很大的可能会返回额外的字段。</p>
+<p>对于自定义方法来说，应当返回各自的 <code>XxxResponse</code> 消息体，因为即使该方法现在没有数据返回随着时间的推移有很大的可能会增加额外的字段。</p>
 <h3 id="范围表示"><a class="markdownIt-Anchor" href="#范围表示"></a> 范围表示</h3>
 <p>表示范围的字段应当使用左闭右开的区间，并以 <code>[start_xxx, end_xxx)</code> 的形式命名，例如 <code>[start_key, end_key)</code> 或者 <code>[start_time, end_time)</code>。<code>API</code> 应当避免其他形式的范围表示，如 <code>(index, count)</code> 或者 <code>[first, last]</code>。</p>
 <h3 id="资源标签"><a class="markdownIt-Anchor" href="#资源标签"></a> 资源标签</h3>
@@ -664,11 +664,11 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">message Book &#123;</span><br><span class="line">  string name &#x3D; 1;</span><br><span class="line">  map&lt;string, string&gt; labels &#x3D; 2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="长时间运行操作"><a class="markdownIt-Anchor" href="#长时间运行操作"></a> 长时间运行操作</h3>
 <p>如果某个 <code>API</code> 方法需要很长时间才能完成，则该方法应该设计成返回一个长时间运行操作资源给客户端，客户端可以通过这个资源来跟踪方法的执行进展及获取执行结果。<a target="_blank" rel="noopener" href="https://github.com/googleapis/googleapis/blob/master/google/longrunning/operations.proto">Operation</a> 定义了标准的接口来处理长时间运行操作，各 <code>API</code> 不允许自行定义额外的长时间运行操作接口以避免不一致。</p>
-<p>长时间运行操作资源必须以响应消息体的方式返回给客户端，并且该操作的任何直接结果都应该反应到 <code>API</code> 中。例如，如果有一个长时间运行操作用于创建资源，即使该资源未创建完成，<code>LIST</code> 和 <code>GET</code> 标准方法也应该返回该资源，只是该资源会被标记为暂未就绪。当长时间操作完成时，<code>Operation.response</code> 字段应当包含该操作的执行结果。</p>
+<p>长时间运行操作资源必须以响应消息体的方式返回给客户端，并且该操作的任何直接结果都应该反应到其他 <code>API</code> 中。例如，如果有一个长时间运行操作用于创建资源，即使该资源未创建完成，<code>LIST</code> 和 <code>GET</code> 标准方法也应该返回该资源，只是该资源会被标记为暂未就绪。当长时间操作完成时，<code>Operation.response</code> 字段应当包含该操作的执行结果。</p>
 <p>长时间运行操作可以通过 <code>Operation.metadata</code> 字段来反馈其运行进展。<code>API</code> 在实现时应当为 <code>Operation.metadata</code> 定义消息类型，即使在一开始的实现中不会填充 <code>metadata</code> 字段。</p>
 <h3 id="list-方法分页"><a class="markdownIt-Anchor" href="#list-方法分页"></a> List 方法分页</h3>
 <p>支持 <code>List</code> 方法的资源集合应当支持分页功能，即使该方法返回的结果集很小。</p>
-<p>因为如果一开始 <code>List</code> 方法不支持分页，后续增加分页功能就会使得原有 <code>API</code> 的行为不一致。客户端在不知道 <code>List</code> 方法使用分页的情况下依然会认为该方法返回的是完整的资源集合，而实际上有可能只是返回了第一页的资源。</p>
+<p>因为如果一开始 <code>List</code> 方法不支持分页，后续增加分页功能就会使得和原有 <code>API</code> 的行为不一致。客户端在不知道 <code>List</code> 方法使用分页的情况下依然会认为该方法返回的是完整的资源集合，而实际上有可能只是返回了第一页的资源。</p>
 <blockquote>
 <p>为了兼容旧的逻辑，只能将分页信息设为非必要字段。</p>
 </blockquote>
@@ -701,7 +701,7 @@
 <h3 id="请求去重"><a class="markdownIt-Anchor" href="#请求去重"></a> 请求去重</h3>
 <p>对于网络 <code>API</code> 来说首选幂等的 <code>API</code>，因为当发生网络异常时可以安全的重试。不过某些 <code>API</code> 无法轻易的实现幂等，例如创建一个资源，但是又需要避免重复的请求。这种情况下请求消息体应该包含一个唯一的 <code>ID</code>，例如 <code>UUID</code> 使得服务端能够通过这个唯一的 <code>ID</code> 进行去重：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 服务端根据此唯一的 ID 进行去重</span><br><span class="line">&#x2F;&#x2F; 该字段应当命名为 request_id</span><br><span class="line">string request_id &#x3D; ...;</span><br></pre></td></tr></table></figure>
-<p>当服务端监测到重复的请求时，服务端应当返回之前成功的相同请求给客户端，因为客户端大概率没有收到之前的返回结果。</p>
+<p>当服务端监测到重复的请求时，服务端应当返回之前成功的相同请求的结果给客户端，因为客户端大概率没有收到之前的返回结果。</p>
 <h3 id="枚举默认值"><a class="markdownIt-Anchor" href="#枚举默认值"></a> 枚举默认值</h3>
 <p>每一个枚举的定义都必须以0作为起始值，当枚举值未明确时应当使用该0值，同时 <code>API</code> 文档必须标注如何处理0值。</p>
 <p>枚举0值应当命名为 <code>ENUM_TYPE_UNSPECIFIED</code>。如果 <code>API</code> 有着通用的默认行为，则枚举值未定义时应当使用0值，否则0值应当被拒绝并返回 <code>INVALID_ARGUMENT</code> 错误。</p>
@@ -752,7 +752,7 @@
 <p>对于任何的双向或者客户端流式 <code>API</code>，服务端应该依赖由 <code>RPC</code> 系统提供、客户端发起的半关闭来完成客户端流。没有必要额外的定义一个完成的消息。</p>
 <p>任何在客户端发起半关闭前想要发送的消息都必须定义为请求消息体的一部分。</p>
 <h3 id="domain-scoped-名称"><a class="markdownIt-Anchor" href="#domain-scoped-名称"></a> Domain-scoped 名称</h3>
-<p><code>domain-scoped</code> 名称指的是添加了域名前缀的实体名称，用于避免命名冲突。<code>Google APIs</code> 和 <code>Kubernetes APIs</code> 大量使用了 <code>domain-scoped</code> 名称：</p>
+<p><code>domain-scoped</code> 名称指的是添加了域名前缀的实体名称，用于避免不同服务的命名冲突。<code>Google APIs</code> 和 <code>Kubernetes APIs</code> 大量使用了 <code>domain-scoped</code> 名称：</p>
 <ul>
 <li><code>Protobuf</code> 的 <code>Any</code> 类型：<code>type.googleapis.com/google.protobuf.Any</code></li>
 <li><code>Stackdriver</code> 的指标类型：<code>compute.googleapis.com/instance/cpu/utilization</code></li>
@@ -786,10 +786,10 @@
 <p>如果某个 <code>API</code> 涉及的传输载荷超过 <code>10 MB</code>，则需要选择合适的策略以确保易用性和未来的扩展的需求。对于 <code>Google APIs</code> 来说，建议使用流式传输或者媒体上传/下载的方式来处理大型载荷，在流式传输下，服务端能够以增量同步的方式处理大量数据，例如 <code>Cloud Spanner API</code>。在媒体传输下，大量的数据流先流入到大型的存储系统中，例如 <code>Google Cloud Storage</code>，然后服务端可以异步的从存储系统中读取数据并处理，例如 <code>Google Drive API</code>。</p>
 <h3 id="可选的基本类型字段"><a class="markdownIt-Anchor" href="#可选的基本类型字段"></a> 可选的基本类型字段</h3>
 <p><code>Protocol Buffers v3</code> 支持 <code>optional</code> 基本类型字段，在语义上等同于众多编程语言中的 <code>nullable</code> 类型，它可以用于区分空值和未设置的值。</p>
-<p>在实践中开发人员难以正确的处理可选字段，大多数的 <code>JSON HTTP</code> 客户端类库，包括 <code>Google API Client Libraries</code>，无法正确区分 <code>proto3</code> 的 <code>int32</code>，<code>google.protobuf.Int32Value</code> 以及 <code>optional int32</code>。如果有一个方案更清晰而且也不需要可选的基本类型字段，则优先选择该方案。如果不使用可选的基本类型字段会造成复杂度上升或者含义不清晰，则选择可选的基本类型字段。但是不允许可选字段搭配包装类型使用。一般而言，从简洁和一致性考虑，<code>API</code> 设计者应当尽量选择基本类型字段，例如 <code>int32</code>。</p>
+<p>在实践中开发人员难以正确的处理可选字段，大多数的 <code>JSON HTTP</code> 客户端类库，包括 <code>Google API Client Libraries</code>，无法正确区分 <code>proto3</code> 的 <code>int32</code>，<code>google.protobuf.Int32Value</code> 以及 <code>optional int32</code>。如果存在一个方案更清晰而且也不需要可选的基本类型字段，则优先选择该方案。如果不使用可选的基本类型字段会造成复杂度上升或者含义不清晰，则选择可选的基本类型字段。但是不允许可选字段搭配包装类型使用。一般而言，从简洁和一致性考虑，<code>API</code> 设计者应当尽量选择基本类型字段，例如 <code>int32</code>。</p>
 <h2 id="版本控制"><a class="markdownIt-Anchor" href="#版本控制"></a> 版本控制</h2>
 <p><code>Google APIs</code> 借助版本控制来解决后向兼容问题。</p>
-<p>所有的 <code>Google API</code> 接口都必须包含一个主版本号，这个主版本号会附加在 <code>protobuf</code> 包的最后，以及包含在 <code>REST APIs</code> 的 <code>URI</code> 的第一个部分中。如果 <code>API</code> 要引入一个与当前版本不兼容的变更，例如删除或者重命名某个字段，则必须增加主版本号，从而避免引用了当前版本的用户代码不受影响。</p>
+<p>所有的 <code>Google API</code> 接口都必须包含一个主版本号，这个主版本号会附加在 <code>protobuf</code> 包的最后，以及包含在 <code>REST APIs</code> 的 <code>URI</code> 的第一个部分中。如果 <code>API</code> 要引入一个与当前版本不兼容的变更，例如删除或者重命名某个字段，则必须增加主版本号，从而避免引用了当前版本的用户代码受到影响。</p>
 <p>所有 <code>API</code> 的新主版本不允许依赖同 <code>API</code> 的前一个主版本。一个 <code>API</code> 本身可能会依赖其他 <code>API</code>，这要求调用方知晓被依赖的 <code>API</code> 的版本稳定性风险。在这种情况下，一个稳定版本的 <code>API</code> 必须只依赖同样是稳定版本的其他 <code>API</code>。</p>
 <p>同一个 <code>API</code> 的不同版本在同一个客户端应用内必须能在一段合理的过渡时期内同时生效。这个过渡时期保障了客户端应用升级到新的 <code>API</code> 版本的平滑过渡。同样的，老版本的 <code>API</code> 也必须在废弃并最终停用之前留有足够的过渡时间。</p>
 <p>对于会发布 <code>alpha</code> 或者 <code>beta</code> 版本的 <code>API</code> 来说，必须将 <code>alpha</code> 或者 <code>beta</code> 附加在主版本号之后，并且使用如下其一的策略：</p>
@@ -811,19 +811,19 @@
 <blockquote>
 <p>基于渠道的版本控制和基于发布的版本控制都会就地更新 <code>stable</code> 版本。</p>
 </blockquote>
-<p><code>alpha</code> 和 <code>beta</code> 版本发布时需要在 <code>alpha</code> 或者 <code>beta</code> 之后附加一个递增的发布版本，例如 <code>v1beta1</code> 或者 <code>v1alpha5</code>。<code>API</code> 应当在文档中记录这些版本的时间顺序。</p>
+<p><code>alpha</code> 和 <code>beta</code> 版本发布时需要在 <code>alpha</code> 或者 <code>beta</code> 之后附加一个递增版本号，例如 <code>v1beta1</code> 或者 <code>v1alpha5</code>。<code>API</code> 应当在文档中记录这些版本的时间顺序。</p>
 <p>每个 <code>alpha</code> 或者 <code>beta</code> 版本都有可能就地进行后向兼容的更新。对于 <code>beta</code> 版本来说，如果发布了后向不兼容的版本则应当修改 <code>beta</code> 后的版本号，然后发布新的版本。例如，如果当前版本是 <code>v1beta1</code>，则新版本为 <code>v1beta2</code>。</p>
 <p>当 <code>alpha</code> 和 <code>beta</code> 版本中的功能合并到 <code>stable</code> 版本之后就可以终止 <code>alpha</code> 或者 <code>beta</code> 版本。<code>alpha</code> 版本可能会在任一时刻终止，但是 <code>beta</code> 版本在终止前应当给用户留有足够的过渡期，建议是180天。</p>
 <h3 id="基于可见性的版本控制"><a class="markdownIt-Anchor" href="#基于可见性的版本控制"></a> 基于可见性的版本控制</h3>
 <p><a target="_blank" rel="noopener" href="https://github.com/googleapis/googleapis/blob/master/google/api/visibility.proto">API 可见性</a> 是 <code>Google API</code> 基础架构提供的一项高级功能。它允许 <code>API</code> 发布者将一个 <code>API</code> 对外暴露出多个不同的外部 <code>API</code> 视图，每个视图关联一个 <code>API</code> 可见性的标签，例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import &quot;google&#x2F;api&#x2F;visibility.proto&quot;;</span><br><span class="line"></span><br><span class="line">message Resource &#123;</span><br><span class="line">  string name &#x3D; 1;</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; Preview. Do not use this feature for production.</span><br><span class="line">  string display_name &#x3D; 2</span><br><span class="line">    [(google.api.field_visibility).restriction &#x3D; &quot;PREVIEW&quot;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可见性标签是一个区分大小写的字符串，可以绑定到任意 <code>API</code> 元素上。一般来说，可见性标签应当始终使用全大写表示。所有的 <code>API</code> 元素默认绑定 <code>PUBLIC</code> 的可见性标签，除非显示的声明了可见性。</p>
-<p>每个可见性标签本质上是一个运行访问的列表，<code>API</code> 生产者需要授权给 <code>API</code> 消费者合适的可见性标签才能使用 <code>API</code>。换句话说，可见性标签类似于 <code>API</code> 的 <code>ACL</code>（<code>Access Control List</code>）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import &quot;google&#x2F;api&#x2F;visibility.proto&quot;;</span><br><span class="line"></span><br><span class="line">message Resource &#123;</span><br><span class="line">  string name &#x3D; 1;</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; 预览功能，勿在生产环境使用</span><br><span class="line">  string display_name &#x3D; 2</span><br><span class="line">    [(google.api.field_visibility).restriction &#x3D; &quot;PREVIEW&quot;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可见性标签是一个区分大小写的字符串，可以绑定到任意 <code>API</code> 元素上。一般来说，可见性标签应当始终使用全大写字母。所有的 <code>API</code> 元素默认绑定 <code>PUBLIC</code> 的可见性标签，除非显式的声明了可见性。</p>
+<p>每个可见性标签本质上是一个允许访问的列表，<code>API</code> 生产者需要授权给 <code>API</code> 消费者合适的可见性标签才能使用 <code>API</code>。换句话说，可见性标签类似于 <code>API</code> 的 <code>ACL</code>（<code>Access Control List</code>）。</p>
 <p>每个 <code>API</code> 元素可以绑定多个可见性标签，各可见性标签之间用逗号分割（例如 <code>PREVIEW,TRUSTED_TESTER</code>）。多个可见性标签之间是逻辑或的关系，<code>API</code> 消费者只要授权了其中一个可见性标签就可以使用 <code>API</code>。</p>
-<p>一个 <code>API</code> 请求只能使用一个可见性标签，默认使用的是授权给当前 <code>API</code> 消费者的可见性标签。客户端可以显示的指定需要用哪个可见性标签：</p>
+<p>一个 <code>API</code> 请求只能使用一个可见性标签，默认使用的是授权给当前 <code>API</code> 消费者的可见性标签。客户端可以显式的指定需要用哪个可见性标签：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;v1&#x2F;projects&#x2F;my-project&#x2F;topics HTTP&#x2F;1.1</span><br><span class="line">Host: pubsub.googleapis.com</span><br><span class="line">Authorization: Bearer y29....</span><br><span class="line">X-Goog-Visibilities: PREVIEW</span><br></pre></td></tr></table></figure>
 <p><code>API</code> 生产者可以借助可见性标签来实现版本控制，例如 <code>INTERNAL</code> 和 <code>PREVIEW</code>。<code>API</code> 的新功能从 <code>INTERNAL</code> 可见性标签开始，然后升级到 <code>PREVIEW</code> 可见性标签。当功能稳定可用后，就删除所有的可见性标签，即等同于默认的可见性标签 <code>PUBLIC</code>。</p>
-<p>总体来说，<code>API</code> 的可见性比 <code>API</code> 版本号更容易实现增量的功能迭代，不过这要求比较成熟的 <code>API</code> 基础架构的支持。<code>Google Cloud APIs</code> 经常使用 <code>API</code> 可见性用于预发布功能。</p>
+<p>总体来说，<code>API</code> 的可见性比 <code>API</code> 版本号更容易实现增量的功能迭代，不过这要求比较成熟的 <code>API</code> 基础架构的支持。<code>Google Cloud APIs</code> 经常使用 <code>API</code> 可见性用于预览功能。</p>
 <h2 id="兼容性"><a class="markdownIt-Anchor" href="#兼容性"></a> 兼容性</h2>
 <p>这里的兼容性讨论的是对于 <code>API</code> 使用者的影响，<code>API</code> 生产者应当自身知晓为了实现兼容性需要哪方面的工作。</p>
 <p>总的来说，<code>API</code> 的小版本更新或者补丁更新不应该对客户端造成兼容性问题。可能的不兼容问题包括：</p>
@@ -841,7 +841,7 @@
 <p>除非新添加的方法和客户端自动生成的代码中的某个方法冲突，否则这也是安全的。</p>
 <p>例如当前已经存在了一个 <code>GetFoo</code> 方法，<code>C#</code> 的代码生成器会同时生成一个 <code>GetFooAsync</code> 的方法，如果此时再添加一个 <code>GetFooAsync</code> 方法，则会造成冲突。</p>
 <h4 id="向已有的方法添加-http-绑定"><a class="markdownIt-Anchor" href="#向已有的方法添加-http-绑定"></a> 向已有的方法添加 HTTP 绑定</h4>
-<p>假设绑定 <code>HTTP</code> 没有任何歧义，那么让服务端响应之前拒绝的 <code>URL</code> 就是安全的。这个操作可能存在于将某个已有的操作映射到某个新资源时发生。</p>
+<p>假设绑定 <code>HTTP</code> 没有任何歧义，那么让服务端响应之前拒绝的 <code>URL</code> 就是安全的。这个操作可能在将某个已有的操作映射到某个新资源时发生。</p>
 <h4 id="向请求消息体添加新的字段"><a class="markdownIt-Anchor" href="#向请求消息体添加新的字段"></a> 向请求消息体添加新的字段</h4>
 <p>只要服务端在新版本的代码中处理未传入的新字段的逻辑和老版本代码中的逻辑一致，那么添加新的字段就是安全的。</p>
 <p>一个最可能出错的场景是添加分页相关的字段：如果 <code>v1.0</code> 版本的代码中没有分页功能，那么也不能将分页功能添加到 <code>v1.1</code> 版本中，除非 <code>page_size</code> 的默认值是无限大（但这通常不是个好的设计）。否则的话依赖了 <code>v1.0</code> 版本的客户端期望一次请求获取所有的数据，但实际上可能只获取了第一页的数据。</p>
@@ -857,11 +857,11 @@
 <h4 id="移除或者重命名服务字段方法或者枚举值"><a class="markdownIt-Anchor" href="#移除或者重命名服务字段方法或者枚举值"></a> 移除或者重命名服务，字段，方法或者枚举值</h4>
 <p>一般来说，移除或者重命名某个客户端代码可能引用的内容都是一次后向不兼容的修改，必须升级主版本号才能更新。对于某些编程语言来说如果引用了旧的名称则会造成编译问题（例如 <code>C#</code> 和 <code>Java</code>）或者对于另一些编程语言来说造成运行时异常或者数据丢失。</p>
 <h4 id="更改-http-映射"><a class="markdownIt-Anchor" href="#更改-http-映射"></a> 更改 HTTP 映射</h4>
-<p>这里的更改值得是删除和添加。例如，假设你想将某个已经存在的方法的 <code>HTTP</code> 映射改为 <code>PATCH</code>，而目前暴露的 <code>HTTP</code> 方法是 <code>PUT</code>，你可以添加一个新的 <code>HTTP</code> 映射，但是不能删除原有的 <code>HTTP</code> 映射。</p>
+<p>这里的更改指的是删除然后添加。例如，假设你想将某个已经存在的方法的 <code>HTTP</code> 映射改为 <code>PATCH</code>，而目前暴露的 <code>HTTP</code> 方法是 <code>PUT</code>，你可以添加一个新的 <code>HTTP</code> 映射，但是不能删除原有的 <code>HTTP</code> 映射。</p>
 <h4 id="更改字段类型"><a class="markdownIt-Anchor" href="#更改字段类型"></a> 更改字段类型</h4>
 <p>即使更改后的字段类型和当前的传输格式兼容，也可能造成客户端生成的代码不兼容，因此也必须升级主版本号才能更新。对于静态编译型编程语言来说，这很容易引入编译问题。</p>
 <h4 id="更改资源的命名格式"><a class="markdownIt-Anchor" href="#更改资源的命名格式"></a> 更改资源的命名格式</h4>
-<p>不允许修改资源的名称，这也意味着资源集合的名称因为不允许修改。</p>
+<p>不允许修改资源的名称，这也意味着资源集合的名称也不允许修改。</p>
 <p>如果客户端能够在 <code>v2.0</code> 版本中访问 <code>v1.0</code> 版本中创建的资源（或者反过来），那么该资源在两个版本中就应当使用相同的资源名称。</p>
 <p>另外，有效的资源名称集也不能修改，因为：</p>
 <ul>
@@ -878,7 +878,9 @@
 <li>资源参数名称：例如从 <code>v1/shelves/&#123;shelf&#125;/books/&#123;book&#125;</code> 修改为 <code>v1/shelves/&#123;shelf_id&#125;/books/&#123;book_id&#125;</code> 不会影响资源名称，但是会影响客户端自动生成的代码</li>
 </ul>
 <h4 id="向资源消息体添加读写字段"><a class="markdownIt-Anchor" href="#向资源消息体添加读写字段"></a> 向资源消息体添加读/写字段</h4>
-<p>客户端经常会执行读/修改/写入的操作，大多数情况下如果某个字段客户端用不到就不会给它赋值。虽然服务端可以采取缺失值的字段就不执行写入的措施，但不适用于基本类型的字段（包括 <code>string</code> 和 <code>bytes</code>），因为无法区分出是客户端主动设置 <code>int32</code> 类型的字段值为0还是没有设置值使用默认值0。</p>
+<p>客户端经常会执行先读，然后修改，最后写入的一整套操作，大多数情况下如果某个字段客户端用不到就不会给它赋值。虽然服务端可以采取缺失值的字段就不执行写入的措施，但不适用于基本类型的字段（包括 <code>string</code> 和 <code>bytes</code>），因为基本类型默认值的存在造成无法区分出是客户端主动设置 <code>int32</code> 类型的字段值为0还是没有设置值从而使用默认值0。</p>
+<h3 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h3>
+<p>虽然 <code>Google</code> 的这篇 <code>API</code> 设计主要是面向资源的设计，但同时也针对其不足提出了改进的方案。不管是 <code>RESTful</code> 还是非 <code>RESTful</code> 的接口设计，都只是一种规范，有各自适合的场景没有孰优孰劣，统一的规范胜过生搬硬套。</p>
 <h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://cloud.google.com/apis/design">API design guide</a></li>
