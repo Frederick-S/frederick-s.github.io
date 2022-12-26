@@ -570,7 +570,7 @@ message Error {
 下表列出了 `google.rpc.Code` 定义的所有错误码：
 
 |HTTP   |gRPC   |
-|---|---|---|
+|---|---|
 |200   |OK   |   
 |400   |INVALID_ARGUMENT   |   
 |400   |FAILED_PRECONDITION   |   
