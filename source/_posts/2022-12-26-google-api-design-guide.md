@@ -575,8 +575,7 @@ message Error {
 |400   |INVALID_ARGUMENT   |   
 |400   |FAILED_PRECONDITION   |   
 |400   |OUT_OF_RANGE   |   
-|401   |UNAUTHENTICATED   |   
-|401   |UNAUTHENTICATED   |   
+|401   |UNAUTHENTICATED   |     
 |403   |PERMISSION_DENIED   |   
 |404   |NOT_FOUND   |   
 |409   |ABORTED   |   
