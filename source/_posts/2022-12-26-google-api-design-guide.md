@@ -950,6 +950,47 @@ message UpdateSettingsRequest {
 
 在实践中开发人员难以正确的处理可选字段，大多数的 `JSON HTTP` 客户端类库，包括 `Google API Client Libraries`，无法正确区分 `proto3` 的 `int32`，`google.protobuf.Int32Value` 以及 `optional int32`。如果有一个方案更清晰而且也不需要可选的基本类型字段，则优先选择该方案。如果不使用可选的基本类型字段会造成复杂度上升或者含义不清晰，则选择可选的基本类型字段。但是不允许可选字段搭配包装类型使用。一般而言，从简洁和一致性考虑，`API` 设计者应当尽量选择基本类型字段，例如 `int32`。
 
+## 版本控制
+`Google APIs` 借助版本控制来解决后向兼容问题。
+
+所有的 `Google API` 接口都必须包含一个主版本号，这个主版本号会附加在 `protobuf` 包的最后，以及包含在 `REST APIs` 的 `URI` 的第一个部分中。如果 `API` 要引入一个与当前版本不兼容的变更，例如删除或者重命名某个字段，则必须增加主版本号，从而避免引用了当前版本的用户代码不受影响。
+
+所有 `API` 的新主版本不允许依赖同 `API` 的前一个主版本。一个 `API` 本身可能会依赖其他 `API`，这要求调用方知晓被依赖的 `API` 的版本稳定性风险。在这种情况下，一个稳定版本的 `API` 必须只依赖同样是稳定版本的其他 `API`。
+
+同一个 `API` 的不同版本在同一个客户端应用内必须能在一段合理的过渡时期内同时生效。这个过渡时期保障了客户端应用升级到新的 `API` 版本的平滑过渡。同样的，老版本的 `API` 也必须在废弃并最终停用之前留有足够的过渡时间。
+
+对于会发布 `alpha` 或者 `beta` 版本的 `API` 来说，必须将 `alpha` 或者 `beta` 附加在主版本号之后，并且使用如下其一的策略：
+
+* 基于渠道的版本控制（推荐）
+* 基于发布的版本控制
+* 基于可见性的版本控制
+
+### 基于渠道的版本控制
+`stability channel` 是在某个稳定性级别下长期进行更新的版本。每个主版本号下的每个稳定性级别最多只有一个版本。因此，在这个策略下，每个主版本最多只有三个可用的版本：`alpha`，`beta`，以及 `stable`。
+
+`alpha` 和 `beta` 版本必须将稳定性级别附加到主版本号后，而 `stable` 则不需要也不允许。例如，`v1` 可用作为 `stable` 版本的版本号，但是 `v1beta` 和 `v1alpha` 不是。类似的，`v1beta` 或者 `v1alpha` 可用作为对应的 `beta` 和 `alpha` 版本，但是 `v1` 不行。每个版本下会对新功能进行就地更新而不会修改版本号。
+
+`beta` 版本的功能必须是 `stable` 版本的功能的超集，同时 `alpha` 版本的功能必须是 `beta` 版本的功能的超集。
+
+对于任何版本的 `API` 来说，其中的内容（字段，消息体，RPC 方法等）都有可能被标记为废弃：
+
+```
+// Represents a scroll. Books are preferred over scrolls.
+message Scroll {
+  option deprecated = true;
+
+  // ...
+}
+```
+
+废弃的 `API` 功能不允许从 `alpha` 版本继续保留到 `beta` 版本，也不允许从 `beta` 版本保留到 `stable` 版本。也就是说某个功能不能在任何版本中预先废弃。
+
+`beta` 版本的功能可以在废弃后经过合理的时间后删除，一般建议是180天。对于只存在于 `alpha` 版本的功能，不一定会标记为废弃，并且删除时也不会通知。
+
+### 基于发布的版本控制
+
+### 基于可见性的版本控制
+
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
 * [What’s the best RESTful method to return total number of items in an object?](https://stackoverflow.com/questions/3715981/what-s-the-best-restful-method-to-return-total-number-of-items-in-an-object)
