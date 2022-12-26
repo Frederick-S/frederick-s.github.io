@@ -972,7 +972,7 @@ message UpdateSettingsRequest {
 
 `beta` 版本的功能必须是 `stable` 版本的功能的超集，同时 `alpha` 版本的功能必须是 `beta` 版本的功能的超集。
 
-对于任何版本的 `API` 来说，其中的内容（字段，消息体，RPC 方法等）都有可能被标记为废弃：
+对于任何版本的 `API` 来说，其中的元素（字段，消息体，RPC 方法等）都有可能被标记为废弃：
 
 ```
 // Represents a scroll. Books are preferred over scrolls.
@@ -985,11 +985,52 @@ message Scroll {
 
 废弃的 `API` 功能不允许从 `alpha` 版本继续保留到 `beta` 版本，也不允许从 `beta` 版本保留到 `stable` 版本。也就是说某个功能不能在任何版本中预先废弃。
 
-`beta` 版本的功能可以在废弃后经过合理的时间后删除，一般建议是180天。对于只存在于 `alpha` 版本的功能，不一定会标记为废弃，并且删除时也不会通知。
+`beta` 版本的功能可以在废弃后经过合理的时间后删除，建议是180天。对于只存在于 `alpha` 版本的功能，不一定会标记为废弃，并且删除时也不会通知。
 
 ### 基于发布的版本控制
+在该策略下，`alpha` 或者 `beta` 版本的功能在合并到 `stable` 版本之前只会在有限的时间内可用。因此，一个 `API` 在每个稳定性级别下可能有任意数量的版本发布。
+
+> 基于渠道的版本控制和基于发布的版本控制都会就地更新 `stable` 版本。
+
+`alpha` 和 `beta` 版本发布时需要在 `alpha` 或者 `beta` 之后附加一个递增的发布版本，例如 `v1beta1` 或者 `v1alpha5`。`API` 应当在文档中记录这些版本的时间顺序。
+
+每个 `alpha` 或者 `beta` 版本都有可能就地进行后向兼容的更新。对于 `beta` 版本来说，如果发布了后向不兼容的版本则应当修改 `beta` 后的版本号，然后发布新的版本。例如，如果当前版本是 `v1beta1`，则新版本为 `v1beta2`。
+
+当 `alpha` 和 `beta` 版本中的功能合并到 `stable` 版本之后就可以终止 `alpha` 或者 `beta` 版本。`alpha` 版本可能会在任一时刻终止，但是 `beta` 版本在终止前应当给用户留有足够的过渡期，建议是180天。
 
 ### 基于可见性的版本控制
+[API 可见性](https://github.com/googleapis/googleapis/blob/master/google/api/visibility.proto) 是 `Google API` 基础架构提供的一项高级功能。它允许 `API` 发布者将一个 `API` 对外暴露出多个不同的外部 `API` 视图，每个视图关联一个 `API` 可见性的标签，例如：
+
+```
+import "google/api/visibility.proto";
+
+message Resource {
+  string name = 1;
+
+  // Preview. Do not use this feature for production.
+  string display_name = 2
+    [(google.api.field_visibility).restriction = "PREVIEW"];
+}
+```
+
+可见性标签是一个区分大小写的字符串，可以绑定到任意 `API` 元素上。一般来说，可见性标签应当始终使用全大写表示。所有的 `API` 元素默认绑定 `PUBLIC` 的可见性标签，除非显示的声明了可见性。
+
+每个可见性标签本质上是一个运行访问的列表，`API` 生产者需要授权给 `API` 消费者合适的可见性标签才能使用 `API`。换句话说，可见性标签类似于 `API` 的 `ACL`（`Access Control List`）。
+
+每个 `API` 元素可以绑定多个可见性标签，各可见性标签之间用逗号分割（例如 `PREVIEW,TRUSTED_TESTER`）。多个可见性标签之间是逻辑或的关系，`API` 消费者只要授权了其中一个可见性标签就可以使用 `API`。
+
+一个 `API` 请求只能使用一个可见性标签，默认使用的是授权给当前 `API` 消费者的可见性标签。客户端可以显示的指定需要用哪个可见性标签：
+
+```
+GET /v1/projects/my-project/topics HTTP/1.1
+Host: pubsub.googleapis.com
+Authorization: Bearer y29....
+X-Goog-Visibilities: PREVIEW
+```
+
+`API` 生产者可以借助可见性标签来实现版本控制，例如 `INTERNAL` 和 `PREVIEW`。`API` 的新功能从 `INTERNAL` 可见性标签开始，然后升级到 `PREVIEW` 可见性标签。当功能稳定可用后，就删除所有的可见性标签，即等同于默认的可见性标签 `PUBLIC`。
+
+总体来说，`API` 的可见性比 `API` 版本号更容易实现增量的功能迭代，不过这要求比较成熟的 `API` 基础架构的支持。`Google Cloud APIs` 经常使用 `API` 可见性用于预发布功能。
 
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
