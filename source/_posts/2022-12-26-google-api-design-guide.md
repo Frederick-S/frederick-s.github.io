@@ -1032,6 +1032,18 @@ X-Goog-Visibilities: PREVIEW
 
 总体来说，`API` 的可见性比 `API` 版本号更容易实现增量的功能迭代，不过这要求比较成熟的 `API` 基础架构的支持。`Google Cloud APIs` 经常使用 `API` 可见性用于预发布功能。
 
+## 兼容性
+这里的兼容性讨论的是对于 `API` 使用者的影响，`API` 生产者应当自身知晓为了实现兼容性需要哪方面的工作。
+
+总的来说，`API` 的小版本更新或者补丁更新不应该对客户端造成兼容性问题。可能的不兼容问题包括：
+
+* 源代码兼容性：针对1.0版本编写的代码升级到1.1版本后编译失败
+* 二进制文件兼容性：针对1.0版本编译生成的二进制文件链接到1.1版本后运行失败
+* 通信兼容性：针对1.0版本编写的应用程序无法和运行1.1版本的服务端通信
+* 语义兼容性：针对1.0版本编写的应用程序升级到1.1版本后能够运行，但是存在不可预知的结果
+
+从另一个角度来说，只要主版本号一致，运行着旧版本的客户端程序就能够和运行着新版本的服务端结合使用，并且客户端程序也能轻易的升级小版本
+
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
 * [What’s the best RESTful method to return total number of items in an object?](https://stackoverflow.com/questions/3715981/what-s-the-best-restful-method-to-return-total-number-of-items-in-an-object)
