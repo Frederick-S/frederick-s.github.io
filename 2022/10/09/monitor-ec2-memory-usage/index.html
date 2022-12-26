@@ -294,7 +294,7 @@
 <p>如果在 <code>AWS</code> 控制台没有看到 <code>CWAgent</code> 项目，那么可以查看 <code>EC2</code> 上 <code>CloudWatch agent</code> 的日志是否有异常，日志保存在 <code>/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log</code>。例如，如果忘记为 <code>EC2</code> 配置 <code>IAM</code> 角色，同时 <code>EC2</code> 上又没有其他的权限访问信息，<code>CloudWatch agent</code> 就无法上报监控数据，会提示如下类似的异常：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2022-10-09T13:27:36Z E! WriteToCloudWatch failure, err:  NoCredentialProviders: no valid providers in chain</span><br><span class="line">caused by: EnvAccessKeyNotFound: failed to find credentials in the environment.</span><br><span class="line">SharedCredsLoad: failed to load profile, .</span><br><span class="line">EC2RoleRequestError: no EC2 instance role found</span><br><span class="line">caused by: EC2MetadataError: failed to make EC2Metadata request</span><br></pre></td></tr></table></figure>
 <p>最后，如果想要添加更多的监控指标，可以参考 <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-collected-by-CloudWatch-agent.html">Metrics collected by the CloudWatch agent</a> 添加相应的指标。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<p>参考：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://lepczynski.it/en/aws_en/how-to-monitor-memory-usage-on-aws-ec2/">How to monitor memory usage on AWS EC2 ??</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/download-cloudwatch-agent-commandline.html">Download and configure the CloudWatch agent using the command line</a></li>
@@ -339,7 +339,10 @@
     <a href="/2022/09/18/add-volume-to-aws-ec2/" rel="prev" title="AWS EC2 挂载磁盘">
       <i class="fa fa-chevron-left"></i> AWS EC2 挂载磁盘
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/12/26/google-api-design-guide/" rel="next" title="【读】Google API Design Guide">
+      【读】Google API Design Guide <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -398,7 +401,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -412,14 +414,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">75</span>
+          <span class="site-state-item-count">76</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-count">51</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
