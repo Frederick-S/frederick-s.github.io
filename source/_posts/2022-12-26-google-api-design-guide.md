@@ -911,6 +911,45 @@ message UpdateSettingsRequest {
 
 任何在客户端发起半关闭前想要发送的消息都必须定义为请求消息体的一部分。
 
+### Domain-scoped 名称
+`domain-scoped` 名称指的是添加了域名前缀的实体名称，用于避免命名冲突。`Google APIs` 和 `Kubernetes APIs` 大量使用了 `domain-scoped` 名称：
+
+* `Protobuf` 的 `Any` 类型：`type.googleapis.com/google.protobuf.Any`
+* `Stackdriver` 的指标类型：`compute.googleapis.com/instance/cpu/utilization`
+* 标签的键：`cloud.googleapis.com/location`
+* `Kubernetes` 的 `API` 版本号：`networking.k8s.io/v1`
+* `x-kubernetes-group-version-kind` 的 `OpenAPI` 扩展中的 `kind` 字段
+
+### 布尔值 vs. 枚举 vs. 字符串
+设计 `API` 时有时候会遇到需要能够启用或者禁用某个功能的场景，从实现上说可以增加一个 `bool`，`enum` 或者 `string` 类型的字段来控制，具体选择哪种类型可以遵循如下规则：
+
+* 如果确定只有两种状态且不希望在未来扩展时使用 `bool`，例如 `enable_tracing` 或者 `enable_pretty_print`
+* 如果希望设计更为灵活但是又不希望改动太频繁时使用 `enum`，一个评估的准则是一旦 `enum` 的值确定了，那么一年内只会改动一次或者更低频，例如 `enum TlsVersion` 或者 `enum HttpVersion`
+* `string` 有着最大的灵活性，适用于可能会频繁修改的场景，其对应的值必须清晰的在文档中标注，例如：
+  * [Unicode regions](https://www.unicode.org/reports/tr35/#unicode_region_subtag) 对应的 `string region_code`
+  * [Unicode locales](https://www.unicode.org/reports/tr35/#Unicode_locale_identifier) 对应的 `string language_code`
+
+### 数据保留
+对于某些服务而言，用户数据非常重要，如果用户数据不小心被软件 `bug` 或者人为错误删除，在缺少数据保留策略和撤销删除功能的情况下，可能对业务造成灾难性的影响。
+
+一般而言，建议为 `API` 服务设置如下的数据保留策略：
+
+* 对于用户的元数据，用户设置等其他重要的数据，设置30天的数据保留期。例如监控指标，项目的元数据和服务定义
+* 对于大容量的用户数据，应该设置7天的数据保留期。例如对象存储和数据库表
+* 对于临时的状态数据或者昂贵的存储数据，如果可行的话应该设置1天的数据保留期。例如 `memcache` 和 `Redis` 内存中的数据
+
+在数据保留期内，可以执行撤销删除的操作从而不会造成数据丢失。
+
+### 大型传输载荷
+网络 `API` 依赖分层的网络架构来传输数据，大多数的网络协议层对输入和输出的数据量设置了上限，一般而言，`32 MB` 是大多数系统中常用的大小上限。
+
+如果某个 `API` 涉及的传输载荷超过 `10 MB`，则需要选择合适的策略以确保易用性和未来的扩展的需求。对于 `Google APIs` 来说，建议使用流式传输或者媒体上传/下载的方式来处理大型载荷，在流式传输下，服务端能够以增量同步的方式处理大量数据，例如 `Cloud Spanner API`。在媒体传输下，大量的数据流先流入到大型的存储系统中，例如 `Google Cloud Storage`，然后服务端可以异步的从存储系统中读取数据并处理，例如 `Google Drive API`。
+
+### 可选的基本类型字段
+`Protocol Buffers v3` 支持 `optional` 基本类型字段，在语义上等同于众多编程语言中的 `nullable` 类型，它可以用于区分空值和未设置的值。
+
+在实践中开发人员难以正确的处理可选字段，大多数的 `JSON HTTP` 客户端类库，包括 `Google API Client Libraries`，无法正确区分 `proto3` 的 `int32`，`google.protobuf.Int32Value` 以及 `optional int32`。如果有一个方案更清晰而且也不需要可选的基本类型字段，则优先选择该方案。如果不使用可选的基本类型字段会造成复杂度上升或者含义不清晰，则选择可选的基本类型字段。但是不允许可选字段搭配包装类型使用。一般而言，从简洁和一致性考虑，`API` 设计者应当尽量选择基本类型字段，例如 `int32`。
+
 ## 参考
 * [API design guide](https://cloud.google.com/apis/design)
 * [What’s the best RESTful method to return total number of items in an object?](https://stackoverflow.com/questions/3715981/what-s-the-best-restful-method-to-return-total-number-of-items-in-an-object)
