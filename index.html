@@ -879,7 +879,7 @@
 </ul>
 <h4 id="向资源消息体添加读写字段"><a class="markdownIt-Anchor" href="#向资源消息体添加读写字段"></a> 向资源消息体添加读/写字段</h4>
 <p>客户端经常会执行先读，然后修改，最后写入的一整套操作，大多数情况下如果某个字段客户端用不到就不会给它赋值。虽然服务端可以采取缺失值的字段就不执行写入的措施，但不适用于基本类型的字段（包括 <code>string</code> 和 <code>bytes</code>），因为基本类型默认值的存在造成无法区分出是客户端主动设置 <code>int32</code> 类型的字段值为0还是没有设置值从而使用默认值0。</p>
-<h3 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h3>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
 <p>虽然 <code>Google</code> 的这篇 <code>API</code> 设计主要是面向资源的设计，但同时也针对其不足提出了改进的方案。不管是 <code>RESTful</code> 还是非 <code>RESTful</code> 的接口设计，都只是一种规范，有各自适合的场景没有孰优孰劣，统一的规范胜过生搬硬套。</p>
 <h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
 <ul>
