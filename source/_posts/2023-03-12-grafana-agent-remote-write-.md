@@ -159,6 +159,8 @@ integrations:
         password: password
 ```
 
+配置文件修改完成之后，通过 `sudo systemctl restart grafana-agent` 来重启 `grafana-agent` 服务。
+
 ## Grafana 展示
 对于自定义服务的监控展示使用自己熟悉的方式即可，例如 `Java` 应用可以配合使用 [JVM (Micrometer)](https://grafana.com/grafana/dashboards/4701-jvm-micrometer/)。
 
