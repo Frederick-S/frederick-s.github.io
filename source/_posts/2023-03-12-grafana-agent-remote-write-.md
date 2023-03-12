@@ -40,6 +40,19 @@ Mar 12 05:08:43 example-name systemd[1]: Started Monitoring system and forwarder
 sudo systemctl enable grafana-agent.service
 ```
 
+另外，可以通过 `sudo journalctl -u grafana-agent` 查看 `grafana-agent` 的运行日志：
+
+```
+-- Logs begin at Sun 2021-12-26 04:48:21 UTC, end at Sun 2023-03-12 06:34:53 UTC. --
+Mar 12 05:08:43 example-name systemd[1]: Started Monitoring system and forwarder.
+Mar 12 05:38:45 example-name grafana-agent[1049084]: ts=2023-03-12T05:38:45.6366501Z caller=cleaner.go:203 level=warn agent=prometheus component=cleaner msg="unable to fi>
+Mar 12 06:08:45 example-name grafana-agent[1049084]: ts=2023-03-12T06:08:45.63549564Z caller=cleaner.go:203 level=warn agent=prometheus component=cleaner msg="unable to f>
+Mar 12 06:20:16 example-name systemd[1]: Stopping Monitoring system and forwarder...
+Mar 12 06:20:16 example-name systemd[1]: grafana-agent.service: Succeeded.
+Mar 12 06:20:16 example-name systemd[1]: Stopped Monitoring system and forwarder.
+Mar 12 06:20:16 example-name systemd[1]: Started Monitoring system and forwarder.
+```
+
 ## 上报监控数据
 `grafana-agent` 上报的监控数据分两种，一种是 `grafana-agent` 自身及其所在主机的监控数据，另一种是自定义服务的监控数据，我们需要修改 `grafana-agent` 的配置文件来指定如何收集监控数据。
 
