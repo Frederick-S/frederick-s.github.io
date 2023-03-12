@@ -18,7 +18,7 @@ sudo apt-get update
 sudo apt-get install grafana-agent
 ```
 
-然后通过 `sudo systemctl start grafana-agent` 将其启动，并可通过 `sudo systemctl status grafana-agent` 显示 `grafana-agent` 的当前状态：
+安装完成之后通过 `sudo systemctl start grafana-agent` 将其启动，并可通过 `sudo systemctl status grafana-agent` 显示 `grafana-agent` 的当前状态：
 
 ```
 ● grafana-agent.service - Monitoring system and forwarder
@@ -40,5 +40,40 @@ Mar 12 05:08:43 example-name systemd[1]: Started Monitoring system and forwarder
 sudo systemctl enable grafana-agent.service
 ```
 
+## 上报监控数据
+
+`grafana-agent` 的默认配置文件为 `/etc/grafana-agent.yaml`：
+
+```
+# Sample config for Grafana Agent
+# For a full configuration reference, see: https://grafana.com/docs/agent/latest/configuration/.
+server:
+  log_level: warn
+
+metrics:
+  global:
+    scrape_interval: 1m
+  wal_directory: '/var/lib/grafana-agent'
+  configs:
+    # Example Prometheus scrape configuration to scrape the agent itself for metrics.
+    # This is not needed if the agent integration is enabled.
+    # - name: agent
+    #   host_filter: false
+    #   scrape_configs:
+    #     - job_name: agent
+    #       static_configs:
+    #         - targets: ['127.0.0.1:9090']
+
+integrations:
+  agent:
+    enabled: true
+  node_exporter:
+    enabled: true
+    include_exporter_metrics: true
+    disable_collectors:
+      - "mdadm"
+```
+
 ## 参考
 * [Install Grafana Agent on Linux](https://grafana.com/docs/agent/latest/set-up/install-agent-linux/)
+* [Getting started with the Grafana Cloud Agent, a remote_write-focused Prometheus agent](https://grafana.com/blog/2020/07/02/getting-started-with-the-grafana-cloud-agent-a-remote_write-focused-prometheus-agent/)
