@@ -160,6 +160,15 @@ integrations:
 ```
 
 ## Grafana 展示
+对于自定义服务的监控展示使用自己熟悉的方式即可，例如 `Java` 应用可以配合使用 [JVM (Micrometer)](https://grafana.com/grafana/dashboards/4701-jvm-micrometer/)。
+
+对于 `grafana-agent` 自身的监控展示可以结合 [agent-remote-write.json](https://github.com/grafana/agent/blob/main/example/docker-compose/grafana/dashboards/agent-remote-write.json)：
+
+![alt](/images/grafana-cloud-2.png)
+
+最后，`grafana-agent` 对于所在主机的监控展示可以借助 [Node Exporter Full](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)：
+
+![alt](/images/grafana-cloud-3.png)
 
 ## 参考
 * [Install Grafana Agent on Linux](https://grafana.com/docs/agent/latest/set-up/install-agent-linux/)
