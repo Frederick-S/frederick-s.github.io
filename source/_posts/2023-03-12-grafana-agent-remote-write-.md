@@ -91,6 +91,63 @@ integrations:
             application: 'My Spring Boot App'
 ```
 
+最后，再通过 `remote_write` 设置将监控数据推送到 `Grafana Cloud` 下的 `Prometheus`：
+
+```
+remote_write:
+  - url: https://prometheus-xxx.grafana.net/api/prom/push
+    basic_auth:
+      username: username
+      password: password
+```
+
+其中 `url`，`username` 和 `password` 这三个信息都可以在所创建的 `Grafana Cloud Stack` 下的 `Prometheus` 的详情页中找到。`password` 对应 `Grafana Cloud API Key`，如果之前没有创建过的话需要新生成一个，角色选择 `MetricsPublisher` 即可：
+
+![alt](/images/grafana-cloud-1.png)
+
+完整的配置文件示例如下：
+
+```
+server:
+  log_level: warn
+
+metrics:
+  global:
+    scrape_interval: 1m
+  wal_directory: '/var/lib/grafana-agent'
+  configs:
+    - name: 'My Spring Boot App'
+      scrape_configs:
+        - job_name: 'My Spring Boot App'
+          metrics_path: '/actuator/prometheus'
+          scrape_interval: 1m
+          static_configs:
+            - targets: ['127.0.0.1:8080']
+              labels:
+                application: 'My Spring Boot App'
+      remote_write:
+        - url: https://prometheus-xxx.grafana.net/api/prom/push
+          basic_auth:
+            username: username
+            password: password
+
+integrations:
+  agent:
+    enabled: true
+  node_exporter:
+    enabled: true
+    include_exporter_metrics: true
+    disable_collectors:
+      - "mdadm"
+  prometheus_remote_write:
+    - url: https://prometheus-xxx.grafana.net/api/prom/push
+      basic_auth:
+        username: username
+        password: password
+```
+
+## Grafana 展示
+
 ## 参考
 * [Install Grafana Agent on Linux](https://grafana.com/docs/agent/latest/set-up/install-agent-linux/)
 * [Getting started with the Grafana Cloud Agent, a remote_write-focused Prometheus agent](https://grafana.com/blog/2020/07/02/getting-started-with-the-grafana-cloud-agent-a-remote_write-focused-prometheus-agent/)
