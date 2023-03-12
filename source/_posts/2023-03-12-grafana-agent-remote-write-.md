@@ -41,6 +41,7 @@ sudo systemctl enable grafana-agent.service
 ```
 
 ## 上报监控数据
+`grafana-agent` 上报的监控数据分两种，一种是 `grafana-agent` 自身及其所在主机的监控数据，另一种是自定义服务的监控数据，我们需要修改 `grafana-agent` 的配置文件来指定如何收集监控数据。
 
 `grafana-agent` 的默认配置文件为 `/etc/grafana-agent.yaml`：
 
@@ -72,6 +73,22 @@ integrations:
     include_exporter_metrics: true
     disable_collectors:
       - "mdadm"
+```
+
+自定义服务的监控数据收集需要定义在 `metrics.configs` 下，`grafana-agent` 自身及其所在主机的监控数据收集默认已经是开启的。
+
+假设需要收集由 `Spring Boot` 的 `actuator` 模块所暴露的 `Prometheus` 监控数据，则需要在 `metrics.configs` 下新增如下类似配置：
+
+```  
+- name: 'My Spring Boot App'
+  scrape_configs:
+    - job_name: 'My Spring Boot App'
+      metrics_path: '/actuator/prometheus'
+      scrape_interval: 1m
+      static_configs:
+        - targets: ['127.0.0.1:8080']
+          labels:
+            application: 'My Spring Boot App'
 ```
 
 ## 参考
