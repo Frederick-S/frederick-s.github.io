@@ -214,6 +214,84 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/08/ssh-installation-couldnot-be-found-error-when-running-remote-ssh-in-vscode/" class="post-title-link" itemprop="url">VS Code remote development tool error - An SSH installation couldn't be found</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-08 00:00:00" itemprop="dateCreated datePublished" datetime="2019-08-08T00:00:00+08:00">2019-08-08</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>592</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>I ran into an error when running <code>Remote - SSH</code> in Visual Studio Code on Windows. The error shows that an SSH installation couldn’t be found, but I’ve installed the git client. Finally I found some useful info in the doc:</p>
+<blockquote>
+<p>VS Code will look for the <code>ssh</code> command in the PATH. Failing that, on Windows it will attempt to find <code>ssh.exe</code> in the default Git for Windows install path. You can also specifically tell VS Code where to find the SSH client by adding the <code>remote.SSH.path</code> property to <code>settings.json</code>.</p>
+</blockquote>
+<p>My git client was not installed in the default path, thus VS Code couldn’t find the <code>ssh</code> command. So I added the <code>remote.SSH.path</code> property to <code>settings.json</code> and problem solved.</p>
+<p>Reference:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/docs/remote/troubleshooting#_installing-a-supported-ssh-client">Installing a supported SSH client</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2019/02/26/how-to-exclude-sub-folder-in-filelocator-pro/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -827,7 +905,7 @@ Because the app part doesn’t have a title under these 2 modes. Of course it wi
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

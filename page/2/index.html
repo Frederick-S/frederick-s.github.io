@@ -214,6 +214,186 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/11/mit-6.824-frangipani/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/11/mit-6.824-frangipani/" class="post-title-link" itemprop="url">MIT 6.824 - Frangipani: A Scalable Distributed File System</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-06-11 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-11T00:00:00+08:00">2022-06-11</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>28 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p>这是一篇上世纪九十年代的论文，在当时的环境下，安装新工作站的需求与日俱增，而针对大量工作站的文件系统管理却费时费力。为了保存更多的文件和服务更多的用户，就需要更多的磁盘，并挂载到更多的机器上。某一组文件经常会被手动分配给某些特定的磁盘，当磁盘空间不足，异常或者成为性能热点时，就需要手动移动或者复制文件到其他磁盘上。使用 <code>RAID</code> 技术管理多个磁盘只能解决部分问题；当系统增长到需要多个磁盘阵列和多台服务器时，系统管理问题也随之而来。</p>
+<p><code>Frangipani</code> 是一个可扩展的分布式文件系统，它能统一管理挂载在不同机器上的磁盘，对外来说，这些磁盘构成了一个独立的共享存储池。组成 <code>Frangipani</code> 的机器默认能够被统一管理而且相互间能安全的通信。在 <code>Frangipani</code> 之前已经有了一些分布式文件系统的实现，并且在吞吐和容量上有很好的扩展性。<code>Frangipani</code> 的一个显著特性是它的内部结构非常简单——各台协作的机器共同访问一个通用的存储，并使用锁来保证访问的同步性。这种简单的结构使得只需要少量的机器就能处理系统恢复，重配置和负载均衡。<code>Frangipani</code> 的另一个关键特性是相比于已知的分布式文件系统，它结合了一系列功能使得 <code>Frangipani</code> 更易于使用和管理：</p>
+<ol>
+<li>所有用户读取到的文件内容都相同。</li>
+<li>可以轻易的向 <code>Frangipani</code> 添加更多的服务器来增加存储容量和吞吐，而无需修改已有服务器的配置，或者中断其操作。这些服务器可以像积木一样根据需要搭建来构建更大的文件系统。</li>
+<li>系统管理员添加新用户时无需关心新用户的数据会由哪台服务器管理或者保存在哪个磁盘上。</li>
+<li>系统管理员可以对整个文件系统进行完整和一致的备份，而无需停止服务。备份可以在线进行，使得用户可以快速访问被意外删除的文件。</li>
+<li>文件系统可以在无需人工干预的情况下容忍机器、网络、磁盘异常并自行恢复。</li>
+</ol>
+<p><code>Frangipani</code> 构建于 <code>Petal</code> 之上，<code>Petal</code> 是一个易于管理的分布式存储系统，为客户端提供了虚拟磁盘。和物理磁盘一样，<code>Petal</code> 的虚拟磁盘也是以块（<code>block</code>）的方式来读取和写入。和物理磁盘不同的是，一个 <code>Petal</code> 虚拟磁盘提供了<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>字节的稀疏地址空间，并且只在需要的时候才会分配物理存储。<code>Petal</code> 也支持数据备份来保证高可用。<code>Petal</code> 同时提供了高效的快照功能来支持一致性备份。<code>Frangipani</code> 从下层存储系统继承了扩展性，容错和易于管理的特性，不过将这些特性扩展到文件系统还需要些细致的设计。下一节将会详细描述 <code>Frangipani</code> 的结构以及和 <code>Petal</code> 的关系。</p>
+<p><img src="/images/frangipani-1.png" alt="alt" /></p>
+<p>上图展示了 <code>Frangipani</code> 的层级设计。多个可替换的 <code>Frangipani</code> 服务器运行于一个共享的 <code>Petal</code> 虚拟磁盘之上，不同的用户程序可以各自通过连接的 <code>Frangipani</code> 服务器来访问相同的文件，而各 <code>Frangipani</code> 服务器间通过分布式锁服务来保证数据的一致性。通过添加 <code>Frangipani</code> 服务器可以实现对文件系统层的扩展。<code>Frangipani</code> 通过异常服务器的自动恢复和借助依然存活的服务器来提供服务实现了容错。相比于中心化的网络文件服务器，<code>Frangipani</code> 通过将负载分摊到各个正在使用文件的机器上来提供更好的负载均衡。出于扩展性，容错和负载均衡的考虑，<code>Petal</code> 和 <code>Frangipani</code> 用到的锁服务也是分布式的。</p>
+<p><code>Frangipani</code> 服务器默认信任 <code>Petal</code> 服务器和锁服务。<code>Frangipani</code> 的最佳使用场景是在同一个管理域下的工作站集群，虽然它也可以扩展到其他管理域下。因此，<code>Frangipani</code> 可以被看做是一个集群文件系统。</p>
+<p>论文的作者在 <code>DIGITAL Unix 4.0</code> 之上实现了 <code>Frangipani</code>。得益于 <code>Frangipani</code> 在 <code>Petal</code> 之上构建的简洁的层级设计，使得在几个月内实现了一个可用的系统。</p>
+<p><code>Frangipani</code> 的目标运行环境的场景是程序开发和工程。测试表明在这样的负载下，<code>Frangipani</code> 有着优秀的性能并且能很好的扩展，而最终的性能上限则受限于网络能力。</p>
+<h2 id="系统结构"><a class="markdownIt-Anchor" href="#系统结构"></a> 系统结构</h2>
+<p><img src="/images/frangipani-2.png" alt="alt" /></p>
+<p>上图展示了 <code>Frangipani</code> 系统下各机器的一种典型职责分配。最上方的机器运行着用户程序和 <code>Frangipani</code> 的文件服务模块，这些机器无需挂载磁盘。最下方的机器运行着 <code>Petal</code> 和分布式锁服务。</p>
+<p>不过在实际场景中，组成 <code>Frangipani</code> 的机器无需严格按照上图中的描述承担职责。<code>Petal</code> 和 <code>Frangipani</code> 文件服务不一定要运行在不同的机器上；每台运行着 <code>Petal</code> 的机器也可以同时运行着 <code>Frangipani</code> 文件服务，特别是当 <code>Petal</code> 的机器负载不高时。分布式锁服务独立于系统中的其他服务，上图中描述了每个 <code>Petal</code> 机器上运行着一个锁服务，不过它们也可以运行在 <code>Frangipani</code> 或者其他可用的机器上。</p>
+<h3 id="组件"><a class="markdownIt-Anchor" href="#组件"></a> 组件</h3>
+<p>如前面的图中所示，用户程序通过标准的系统调用接口来访问 <code>Frangipani</code>。运行在不同机器上的应用程序能访问到相同的文件，而且看到的文件内容也是相同的；也就是说，如果在某台机器上修改了某个文件或者文件夹，那么运行在其他机器上的程序也能马上看到这个修改。对于使用 <code>Frangipani</code> 的程序来说，<code>Frangipani</code> 提供的文件操作语义保证和本地 <code>Unix</code> 文件系统提供的文件操作语义保证相同：程序对文件的修改会先暂存在内核的缓冲区中，在下一次的 <code>fsync</code> 或者 <code>sync</code> 系统调用之前，系统不保证对文件的修改会保存到非易失存储上，不过系统会记录对文件元数据的修改并且可选的保证当系统调用返回时，文件的元数据修改已经保存到了非易失存储上。和本地文件系统的文件操作语义有点小小的不同，<code>Frangipani</code> 中文件的最后访问时间是一个近似值，从而避免了每次读取文件时都需要写元数据。</p>
+<p>每台机器上的 <code>Frangipani</code> 文件服务模块运行在操作系统内核中。通过内核的 <code>file system switch</code> <code>Frangipani</code> 将自己注册为一个可用的文件系统实现。<code>Frangipani</code> 的文件服务模块使用了内核的缓冲区来缓存最近使用的文件数据。它通过本地的 <code>Petal</code> 设备驱动来实现对 <code>Petal</code> 虚拟磁盘的读写。每个文件服务器使用相同的数据结构来读取和写入文件到共享的 <code>Petal</code> 磁盘上，不过各服务器会在 <code>Petal</code> 磁盘的不同区域上针对进行中的修改维护各自的重做日志。因为 <code>Frangipani</code> 的重做日志保存在 <code>Petal</code> 中，所以当某个 <code>Frangipani</code> 服务器异常时，其他的服务器可以通过 <code>Petal</code> 访问日志并进行数据恢复。各 <code>Frangipani</code> 服务器之间无需通信；它们只会和 <code>Petal</code> 和分布式锁通信。这就简化了服务器的添加，删除和恢复。</p>
+<p><code>Petal</code> 的设备驱动程序掩盖了 <code>Petal</code> 分布式的特性，对操作系统的上层应用来说，<code>Petal</code> 就等同于是一块本地磁盘。驱动程序负责和正确的 <code>Petal</code> 服务器通信，以及如果当前的服务器发生异常，能切换到另一台可用的服务器。类似 <code>Digital Unix</code>  的文件系统都可以运行在 <code>Petal</code> 之上，不过只有 <code>Frangipani</code> 提供了多客户端下访问同一文件的数据一致性特性。</p>
+<p><code>Petal</code> 的各服务器基于本地挂载的物理磁盘并通过协作来向 <code>Frangipani</code> 提供大型，可扩展，容错的虚拟磁盘。<code>Petal</code> 可以容忍一个或多个磁盘或者服务器异常，只要大多数的 <code>Petal</code> 服务器依然存活并且相互之间可以通信，以及每个数据块都至少有一个副本保存在物理存储上并且能够被访问。</p>
+<p><code>Frangipani</code> 用到的锁服务能够为网络中的客户端提供通用的读写锁服务。出于容错和扩展性考虑，它的实现是分布式的。<code>Frangipani</code> 使用锁服务来协调对虚拟磁盘的访问，以及保证各服务器内文件缓存的一致性。</p>
+<h3 id="安全和客户端服务器配置"><a class="markdownIt-Anchor" href="#安全和客户端服务器配置"></a> 安全和客户端/服务器配置</h3>
+<p>如 <code>Fugure 2</code> 所示，每台运行着用户程序的机器同时运行着 <code>Frangipani</code> 的文件服务模块。虽然这种配置有利于负载均衡和扩展，不过存在安全隐患。每个 <code>Frangipani</code> 机器都可以对共享的 <code>Petal</code> 虚拟磁盘上的数据块进行任意读写，所以 <code>Frangipani</code> 必须运行在受信任的操作系统上；类似于 <code>NFS</code> 的远程文件访问协议中的身份认证还不足以保证安全性。完整的安全性也要求 <code>Petal</code> 和锁服务运行在受信任的操作系统上，并且 <code>Frangipani</code>、<code>Petal</code>、锁服务这三个组件都需要能够互相认证。最后，为了保证文件数据的私有性，也需要保证没有人能够窃听 <code>Petal</code> 和 <code>Frangipani</code> 机器间的网络通信。</p>
+<p>一种解决方案是运行用户程序的机器被设置为不允许运行自定义修改的操作系统，同时这些机器间通过一个私有网络连接并且用户程序没有权限访问。不过这并不是说需要将所有的机器放在同一个机房中并通过私有的物理网络相连；可以借助某些加密技术来实现系统的安全启动，以及某些认证技术和加密链路来保证通信安全性。另外，对于某些应用程序来说，一个不完整的解决方案也是可以接受的；典型的如 <code>NFS</code> 就不能防止网络窃听以及杜绝用户在自己的工作站上运行修改后的操作系统。论文的作者并没有实现所有的安全措施，不过 <code>Frangipani</code> 基本也可以达到 <code>NFS</code> 的安全级别，<code>Petal</code> 服务器只会接受来自已知网络地址的 <code>Frangipani</code> 服务器的请求。</p>
+<p><img src="/images/frangipani-3.png" alt="alt" /></p>
+<p>如上图所示，<code>Frangipani</code> 文件系统可以扩展到外部非受信的管理域中。图中区分开了 <code>Frangipani</code> 客户端和服务端。只有受信的 <code>Frangipani</code> 服务端可以和 <code>Petal</code> 以及锁服务通信。这三个组件可以放置在一个受限制的环境中并且通过私有的网络连接。而外部的非受信远程客户端只能和 <code>Frangipani</code> 服务端通信，而不能直接访问 <code>Petal</code> 服务器。</p>
+<p>客户端可以和 <code>Frangipani</code> 服务端以任何操作系统支持的文件访问协议通信，例如 <code>DCE/DFS</code>，<code>NFS</code>，<code>SMB</code>，因为对于运行着 <code>Frangipani</code> 服务端的机器来说，<code>Frangipani</code> 就类似于是个本地文件系统。当然，如果访问协议本身支持一致性访问是最好的（例如 <code>DCE/DFS</code>），从而使得 <code>Frangipani</code> 的多服务器间的一致性不会在上一层丢失。理想情况下，客户端的访问协议需要支持故障转移。上述提到的协议并不直接支持故障转移，不过在其他系统中如果某台服务器发生异常，会有另一台服务器接管并复用异常服务器的 <code>IP</code> 地址，因此可以在这里应用同样的手段。</p>
+<p>除了安全之外，还有第二个原因要使用上述的客户端/服务端配置。因为 <code>Frangipani</code> 运行在操作系统内核，不能快速的适配不同的操作系统甚至是不同版本的 <code>Unix</code>。所以通过远程客户端的方式就能使得运行不支持的操作系统的客户端也能够使用 <code>Frangipani</code>。</p>
+<h3 id="讨论"><a class="markdownIt-Anchor" href="#讨论"></a> 讨论</h3>
+<p>构建文件系统的分层思想——低层提供存储服务，高层提供命名，文件夹和文件服务，并不是 <code>Frangipani</code> 独有的。最早应用这个思想的是 <code>Universal File Server</code>。不过，<code>Petal</code> 提供的存储功能和早先的系统大有不同，从而引申出不同的上层结构设计。</p>
+<p><code>Frangipani</code> 的设计是基于 <code>Petal</code> 提供的抽象存储服务，作者还未充分考虑为了适配其他的存储服务（例如 <code>NASD</code>）需要对 <code>Frangipani</code> 做出哪些修改。</p>
+<p><code>Petal</code> 提供了高可用的存储服务并且能够通过添加资源来实现对吞吐和容量的扩展。不过，<code>Petal</code> 不提供协同功能或者在多个客户端间共享存储。另外，大部分的应用程序不能直接使用 <code>Petal</code> 的接口因为 <code>Petal</code> 面向的是磁盘而不是文件。<code>Frangipani</code> 在 <code>Petal</code> 之上构建了文件系统层使得在保留和扩展了 <code>Petal</code> 有用的特性的同时对应用程序更加易用。</p>
+<p><code>Frangipani</code> 的一个优势是能够透明的添加服务器，删除服务器以及实现故障恢复。通过将预写日志、锁和提供一致性访问、高可用的存储结合使用，<code>Frangipani</code> 能轻易的实现这个特性。</p>
+<p><code>Frangipani</code> 的另一个特性是能在文件系统运行时生成一致性的备份。这个机制会在后面介绍。</p>
+<p>不过 <code>Frangipani</code> 的设计可能在三个方面上存在问题。基于启用了副本的 <code>Petal</code> 虚拟磁盘构建的 <code>Frangipani</code> 有时候会记录重复的日志，一次是 <code>Frangipani</code> 自己写入的日志，这里是 <code>Frangipani</code> 为客户端提供服务；另一次是 <code>Petal</code>记录的日志，这里以 <code>Petal</code> 的视角来说 <code>Frangipani</code> 成为了客户端。第二，<code>Frangipani</code> 无法根据磁盘的位置来选择在哪里保存数据，因为 <code>Petal</code> 提供的是虚拟的磁盘，之所以有这个需求可能是因为类似于 <code>GFS</code> 选择在哪里放置副本一样，如果 <code>Frangipani</code> 能知道具体磁盘的位置，它就能选择一个距离客户端近的磁盘保存文件。最后，<code>Frangipani</code> 会对整个文件或者文件夹加锁而不是对某个数据块加锁。不过作者还没有足够的使用经历来评估这三个问题的影响，不过撇开它们不谈，在作者所处环境下测试出的 <code>Frangipani</code> 的性能还是不错的。</p>
+<h2 id="磁盘布局"><a class="markdownIt-Anchor" href="#磁盘布局"></a> 磁盘布局</h2>
+<p><code>Frangipani</code> 使用 <code>Petal</code> 提供的巨大、稀疏的磁盘地址空间来简化其数据结构。这个想法是受之前有着巨大内存空间的计算机上的相关工作所启发。因为有着如此巨大的地址空间所以可以将其任意切分。</p>
+<p>一个 <code>Petal</code> 虚拟磁盘有<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>字节的地址空间。<code>Petal</code> 只会在物理磁盘空间写入后才会将其提交到虚拟地址中。<code>Petal</code> 同时提供了 <code>decommit</code> 原语用来释放某个范围内的虚拟地址所关联的物理磁盘空间。</p>
+<p>为了使内部的数据结构足够小，<code>Petal</code> 会以较大的数据块来提交（<code>commit</code>）和回收（<code>decommit</code>）虚拟地址，目前的数据块大小是 <code>64 KB</code>。也就是说，对于每个 <code>64 KB</code> 的虚拟地址空间<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mi>a</mi><mo>∗</mo><msup><mn>2</mn><mn>16</mn></msup><mo separator="true">,</mo><mo stretchy="false">(</mo><mi>a</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mo>∗</mo><msup><mn>2</mn><mn>16</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">[a * 2^{16}, (a + 1) * 2^{16})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">(</span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">∗</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，如果有数据写入且没有被回收，那么同时就需要分配 <code>64 KB</code> 的物理磁盘地址空间。因此 <code>Petal</code> 客户端写入的数据不能太稀疏，否则可能由于碎片化造成物理磁盘空间浪费。下图展示了 <code>Frangipani</code> 如何切分 <code>Petal</code> 的虚拟磁盘空间：</p>
+<p><img src="/images/frangipani-4.png" alt="alt" /></p>
+<p>图中的第一个区域用于保存共享的配置参数和其他信息。这个区域的最大大小是 <code>1 T</code>，不过目前实际上只用了几 <code>K</code>。</p>
+<p>第二个区域用于保存日志。每个 <code>Frangipani</code> 服务器会在这块区域中选择一部分来保存自己的私有日志。这里总共预留了 <code>1 T</code> 的空间，并切分为256个分区，所以可以保存256份日志。这就限制了一个 <code>Petal</code> 虚拟磁盘最多支持256个 <code>Frangipani</code> 服务器，不过这可以轻易的通过调整分区个数来扩展。</p>
+<p>第三个区域用于保存分配位图，从而知道余下的虚拟空间中哪些是可用的。每个 <code>Frangipani</code> 服务器会独占式的锁住这块区域中的某一部分。当某台 <code>Frangipani</code> 服务器的分配位图空间不够时，它会再次找到可用的区域然后加锁使用。整个区域的大小是 <code>3 T</code>。</p>
+<p>第四个区域用于保存 <code>inode</code>。每个文件需要一个 <code>inode</code> 来保存元数据，例如访问的时间戳和指向文件数据位置的指针。对于符号链接来说它们的数据直接保存在了 <code>inode</code> 中。每个 <code>inode</code> 的大小为512字节，和磁盘块的大小相同，从而避免了两个服务器同时访问同一个磁盘块上保存的不同 <code>inode</code> 所带来的竞争（也就是 <code>false sharing</code>，<a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/frangipani-faq.txt">FAQ for Frangipani, Thekkath, Mann, Lee, SOSP 1997</a> 中对这个问题有所解释，磁盘数据的读取以块为单位，如果 <code>inode</code> 小于512字节，某个 <code>Frangipani</code> 服务器先读取了磁盘数据块并缓存，此时另一个服务器需要读取和修改同一个磁盘数据块上的 <code>inode</code>，那么为了保证缓存一致性，第一个服务器再次读取 <code>inode</code> 时就需要重新读取磁盘数据块并刷新缓存，造成两个服务器交替的读取修改同一个数据块的内容，缓存也就失去了意义，而本质上两个服务器之间并不应该有竞争。）。整个区域的大小是 <code>1 TB</code>，所以可以保存<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup></mrow><annotation encoding="application/x-tex">2^{31}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>个 <code>inode</code>。在位图分配区域中的比特位和 <code>inode</code> 的映射是固定的，也就是说根据位图分配区域中的比特位地址就能推算出对应 <code>inode</code> 的地址，所以每个 <code>Frangipani</code> 为新文件所创建的 <code>inode</code> 地址在第四个区域中的偏移比例和该 <code>inode</code> 对应位图分配区域中的比特位的偏移比例是一致的。不过任何一个 <code>Frangipani</code> 都可能读写或释放某个已经存在的文件的 <code>inode</code>。</p>
+<p>第五个区域用于保存小数据块，每个数据块大小为 <code>4 KB</code>（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">2^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span>字节）。一个文件的前 <code>64 KB</code>（16个数据块） 的内容会保存在小数据块中。如果某个文件的大小超过 <code>64 KB</code>，则超过的部分会保存在一个大数据块中。<code>Frangipani</code> 在一个 <code>Fetal</code> 虚拟磁盘上最多可以分配<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>47</mn></msup></mrow><annotation encoding="application/x-tex">2^{47}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span></span>字节（<code>128 T</code>）的小数据块，共计<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>35</mn></msup></mrow><annotation encoding="application/x-tex">2^{35}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span>块，是 <code>inode</code> 最大数量的16倍。</p>
+<p><code>Petal</code> 虚拟磁盘剩下的地址空间用于保存大数据块。每个大数据块有 <code>1 TB</code> 空间。</p>
+<p>选择 <code>4 KB</code> 作为数据块大小会比更小的数据块的策略更容易产生磁盘碎片。同时，一个 <code>inode</code> 512字节在某种程度上也是空间浪费。可以将小文件直接保存在 <code>inode</code> 中来缓解这个问题。虽然存在碎片和空间浪费的问题，不过出于设计简洁性的考虑，作者认为这是一种合理的折中选择。</p>
+<p>在当前的设计下，<code>Frangipani</code> 能保存的大文件个数小于<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup></mrow><annotation encoding="application/x-tex">2^{24}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>（1600万，大文件需要保存在大数据块中，一个大数据块 <code>1 T</code>，而虚拟空间最大地址<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>，即<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup><mi>T</mi></mrow><annotation encoding="application/x-tex">2^{24} T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span>，又因为不是整个空间都用来保存大文件，所以实际个数小于<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup></mrow><annotation encoding="application/x-tex">2^{24}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>），大文件是指大于 <code>64 KB</code> 的文件。另外，<code>Frangipani</code> 能保存文件的最大大小是16个小数据块加上一个大数据块（<code>64 KB</code> 加 <code>1 TB</code>）。如果需要保存更多的文件，可以通过减小大数据块的大小来解决；以及允许一个大文件可以保存在多个大数据块中，这样就可以提高最大能保存文件的大小。如果<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>字节的地址空间不够，则一个 <code>Frangipani</code> 服务器可以支持扩展为多个 <code>Petal</code> 虚拟磁盘组成的 <code>Frangipani</code> 文件系统。</p>
+<p>作者基于之前文件系统的使用经验设定了上述的系统参数。作者认为这种配置已经足够满足需求，不过还是需要时间和实际使用来检验。<code>Frangipani</code> 的设计足够灵活所以可以通过备份和恢复来验证合适的磁盘布局。</p>
+<h2 id="日志和恢复"><a class="markdownIt-Anchor" href="#日志和恢复"></a> 日志和恢复</h2>
+<p><code>Frangipani</code> 通过元数据的预写重做日志来简化异常恢复和提高性能；不过用户的数据并不会记录到日志中。每个 <code>Frangipani</code> 服务器会将自己的日志保存在 <code>Petal</code> 中。当某个 <code>Frangipani</code> 服务器需要修改某个元数据时，它会首先生成一条日志来描述具体的修改内容并将其添加到内存日志中。这些内存中的日志会周期性的按照修改请求发起的顺序写入到 <code>Petal</code> 中（<code>Frangipani</code> 同时也支持将日志同步的写入到 <code>Petal</code> 中，这会稍微提高容错性不过会增加元数据更新操作的延迟。）。只有当某条日志写入 <code>Petal</code> 之后，系统才会真正修改对应文件的元数据。实际文件的元数据更新会交由一个 <code>Unix</code> 的 <code>update</code> 守护进程来周期性（大概每隔30秒）的更新。</p>
+<p>在当前的实现中，<code>Frangipani</code> 写到 <code>Petal</code> 的日志的最大大小为 <code>128 KB</code>。根据 <code>Petal</code> 的空间分配策略，一份日志会拆分到两个不同的物理磁盘上，每个磁盘上的大小为 <code>64 KB</code>。<code>Frangipani</code> 会以环形缓冲（<code>circular buffer</code>）的方式来管理所分配的日志空间。当日志空间满时，<code>Frangipani</code> 会回收25%的最老的日志空间来存放新的日志。一般来说，被回收的日志所对应的元数据修改都应该已经写入到了 <code>Petal</code> 中（通过之前的 <code>sync</code> 操作），因此回收日志时不需要额外的写操作。如果回收日志时发现存在某些待回收的日志所对应的元数据修改还没有写入到 <code>Petal</code>，则需要先执行元数据的写入操作再回收日志。根据日志缓冲区和单条 <code>Frangipani</code> 日志的大小（80-128字节），如果在两个 <code>sync</code> 周期内存在1000-1600个元数据修改操作就能写满整个日志缓冲区。</p>
+<p>如果某个 <code>Frangipani</code> 服务器发生异常，系统最终能检测到异常并根据该 <code>Frangipani</code> 服务器的日志进行恢复。<code>Frangipani</code> 服务器异常可以被所访问的客户端发现，或者当锁服务向持有锁的 <code>Frangipani</code> 服务器要求返回锁而没有响应时发现。当异常发生时，负责恢复的守护进程会临时拥有异常的 <code>Frangipani</code> 服务器的日志和锁的所有权。异常恢复进程会先找到异常服务器日志的起始位置和结束位置，然后逐条检查每一条日志，判断哪些日志所对应的元数据更新还没有被执行。当日志处理完成后，异常恢复进程就会释放所持有的锁并清空日志。其他的 <code>Frangipani</code> 服务器就可以在不受异常服务器影响的情况下继续工作，而异常的服务器可以在稍后被重启（对应的日志为空）。只要底层的 <code>Petal</code> 磁盘依然可用，系统就能容忍任意数量的 <code>Frangipani</code> 服务器异常。</p>
+<p>为了确保异常恢复进程能找到异常服务器的日志的结束位置（即使磁盘控制器没有按照顺序写数据），系统为每512字节的日志数据块分配了一个递增的序号。只要发现某个数据块的序号小于前一个数据块的序号，那就说明前一个数据块就是日志的结束位置。</p>
+<p><code>Frangipani</code> 确保了日志和异常恢复能正确的处理多条日志。不过这在细节上有几点要注意。</p>
+<p>首先，在下一节会介绍到 <code>Frangipani</code> 的锁协议保证了多个服务器对同一个数据的更新请求会被串行执行。某个持有写锁且修改了数据的服务器需要先将修改的数据写回到 <code>Petal</code> 后才能释放锁，所以要么是该服务器在正常情况下数据更新完成后主动释放锁，要么是服务器异常后由异常恢复进程在数据更新完成后释放锁。这说明对于任意的数据块来说，整个系统中最多只可能有一条数据修改的日志还未完成。</p>
+<p>第二，<code>Frangipani</code> 确保了异常恢复进程只会处理异常服务器在持有锁之后但还未释放锁期间记录的日志。这是为了确保锁协议保证的更新串行化不会被破坏。<code>Frangipani</code> 使用了更强的条件限制来实现这一保证：异常恢复进程永远不会重新执行一个已经执行完成的数据更新。为了保证这一点，<code>Frangipani</code> 给每512字节的元数据块分配了一个版本号。而类似于文件夹的元数据有可能会跨多个数据块，所以也会有多个版本号。对于每个日志要修改的数据块，日志会记录修改的内容及新的版本号。在异常恢复时，恢复进程会比较当前元数据块最新的版本号和日志中记录的版本号，只有当日志中的版本号大于当前最新的版本号时，恢复进程才会执行重做日志。</p>
+<p>由于 <code>Frangipani</code> 记录更新日志时不会记录用户数据，而只有元数据块给版本号预留了空间。这就带来了一个潜在问题。如果某个数据块一开始被用于保存元数据，后来空间被释放，然后又被用来保存用户数据，那么恢复进程就不能正确的跳过依然引用了这个元数据块（现在的用户数据块）的日志，因为原来保存元数据块中的版本号信息已经被用户数据所覆盖，所以恢复进程就无法比较日志中的版本号的大小。<code>Frangipani</code> 通过要求被释放的元数据块只能用于保存新的元数据来避免这个问题。</p>
+<p>最后，<code>Frangipani</code> 保证在任一时刻只会有一个异常恢复进程在恢复重做某个异常服务器的日志。<code>Frangipani</code> 通过对日志文件的互斥锁来实现这一保证。</p>
+<p><code>Frangipani</code> 的日志和异常恢复机制假定当出现磁盘写异常时，单个扇区中的内容要么都是旧的，要么都是新的，而不会是两者的混合。如果某个磁盘扇区已损坏并且在读操作时返回 <code>CRC</code> 异常，那么 <code>Petal</code> 内置的副本机制通常能恢复对应的数据。如果某个扇区的副本都损坏了，或者 <code>Frangipani</code> 内部的数据结构由于软件 <code>bug</code> 造成损坏，则需要对元数据进行一致性检查以及需要一个恢复工具（例如 <code>Unix</code> 的 <code>fsck</code>）进行数据恢复。不过论文的作者写论文时还未实现这个工具。</p>
+<p><code>Frangipani</code> 的日志并不是为了给用户提供高层次的执行语义保证。它的目的是为了提高元数据更新的性能以及发生服务器异常时通过避免执行 <code>fsck</code> 这样的恢复工具来加快异常恢复速度。因为 <code>Frangipani</code> 的日志只会记录元数据的更新，不会记录用户数据，所以站在用户的视角来说，当系统发生异常时，文件系统的状态和异常发生前并不能保证一致。论文的作者并不是声明这样的语义是理想的，不过这个行为和标准的本地 <code>Unix</code> 文件系统的行为是一样的。在本地 <code>Unix</code> 文件系统和 <code>Frangipani</code> 中，用户都可以在合适的时间点调用 <code>fsync</code> 来确保更好的数据一致性保证。</p>
+<p><code>Frangipani</code> 所使用的日志技术最早被应用于数据库，并在之后应用到其他某些基于日志的系统中。<code>Frangipani</code> 本身不是个日志结构（<code>log-structured</code>）的文件系统；它不会将所有的数据都保存在日志中，而是将数据按约定维护在磁盘中，通过较少的日志 <code>Frangipani</code> 实现了较好的性能和异常恢复的原子性。和其他基于日志的文件系统不同，但是和例如 <code>Zebra</code> 这样的日志结构文件系统相同，<code>Frangipani</code> 也会保存多份日志。</p>
+<h2 id="同步和缓存一致性"><a class="markdownIt-Anchor" href="#同步和缓存一致性"></a> 同步和缓存一致性</h2>
+<p>由于会有多个 <code>Frangipani</code> 服务器修改 <code>Petal</code> 的共享数据，所以需要一个细致化的同步手段来确保各服务器读取到的数据是一致的，以及当系统负载增加或者添加新的服务器时能通过有效的并发手段来提高性能。<code>Frangipani</code> 使用多读一写的读写锁来实现必要的同步。当锁服务侦测到冲突的锁请求时，它会要求锁的持有者释放锁或者进行锁降级（写锁降级为读锁）来消除冲突。</p>
+<p>读锁允许一个 <code>Frangipani</code> 服务器从磁盘中读取相应的数据并缓存。如果该服务器被要求释放锁，则在释放锁前必须先清空缓存。写锁允许一个 <code>Frangipani</code> 服务器读取或者修改数据并将其缓存。只有当某个服务器持有写锁时，它所缓存的数据才有可能和磁盘上保存的数据不同。因此，如果持有写锁的服务器被要求释放写锁或者降级为读锁，则必须先将修改的数据写回到磁盘。如果该服务器降级为了读锁，则依然可以保留缓存，不过如果释放了锁则必须清空缓存。</p>
+<p>相比于释放写锁或者降级为读锁时将缓存中的数据写回到磁盘，还可以选择直接将缓存中的数据发送给请求方。不过出于简洁性考虑 <code>Frangipani</code> 并没有这么做。首先，在 <code>Frangipani</code> 的设计中，<code>Frangipani</code> 服务器之间无需通信。它们只会和 <code>Petal</code> 以及锁服务通信。第二，当某台服务器异常时，<code>Frangipani</code> 的设计保证了系统只需要处理异常服务器的日志即可。如果选择将未写入到磁盘中的数据直接发送给请求方，而接收方发生异常时，指向未持久化的数据的日志可能分散在了多台服务器中。这就给系统恢复和日志空间回收都带来了问题。</p>
+<p><code>Frangipani</code> 将磁盘数据结构拆分为了一个个逻辑段，每个逻辑段都对应一把锁。为了避免 <code>false-sharing</code>，<code>Frangipani</code> 确保了一个磁盘扇区不会保存超过1个可共享的数据结构。将磁盘数据结构拆分为可加锁的段是为了将锁的数量控制的足够小，同时又能避免正常情况下的锁竞争，从而使得锁服务不会成为系统的瓶颈。</p>
+<p>每个 <code>Frangipani</code> 服务器的日志都是一个可加锁的段，因为这些日志都是私有的。磁盘布局中的位图区域也切分为了一个个段，并且相互之间加了互斥锁，所以分配新文件时不会发生竞争，因为每个服务器都在自己持有的段内分配。还未分配给文件的数据块或者 <code>inode</code> 也同时被位图中的同一把锁保护，只是该位置的空间当前被标记为可用状态。最后，每个文件，文件夹，或者符号链接都是一个段；也就是说，<code>inode</code> 和其指向的数据都被同一把锁保护。这种每个文件一把锁的锁粒度对于作者所在的工作负载来说已经足够了，因为文件几乎很少会被并发的修改。而对于其他的工作负载来说则可能需要更细粒度的锁。</p>
+<p>有些操作会要求原子的更新被多把锁保护的磁盘数据结构。<code>Frangipani</code> 通过对锁全局排序以及使用两阶段获取锁来避免死锁。首先，某台服务器先确定需要获取哪些锁。这个过程中会涉及获取或者释放某些锁，例如查找文件夹中的某些文件名。然后，服务器对锁按照 <code>inode</code> 的地址排序然后依次获取锁。同时服务器会检查在第一阶段中读取的对象是否在第二阶段发生了修改，如果发生了修改，那么该服务器会释放所有的锁然后重新执行第一阶段。否则，该服务器就可以开始执行具体的操作，在缓存中修改某些数据并记录一条日志。在缓存中的数据写回到磁盘前，该服务器都会持有相关的锁。</p>
+<p>上述描述的缓存一致性协议类似于 <code>Echo</code>、<code>Andrew File System</code>、<code>DCE/DFS</code> 和 <code>Sprite</code> 中的客户端文件缓存协议。这里使用的避免死锁的技术和 <code>Echo</code> 类似。和 <code>Frangipani</code> 一样，<code>Oracle Parallel Server</code> 同样是将缓存中的数据写回到磁盘，而不是直接将缓存中的数据发送给下一个写锁的持有者。</p>
+<h2 id="锁服务"><a class="markdownIt-Anchor" href="#锁服务"></a> 锁服务</h2>
+<p><code>Frangipani</code> 只需要一小部分，通用的锁功能，并且不希望锁服务在日常操作中成为性能瓶颈，有很多种实现可以满足这些需求。在 <code>Frangipani</code> 项目中，一共尝试了三种不同的锁服务的实现，其他已有的锁服务也可以提供需要的功能，只是在其之上可能需要编写额外的代码来适配。</p>
+<p>锁服务提供了多读一写的读写锁。这里的锁不会用完就马上释放，只要没有其他客户端请求相同的锁，这把锁就会一直被某个客户端持有（这里锁服务的客户端指的是 <code>Frangipani</code> 服务器）。</p>
+<p>锁服务通过租约来处理客户端异常。当某个客户端请求锁服务时，它会先获取一个租约。该客户端获取的所有锁都和这个租约绑定。每个租约有一个过期时间，目前是锁创建或者延期后30秒过期。客户端在租约过期前必须先延期，否则锁服务会认为客户端发生了异常。</p>
+<p>网络异常会妨碍 <code>Frangipani</code> 服务器延长租约，即使 <code>Frangipani</code> 服务器没有发生异常。当某个 <code>Frangipani</code> 服务器无法延长租约时，它会释放所有的锁并清空缓存。如果缓存中的数据被修改了，那么该服务器会打开某个内部标记使得后续的客户端请求都返回一个错误。相应的文件系统必须取消挂载才能删除这个异常。<code>Frangipani</code> 使用这种粗暴的方式来报告异常从而避免了异常被忽略。</p>
+<p>第一版的锁服务实现使用了单节点中心化的服务器，所有的锁状态都保存在了内存中。这种设计对于 <code>Frangipani</code> 来说是足够的，因为 <code>Frangipani</code> 的日志中记录了足够的信息，所以即使锁服务发生异常丢失了所有的状态系统也能够恢复。不过，锁服务异常会导致严重的性能问题。</p>
+<p>第二版的锁服务将锁的状态保存在 <code>Petal</code> 中，每个对锁状态的修改都会先写到 <code>Petal</code> 中，然后才会返回给客户端。如果锁服务的主节点异常，那么会由某个备份节点读取 <code>Petal</code> 中的锁状态然后接管异常的主节点并继续提供服务。在这个设计下，异常恢复更加透明，不过日常操作的性能会低于第一种锁实现。作者还未完全实现所有异常的自动恢复就开始了第三种锁服务的实现。</p>
+<p>第三版的锁服务是分布式的，并且能很好的支持容错和性能。它由一组相互间协作的锁节点组成，同时每个 <code>Frangipani</code> 服务器内嵌了一个 <code>clerk</code> 模块。</p>
+<p>锁服务将锁以表（<code>tables</code>）的形式组织，每个表以 <code>ASCII</code> 字符串的形式命名。每个表中的锁以64位的整型命名。一个 <code>Frangipani</code> 文件系统只使用一个 <code>Petal</code> 虚拟磁盘，虽然多个 <code>Frangipani</code> 文件系统可以挂载到同一个机器上。每个文件系统都绑定了一个关于锁的表。当一个 <code>Frangipani</code> 文件系统挂载时，<code>Frangipani</code> 服务器会请求内嵌的 <code>clerk</code>，然后 <code>clerk</code> 就会打开绑定的锁表。当 <code>clerk</code> 成功打开锁表时，锁服务会返回一个租约标识符，这个租约标识符会在后续通信中使用。当文件系统取消挂载时，<code>clerk</code> 就会关闭锁表。</p>
+<p><code>clerk</code> 和锁节点间使用异步消息而不是 <code>RPC</code> 来通信，这样做能减少内存的使用并同时有着足够好的灵活性和性能。和锁相关的基础消息类型是 <code>request</code>，<code>grant</code>，<code>revoke</code> 和 <code>release</code>。<code>request</code> 和 <code>release</code> 消息是由 <code>clerk</code> 发送给锁节点，而 <code>grant</code> 和 <code>revoke</code> 消息则是由锁节点发送给 <code>clerk</code>。锁的升级和降级同样由这四种消息类型来处理。</p>
+<p>锁服务使用了支持容错，分布式的异常监测机制来检测锁节点的异常。这个机制同时也被用于 <code>Petal</code>。该机制基于各节点间定期的心跳交换，同时使用了共识算法来容忍网络分区。</p>
+<p>一把锁会在服务端和 <code>clerk</code> 侧都需要消耗内存。在当前的实现中，服务端会为每个锁分配112字节，每个 <code>clerk</code> 如果有进行中或者已分配的锁请求则额外还需要104字节。所以每个客户端每个锁最多使用232字节。为了避免长时间持有锁带来的内存消耗，<code>clerk</code> 会丢弃长时间（1小时）未使用的锁。</p>
+<p>一小部分全局且不经常修改的状态信息会由 <code>Lamport</code> 的 <code>Paxos</code> 算法复制到所有的锁服务器上。锁服务复用了为 <code>Petal</code> 实现的 <code>Paxos</code> 算法。全局的状态信息包括锁服务器列表，每个锁服务器负责的锁列表，以及打开还未关闭锁表的 <code>clerk</code> 列表。这些信息用于达成共识，即在各个锁服务器间重新分配锁，当某个锁服务器发生异常时能恢复某个锁的状态，以及协助 <code>Frangipani</code> 服务器的异常恢复。从效率考虑，所有的锁被划分到100个不同的锁组中（<code>lock groups</code>），然后以组的形式分配给锁服务器，而不是以单个锁的形式。</p>
+<p>有时候一把锁会被重新分配给其他的锁服务器，一方面是为了故障转移，另一方面是为了充分利用刚异常恢复的锁服务器，避免流量集中。当某个锁服务器被永久的添加到集群或者从集群中删除时，会发生类似的锁重分配。在这种情况下，所有的锁始终会被重分配，因为需要保证每台锁服务器持有的锁的数量是均衡的，锁重分配的次数要尽可能的少，以及每个锁都只会分配给一台锁服务器。锁的重分配也是由两阶段进行。在第一阶段，各个锁服务器丢弃保存在内部状态中的锁。第二阶段，锁服务器会和 <code>clerk</code> 通信，根据其所打开的锁表来重新分配锁。锁服务器根据 <code>clerk</code> 的锁表来重新生成锁的状态，同时通知 <code>clerk</code> 每把锁在重新分配后对应的锁服务器。</p>
+<p>当某个 <code>Frangipani</code> 服务器异常时，在正确的恢复操作执行前，它所持有的锁不能被释放。特别的，系统需要先处理异常 <code>Frangipani</code> 服务器的日志并将未持久化的元数据更新写入到 <code>Petal</code>。当 <code>Frangipani</code> 服务器的租约到期时，锁服务会通知另一台 <code>Frangipani</code> 服务器上的 <code>clerk</code> 来执行恢复操作，并撤销原来异常服务器持有的全部锁。负责恢复的 <code>clerk</code> 会获取一把异常服务器的日志的互斥锁。这把锁同样分配了一个租约，所以当负责恢复的服务器异常时锁服务会再找一台服务器重新开始恢复任务。</p>
+<p>一般来说，<code>Frangipani</code> 系统能够容忍网络分区，并在可能的情况下继续运行，否则就停止服务。特别的，<code>Petal</code> 可以在网络分区的情况下继续运行，只要大多数的 <code>Petal</code> 服务器依然存活并且相互之间可以通信，不过如果某些 <code>Petal</code> 虚拟磁盘在大多数的 <code>Petal</code> 服务器上没有备份的话，那么这些磁盘无法被继续访问。同样的，只要大多数的锁服务器依然存活并且相互之间可以通信，整个锁服务也依然可用。如果某个 <code>Frangipani</code> 服务器无法和锁服务通信，那么它将再也不能延长租约。此时锁服务会认为这个 <code>Frangipani</code> 服务器发生异常，然后会基于它的日志挑选一个新的 <code>Frangipani</code> 服务器发起恢复流程。如果某个 <code>Frangipani</code> 服务器无法和 <code>Petal</code> 通信，那么它将无法读取和写入虚拟磁盘。不管在哪种情况下，<code>Frangipani</code> 服务器都会拒绝后续受影响的文件系统的用户请求，直到网络分区恢复以及文件系统被重新挂载。</p>
+<p>当 <code>Frangipani</code> 服务器的租约过期时存在一个潜在的问题。如果服务器依然存活而只是由于网络原因造成无法和锁服务通信，那么这台服务器可能依然会在租约过期后访问 <code>Petal</code>。<code>Frangipani</code> 服务器会在写入 <code>Petal</code> 前检查租约是否依然有效（并确保在未来的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>秒内依然有效）。不过，<code>Petal</code> 并不会校验某个写入请求是否还在租约有效期内。所以，如果 <code>Frangipani</code> 服务器检查租约和写请求到达 <code>Petal</code> 的时间大于剩余租约的时间，那就会带来一个问题：当 <code>Petal</code> 收到写请求时，租约已经过期，该服务器持有的写锁已经分配给了其他服务器。<code>Frangipani</code> 为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>选择了一个足够大的值（15秒）来确保在正常情况下上述问题不会发生，不过依然不能确保一定不会发生。</p>
+<p>在未来 <code>Frangipani</code> 会尝试解决这个问题，论文给出了一个可能的解决方案。<code>Frangipani</code> 会给每一个 <code>Petal</code> 的写请求附加一个过期的时间戳。这个时间戳的值为生成写请求时的租约过期时间减去<br />
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>。这样 <code>Petal</code> 就可以忽略任何时间戳小于当前时间的写请求。只要 <code>Petal</code> 和 <code>Frangipani</code> 服务器的时钟在<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>t</mi><mrow><mi>m</mi><mi>a</mi><mi>r</mi><mi>g</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">t_{margin}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9011879999999999em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">g</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>内保持同步，<code>Petal</code> 就能够可靠的拒绝租约过期的写请求。</p>
+<p>另一种解决方案则不依赖时钟同步，但是需要将锁服务和 <code>Petal</code> 集成，并且将 <code>Frangipani</code> 服务器获取的租约标识符附加到写请求中，<code>Petal</code> 收到写请求后就可以根据租约标识符校验租约是否过期，从而拒绝过期的写请求。</p>
+<h2 id="添加和删除服务器"><a class="markdownIt-Anchor" href="#添加和删除服务器"></a> 添加和删除服务器</h2>
+<p>系统管理员有时需要添加或者删除 <code>Frangipani</code> 服务器。<code>Frangipani</code> 被设计成能够轻易的处理这些场景。</p>
+<p>添加一台服务器到运行中的系统只需要一点点的系统管理工作。新添加的服务器只需要知道使用哪块 <code>Petal</code> 虚拟磁盘以及锁服务的地址即可。新添加的服务器会和锁服务通信来获取租约，然后根据租约标识符决定使用哪部分的日志空间，然后就开始提供服务。系统管理员不需要修改其他服务器的配置，其他服务器能自动适配新服务器的上线。</p>
+<p>删除一台 <code>Frangipani</code> 服务器则更简单。可以直接关闭这台服务器。不过更可取的方式是让这台服务器先将未持久化的数据写入到 <code>Petal</code>，然后释放持有的锁，最后再停机，不过这不是强制要求的。当服务器异常停机时，如果后续该服务器持有的锁需要被使用，则系统会自动发起恢复流程，并最终使得共享磁盘的数据达成一致。同样的，系统管理员也不需要修改其他服务器的配置。</p>
+<p>如 <code>Petal</code> 的论文所描述，<code>Petal</code> 服务器同样可以无缝的添加和删除，锁服务器也同理。</p>
+<h2 id="备份"><a class="markdownIt-Anchor" href="#备份"></a> 备份</h2>
+<p><code>Petal</code> 的快照功能提供了一个简便的方法来备份一份完整的 <code>Frangipani</code> 文件系统快照。<code>Petal</code> 的客户端可以在任意时刻创建一个虚拟磁盘的快照。所创建的快照的虚拟磁盘和普通的虚拟磁盘一样，只不过它是只读的。实际快照实现时采用了写时复制（<code>copy-on-write</code>）技术来提高效率。<code>Petal</code> 创建的快照是崩溃一致的（<code>crash-consistent</code>）：也就是说，快照中保存的是在 <code>Petal</code> 虚拟磁盘中的数据，<code>Frangipani</code> 服务器内存中的数据不会记录到快照中。</p>
+<p>因此，我们可以简单的通过创建 <code>Petal</code> 快照并将其拷贝到磁带中来备份一个 <code>Frangipani</code> 文件系统。快照会包含所有的日志，所以可以将其复制到一个新的 <code>Petal</code> 虚拟磁盘中然后根据日志运行恢复程序来恢复一个 <code>Frangipani</code> 文件系统。归功于崩溃一致的特性，从快照中恢复系统后要解决的问题就简化成了和发生系统级别的停电后恢复系统所要解决的问题一样。</p>
+<p>可以对 <code>Frangipani</code> 稍作修改来改进这个恢复机制，即创建一个系统文件级别一致的快照，从而也无需执行恢复操作。可以让备份程序先强制要求所有的 <code>Frangipani</code> 服务器进入一个栅栏，这个功能可以由锁服务提供的全局锁来实现。每个 <code>Frangipani</code> 服务器以共享的模式获取这把锁然后执行修改操作，而备份程序以互斥的方式来处理请求。当 <code>Frangipani</code> 服务器收到请求要求释放锁时，它会阻塞所有新的修改数据的文件系统调用然后进入栅栏，接着清空缓存中已修改的数据，最后释放锁。当所有的 <code>Frangipani</code> 服务器进入栅栏后，备份程序会以互斥的模式获取锁，然后创建一个 <code>Petal</code> 快照并释放锁。之后各 <code>Frangipani</code> 就可以继续以共享的模式获取锁，然后恢复服务。</p>
+<p>在后一种方案下，一个 <code>Frangipani</code> 的快照可以无需进行恢复就直接挂载使用。用户就可以从新的磁盘卷中在线获取单个文件，或者将其以一个更方便的格式转储到磁带中而无需 <code>Frangipani</code> 参与数据恢复。新添加的卷必须以只读的格式挂载，因为底层的 <code>Petal</code> 快照是只读的。在未来作者可能扩展 <code>Petal</code> 的快照使其可写，或者在 <code>Petal</code> 之上再抽象一层来模拟写操作。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/thekkath-frangipani.pdf">Frangipani: A Scalable Distributed File System</a></li>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/frangipani-faq.txt">FAQ for Frangipani, Thekkath, Mann, Lee, SOSP 1997</a></li>
+<li><a target="_blank" rel="noopener" href="https://kb.synology.com/en-global/DSM/tutorial/What_is_file_system_consistent_snapshot">What is the difference between crash-consistent and file-system consistent snapshots?</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/04/engineering-culture/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1726,167 +1906,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/04/24/mit-6.824-vm-ft/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/24/mit-6.824-vm-ft/" class="post-title-link" itemprop="url">MIT 6.824 - The Design of a Practical System for Fault-Tolerant Virtual Machines</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-04-24 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-24T00:00:00+08:00">2022-04-24</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>12k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>20 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
-<p>和一般描述的应用级别的主从备份不同，本文描述的是虚拟机的主从备份。主从备份作为一种常见的容错实现手段，当主节点异常时，从节点能取代主节点从而保证系统依然可用。作为从节点，它的状态必须尽可能的与主节点随时保持一致，这样当主节点异常时从节点能马上取代主节点，而客户端也不会感知到异常，同时也没有数据丢失。其中一种同步主从节点状态的方式是持续将主节点的所有修改发送给从节点，这里的修改包括 <code>CPU</code>、内存以及 <code>IO</code> 设备。然而，采用这种同步方式需要大量的网络带宽，尤其是发送内存的修改。</p>
-<p>另一种只需要耗费少量带宽的方式是状态机（<code>state machine</code>）同步。该方法将主从同步抽象为确定性状态机（<code>deterministic state machine</code>）同步问题，在确定性状态机模型下，对于两个初始状态一样的状态机来说，按照相同的顺序执行相同的一系列输入指令后，最后的状态也一定是相同的。然而，对于大部分的服务来说，存在某些非确定性的操作，例如生成一个随机数，这时候就需要额外的协调使得主从间依然是同步的，即从节点也要生成一模一样的随机数。不过，处理这种情况所需要维护的额外信息相比于主节点状态的修改（主要是内存的修改）来说不值一提。</p>
-<p>对于物理机来说，随着主频的增加，同步主从间的确定性操作也愈发困难。然而对于运行在 <code>hypervisor</code> 上的虚拟机来说却非常适合实现状态机同步。一个虚拟机本身就可以看做一个明确的状态机，它的所有操作就是被虚拟化的机器的操作（包括所有的设备）。和物理机一样，虚拟机也存在一些非确定性的操作（例如读取当前时间或者发送一个中断），所以也需要发送额外的信息给从节点来保证主从同步。因为 <code>hypervisor</code> 掌管着虚拟机的执行，包括发送所有的输入给被虚拟化的机器，所以它能捕获到执行非确定性操作的所有需要的信息，从而能正确的在从节点上执行重放操作。</p>
-<p>因此，基于状态机同步的主从同步方式可以在不需要修改硬件的情况下在廉价的硬件上实现，使得容错技术适用于最新的微处理器。另外，对带宽较低的要求使得长距离的虚拟机主从同步成为了可能。例如，可以在跨校园间不同的物理机上做主从同步，相比于同大厦内的主从同步更为可靠。</p>
-<p>目前在 <code>VMware vSphere 4.0</code> 平台上已经实现了这种容错技术，该平台能高效完整的虚拟化 <code>x86</code> 架构的机器。因为 <code>VMware vSphere</code> 实现了一个完全的 <code>x86</code> 虚拟机，所以可以自动的对任何 <code>x86</code> 的操作系统和应用提供容错支持。通过确定性重放（<code>deterministic replay</code>），系统可以记录下主节点的执行并且确保能在从节点执行相同的操作。<code>VMware vSphere Fault Tolerance (FT)</code> 在此基础之上增加了额外的功能和协议来支持构建一个可完全容错的系统。除了对硬件的容错外，当主节点异常时，系统能自动的在本地集群中启动一台可用的从节点来接管主节点。在该篇论文发表的时候，确定性重放技术和 <code>VMware FT</code> 仅支持单核的虚拟机。受限于严重的性能问题，多核虚拟机的重放支持仍在进行中，因为在多核场景下，几乎每一个对共享内存的访问都是一个非确定性的操作。</p>
-<p><code>Bressoud</code> 和 <code>Schneider</code> 针对惠普的 <code>PA-RISC</code> 平台的虚拟机容错做了个原型实现。<code>VMware</code> 的实现与其类似，不过出于性能的考虑做了些根本的修改以及调研了一些其他实现方案。另外，为了能构建一个高效、可用的容错系统来支持用户的企业级应用，<code>VMware</code> 还设计和实现了许多其他组件以及解决一些实际的问题。和大多数实际的系统要解决的问题一样，这里的容错针对的是 <code>fail-stop</code> 的异常，即在造成外部可见的不正确的行为前可被监测到的异常，例如磁盘空间不足、网络无法连通等等，而诸如应用程序的 <code>bug</code> 或者人为失误等则不属于 <code>fail-stop</code> 异常，系统也无法进行容错。</p>
-<h2 id="基础设计"><a class="markdownIt-Anchor" href="#基础设计"></a> 基础设计</h2>
-<p><img src="/images/vm-ft-1.png" alt="alt" /></p>
-<p>上图展示了支持容错的虚拟机的基本配置。对于每一台需要支持容错的虚拟机（<code>primary VM</code>），系统会在其他物理机上同时运行一台备份虚拟机（<code>backup VM</code>），备份虚拟机和主虚拟机会保持同步，并执行和主虚拟机相同的指令，不过会存在一定的延迟。这两台虚拟机被称为处于 <code>virtual lockstep</code> 状态。同时，虚拟机连接着相同的共享存储，输入和输出都可以被主从虚拟机访问。不过，只有主虚拟机才会暴露在网络中，所以所有的网络输入都只会发送给主虚拟机。同样的，其他所有的输入（例如键盘和鼠标输入）也都只会发送给主虚拟机。</p>
-<p>主虚拟机收到的所有输入都会通过 <code>logging channel</code> 发送给从虚拟机。对系统来说，主要的输入负载就是网络和磁盘。为了保证从虚拟机能和主虚拟机执行相同的非确定性操作，还需要发送一些额外的信息给从虚拟机。从结果上来说，从虚拟机会始终执行和主虚拟机相同的操作。不过，所有从虚拟机的输出都会被 <code>hypervisor</code> 丢弃，只有主虚拟机的输出才会返回给客户端。后面会提到，主从虚拟机间的通信会遵循一个特定的协议，包括从虚拟机对消息的确认，来保证当主虚拟机异常时不会发生数据丢失。</p>
-<p>为了监测主虚拟机或者从虚拟机是否发生异常，系统会通过和主从虚拟机间的心跳以及 <code>logging channel</code> 的流量来判断。另外，系统必须保证在任一时间只有一台主虚拟机或者从虚拟机作为对外执行的入口，即使主虚拟机和从虚拟机间失联发生脑裂的场景。</p>
-<h3 id="确定性重放的实现"><a class="markdownIt-Anchor" href="#确定性重放的实现"></a> 确定性重放的实现</h3>
-<p>在前面提到过，主从虚拟机的同步可以抽象为确定性状态机同步问题。如果两个确定性状态机以相同的初始状态启动，并且按照相同的顺序执行相同的输入，那么这两个状态机会经历相同的状态流转并输出相同的结果。一台虚拟机会有一系列的输入，包括网络包，磁盘读取，以及键盘和鼠标输入。而非确定性的事件（例如虚拟中断（<code>virtual interrupts</code>））和非确定性的操作（例如读取当前处理器的时钟周期数）也会影响虚拟机的内部状态。这就给重放执行一台运行着任意操作系统和任意服务的虚拟机带来了3个挑战：</p>
-<ol>
-<li>需要正确的捕捉到主虚拟机的所有输入和非确定性的操作</li>
-<li>需要正确的将输入和非确定性操作在从虚拟机上重放</li>
-<li>不能影响系统性能</li>
-</ol>
-<p>另外，<code>x86</code> 处理器中很多复杂的操作往往伴有副作用，因此也是非确定性的操作，如何捕捉到这些非确定性的操作并正确的在从虚拟机上重放也是一个挑战。</p>
-<p><code>VMware vSphere</code> 平台为 <code>x86</code> 虚拟机提供了上述的重放功能。确定性重放技术会将主虚拟机的所有输入和所有可能的非确定性操作写入到日志中。从虚拟机就可以读取日志并执行和主虚拟机一样的操作。对于非确定性的操作来说，系统会写入一些额外的信息来保证重放时生成相同的虚拟机状态和输出。对于非确定性的事件例如计时器或者 <code>IO</code> 完成中断，在事件发生时所执行的指令也会记录在日志中。在重放时，事件会和指令一同出现在指令流中。借助联合 <code>AMD</code> 和 <code>Intel</code> 开发的 <code>hardware performance counter</code>（一组特殊寄存器用来记录硬件相关事件发生的次数）和其他技术，<code>VMware</code> 确定性重放技术能高效的记录和重放非确定性的事件。</p>
-<p><code>Bressound</code> 和 <code>Schneider</code> 在其实现中提到将虚拟机的执行以 <code>epoch</code> 为单位进行切分，其中所有的非确定性操作例如中断都放在 <code>epoch</code> 的最后。这个想法是出于批量处理的考虑，因为单独将每一个中断和中断发生时对应的指令重放执行代价较大。不过 <code>VMware</code> 的实现足够高效使得不需要借助 <code>epoch</code> 来实现确定性重放，每一个中断都能被准确的记录并伴随着发生中断时的指令一起执行。</p>
-<h3 id="ft-协议"><a class="markdownIt-Anchor" href="#ft-协议"></a> FT 协议</h3>
-<p><code>VMware FT</code> 使用确定性重放技术将主虚拟机的执行流记录到日志中，不过主虚拟机并不是将日志写入到磁盘上，而是通过 <code>logging channel</code> 将日志发送给从虚拟机。从虚拟机能实时的读取日志并将其重放，从而执行和主虚拟机一样的操作。然而，双方在 <code>logging channel</code> 的通信必须遵循 <code>FT</code> 协议来保证容错。其中一条基本的要求是：</p>
-<blockquote>
-<p><code>Output Requirement</code>：当主虚拟机异常，从虚拟机接管执行时，从虚拟机的输出必须和先前主虚拟机已经发送给客户端的输出一致。</p>
-</blockquote>
-<p>当异常发生时（主虚拟机异常，从虚拟机接管执行），从虚拟机的执行可能会和在没有异常发生时主虚拟机的执行不同，因为在执行时会有很多非确定性的操作。然而，只要从虚拟机的输出满足 <code>Output Requirement</code>，则在主从切换时就不会有外部可见的状态或者数据丢失，而客户端也不会感知到中断或者服务的不一致。</p>
-<p>通过主虚拟机的延迟输出，保证从虚拟机确认收到了所有日志后，主虚拟机才将输出返回给客户端来实现 <code>Output Requirement</code>。一个先决的条件是主虚拟机在执行输出操作前，从虚拟机必须已经收到所有的日志。这些日志能保证从虚拟机执行到主虚拟机最新的执行点。然而，假设当主虚拟机刚开始执行输出操作时发生了异常，此时发生了主从切换，从虚拟机必须先将未处理完的日志进行重放，然后才能 <code>go live</code>（不再执行重放，接管成为主虚拟机）。如果在这之前从虚拟机 <code>go live</code>，可能会有一些非确定性的事件（例如计时器中断）在从虚拟机执行输出操作前改变了执行的路径。</p>
-<p>针对上述的要求，最简单的实现 <code>Output Requirement</code> 的方式是为每一条输出操作创建一条特殊的日志，从而可以通过以下规则来保证 <code>Output Requirement</code>：</p>
-<blockquote>
-<p><code>Output Rule</code>：在从虚拟机确认收到输出操作对应的日志前，主虚拟机不能执行输出操作。</p>
-</blockquote>
-<p>如果从虚拟机收到了所有的日志，包括输出操作对应的日志，那么从虚拟机就能重放出和主虚拟机在执行输出操作时一模一样的状态，当主虚拟机异常时，从虚拟机就能恢复到主虚拟机执行输出操作前一致的状态。相反的，如果从虚拟机在没有收到日志前就接管了主虚拟机的操作，那么它的状态就和主虚拟机不一致，从而导致最终的输出也不一致。</p>
-<p>注意 <code>Output Rule</code> 并没有要求在从虚拟机确认收到输出日志前停止主虚拟机的执行。这里只是延迟了主虚拟机的输出，它依然可以执行其他指令。因为操作系统以异步中断的方式来通知非阻塞网络和磁盘输出的完成，主虚拟机可以在这期间轻易的执行其他指令，而不用阻塞等待。相反的，在其他的一些实现中，在从虚拟机确认收到输出日志前，主虚拟机必须完全停止等待。</p>
-<p><img src="/images/vm-ft-2.png" alt="alt" /></p>
-<p>上图展示了 <code>FT</code> 协议的要求。主虚拟机到从虚拟机的箭头表示日志的发送，从虚拟机到主虚拟机的箭头表示日志的确认。所有异步事件，输入和输出的操作都必须发送给从虚拟机并得到确认。只有当从虚拟机确认了某条输出操作的日志后，主虚拟机才能执行输出操作。所以只要遵循了 <code>Output Rule</code>，从虚拟机在接管执行时就能保持和主虚拟机一致的状态。</p>
-<p>不过在异常发生时，<code>VMware FT</code> 并不能保证所有的输出只发送一次。在缺少两阶段提交的帮助下，从虚拟机不能知晓主虚拟机在发送某条输出之前还是之后发生了异常。不过，网络协议（包括常见的 <code>TCP</code> 协议）在设计时就已经考虑了包的丢失和重复包的情况，所以这里无需特殊处理。另外，在主虚拟机异常时发送给主虚拟机的输入也有可能丢失，因此从虚拟机也会丢失这部分的输入。不过，即使在主虚拟机没有异常的情况下，网络包本身就有可能丢失，所以这里同样也不需要特殊处理，不管是网络协议、操作系统还是应用程序，在设计和编写时本身已经考虑到了包丢失的情况。</p>
-<h3 id="监测和响应异常"><a class="markdownIt-Anchor" href="#监测和响应异常"></a> 监测和响应异常</h3>
-<p>之前提到过，当主虚拟机或者从虚拟机发生异常时，双方都必须能快速响应。当从虚拟机异常时，主虚拟机会进入 <code>go live</code> 模式，即不再记录执行日志，以常规的方式执行。当主虚拟机异常时，从虚拟机也会进入 <code>go live</code> 模式，不过相比于主虚拟机略微复杂些。因为从虚拟机在执行上本身就落后于主虚拟机，在主虚拟机异常时，从虚拟机已经收到和确认了一部分执行日志，但是还没有执行重放，此时从虚拟机的状态和主虚拟机还是不一致的。所以，从虚拟机必须先将暂存的日志进行重放，当所有重放都执行完成后，从虚拟机就会进行 <code>go live</code> 模式，正式接管主虚拟机（此时缺少一个从虚拟机）。因为此时这台从虚拟机不再是从虚拟机，被虚拟化的操作系统所执行的输出操作都会发送给客户端。在这个转换期间，可能也需要某些设备执行一些特定的操作来保证后续输出的正确性。特别是对于网络输出来说，<code>VMware FT</code> 会自动的将新的主虚拟机的 <code>MAC</code> 地址在网络中广播，使得物理交换机知道最新的主虚拟机的地址。另外，后文会提到新的主虚拟机可能会重新发起一些磁盘 <code>IO</code> 操作。</p>
-<p>有很多种方式来监测主虚拟机和从虚拟机的异常。<code>VMware FT</code> 通过 <code>UDP</code> 心跳来监测启用了容错的虚拟机是否发生了异常。另外，<code>VMware FT</code> 还会监控 <code>logging channel</code> 中的流量，包括主虚拟机发送给从虚拟机的日志，以及从虚拟机的消息确认回执。因为操作系统本身存在时钟中断，所以理论上来说 <code>logging channel</code> 中的流量应该是连续不断的。因此，如果监测到 <code>logging channel</code> 中没有流量了，那么就可以推断出某台虚拟机发生了异常。如果没有心跳或者 <code>logging channel</code> 中没有流量超过一段指定的时间（近似几秒钟），那么系统就会声明这台虚拟机发生了异常。</p>
-<p>然而，这种异常监测机制可能会引发脑裂问题。如果从虚拟机不再接收到来自主虚拟机的心跳，那么有可能说明主虚拟机发生了异常，但也有可能只是双方间的网络断开。如果此时从虚拟机进入 <code>go live</code> 模式，由于此时主虚拟机依然存活，就有可能给客户端造成数据损坏或其他问题。因此，当监测到异常时必须保证只有一台主虚拟机或者从虚拟机进入 <code>go live</code> 模式。为了解决脑裂问题，<code>VMware FT</code> 借助了虚拟机所连接的共享存储。当主虚拟机或者从虚拟机希望进入 <code>go live</code> 模式时，它会向共享存储发起一个原子性的 <code>test-and-set</code> 操作。如果操作成功，那么当前虚拟机可以进入 <code>go live</code> 模式，如果操作失败，说明已经有其他虚拟机先进入了 <code>go live</code> 模式，所以当前虚拟机就将自己挂起。如果虚拟机访问共享存储失败，那么它会一直等待直到访问成功。如果共享存储由于网络问题造成无法访问，那么虚拟机本身也做不了什么因为它的虚拟磁盘就挂载在共享存储上。所以使用共享存储来解决脑裂问题不会带来其他可用性问题。</p>
-<p>最后一个设计的点是如果虚拟机发生了异常，使得某台虚拟机进入了 <code>go live</code> 模式，那么 <code>VMware FT</code> 会自动在其他物理机上启动一台新的备份虚拟机。</p>
-<h2 id="ft-的实际实现"><a class="markdownIt-Anchor" href="#ft-的实际实现"></a> FT 的实际实现</h2>
-<p>上节主要描述了 <code>FT</code> 的基础设计和协议。然而，为了构建一个可用，健壮和自动化的系统，还需要设计和实现很多其他的组件。</p>
-<h3 id="启动和重启-ft-虚拟机"><a class="markdownIt-Anchor" href="#启动和重启-ft-虚拟机"></a> 启动和重启 FT 虚拟机</h3>
-<p>其中一个至关重要的组件是如何启动一台有着和主虚拟机一模一样状态的备份虚拟机。这个同时也会在当某台虚拟机异常需要重新启动一台备份虚拟机时用到。因此，这个组件必须能够在主虚拟机处于任意状态的时候复制一台一模一样的备份虚拟机（而不仅仅是初始状态）。另外，这个启动操作还不能影响到主虚拟机的执行，因为这有可能影响到当前所有连接着的客户端。</p>
-<p>对于 <code>VMware FT</code> 来说，它借用了 <code>VMware vSphere</code> 平台已有的 <code>VMotion</code> 的功能。<code>VMware VMotion</code> 能以极小的代价将一台运行中的虚拟机迁移到另一台机器上——虚拟机的暂停时间一般在一秒内。<code>VMware FT</code> 对 <code>VMotion</code> 做了些改动使得在不销毁当前虚拟机的情况下，在远程服务器上复制一台和当前虚拟机一模一样的虚拟机。即修改版的 <code>FT VMotion</code> 做的是虚拟机的复制而不是迁移。<code>FT VMotion</code> 也会同时建立一条 <code>logging channel</code>，源虚拟机作为主虚拟机就会将执行日志写入到 <code>logging channel</code>，而复制后的虚拟机作为从虚拟机就会读取日志开始重放执行。和常规的 <code>VMotion</code> 一样，<code>FT VMotion</code> 也能将对主虚拟机的暂停控制在一秒以内。因此，对某台运行中的虚拟机开启 <code>FT</code> 功能非常简单，且没有破坏性。</p>
-<p>另一个启动一台备份虚拟机要考虑的点是选择在哪台物理机上启动。支持容错的虚拟机运行在某个可访问共享存储的集群中，所以本质上虚拟机可以运行在任意一台机器上。这个灵活性使得 <code>VMware vSphere</code> 可以轻易的为一台或多台异常的虚拟机启动新的备份虚拟机。<code>VMware vSphere</code> 实现了一套集群服务来管理集群中的资源。当虚拟机发生异常主虚拟机需要一台新的虚拟机来维持容错时，主虚拟机会通知集群服务需要一台新的备份虚拟机。此时集群服务会根据资源利用率和其他条件来决定在哪台机器上重启新的备份虚拟机，然后会由 <code>FT VMotion</code> 创建一台新的备份虚拟机。一般来说，<code>VMware FT</code> 可以在发生异常的几分钟内恢复某台虚拟机的冗余功能，而不会造成任何中断。</p>
-<h3 id="管理-logging-channel"><a class="markdownIt-Anchor" href="#管理-logging-channel"></a> 管理 Logging Channel</h3>
-<p>在管理 <code>logging channel</code> 的流量上有很多有趣的实现细节。在 <code>VMware</code> 的实现里，<code>hypervisor</code> 为主虚拟机和从虚拟机维护了一大块日志缓冲区。在主虚拟机执行时，它将执行日志发送到日志缓冲区中，类似的，从虚拟机从日志缓冲区中消费日志。每当主虚拟机的日志缓冲区中有数据，系统就会将其发送到 <code>logging channel</code> 中，相应的在另一边则会将其放入到从虚拟机的日志缓冲区中。当从虚拟机从 <code>logging channel</code> 中读取到日志并将其放入日志缓冲区后，它就会向主虚拟机发送一个已读消息的回执。<code>VMare FT</code> 就可以根据这个已读回执决定哪些输出操作可以执行了。下图展示了这个过程：</p>
-<p><img src="/images/vm-ft-3.png" alt="alt" /></p>
-<p>当从虚拟机从日志缓冲区读取不到任何日志时（日志缓冲区为空），它就会暂停执行直到下一条日志到达。因为从虚拟机不和外界交互，这个暂停对客户端没有任何影响。类似的，如果主虚拟机往日志缓冲区中写日志发现日志缓冲区满时，它必须停止执行直到日志缓冲区被消费。这个暂停保证了主虚拟机以一个可控的速度生产执行日志。不过，这个暂停会影响客户端的响应，直到主虚拟机可以继续写日志并恢复执行。所以，在实现时必须考虑如何尽量避免主虚拟机的日志缓冲区写满。</p>
-<p>其中一个原因造成主虚拟机的日志缓冲区写满是因为从虚拟机执行的太慢从而造成消费日志太慢。一般来说，从虚拟机必须以和主虚拟机记录执行日志一样的速度来执行重放。幸运的是，在 <code>VMware FT</code> 的实现下，记录执行日志和重放所需要的时间基本是相同的。不过，如果从虚拟机所在的机器存在和其他虚拟机资源竞争（资源超卖），不管 <code>hypervisor</code> 的虚拟机调度多么高效，从虚拟机都有可能得不到足够的 <code>CPU</code> 和内存资源来保证和主虚拟机一样的速度执行重放。</p>
-<p>除了主虚拟机日志缓冲区满造成的不可控暂停外，还有一个原因也要求主从虚拟机间的状态不能差太远。当主虚拟机异常时，从虚拟机必须尽快的将所有的执行日志进行重放，达到和主虚拟机一样的状态，然后接管主虚拟机向客户端提供服务。结束重放的时间基本上等于异常发生时从虚拟机落后主虚拟机的时间，所以从虚拟机进入 <code>go live</code> 模式需要的时间就基本上等于检测出异常的时间加上当前从虚拟机落后的时间。因此，从虚拟机不能落后主虚拟机太多（大于一秒），否则这会大大增加故障切换的时间。</p>
-<p>因此，<code>VMware FT</code> 有另一套机制来保证从虚拟机不会落后主虚拟机太多。在主从虚拟机间的通信协议里，还会发送额外的信息来计算两者间的执行时间差。一般来说这个时间差在100毫秒以内。如果从虚拟机开始明显落后主虚拟机（例如大于1秒），那么 <code>VMware FT</code> 会通知调度器降低主虚拟机的 <code>CPU</code> 资源配额（初始减少几个百分点）来延缓主虚拟机的执行。<code>VMware FT</code> 会根据从虚拟机返回的落后时间来不断调整主虚拟机的 <code>CPU</code> 资源配额，如果从虚拟机一直落后，那么 <code>VMware FT</code> 会逐渐减少主虚拟机的 <code>CPU</code> 资源配额。相反的，如果从虚拟机开始赶上了主虚拟机的执行速度，那么 <code>VMware FT</code> 会逐渐增加主虚拟机的 <code>CPU</code> 资源配额，直到两者的执行时间差到达一个合理的值。</p>
-<p>不过在实际场景中减慢主虚拟机执行的速度非常少见，一般只会发生在系统承受极大负载的情况下。</p>
-<h3 id="ft-虚拟机上的操作"><a class="markdownIt-Anchor" href="#ft-虚拟机上的操作"></a> FT 虚拟机上的操作</h3>
-<p>另一个实际中要考虑的问题是处理针对主虚拟机的一系列控制操作。例如，如果主虚拟机主动关机了，从虚拟机也需要同步关机，而不是进入 <code>go live</code> 模式。另外，所有对主虚拟机的资源修改（例如增加 <code>CPU</code> 资源配额）都必须应用到从虚拟机上。针对这些操作，系统会将其转化为特殊的执行日志发送到 <code>logging channel</code>，从虚拟机收到后也会将其正确的重放。</p>
-<p>一般来说，大部分对虚拟机的操作都只应该在主虚拟机上发起。然后 <code>VMware FT</code> 会将其转化为日志发送给从虚拟机来进行重放。唯一可以独立的在主虚拟机和从虚拟机上执行的操作是 <code>VMotion</code>。即主虚拟机和从虚拟机都可以独立的被复制到其他机器上。<code>VMware FT</code> 保证了在复制虚拟机时不会将其复制到一台已经运行了其他虚拟机的机器上，因为这无法提供有效的容错保证。</p>
-<p>复制一台主虚拟机要比迁移一台普通的虚拟机复杂些，因为从虚拟机需要先和主虚拟机断开连接，然后之后在合适的时间和新的主虚拟机建立连接。从虚拟机的复制有类似的问题，不过也略微复杂些。对于普通的虚拟机迁移来说，系统会要求当前所有进行中的磁盘 <code>IO</code> 在切换前执行完成。对于主虚拟机来说，它可以等待所有进行中的磁盘 <code>IO</code> 的完成通知。而对于从虚拟机来说，它不能简单的在某个时间让所有的磁盘 <code>IO</code> 都结束，因为从虚拟机还在执行重放，也需要等待重放涉及的磁盘 <code>IO</code> 完成。而另一方面，主虚拟机在执行时有可能一直伴有磁盘 <code>IO</code>。<code>VMware FT</code> 有一个特有的方法来解决这个问题，当从虚拟机在执行切换前，会通过 <code>logging channel</code> 向主虚拟机发送请求要求暂时结束所有的磁盘 <code>IO</code>，主虚拟机收到请求后会天然的将其转化为执行日志发送到 <code>logging channel</code>，从虚拟机的磁盘 <code>IO</code> 也因此会伴随着重放而终止。</p>
-<h3 id="磁盘-io-的实现问题"><a class="markdownIt-Anchor" href="#磁盘-io-的实现问题"></a> 磁盘 IO 的实现问题</h3>
-<p><code>VMware</code> 在实现时遇到了一些和磁盘 <code>IO</code> 相关的问题。首先，因为磁盘操作是非阻塞的所以可以并行执行，同一时间访问同一块磁盘区域就会导致非确定性结果。另外，磁盘 <code>IO</code> 会通过 <code>DMA</code>（<code>Direct memory access</code>） 来直接访问虚拟机的内存，因此同一时间的磁盘操作如果访问到了同一块内存页也会导致非确定性结果。<code>VMware</code> 通过监测这样的 <code>IO</code> 竞争（实际场景中极少）并强制让其在主虚拟机和从虚拟机中串行执行来解决这个问题。</p>
-<p>第二，磁盘操作访问内存可能和应用程序访问内存产生竞争，因为磁盘操作可以通过 <code>DMA</code> 直接访问内存。例如，如果应用程序正在访问某个内存块，而此时磁盘也在写入这个内存块，则会发生非确定性的结果。虽然这种情况同样很少，但也仍然需要能够监测并解决。其中一种解决方案是当磁盘正在访问某个内存页时暂时对该页设置页保护。当应用程序尝试访问页保护的内存页时，会触发一个陷阱（<code>trap</code>）使得操作系统能够暂停执行直到磁盘操作完成。不过，修改 <code>MMU</code>（<code>Memory management unit</code>）的页保护机制代价较大，<code>VMware</code> 借助 <code>bounce buffer</code> 来解决这个问题。<code>bounce buffer</code> 是一块和磁盘操作正在访问的内存一样大小的临时缓冲区。磁盘的读操作被修改为磁盘先将数据复制到 <code>bounce buffer</code> 中，然后虚拟机读取 <code>bounce buffer</code> 中的数据，而且只有在磁盘 <code>IO</code> 完成后才会将 <code>bounce buffer</code> 中的数据复制到虚拟机内存中。类似的，对于磁盘写操作，数据会先写到 <code>bounce buffer</code> 中，磁盘再将数据从 <code>bounce buffer</code> 中复制到磁盘上。使用 <code>bounce buffer</code> 的情况下会降低磁盘的吞吐，不过实际中还没有发现造成可见的性能损耗。</p>
-<p>第三，还有些问题发生于主虚拟机正在执行某些磁盘 <code>IO</code>（未完成），然后主虚拟机异常，从虚拟机接管执行。对于从虚拟机来说，它并不知道这些磁盘 <code>IO</code> 是否已发送给磁盘或者已成功执行。另外，由于这些磁盘 <code>IO</code> 还没有在从虚拟机上发起过，所以也不会相应的 <code>IO</code> 完成的通知，但是在操作系统的角度指令已经发出了，但是从虚拟机上的操作系统也收不到 <code>IO</code> 完成的通知，最终会终止或者重置这个过程。在这种情况下，系统会为每一个 <code>IO</code> 操作发送一个失败的通知，即使某个 <code>IO</code> 操作实际成功了而返回失败也是可以接受的。然而，由于从虚拟机上的操作系统可能不能很好的响应 <code>IO</code> 失败的通知，所以在从虚拟机 <code>go live</code> 阶段会重新发起这些 <code>IO</code> 请求。因为系统已经消除了并发 <code>IO</code> 间的竞争，所以这些 <code>IO</code> 操作可以重新发起即使它们之前已经成功执行了（操作是幂等的）。</p>
-<h3 id="网络-io-的实现问题"><a class="markdownIt-Anchor" href="#网络-io-的实现问题"></a> 网络 IO 的实现问题</h3>
-<p><code>VMware vSphere</code> 为虚拟机的网络提供了很多的性能优化。部分优化基于 <code>hypervisor</code> 能异步更新虚拟机的网络设备的状态。例如，在虚拟机还在执行时 <code>hypervisor</code> 就可以直接更新接收缓冲区。不过，这种异步更新同样也带来了非确定性。除非能保证在异步更新的时间点在主虚拟机上执行的指令能严格一致的在从虚拟机上重放，否则从虚拟机的状态就会和主虚拟机不一致。</p>
-<p><code>FT</code> 中对网络代码改动最大的一块就是禁止了异步网络更新优化。从原先的异步更新缓冲区修改为强制陷入到陷阱（<code>trap</code>）中，<code>hypervisor</code> 响应后将更新记录到日志中，然后再将其应用到虚拟机上。类似的，异步从缓冲区中拉取数据包也同样被禁止了，同样由 <code>hypervisor</code> 托管执行。</p>
-<p>消除了异步的网络设备状态更新以及前面所提到的 <code>Output Rule</code> 带来的延迟输出，为网络性能优化又提出了挑战。<code>VMware</code> 通过两个方面来优化网络性能。第一，实现了集群优化来减少虚拟机的陷阱和中断。当虚拟机在接收网络包时，<code>hypervisor</code> 可以在一个陷阱、中断内处理多组数据包来减少陷阱和中断的次数。</p>
-<p>第二个网络优化是降低数据包延迟发送的时间。前面提到，只有当从虚拟机确认收到所有输出操作的日志后，主虚拟机才能执行输出操作。所以减少数据包延迟发送的时间等价于减少日志发送和确认的时间。这里主要的优化点是发送和接受消息回执的过程中确保不会触发线程切换。另外，当主虚拟机将某个数据包加入发送队列时，系统会强制刷新主虚拟机的日志缓冲区到 <code>logging channel</code> 中。</p>
-<h2 id="其他设计方案"><a class="markdownIt-Anchor" href="#其他设计方案"></a> 其他设计方案</h2>
-<p>本节主要描述了 <code>VMware</code> 在实现 <code>VMware FT</code> 时调研和考虑的其他一些方案。</p>
-<h3 id="共享磁盘和非共享磁盘"><a class="markdownIt-Anchor" href="#共享磁盘和非共享磁盘"></a> 共享磁盘和非共享磁盘</h3>
-<p>在当前的实现中，主虚拟机和从虚拟机共享一个存储。因此当发生主从切换时，从虚拟机上的数据天然是和主虚拟机上的数据一致的。共享存储相对于主从虚拟机来说是一个外部系统，所以任何对共享存储的写入都被视为和外部的通信。因此，只有主虚拟机被允许写入到共享存储，而且写入必须遵循 <code>Output Rule</code> 规则。</p>
-<p>另一种设计是主虚拟机和从虚拟机各自有一套独立的存储。在这个设计中，从虚拟机会将所有的输出写入到自己的存储中，所以从虚拟机的数据也能和主虚拟机保持同步。下图展示了这种设计下的配置：</p>
-<p><img src="/images/vm-ft-4.png" alt="alt" /></p>
-<p>在非共享磁盘的场景下，每个虚拟机的存储被视为该虚拟机内部状态的一部分。因此，虚拟机的输出没有必要遵循 <code>Output Rule</code> 规则。非共享磁盘的设计在主从虚拟机无法访问共享存储时很有用。这可能时因为共享存储不可用或者过于昂贵，或者主从虚拟机间的物理距离太长。这种方案的一个主要的缺点是主从虚拟机开启容错时必须将双方的磁盘进行初始化同步。另外，双方的磁盘也有可能在异常发生后造成不同步，所以当备份虚拟机重启后，双方磁盘需要再次同步。所以，<code>FT VMotion</code> 不只要同步主从虚拟机的状态，还要同步磁盘的状态。</p>
-<p>在非共享磁盘的场景下，系统就不能借助共享存储来解决脑裂问题。在这种场景下，系统可借助其他的外部组件，例如某个主从虚拟机都可以连接的第三方服务器。如果主从服务器属于某个多于两个节点的集群，那么就可以使用某个选举算法来选择谁能进入 <code>go live</code> 模式。在这种场景下，如果某台虚拟机获得了大多数节点的投票，那么它就可以进入 <code>go live</code> 模式。</p>
-<h3 id="在从虚拟机上执行磁盘读操作"><a class="markdownIt-Anchor" href="#在从虚拟机上执行磁盘读操作"></a> 在从虚拟机上执行磁盘读操作</h3>
-<p>在当前的实现中，从虚拟机从来不会从虚拟磁盘中读取数据（不论是共享存储还是非共享存储）。因为磁盘读也是一种输入，所以会自然的将磁盘读取后的结果以日志的形式通过 <code>logging channel</code> 发送给从虚拟机。</p>
-<p>另一种设计是涉及到磁盘读操作的执行由从虚拟机自行从磁盘中读取，主虚拟机不再向 <code>logging channel</code> 中发送从磁盘读取到的数据。对于磁盘密集型的系统来说，这种设计可以大幅降低 <code>logging channel</code> 的负载。不过，这种设计也存在一些问题。这可能会降低从虚拟机的执行速度，因为从虚拟机在重放时必须先等待所有依赖的磁盘 <code>IO</code> 操作完成。</p>
-<p>另外，当磁盘读失败时还需要额外的处理。如果主虚拟机读取磁盘成功了，而从虚拟机读取磁盘失败了，那么从虚拟机就需要进行重试直到成功，因为从虚拟机必须拿到和主虚拟机内存中一样的数据。相反的，如果主虚拟机读取磁盘失败了，则相应主虚拟机中目标内存中的数据就必须通过 <code>logging channel</code> 发送给从虚拟机，因为此时主虚拟机中内存中的数据是不确定的。</p>
-<p>最后，在共享存储的模式下如果让从虚拟机执行磁盘读也有个问题。如果主虚拟机在某个磁盘区域执行了读操作，然后马上又对相同的区域执行了写操作，那么这个写操作就必须等到从虚拟机读取完成后再执行。这个依赖也能够被监测和正确处理，不过也给系统实现增加了额外的复杂度。</p>
-<p>在实际性能测试中，从虚拟机执行磁盘读操作的情况下应用程序的吞吐会降低 <code>1-4%</code>，但是也能有效降低 <code>logging channel</code> 的负载。因此，在 <code>logging channel</code> 的带宽有限的情况下，可以考虑使用从虚拟机磁盘读操作。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/vm-ft.pdf">The Design of a Practical System for Fault-Tolerant Virtual Machines</a></li>
-<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/notes/l-vm-ft.txt">6.824 2022 Lecture 4: Primary/Backup Replication</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Hardware_performance_counter">Hardware performance counter</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Direct_memory_access">Direct memory access</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Memory_management_unit">Memory management unit</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1956,7 +1975,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

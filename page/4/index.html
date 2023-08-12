@@ -214,6 +214,247 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/13/mit-6.824-map-reduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/13/mit-6.824-map-reduce/" class="post-title-link" itemprop="url">MIT 6.824 - MapReduce: Simplified Data Processing on Large Clusters</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-02-13 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-13T00:00:00+08:00">2022-02-13</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>16k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>27 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p><code>MapReduce: Simplified Data Processing on Large Clusters</code> 是 <a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/">6.824: Distributed Systems</a> 中所介绍的第一篇论文。它提出了一种针对大数据处理的编程模型和实现，使得编程人员无需并行和分布式系统经验就可以轻松构建大数据处理应用。该模型将大数据处理问题拆解为两步，即 <code>map</code> 和 <code>reduce</code>，<code>map</code> 阶段将一组输入的键值对转化为中间结果键值对，<code>reduce</code> 阶段对中间结果键值对按照相同的键进行值的合并，从而得到最终的结果。</p>
+<h2 id="背景"><a class="markdownIt-Anchor" href="#背景"></a> 背景</h2>
+<p>对于 <code>Google</code> 来说，每天运行的系统会产生大量的原始数据，同时又要对这些原始数据进行加工产生各种衍生数据，虽然大部分数据加工的逻辑都较为简单，然而由于数据量过于庞大，为了在合理的时间内完成数据处理，通常需要将待处理的数据分发到几百或几千台机器上并行计算，这就存在几个问题：</p>
+<ol>
+<li>如何使计算可并行</li>
+<li>如何分发数据</li>
+<li>如何处理异常</li>
+</ol>
+<p>如果每一个数据加工任务都需要独立去解决上述的问题，一方面会使得原本简单的代码逻辑变得庞大、复杂和难以维护，另一方面也是在重复工作。受 <code>Lisp</code> 等其他函数式编程语言中的 <code>map</code> 和 <code>reduce</code> 函数的启发，<code>Google</code> 的工程师们发现大部分的数据处理遵循如下的模式：</p>
+<ol>
+<li>对输入的每一条数据应用一个 <code>map</code> 函数产生一组中间结果键值对</li>
+<li>对中间结果键值对按照相同的键聚合后，应用 <code>reduce</code> 函数生成最终的衍生数据</li>
+</ol>
+<p>因此，<code>Google</code> 的工程师们抽象出了 <code>MapReduce</code> 框架，使得应用开发人员可以专注于计算逻辑实现而无需关心底层运行细节，统一由框架层处理并行、容错、数据分发和负载均衡等系统问题。现在再来看前面提到的问题是如何解决的：</p>
+<ol>
+<li>如何使计算可并行：在 <code>map</code> 阶段，对数据分发后，各任务间无依赖，可并行执行；在 <code>reduce</code> 阶段，不同 <code>key</code> 的数据处理间无依赖，可并行执行</li>
+<li>如何分发数据：在 <code>map</code> 阶段，可按执行 <code>map</code> 任务的节点数量平均分发（这只是一种可能的策略，具体分发策略见后文描述）；在 <code>reduce</code> 阶段，可按 <code>key</code> 相同的数据聚合后分发</li>
+<li>如何处理异常：重新执行某个节点上失败的 <code>map</code> 或 <code>reduce</code> 任务作为首要的容错手段</li>
+</ol>
+<h2 id="编程模型"><a class="markdownIt-Anchor" href="#编程模型"></a> 编程模型</h2>
+<p>假设需要统计一组文档中每个单词出现的次数，在 <code>MapReduce</code> 框架下用户需要编写 <code>map</code> 和 <code>reduce</code> 函数，近似的伪代码表示如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">    &#x2F;&#x2F; key: document name</span><br><span class="line">    &#x2F;&#x2F; value: document contents</span><br><span class="line">    for each word w in value:</span><br><span class="line">        EmitIntermediate(w, &quot;1&quot;);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">    &#x2F;&#x2F; key: a word</span><br><span class="line">    &#x2F;&#x2F; values: a list of counts</span><br><span class="line">    int result &#x3D; 0;</span><br><span class="line">    for each v in values:</span><br><span class="line">        result +&#x3D; ParseInt(v);</span><br><span class="line">    Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<p>假设有两个文档 <code>hello.txt</code> 和 <code>world.txt</code>，其内容分别为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hello.txt:</span><br><span class="line">It was the best of times</span><br><span class="line"></span><br><span class="line">world.txt:</span><br><span class="line">it was the worst of times</span><br></pre></td></tr></table></figure>
+<p>对上述 <code>map</code> 和 <code>reduce</code> 函数来说，<code>map</code> 函数每次处理一个文档，<code>key</code> 为文档的名称，<code>value</code> 为文档的内容，即：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map(&quot;hello.txt&quot;, &quot;It was the best of times&quot;)</span><br><span class="line">map(&quot;world.txt&quot;, &quot;it was the worst of times&quot;)</span><br></pre></td></tr></table></figure>
+<p><code>map</code> 函数执行时会遍历文档的内容，对每个单词输出中间结果键值对（作为示例，这里省去了将文档内容拆分为单词的过程，同时也忽略了标点符号、大小写等与示例无关的内容），键为单词，值为 <code>&quot;1&quot;</code>，所有 <code>map</code> 函数执行完成后生成的中间结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">hello.txt:</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">best 1</span><br><span class="line">of 1</span><br><span class="line">times 1</span><br><span class="line"></span><br><span class="line">world.txt:</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">worst 1</span><br><span class="line">of 1</span><br><span class="line">times 1</span><br></pre></td></tr></table></figure>
+<p>然后，<code>MapReduce</code> 框架对所有中间结果按照相同的键进行聚合，即：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">it [&quot;1&quot;, &quot;1&quot;]</span><br><span class="line">was [&quot;1&quot;, &quot;1&quot;]</span><br><span class="line">the [&quot;1&quot;, &quot;1&quot;]</span><br><span class="line">best [&quot;1&quot;]</span><br><span class="line">worst [&quot;1&quot;]</span><br><span class="line">of [&quot;1&quot;, &quot;1&quot;]</span><br><span class="line">times [&quot;1&quot;, &quot;1&quot;]</span><br></pre></td></tr></table></figure>
+<p>最后，<code>MapReduce</code> 框架将上述聚合后的数据分发给 <code>reduce</code> 函数执行，即：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">reduce(&quot;it&quot;, [&quot;1&quot;, &quot;1&quot;])</span><br><span class="line">reduce(&quot;was&quot;, [&quot;1&quot;, &quot;1&quot;])</span><br><span class="line">reduce(&quot;the&quot;, [&quot;1&quot;, &quot;1&quot;])</span><br><span class="line">reduce(&quot;best&quot;, [&quot;1&quot;])</span><br><span class="line">reduce(&quot;worst&quot;, [&quot;1&quot;])</span><br><span class="line">reduce(&quot;of&quot;, [&quot;1&quot;, &quot;1&quot;])</span><br><span class="line">reduce(&quot;times&quot;, [&quot;1&quot;, &quot;1&quot;])</span><br></pre></td></tr></table></figure>
+<p><code>reduce</code> 函数执行时会遍历 <code>values</code>，将每个字符串转换为整型后累加，然后作为 <code>reduce</code> 的结果返回，最终得到所有单词出现的次数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">it 2</span><br><span class="line">was 2</span><br><span class="line">the 2</span><br><span class="line">best 1</span><br><span class="line">worst 1</span><br><span class="line">of 2</span><br><span class="line">times 2</span><br></pre></td></tr></table></figure>
+<p>实际执行 <code>reduce</code> 函数时，并不会将 <code>values</code> 一次性传给某个 <code>reduce</code> 函数，因为有可能数据量太大无法完全载入内存，所以 <code>values</code> 在实现时是个迭代器，<code>reduce</code> 函数能以流式的形式获取值。</p>
+<p>另外，虽然在上述的例子中 <code>map</code> 和 <code>reduce</code> 处理的都是字符串类型的数据，但是也可以支持其他类型的数据，<code>map</code> 和 <code>reduce</code> 处理的数据类型遵循如下的模式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map (k1, v1) -&gt; list(k2, v2)</span><br><span class="line">reduce (k2, list(v2)) -&gt; list(v2)</span><br></pre></td></tr></table></figure>
+<p>可以看到，<code>map</code> 产生的中间结果的数据类型和最终结果的数据类型是一致的。对整个框架来说，最初的输入和最终的输出都是某种形式的字节流或字符串，因此在 <code>Google</code> 的 <code>C++</code> 实现中，提供了专门的数据转换接口，用户可实现该接口用于字符串和 <code>map</code>、<code>reduce</code> 需要的数据类型之间转换。</p>
+<h2 id="实现"><a class="markdownIt-Anchor" href="#实现"></a> 实现</h2>
+<p><code>MapReduce</code> 的具体实现视硬件环境的不同而不同，论文中描述的实现是针对 <code>Google</code> 内部广泛使用的硬件环境，即通过交换以太网相连的大量廉价 <code>PC</code> 组成的集群：</p>
+<ol>
+<li>每台机器的配置一般为双核 <code>x86</code> 处理器，<code>2-4 GB</code> 内存，运行 <code>Linux</code> 系统</li>
+<li>使用廉价网络硬件，带宽一般为 <code>100 Mbit/s</code> 或 <code>1 Gbit/s</code>，不过平均来说会小于 <code>bisection bandwidth</code>（<code>bisection bandwidth</code> 指当某个网络被分成两部分时，这两部分间的带宽）</li>
+<li>一个集群一般由几百上千台机器组成，所以机器异常是家常便饭</li>
+<li>存储使用的是廉价的 <code>IDE</code> 硬盘，并直接装载到了机器上。不过 <code>Google</code> 内部实现了一套分布式文件存储系统来管理这些硬盘上的数据，并通过数据冗余作为在不可靠的硬件上实现可用性和可靠性的手段。</li>
+<li>用户向调度系统提交一组任务，每个任务包含多个子任务，调度系统会为每个任务分配一批集群内的机器执行。</li>
+</ol>
+<h3 id="执行概览"><a class="markdownIt-Anchor" href="#执行概览"></a> 执行概览</h3>
+<p>在 <code>map</code> 执行阶段，框架会自动将输入数据分为 <code>M</code> 片，从而将 <code>map</code> 任务分发到多台机器上并行执行，每台机器只处理某一片的数据。同样的，在 <code>reduce</code> 阶段，框架首先将中间结果数据根据分片函数（例如 <code>hash(key) mod R</code>）拆分为 <code>R</code> 片，然后分发给 <code>reduce</code> 任务执行，用户可自行指定 <code>R</code> 的值和实现具体的分片函数。</p>
+<p>下图展示了 <code>Google</code> 所实现的 <code>MapReduce</code> 框架的整体执行流程：</p>
+<p><img src="/images/map-reduce.png" alt="alt" /></p>
+<p>当用户提交 <code>MapReduce</code> 任务后，框架会执行以下一系列流程（下文中的序号和上图中的序号对应）：</p>
+<ol>
+<li>首先 <code>MapReduce</code> 框架将输入数据分为 <code>M</code> 片，每片数据大小一般为 <code>16 MB</code> 至 <code>64 MB</code>（具体大小可由用户入参控制），然后将 <code>MapReduce</code> 程序复制到集群中的一批机器上运行。</li>
+<li>在所有的程序拷贝中，某台机器上的程序会成为主节点（<code>master</code>），其余称为工作节点（<code>worker</code>），由主节点向工作节点分派任务，一共有 <code>M</code> 个 <code>map</code> 任务和 <code>R</code> 个 <code>reduce</code> 任务需要分派。主节点会选择空闲的工作节点分派 <code>map</code> 或 <code>reduce</code> 任务。</li>
+<li>如果某个工作节点被分派了 <code>map</code> 任务则会读取当前的数据分片，然后将输入数据解析为一组键值对后传递给用户自定义的 <code>map</code> 函数执行。<code>map</code> 函数产生的中间结果键值对会暂存在内存中。</li>
+<li>暂存在内存中的中间结果键值对会周期性的写入到本地磁盘中，并根据某个分片函数将这些数据写入到本地磁盘下的 <code>R</code> 个区，这样相同键的中间结果数据在不同的 <code>map</code> 节点下属于同一个区号，就可以在后续将同一个键的中间结果数据全部发给同一个 <code>reduce</code> 节点。同时，这些数据写入后的地址会回传给 <code>master</code> 节点，<code>master</code> 节点会将这些数据的地址发送给相应的 <code>reduce</code> 节点。</li>
+<li>当 <code>reduce</code> 节点接收到 <code>master</code> 节点发送的中间结果数据地址通知后，将通过 <code>RPC</code> 请求根据数据地址读取 <code>map</code> 节点生成的数据。在所有中间结果数据都读取完成后，<code>reduce</code> 节点会先将所有中间结果数据按照键进行排序，这样所有键相同的数据就聚合在了一起。之所以要排序是因为一个 <code>reduce</code> 节点会分发处理多个键下的中间结果数据。如果中间结果数据量太大不足以完全载入内存，则需要使用外部排序。</li>
+<li><code>reduce</code> 节点执行时会先遍历排序后的中间结果数据，每遇到一个新的键就会将该键及其对应的所有中间结果数据传递给用户自定义的 <code>reduce</code> 函数执行。<code>reduce</code> 函数执行的结果数据会追加到当前 <code>reduce</code> 节点的最终输出文件里。</li>
+<li>当所有 <code>map</code> 任务和 <code>reduce</code> 任务都执行完成后，<code>master</code> 节点会唤醒用户程序，并将控制权交还给用户代码。</li>
+</ol>
+<p>当成功结束 <code>MapReduce</code> 任务后，其执行结果就保存在了 <code>R</code> 个文件中（每个文件对应一个 <code>reduce</code> 节点的产出，文件的名字由用户所指定）。一般来说，用户不必将这 <code>R</code> 个输出文件合并成一个，它们通常会作为另一个 <code>MapReduce</code> 任务的输入，或交由其他分布式应用处理。</p>
+<p>基于上述流程，再来看在 <code>编程模型</code> 这节中的例子。假设有6个文档，分别是 <code>1.txt</code> 到 <code>6.txt</code>，每个文档中的内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1.txt:</span><br><span class="line">It was the best of times</span><br><span class="line"></span><br><span class="line">2.txt:</span><br><span class="line">it was the worst of times</span><br><span class="line"></span><br><span class="line">3.txt:</span><br><span class="line">it was the age of wisdom</span><br><span class="line"></span><br><span class="line">4.txt:</span><br><span class="line">it was the age of foolishness</span><br><span class="line"></span><br><span class="line">5.txt:</span><br><span class="line">it was the epoch of belief</span><br><span class="line"></span><br><span class="line">6.txt:</span><br><span class="line">it was the epoch of incredulity</span><br></pre></td></tr></table></figure>
+<p>对应 <code>MapReduce</code> 执行流程为：</p>
+<ol>
+<li>我们假设每两个文档的数据大小为 <code>16 MB</code>，则6个文档对应3片数据</li>
+<li>由1所知一共有3个 <code>map</code> 任务，不妨将 <code>reduce</code> 任务也设为3个，并将6个文档按顺序每两个一组依次分发给每个 <code>map</code> 节点</li>
+<li>每个 <code>map</code> 节点处理的数据分片为两个文档，所产生的中间结果数据分别为： <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">map worker 1:</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">best 1</span><br><span class="line">of 1</span><br><span class="line">times 1</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">worst 1</span><br><span class="line">of 1</span><br><span class="line">times 1</span><br><span class="line"></span><br><span class="line">map worker 2:</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">age 1</span><br><span class="line">of 1</span><br><span class="line">wisdom 1</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">age 1</span><br><span class="line">of 1</span><br><span class="line">foolishness 1</span><br><span class="line"></span><br><span class="line">map worker 3:</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">epoch 1</span><br><span class="line">of 1</span><br><span class="line">belief 1</span><br><span class="line">it 1</span><br><span class="line">was 1</span><br><span class="line">the 1</span><br><span class="line">epoch 1</span><br><span class="line">of 1</span><br><span class="line">incredulity 1</span><br></pre></td></tr></table></figure>
+</li>
+<li>在每个 <code>map</code> 节点上将中间结果数据按照某个哈希函数分发到3个区，不妨为以下结果： <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">map worker 1:</span><br><span class="line">    region 1:</span><br><span class="line">    it 1</span><br><span class="line">    best 1</span><br><span class="line">    it 1</span><br><span class="line"></span><br><span class="line">    region 2:</span><br><span class="line">    was 1</span><br><span class="line">    of 1</span><br><span class="line">    was 1</span><br><span class="line">    worst 1</span><br><span class="line">    of 1</span><br><span class="line"></span><br><span class="line">    region 3:</span><br><span class="line">    the 1</span><br><span class="line">    times 1</span><br><span class="line">    the 1</span><br><span class="line">    times 1</span><br><span class="line"></span><br><span class="line">map worker 2:</span><br><span class="line">    region 1:</span><br><span class="line">    it 1</span><br><span class="line">    age 1</span><br><span class="line">    it 1</span><br><span class="line">    age 1</span><br><span class="line">    foolishness 1</span><br><span class="line"></span><br><span class="line">    region 2:</span><br><span class="line">    was 1</span><br><span class="line">    of 1</span><br><span class="line">    of 1</span><br><span class="line">    wisdom 1</span><br><span class="line">    was 1</span><br><span class="line"></span><br><span class="line">    region 3:</span><br><span class="line">    the 1</span><br><span class="line">    the 1</span><br><span class="line"></span><br><span class="line">map worker 3:</span><br><span class="line">    region 1:</span><br><span class="line">    it 1</span><br><span class="line">    epoch 1</span><br><span class="line">    belief 1</span><br><span class="line">    it 1</span><br><span class="line">    epoch 1</span><br><span class="line">    </span><br><span class="line">    region 2:</span><br><span class="line">    was 1</span><br><span class="line">    of 1</span><br><span class="line">    was 1</span><br><span class="line">    of 1</span><br><span class="line">    </span><br><span class="line">    region 3:</span><br><span class="line">    the 1</span><br><span class="line">    the 1</span><br><span class="line">    incredulity 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><code>reduce</code> 节点按照数据分区接收到所有中间结果数据后将其按照键排序： <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">reduce worker 1:</span><br><span class="line">age 1</span><br><span class="line">age 1</span><br><span class="line">belief 1</span><br><span class="line">best 1</span><br><span class="line">epoch 1</span><br><span class="line">epoch 1</span><br><span class="line">foolishness 1</span><br><span class="line">it 1</span><br><span class="line">it 1</span><br><span class="line">it 1</span><br><span class="line">it 1</span><br><span class="line">it 1</span><br><span class="line">it 1</span><br><span class="line"></span><br><span class="line">reduce worker 2:</span><br><span class="line">of 1</span><br><span class="line">of 1</span><br><span class="line">of 1</span><br><span class="line">of 1</span><br><span class="line">of 1</span><br><span class="line">of 1</span><br><span class="line">was 1</span><br><span class="line">was 1</span><br><span class="line">was 1</span><br><span class="line">was 1</span><br><span class="line">was 1</span><br><span class="line">was 1</span><br><span class="line">wisdom 1</span><br><span class="line">worst 1</span><br><span class="line"></span><br><span class="line">reduce worker 3:</span><br><span class="line">incredulity 1</span><br><span class="line">the 1</span><br><span class="line">the 1</span><br><span class="line">the 1</span><br><span class="line">the 1</span><br><span class="line">the 1</span><br><span class="line">the 1</span><br><span class="line">times 1</span><br><span class="line">times 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><code>reduce</code> 节点调用用户自定义 <code>reduce</code> 函数计算单词出现次数，最终每个 <code>reduce</code> 节点的输出文件为： <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">reduce worker 1 output:</span><br><span class="line">age 2</span><br><span class="line">belief 1</span><br><span class="line">best 1</span><br><span class="line">epoch 2</span><br><span class="line">foolishness 1</span><br><span class="line">it 6</span><br><span class="line"></span><br><span class="line">reduce worker 2 output:</span><br><span class="line">of 6</span><br><span class="line">was 6</span><br><span class="line">wisdom 1</span><br><span class="line">worst 1</span><br><span class="line"></span><br><span class="line">reduce worker 3 output:</span><br><span class="line">incredulity 1</span><br><span class="line">the 6</span><br><span class="line">times 2</span><br></pre></td></tr></table></figure>
+</li>
+<li>将代码控制权交还给用户代码</li>
+</ol>
+<h3 id="master-节点数据结构"><a class="markdownIt-Anchor" href="#master-节点数据结构"></a> Master 节点数据结构</h3>
+<p><code>master</code> 节点需要维护当前所有的 <code>map</code> 和 <code>reduce</code> 任务，每个任务需区分不同的状态（空闲、进行中、完成），同时还需要知道每个任务对应的工作节点。作为 <code>map</code> 节点和 <code>reduce</code> 节点间中间结果数据的传输媒介，<code>master</code> 节点需保存 <code>R</code> 个中间结果分区，每当一个 <code>map</code> 节点执行成功时，会将生成的 <code>R</code> 个中间结果文件地址发送给 <code>master</code> 节点，当 <code>master</code> 节点收到通知后，会将其转发给对应进行中的 <code>reduce</code> 节点。</p>
+<p>对应数据结构简单示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 任务状态</span><br><span class="line">enum TaskState &#123;</span><br><span class="line">    &#x2F;&#x2F; 空闲</span><br><span class="line">    Idle,</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 进行中</span><br><span class="line">    InProgress,</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 完成</span><br><span class="line">    Completed</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 一个 map 或 reduce 任务</span><br><span class="line">class Task &#123;</span><br><span class="line">    &#x2F;&#x2F; 任务状态</span><br><span class="line">    TaskState state;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 对应的工作节点 id</span><br><span class="line">    int workerId;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 工作节点</span><br><span class="line">class Worker &#123;</span><br><span class="line">    &#x2F;&#x2F; 节点 id</span><br><span class="line">    int id;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; Map 任务产生的中间结果文件，一个 map 任务一般会产生多个中间结果文件</span><br><span class="line">class IntermediateFile &#123;</span><br><span class="line">    &#x2F;&#x2F; 文件地址</span><br><span class="line">    string location;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 文件大小</span><br><span class="line">    long size;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 中间结果文件集，所有 map 任务产生的中间结果文件会根据分片函数划分到本地磁盘下的 R 个区</span><br><span class="line">class IntermediateFileRegion &#123;</span><br><span class="line">    &#x2F;&#x2F; 中间结果文件</span><br><span class="line">    IntermediateFile[] intermediateFiles;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; Map 节点</span><br><span class="line">class MapWorker : Worker &#123;</span><br><span class="line">    &#x2F;&#x2F; 中间结果文件集，一共有 R 个</span><br><span class="line">    IntermediateFileRegion[] intermediateFileRegions;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; Reduce 节点</span><br><span class="line">class ReduceWorker : Worker &#123;</span><br><span class="line">    &#x2F;&#x2F; 中间结果文件，master 节点会不断发送中间结果文件给 reduce 节点，当所有中间结果文件都收到后，reduce 节点开始工作</span><br><span class="line">    IntermediateFile[] intermediateFiles;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 主节点</span><br><span class="line">class Master &#123;</span><br><span class="line">    &#x2F;&#x2F; Map 任务，一共有 M 个</span><br><span class="line">    Task[] mapTasks;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; Reduce 任务，一共有 R 个</span><br><span class="line">    Task[] reduceTasks;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 工作节点，最多有 M + R 个，一个工作节点并不是只负责 map 或者 reduce 任务，master 节点会选择空闲节点分派 map 或者 reduce 任务</span><br><span class="line">    Worker[] workers;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 中间结果文件集，一共有 R 个，由 map 节点下的中间结果文件集聚合而来，某个 map 节点执行成功后会将生成的 R 个中间结果文件地址发送给 master 节点，由 master 节点将某个区下的中间结果文件地址转发给对应 reduce 节点</span><br><span class="line">    IntermediateFileRegion[] intermediateFileRegions;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="容错"><a class="markdownIt-Anchor" href="#容错"></a> 容错</h3>
+<p>因为 <code>MapReduce</code> 框架借助几百或几千台机器来处理海量数据，所以必须优雅的应对机器异常。</p>
+<h4 id="工作节点异常"><a class="markdownIt-Anchor" href="#工作节点异常"></a> 工作节点异常</h4>
+<p><code>master</code> 节点会周期性的对工作节点进行探活。如果某个工作节点在一段时间内无响应，则 <code>master</code> 节点会将该工作节点标记为异常。该工作节点完成的所有 <code>map</code> 任务的状态都会被重置为空闲，可重新被 <code>master</code> 节点调度到其他工作节点上执行。类似的，该工作节点所有进行中的 <code>map</code> 或 <code>reduce</code> 任务也都会被重置为空闲，并重新接受调度。</p>
+<p>之所以这里已完成的 <code>map</code> 任务也需要重新执行是因为所产生的中间结果文件是保存在 <code>map</code> 节点的本地磁盘上，当该节点无响应时便认为无法与之连通从而认为无法通过 <code>RPC</code> 请求获取这些数据。而如果 <code>reduce</code> 节点异常，它所完成的 <code>reduce</code> 任务不需要重新执行是因为 <code>reduce</code> 节点执行成功后产生的输出文件是保存在全局的文件系统上。</p>
+<p>如果某个 <code>map</code> 任务一开始由工作节点 <code>A</code> 执行，之后由工作节点 <code>B</code> 执行（因为节点 <code>A</code> 发生了异常），则所有执行 <code>reduce</code> 任务的节点都会被通知，其中所有要从节点 <code>A</code> 读取数据但还未读取的 <code>reduce</code> 节点会转而从节点 <code>B</code> 读取数据。</p>
+<p><code>MapReduce</code> 框架能从容应对大量的节点异常。例如，在某次 <code>MapReduce</code> 任务中，由于对运行中的集群进行网络维护一次性造成了80台机器在几分钟内无法连通。<code>MapReduce</code> 框架可直接重新分发和执行这些不连通的节点正在处理的任务，然后继续后续流程，并最终完成当次任务。</p>
+<h4 id="主节点异常"><a class="markdownIt-Anchor" href="#主节点异常"></a> 主节点异常</h4>
+<p>类似于游戏的自动存档，我们可以定期为主节点内部的数据结构保存检查点。如果主节点发生异常，则可以重新启动一个主节点程序并加载最新的检查点数据。然而对于单个主节点来说，主节点异常发生的概率较小，所以在 <code>Google</code> 的实现中，如果主节点发生异常，则会直接中断当次 <code>MapReduce</code> 任务。客户端可捕获到这种情况，并根据自身需要决定是否进行重试。</p>
+<h4 id="执行语义"><a class="markdownIt-Anchor" href="#执行语义"></a> 执行语义</h4>
+<p>如果用户编写的 <code>map</code> 和 <code>reduce</code> 函数是确定性的函数（即对于相同的输入始终返回相同的输出），则对于同一份输入，分布式的 <code>MapReduce</code> 框架的执行结果和一个串行执行且没有任何异常的 <code>MapReduce</code> 框架的执行结果相同。</p>
+<p>不论是 <code>map</code> 还是 <code>task</code> 任务，都需要将执行结果写入到文件系统上，通过原子性的写入提交，可实现上述的语义保证。每个进行中的任务会先将输出结果写入到私有临时文件中，对 <code>reduce</code> 任务来说，最终只产生一个文件，而对于 <code>map</code> 任务则会产生 <code>R</code> 个文件（每个文件对应一个 <code>reduce</code> 任务）。当一个 <code>map</code> 任务执行完成时，<code>map</code> 节点会发送一条消息给 <code>master</code> 节点，这条消息中包含了 <code>map</code> 任务所生成的 <code>R</code> 个临时文件的名字。如果 <code>master</code> 节点收到了一条已经完成的 <code>map</code> 任务的消息，则会忽略该消息，否则将 <code>R</code> 个临时文件的名字保存在内部的数据结构中。</p>
+<p>当 <code>reduce</code> 任务执行完成时，<code>reduce</code> 节点能原子性的将其生成的临时文件重命名为最终的输出文件。如果同一个 <code>reduce</code> 任务有多个工作节点执行（因为网络连通问题导致 <code>master</code> 重新分发 <code>reduce</code> 任务），则对同一个最终输出文件会有多个文件重命名的请求。通过底层文件系统的原子性重命名保证，最终的输出文件只会对应一个 <code>reduce</code> 任务的结果。</p>
+<p>在 <code>Google</code> 内部大部分的 <code>map</code> 和 <code>reduce</code> 函数都是确定性的，在这种情况下分布式程序执行的结果和串行程序执行的结果相同的语义性保证使得开发人员能很容易的审视所编写的程序的行为（即如果程序的执行结果不符合预期，那么可以基本肯定的是开发人员编写的 <code>map</code> 或者 <code>reduce</code> 函数存在问题，而不是 <code>MapReduce</code> 框架存在问题）。当 <code>map</code> 或者 <code>reduce</code> 函数不具有确定性时，框架能提供稍弱一级但仍是合理的语义性保证。在非确定性的函数下，某个 <code>reduce</code> 任务 <code>R1</code> 由分布式执行的结果等价于一个串行执行的程序 <code>A</code> 执行 <code>R1</code> 后的结果。但是，另一个 <code>reduce</code> 任务 <code>R2</code> 的执行结果也可能等同于由另一个不同的串行执行的程序 <code>B</code> 执行后的结果。</p>
+<p>假设有一个 <code>map</code> 任务 <code>M</code>，以及总共有两个 <code>reduce</code> 任务 <code>R1</code> 和 <code>R2</code>，记 <code>e(Ri)</code> 表示 <code>Ri</code> 执行并提交成功的结果。以前面的单词统计为例，假设发送给 <code>map</code> 任务的只有两个文档：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.txt:</span><br><span class="line">It was the best of times</span><br><span class="line"></span><br><span class="line">2.txt:</span><br><span class="line">it was the worst of times</span><br></pre></td></tr></table></figure>
+<p>在 <code>map</code> 函数是非确定性的情况下，不妨这样实现 <code>map</code> 函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">    &#x2F;&#x2F; key: document name</span><br><span class="line">    &#x2F;&#x2F; value: document contents</span><br><span class="line">    for each word w in value:</span><br><span class="line">        r &#x3D; Random(0, 1)</span><br><span class="line"></span><br><span class="line">        if r &gt; 0.5:</span><br><span class="line">            EmitIntermediate(w, &quot;1&quot;);</span><br><span class="line">        else:</span><br><span class="line">            EmitIntermediate(w, &quot;0&quot;);</span><br></pre></td></tr></table></figure>
+<p>即对于某个单词，<code>map</code> 函数有一半的概率计数为1，一半的概率计数为0。</p>
+<p>类似的，以同样的手段来实现 <code>reduce</code> 函数，对于某个单词的所有出现次数，<code>reduce</code> 函数有一半的概率会计数，一半的概率会忽略：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">reduce(String key, Iterator values):</span><br><span class="line">    &#x2F;&#x2F; key: a word</span><br><span class="line">    &#x2F;&#x2F; values: a list of counts</span><br><span class="line">    int result &#x3D; 0;</span><br><span class="line">    for each v in values:</span><br><span class="line">        r &#x3D; Random(0, 1)</span><br><span class="line"></span><br><span class="line">        if r &gt; 0.5:</span><br><span class="line">            result +&#x3D; ParseInt(v);</span><br><span class="line">        else:</span><br><span class="line">            result +&#x3D; 0;</span><br><span class="line">    Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<p>令 <code>R1</code> 为统计单词 <code>it</code> 的个数，经过 <code>map</code> 任务后，生成的中间结果键值对可能为以下四种情况：</p>
+<ol>
+<li>[0, 1]</li>
+<li>[1, 0]</li>
+<li>[1, 1]</li>
+<li>[0, 0]</li>
+</ol>
+<p>最后由 <code>reduce</code> 任务执行后的结果可能为0、1、2三种情况，而相同的输入由一个串行执行的程序来执行也是同样的结果，即不管是分布式的程序还是串行的程序最终结果都是相同的集合，所以认为两者是等价的，也是合理的。</p>
+<p>在确定性的函数下，相同的输入必然返回相同的输出，而在不确定性的函数下，不同的输入可能返回相同的输出或者相同的输入可能返回不同的输出。这就类似于知道 <code>x</code> 的定义域是 <code>&#123;1, 2, 3&#125;</code>，<code>y</code> 值域是 <code>&#123;4, 5, 6&#125;</code>，求 <code>f(x)</code>，显然 <code>f(x)</code> 存在不止唯一的解。</p>
+<p>记上述的 <code>map</code> 和 <code>reduce</code> 函数组成的串行程序为 <code>A</code>，假设有另一个串行程序 <code>B</code>，其中 <code>map</code> 函数不变，<code>reduce</code> 函数变为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">reduce(String key, Iterator values):</span><br><span class="line">    &#x2F;&#x2F; key: a word</span><br><span class="line">    &#x2F;&#x2F; values: a list of counts</span><br><span class="line">    int result &#x3D; 0;</span><br><span class="line">    for each v in values:</span><br><span class="line">        r &#x3D; Random(0, 1)</span><br><span class="line"></span><br><span class="line">        if r &gt; 0.5:</span><br><span class="line">            result +&#x3D; 0;</span><br><span class="line">        else:</span><br><span class="line">            result +&#x3D; ParseInt(v);</span><br><span class="line">    Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<p>令 <code>R2</code> 为统计单词 <code>was</code> 的个数，由 <code>A</code> 或 <code>B</code> 执行的最终结果都等于集合 <code>&#123;0, 1, 2&#125;</code>，相比于确定性的函数，开发人员因此无法有效的审视所编写函数的行为。</p>
+<h3 id="局部性"><a class="markdownIt-Anchor" href="#局部性"></a> 局部性</h3>
+<p>在 <code>Google</code> 内部的运行环境中网络带宽属于稀缺资源，不管是 <code>map</code> 还是 <code>reduce</code> 任务都依托于文件的读取，不可避免的会产生大量网络 <code>IO</code>。而在前面提到，<code>Google</code> 内部实现了一套分布式文件存储系统（<code>GFS</code>）来管理存储在集群内机器本地磁盘上的文件，对于每一个文件 <code>GFS</code> 会将其切分为若干个 <code>64MB</code> 的数据块，每个数据块存有多份冗余（一般是3份）保存在不同的机器上。对于 <code>MapReduce</code> 框架来说，原始的数据输入是保存在本地磁盘上的，依据这个特性，框架在分发 <code>map</code> 任务时，根据输入数据在 <code>GFS</code> 内的位置会优先选择本地磁盘上存有对应输入数据的工作节点。如果找不到这样的工作节点，则会选择一个距离输入数据最近的工作节点（例如工作节点和存有输入数据的节点由同一个交换机相连）。当运行大量的 <code>MapReduce</code> 任务时，大部分的输入数据都是从本地读取从而不消耗任何网络带宽。</p>
+<h3 id="任务粒度"><a class="markdownIt-Anchor" href="#任务粒度"></a> 任务粒度</h3>
+<p>如前文所述 <code>MapReduce</code> 框架会根据输入数据拆分为 <code>M</code> 个 <code>map</code> 任务和 <code>R</code> 个 <code>reduce</code> 任务。理想情况下，<code>M</code> 和 <code>R</code> 的值应该远大于工作节点的数量。为什么需要远大于？首先，<code>M</code> 和 <code>R</code> 的数量比工作节点的数量少是不适合的，会造成资源空闲；其次，如果 <code>M</code> 和 <code>R</code> 的数量和工作节点相等，由于每台机器的处理能力有差异或者输入数据不同，每个工作节点完成某个任务需要的时间也不同，会存在部分机器先完成任务的情况，同样会造成资源空闲，另一方面 <code>MapReduce</code> 面向的是大数据处理，输入数据的数据量远大于工作节点的数量，<code>M</code> 和 <code>R</code> 数量较少的情况下单个工作节点需要处理的数据量则较大，单次处理时间可能较慢，而如果发生了异常，重新执行的成本也较高。所以 <code>M</code> 和 <code>R</code> 的数量设置较大能更好的应对负载均衡，性能好的机器在完成任务后可以继续处理其他任务，同时当某个任务执行异常时也能更快的恢复：该异常的工作节点已完成的 <code>map</code> 任务可分发给余下的工作节点执行。</p>
+<p>当然 <code>M</code> 和 <code>R</code> 的数量也是存在上限的，对于 <code>master</code> 节点来说，它需要维护 <code>M</code> 个 <code>map</code> 任务和 <code>R</code> 个 <code>reduce</code> 任务，时间复杂度是 <code>O(M + R)</code>，另一方面每个 <code>map</code> 任务会产出 <code>R</code> 份中间结果数据，对应 <code>R</code> 个 <code>reduce</code> 任务，所以 <code>master</code> 节点也需要 <code>O(M * R)</code> 的空间复杂度来维护这样的对应关系（<code>Google</code> 实际实现时，每个 <code>map/reduce</code> 关系对约占据 <code>1 byte</code> 内存）。</p>
+<p>另外，由于每个 <code>reduce</code> 任务的最终产出结果是一个单独的文件所以 <code>R</code> 的数量受用户设置限制。在实践中，会趋向于让每个 <code>map</code> 任务处理 <code>16 MB</code> 到 <code>64 MB</code> 的输入数据来确定 <code>M</code> 的大小，因为 <code>64 MB</code> 正好是 <code>GFS</code> 单个数据块的大小，这样每个 <code>map</code> 任务必然能从本地磁盘读取输入数据而不会涉及网络 <code>IO</code>（如果能将任务分发给存有对应输入数据的节点的话），而 <code>R</code> 的数量会在工作节点的数量上乘上一个较小的常数得到。<code>Google</code> 内部运行 <code>MapReduce</code> 任务时通常设置 <code>M</code> 为200000，使用2000台机器的情况下设置 <code>R</code> 为5000。</p>
+<h3 id="后备任务"><a class="markdownIt-Anchor" href="#后备任务"></a> 后备任务</h3>
+<p>类似于木桶原理，一次 <code>MapReduce</code> 任务完成的时间取决于最慢的机器完成 <code>map</code> 或 <code>reduce</code> 任务的时间，这也是造成 <code>MapReduce</code> 任务耗时长的常见原因之一。某台机器执行慢可能有好几个原因造成，例如某台机器的磁盘存在异常，可能频繁遭遇可校正的异常，从而使得磁盘的读速度从 <code>30 MB/s</code> 降低到 <code>1 MB/s</code>。而调度系统同时有可能分配了其他的任务给这台机器，会进一步引发 <code>CPU</code>、内存、本地磁盘、网络带宽的竞争，从而造成执行 <code>MapReduce</code> 任务的耗时更长。<code>Google</code> 内部曾经遇到一个问题，由于机器初始化代码中的一个 <code>bug</code> 造成处理器的缓存被禁用，在这些受影响的机器上运行的任务耗时增长了超过100倍。</p>
+<p>针对这个问题，<code>Google</code> 提出了一个通用的缓解机制。当一次 <code>MapReduce</code> 任务快执行结束时，框架会将剩余还在进行中的任务分配给其他机器执行。不管是原先分配的机器执行完成，还是新分配的机器执行完成，对应的任务都将标记为完成。让一个任务由两台机器同时执行势必存在资源浪费，<code>Google</code> 通过调优使得耗费的计算资源控制在了增加几个百分比以内。这个机制在处理一个数据量巨大的 <code>MapReduce</code> 任务时能大幅降低整体耗时。在某个约需处理 <code>1T</code> 数据的排序任务中，不启用这个机制的情况下整体耗时会增加44%。</p>
+<h2 id="改进"><a class="markdownIt-Anchor" href="#改进"></a> 改进</h2>
+<p>大多数情况下用户仅需编写 <code>map</code> 和 <code>reduce</code> 函数就能满足需求，本节主要描述一些 <code>MapReduce</code> 的扩展，可能在某些场合下会比较有用。</p>
+<h3 id="分片函数"><a class="markdownIt-Anchor" href="#分片函数"></a> 分片函数</h3>
+<p>用户可指定 <code>MapReduce</code> 任务最终输出文件的数量 <code>R</code>，也即 <code>reduce</code> 任务的数量。那么由 <code>map</code> 任务产生的中间结果数据应该发给哪个 <code>reduce</code> 节点执行呢？这个就交由分片函数决定，默认的分片函数是哈希函数（例如 <code>hash(key) mod R</code>），这种分片结果一般比较均匀。不过，有时候自定义分片函数会更有用，例如，当最终结果文件的键是 <code>URL</code> 时，我们希望同属于一个 <code>host</code> 下的 <code>URL</code> 对应的数据最终都在同一个文件里，用户可自定义分片函数来实现，例如 <code>hash(Hostname(urlkey)) mod R</code>，即先通过 <code>urlkey</code> 提取 <code>host</code>，然后对 <code>host</code> 计算哈希最后取模 <code>R</code>。</p>
+<h3 id="顺序保证"><a class="markdownIt-Anchor" href="#顺序保证"></a> 顺序保证</h3>
+<p><code>MapReduce</code> 框架保证在同一个中间结果分区内，即同一个 <code>reduce</code> 任务内，中间结果数据是按照键的升序处理的，因为 <code>reduce</code> 任务处理前会先将中间结果数据按照键进行排序。这样在 <code>reduce</code> 任务处理完成后，最终结果文件内的数据也是按照键的顺序排序的，这就有利于对最终结果文件按键进行高效的随机查找，或方便其他需要排好序的数据的场景。</p>
+<h3 id="合并函数"><a class="markdownIt-Anchor" href="#合并函数"></a> 合并函数</h3>
+<p>在某些场景下，<code>map</code> 任务产生的中间结果数据的键存在大量的重复，同时用户编写的 <code>reduce</code> 函数又符合交换律和结合律（即 <code>a + b = b + a</code>，<code>(a + b) + c = a + (b + c)</code>）。一个典型案例就是前文描述的单词计数程序，每个 <code>map</code> 任务都会产生成百上千的形如 <code>&lt;the, 1&gt;</code> 的中间结果数据，其中 <code>the</code> 指某个单词，1表示该单词出现的次数。这些同键的中间结果数据接着会经过网络传输发送给 <code>reduce</code> 任务，然后由 <code>reduce</code> 函数合并相加。为了减少这种雷同数据的网络传输，用户可编写自定义的合并函数，<code>map</code> 任务在生成中间结果数据前先进行同键的合并，从而将原来成百上千的同键网络传输降低为1次。</p>
+<p>一般来说，合并函数和 <code>reduce</code> 函数的用户代码实现是相同的。不同在于 <code>MapReduce</code> 框架如何处理这两个函数产出的结果，<code>reduce</code> 函数的产出结果会写到最终的结果文件里，而合并函数的产出结果会写到中间结果文件里，然后发送给 <code>reduce</code> 任务。</p>
+<p>在特定情况下，由于省去了大量的网络 <code>IO</code>，合并函数能显著的降低一次 <code>MapReduce</code> 任务执行的耗时。</p>
+<h3 id="输入和输出类型"><a class="markdownIt-Anchor" href="#输入和输出类型"></a> 输入和输出类型</h3>
+<p><code>MapReduce</code> 框架支持从多个数据格式读取输入数据。例如，<code>text</code> 模式下将输入数据的每一行作为键值对，其中键通过在文本中的偏移量来确定，而值就是当前行的内容。另一种通用支持的格式是本身保存了已排好序的键值对。不管是哪种输入格式，<code>MapReduce</code> 都能从原始输入中准确切分出键值对供 <code>map</code> 任务使用（例如 <code>text</code> 模式保证以每一行的结束进行切分）。用户也可实现自定义的 <code>reader</code> 接口来支持读取新的输入格式，不过大部分情况下内置的输入格式已经能满足需求。</p>
+<p>虽然前文描述过 <code>MapReduce</code> 的原始输入数据来源于文本文件，不过用户自定义的 <code>reader</code> 接口并不一定要从文本文件读取，例如还可以从数据库或内存中读取。</p>
+<p>类似的，<code>MapReduce</code> 框架也支持不同的最终输出数据的格式，用户也同样可实现支持自定义的输出格式。</p>
+<h3 id="副作用"><a class="markdownIt-Anchor" href="#副作用"></a> 副作用</h3>
+<p>在某些情况下，用户可能希望在 <code>map</code> 或 <code>reduce</code> 阶段生成额外的辅助文件，这就要求开发人员自己保证输出文件的原子性和幂等性，特别是用户程序先将数据写入到临时文件内，最后在所有数据写入完成后能原子性的将临时文件重命名。</p>
+<p>不过，<code>MapReduce</code> 框架本身并不支持两阶段协议来保证 <code>map</code> 或 <code>reduce</code> 任务输出多个文件时的一致性，同样的，这也需要开发人员自己来保证。因此多文件一致性对应的任务应当是确定性的，否则如何确定产出的文件是符合一致性的？而在实践中要求任务是确定性的并不是个问题。</p>
+<h3 id="忽略异常数据"><a class="markdownIt-Anchor" href="#忽略异常数据"></a> 忽略异常数据</h3>
+<p>有时候由于用户编写的 <code>map</code> 或 <code>reduce</code> 函数存在 <code>bug</code>，导致处理某些数据时 <code>map</code> 或 <code>reduce</code> 函数必然发生异常，这就造成 <code>MapReduce</code> 任务无法正常完成。正常来说应当修复 <code>bug</code>，但有时候不可行，例如造成 <code>bug</code> 的代码可能是第三方库引入的。另一方面，有时候忽略这些造成异常的数据也是可以接受的，例如在对一个数据量非常庞大的数据集做统计分析时。因此，<code>MapReduce</code> 框架提供了一种可选的执行模式，当其检测到某些输入数据必然造成异常时，则会跳过这些数据从而使得执行流程能继续走下去。</p>
+<p>为了实现这个功能，首先每个工作节点上都安装了一个 <code>signal handler</code> 程序用于捕获段异常和总线异常。在执行 <code>map</code> 或 <code>reduce</code> 任务之前，<code>MapReduce</code> 框架首先将当前任务需要的输入数据所对应的序号保存在工作节点内的一个全局变量中，在执行 <code>map</code> 或 <code>reduce</code> 任务时，如果用户代码发生异常，此时 <code>signal handler</code> 能捕获到相应的异常信号，然后 <code>signal handler</code> 会发送一个 <code>UDP</code> 数据包给主节点，该数据包中包含了执行当次任务的输入数据序号。如果主节点发现某个数据对应的任务执行失败了多次，则会忽略该数据而不是重新执行 <code>map</code> 或 <code>reduce</code> 任务。按照这样的描述，被忽略的数据是数据片维度，而不是键值对维度，因为每片的数据块大小相比于总数据量的大小来说微乎其微，所以整体影响不大。</p>
+<h3 id="本地执行"><a class="markdownIt-Anchor" href="#本地执行"></a> 本地执行</h3>
+<p>调试分布式程序并不是件简单的事，对于 <code>MapReduce</code> 任务来说，一次任务会被分发到几千台机器上执行，每台机器实际执行的任务也无法预测。为了方便调试、性能分析和小规模测试，<code>Google</code> 实现的 <code>MapReduce</code> 框架也提供了一个串行执行的版本，能在单台机器上串行执行所有任务。同时，用户也可通过参数控制一次 <code>MapReduce</code> 任务只执行些特定的 <code>map</code> 任务。通过在启动程序时指定调试参数，用户就可轻松的使用调试或测试工具（如 <code>gdb</code>）对编写的程序进行调试和测试。</p>
+<h3 id="状态信息"><a class="markdownIt-Anchor" href="#状态信息"></a> 状态信息</h3>
+<p>主节点内部同时运行了一个 <code>HTTP</code> 服务，用于提供给用户查看一系列状态信息。状态信息页面展示了当前任务的进度，例如有多少个任务已经完成，有多少个任务正在进行中，输入数据的大小，中间结果数据的大小，最终结果数据的大小，任务处理百分比等。同时，状态页面也提供了每个任务执行产生的标准错误输出和标准输出文件。用户可根据这些信息来预测任务需要多久才能完成，以及是否需要添加更多的计算资源。状态页面也可用于判断当前任务执行耗时是否比预期的长。</p>
+<p>此外，状态页面也显示了失败的工作节点，以及这些失败的工作节点对应的 <code>map</code> 或 <code>reduce</code> 任务。这有助于用户排查编写的代码中是否有 <code>bug</code>。</p>
+<h3 id="计数器"><a class="markdownIt-Anchor" href="#计数器"></a> 计数器</h3>
+<p><code>MapReduce</code> 框架内部提供了一个计数器用于统计各个事件发生的次数。例如，用户可能希望统计一次任务中一共处理了多少个单词，或者有多少个德语文档建立了索引。</p>
+<p>如果要开启这个功能，用户需要编写一个命名计数器，然后在 <code>map</code> 或 <code>reduce</code> 函数中在需要的时候对计数器自增，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase &#x3D; GetCounter(&quot;uppercase);</span><br><span class="line"></span><br><span class="line">map(String name, String contents):</span><br><span class="line">    for each word w in contents:</span><br><span class="line">        if (IsCapitalized(w)):</span><br><span class="line">            uppsercase-&gt;Increment();</span><br><span class="line">        EmitIntermediate(w, &quot;1&quot;);</span><br></pre></td></tr></table></figure>
+<p>每个工作节点上的计数器的值会周期性的发送给主节点（如前文所述，主节点会周期性的对工作节点进行心跳探测，工作节点会在响应结果中带上计数器的值）。主节点会对执行成功的 <code>map</code> 和 <code>reduce</code> 任务返回的计数器聚合，当整个 <code>MapReduce</code> 任务完成将控制权交还给用户代码时，用户代码可获取到创建的计数器的值。当前的计数器的值也同样会展示在状态页面，用户也可根据此信息来观测整个任务的进展。在对计数器聚合时，和主节点会忽略已完成的某个任务的重复通知一样，主节点同样会忽略某个来自已完成任务的计数器更新，从而避免重复计数（任务的重复执行主要有两种情况，一种是由于网络不连通，导致主节点重新分配某个 <code>map</code> 或 <code>reduce</code> 任务到新的工作节点上；另一种是触发了后备任务，主节点主动分发同一个 <code>map</code> 或 <code>reduce</code> 任务给多个工作节点执行）。</p>
+<p><code>MapRecue</code> 框架本身也维护了一些计数器，例如已处理的输入数据键值对的数量，以及已生成的最终数据键值对的数量。</p>
+<p>用户能很方便的通过计数器来检查 <code>MapReduce</code> 任务的行为。例如，在任务执行时用户可通过计数器来确保输出的键值对数量是否等于输入的键值对数量，或者已处理的德语文档的数量在全部已处理的文档数量中的占比是否符合预期。</p>
+<h2 id="性能"><a class="markdownIt-Anchor" href="#性能"></a> 性能</h2>
+<p>这一节主要描述 <code>MapReduce</code> 在 <code>Google</code> 内部环境下运行的性能情况，这里不再赘述。简单举例来说，在1800台机器上执行一个 <code>10T</code> 数据量的分布式 <code>grep</code> 搜索耗时约150秒。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>最后，来自 <code>Google</code> 的总结：</p>
+<ol>
+<li>限制性的编程模型使得计算并行化变得容易，以及有着较好的容错性，这也体现了计算机领域的一个重要思想：抽象</li>
+<li>对于大型系统来说，网络 <code>IO</code> 容易成为瓶颈</li>
+<li>冗余执行可以作为有效降低成为性能短板的机器带来的影响的手段，另外冗余也是应对机器异常、数据丢失的方式</li>
+</ol>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf">MapReduce: Simplified Data Processing on Large Clusters</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Bisection_bandwidth">Bisection bandwidth</a></li>
+<li><a target="_blank" rel="noopener" href="https://networkengineering.stackexchange.com/questions/28894/understanding-bisection-bandwidth">Understanding bisection bandwidth</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/02/07/add-node-in-binary-search-tree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -981,83 +1222,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/07/10/permissions-0644-for-xx-are-too-open/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/07/10/permissions-0644-for-xx-are-too-open/" class="post-title-link" itemprop="url">Permissions 0644 for 'xxx.pem' are too open</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-07-10 00:00:00" itemprop="dateCreated datePublished" datetime="2021-07-10T00:00:00+08:00">2021-07-10</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>618</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>使用 <code>SSH</code> 连接到 <code>Azure</code> 的虚拟机时遇到错误：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ ssh -i &#x2F;path&#x2F;to&#x2F;some.pem xxx@x.x.x.x</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">Permissions 0644 for &#39;&#x2F;path&#x2F;to&#x2F;some.pem&#39; are too open.</span><br><span class="line">It is required that your private key files are NOT accessible by others.</span><br><span class="line">This private key will be ignored.</span><br><span class="line">Load key &quot;&#x2F;path&#x2F;to&#x2F;some.pem&quot;: bad permissions</span><br><span class="line">xxx@x.x.x.x: Permission denied (publickey).</span><br></pre></td></tr></table></figure>
-<p>这是因为创建虚拟机时从 <code>Azure</code> 下载的私钥默认权限太大，需要将其权限改为只读且仅当前用户可见：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 400 some.pem</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/8193768/trying-to-ssh-into-an-amazon-ec2-instance-permission-error">Trying to SSH into an Amazon Ec2 instance - permission error</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1127,7 +1291,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
