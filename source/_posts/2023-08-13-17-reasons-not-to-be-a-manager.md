@@ -65,6 +65,11 @@ tags:
 
 这里作者认为需要有能够发声的高级 `IC`，因为他们毕竟还是 `IC` 线，他们所代表的利益有时也符合普通工程师的利益。如果高级 `IC` 最终都转到了管理岗，那么本来就人微言轻的普通工程师的利益也更难传达到上层。不过，这也要求公司有能够让高级 `IC` 开花结果的土壤。
 
+### 11. 管理只是一系列技能，你同样能以 `IC` 的身份去尝试所有有趣的管理工作
+随着在 `IC` 路线上的成长，你会逐渐涉及一些技术之外的管理工作。有人可能就会乐于去尝试这些管理工作，例如担任导师，面试，参与决策，制定职业规划等。作者认为一个健康的公司应当鼓励并允许高级 `IC` 去参与这些工作。这样就避免了参与管理者职责中的一些不讨喜的活，例如绩效考核，裁人等。
+
+### 12. 
+
 ## 参考
 * [17 REASONS NOT TO BE A MANAGER](https://charity.wtf/2019/09/08/reasons-not-to-be-a-manager/)
 * [Dropbox Engineering Career Framework](https://dropbox.github.io/dbx-career-framework/overview.html)
