@@ -672,7 +672,7 @@
 <p>如果某个 <code>API</code> 允许客户端指定资源的排序顺序，则请求消息体中应该包含一个 <code>order_by</code> 字段：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string order_by = ...;</span><br></pre></td></tr></table></figure>
 <p><code>order_by</code> 应当遵循 <code>SQL</code> 语法：即使用逗号分割多个字段，例如 <code>&quot;foo,bar&quot;</code>。默认的排序规则是升序，如果需要降序排序，则应当在字段名后增加 <code>&quot; desc&quot;</code> 后缀，例如 <code>&quot;foo desc,bar&quot;</code>。</p>
-<p>同时，字段间额外的空格是无关紧要的，例如 <code>&quot;foo,bar desc&quot;</code> 和 <code>&quot; foo , bar desc &quot;</code> 是等价的。</p>
+<p>同时，字段间额外的空格是无关紧要的，例如 <code>&quot;foo,bar desc&quot;</code> 和 <code>&quot;  foo ,  bar  desc  &quot;</code> 是等价的。</p>
 <h3 id="请求验证"><a class="markdownIt-Anchor" href="#请求验证"></a> 请求验证</h3>
 <p>如果某个 <code>API</code> 有副作用并且需要在执行前验证请求是否有效，则请求消息体中应该包含一个 <code>validate_only</code> 字段：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bool validate_only = ...;</span><br></pre></td></tr></table></figure>
