@@ -95,6 +95,23 @@ SELECT SYSTEM$GET_SNOWFLAKE_PLATFORM_INFO();
 }
 ```
 
+## 创建 IAM 角色
+接着，创建一个 `IAM` 角色并绑定前一步创建的 `S3` 策略。在 `IAM` 左侧导航栏 `Access management` 下选择 `Roles`，之后点击 `Create role`：
+
+![alt](/images/snowflake-5.png)
+
+`Trusted entity type` 选择 `AWS account`，然后在 `An AWS account` 下选择 `Another AWS account`，`Account ID` 暂时先填当前账号的 `ID`，之后会修改：
+
+![alt](/images/snowflake-6.png)
+
+同时，选择 `Require external ID (Best practice when a third party will assume this role)`，`External ID` 暂时用一个假的例如 `0000` 替代，之后同样会修改：
+
+![alt](/images/snowflake-7.png)
+
+绑定先前创建的 `S3` 策略：
+
+![alt](/images/snowflake-8.png)
+
 ## 参考
 * [Allowing the Virtual Private Cloud IDs](https://docs.snowflake.com/en/user-guide/data-load-s3-allow)
 * [Option 1: Configuring a Snowflake storage integration to access Amazon S3](https://docs.snowflake.com/en/user-guide/data-load-s3-config-storage-integration)
