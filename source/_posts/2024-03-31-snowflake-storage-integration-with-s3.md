@@ -43,7 +43,7 @@ SELECT SYSTEM$GET_SNOWFLAKE_PLATFORM_INFO();
 
 ![alt](/images/snowflake-4.png)
 
-下面的策略中 `vpc-abc` 是 `Snowflake` 实例的 `VPC`，`snowflake-storage-integration-example` 是示例 `Bucket` 的名字，`unloading` 和 `loading` 是该 `Bucket` 下的两个文件夹：
+下面的策略中 `vpc-abc` 是 `Snowflake` 实例的 `VPC`，`snowflake-storage-integration-example` 是示例 `Bucket` 的名字，`unloading` 和 `loading` 是该 `Bucket` 下的两个文件夹，分别用于 `Data Unloading` 和 `Data Loading` 使用：
 
 ```json
 {
@@ -133,7 +133,7 @@ CREATE STORAGE INTEGRATION snowflake_storage_integration_example
 > 只有授权了 `CREATE INTEGRATION` 权限的角色才能创建 `STORAGE INTEGRATION`，默认只有 `ACCOUNTADMIN` 才有这个权限。
 
 ## 获取 Snowflake 的用户 ARN 和 External ID
-接着需要获取所创建的 `Storage Integration` 对应的 `IAM` 用户的 `ARN` 和 `External ID`：
+接着需要获取所创建的 `Storage Integration` 对应的 `Snowflake` `IAM` 用户的 `ARN` 和 `External ID`：
 
 ```sql
 desc integration snowflake_storage_integration_example;
@@ -150,7 +150,7 @@ desc integration snowflake_storage_integration_example;
 
 ![alt](/images/snowflake-12.png)
 
-然后，我们就可以执行一条 `Data Unloading` 命令来验证配置是否成功：
+完成后，我们就可以执行一条 `Data Unloading` 命令来验证配置是否成功：
 
 ```sql
 copy into 's3://snowflake-storage-integration-example/unloading/'
