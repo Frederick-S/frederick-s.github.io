@@ -11,7 +11,7 @@ tags:
 ## 获取 VPC ID
 在配置 `Storage Integration` 前，需要设置 `S3` 策略，首先获取 `Snowflake` 的 `VPC ID`，后续的 `S3` 策略配置中将只允许该 `VPC` 访问。
 
-> 注意，允许特定 VPC 访问的功能要求 Snowflake 实例和对应的 S3 Bucket 运行在相同的 AWS 区域内。
+> 允许特定 VPC 访问的功能要求 Snowflake 实例和对应的 S3 Bucket 运行在相同的 AWS 区域内。
 
 切换到 `ACCOUNTADMIN` 角色在 `Snowflake` 中执行：
 ```sql
@@ -108,10 +108,49 @@ SELECT SYSTEM$GET_SNOWFLAKE_PLATFORM_INFO();
 
 ![alt](/images/snowflake-7.png)
 
-绑定先前创建的 `S3` 策略：
+最后绑定先前创建的 `S3` 策略：
 
 ![alt](/images/snowflake-8.png)
+
+创建角色之后，记录下角色的 `ARN`，接下来会用到：
+
+![alt](/images/snowflake-9.png)
+
+## 创建 Storage Integration
+这时就可以在 `Snowflake` 中创建 `Storage Integration` 了：
+
+```sql
+CREATE STORAGE INTEGRATION snowflake_storage_integration_example
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = 'S3'
+  ENABLED = TRUE
+  STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::123:role/snowflake-integration-role'
+  STORAGE_ALLOWED_LOCATIONS = ('s3://snowflake-storage-integration-example/loading/', 's3://snowflake-storage-integration-example/unloading/')
+```
+
+其中 `STORAGE_AWS_ROLE_ARN` 是之前所创建的 `IAM` 角色的 `ARN`，`STORAGE_ALLOWED_LOCATIONS` 是示例 `Bucket` 下的两个文件夹的地址。
+
+> 只有授权了 `CREATE INTEGRATION` 权限的角色才能创建 `STORAGE INTEGRATION`，默认只有 `ACCOUNTADMIN` 才有这个权限。
+
+## 获取 Snowflake 的用户 ARN 和 External ID
+接着需要获取所创建的 `Storage Integration` 对应的 `IAM` 用户的 `ARN` 和 `External ID`：
+
+```sql
+desc integration snowflake_storage_integration_example;
+```
+
+![alt](/images/snowflake-10.png)
+
+记录下 `STORAGE_AWS_IAM_USER_ARN` 和 `STORAGE_AWS_EXTERNAL_ID`。
+
+## 授权 Snowflake 用户
+回到之前创建的 `IAM` 角色，在 `Trust relationships` 下替换掉之前填写的临时 `Account ID` 和 `External ID`：
+
+![alt](/images/snowflake-11.png)
+
+![alt](/images/snowflake-12.png)
 
 ## 参考
 * [Allowing the Virtual Private Cloud IDs](https://docs.snowflake.com/en/user-guide/data-load-s3-allow)
 * [Option 1: Configuring a Snowflake storage integration to access Amazon S3](https://docs.snowflake.com/en/user-guide/data-load-s3-config-storage-integration)
+* [CREATE STORAGE INTEGRATION](https://docs.snowflake.com/en/sql-reference/sql/create-storage-integration)
