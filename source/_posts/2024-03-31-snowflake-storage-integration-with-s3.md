@@ -6,10 +6,10 @@ tags:
 ## 介绍
 `Snowflake` 的 `Data Loading` 和 `Data Unloading` 可以通过 `S3` 导入和导出数据。用户可以使用 `AWS_KEY_ID` 和 `AWS_SECRET_KEY` 来授权 `Snowflake` 访问 `S3`，不过出于安全和权限控制的考虑，一般不会这么做。
 
-`Snowflake` 建议通过 `Storage Integration` 来管理授权。
+`Snowflake` 建议通过 `Storage Integration` 来管理权限。
 
 ## 获取 VPC ID
-在配置 `Storage Integration` 前，需要设置 `S3` 策略，首先获取 `Snowflake` 的 `VPC ID`，后续的 `S3` 策略配置中将只允许该 `VPC` 访问。
+在配置 `Storage Integration` 前，需要设置 `S3` 策略。首先获取 `Snowflake` 的 `VPC ID`，后续的 `S3` 策略配置中将只允许该 `VPC` 访问。
 
 > 允许特定 VPC 访问的功能要求 Snowflake 实例和对应的 S3 Bucket 运行在相同的 AWS 区域内。
 
@@ -149,6 +149,17 @@ desc integration snowflake_storage_integration_example;
 ![alt](/images/snowflake-11.png)
 
 ![alt](/images/snowflake-12.png)
+
+然后，我们就可以执行一条 `Data Unloading` 命令来验证配置是否成功：
+
+```sql
+copy into 's3://snowflake-storage-integration-example/unloading/'
+from (select OBJECT_CONSTRUCT_KEEP_NULL(*) from (select * from MY_DATABASE.MY_SCHEMA.MY_TABLE limit 10))
+FILE_FORMAT = (type = json, COMPRESSION = NONE)
+STORAGE_INTEGRATION = snowflake_storage_integration_example
+```
+
+如果配置成功，那么 `Snowflake` 会将表 `MY_DATABASE.MY_SCHEMA.MY_TABLE` 的数据导出到 `s3://snowflake-storage-integration-example/unloading/` 文件夹下。
 
 ## 参考
 * [Allowing the Virtual Private Cloud IDs](https://docs.snowflake.com/en/user-guide/data-load-s3-allow)
