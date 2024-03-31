@@ -154,13 +154,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-count">55</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -177,6 +177,148 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/03/31/snowflake-storage-integration-with-s3/" class="post-title-link" itemprop="url">Snowflake 配置 S3 Storage Integration</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-03-31 00:00:00" itemprop="dateCreated datePublished" datetime="2024-03-31T00:00:00+08:00">2024-03-31</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.7k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>6 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p><code>Snowflake</code> 的 <code>Data Loading</code> 和 <code>Data Unloading</code> 可以通过 <code>S3</code> 导入和导出数据。用户可以使用 <code>AWS_KEY_ID</code> 和 <code>AWS_SECRET_KEY</code> 来授权 <code>Snowflake</code> 访问 <code>S3</code>，不过出于安全和权限控制的考虑，一般不会这么做。</p>
+<p><code>Snowflake</code> 建议通过 <code>Storage Integration</code> 来管理权限。</p>
+<h2 id="获取-vpc-id"><a class="markdownIt-Anchor" href="#获取-vpc-id"></a> 获取 VPC ID</h2>
+<p>在配置 <code>Storage Integration</code> 前，需要设置 <code>S3</code> 策略。首先获取 <code>Snowflake</code> 的 <code>VPC ID</code>，后续的 <code>S3</code> 策略配置中将只允许该 <code>VPC</code> 访问。</p>
+<blockquote>
+<p>允许特定 VPC 访问的功能要求 Snowflake 实例和对应的 S3 Bucket 运行在相同的 AWS 区域内。</p>
+</blockquote>
+<p>切换到 <code>ACCOUNTADMIN</code> 角色在 <code>Snowflake</code> 中执行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">USE ROLE ACCOUNTADMIN;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">SYSTEM</span>$GET_SNOWFLAKE_PLATFORM_INFO();</span><br></pre></td></tr></table></figure>
+<p>记录下返回的 <code>VPC ID</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;snowflake-vpc-id&quot;:[&quot;vpc-abc&quot;]&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="创建-iam-策略"><a class="markdownIt-Anchor" href="#创建-iam-策略"></a> 创建 IAM 策略</h2>
+<p>然后，需要创建一个 <code>S3</code> 策略来定义 <code>Snowflake</code> 访问 <code>S3 Bucket</code> 的权限。</p>
+<p>从 <code>AWS</code> 控制台进入 <code>IAM</code>，在左侧导航栏 <code>Access management</code> 下选择 <code>Account settings</code>：</p>
+<p><img src="/images/snowflake-1.png" alt="alt" /></p>
+<p>在 <code>Security Token Service (STS)</code> 下查看所在区域的 <code>STS</code> 状态是否是 <code>Active</code>：</p>
+<p><img src="/images/snowflake-2.png" alt="alt" /></p>
+<p>接着，在左侧导航栏 <code>Access management</code> 下选择 <code>Policies</code>，之后点击 <code>Create policy</code>：</p>
+<p><img src="/images/snowflake-3.png" alt="alt" /></p>
+<p>切换到 <code>JSON</code> 后输入 <code>S3</code> 策略：</p>
+<p><img src="/images/snowflake-4.png" alt="alt" /></p>
+<p>下面的策略中 <code>vpc-abc</code> 是 <code>Snowflake</code> 实例的 <code>VPC</code>，<code>snowflake-storage-integration-example</code> 是示例 <code>Bucket</code> 的名字，<code>unloading</code> 和 <code>loading</code> 是该 <code>Bucket</code> 下的两个文件夹，分别用于 <code>Data Unloading</code> 和 <code>Data Loading</code> 使用：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;Version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2012-10-17&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;Statement&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">		<span class="punctuation">&#123;</span></span><br><span class="line">			<span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Statement1&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;s3:PutObject&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:GetObject&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:GetObjectVersion&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:DeleteObject&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:DeleteObjectVersion&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;arn:aws:s3:::snowflake-storage-integration-example/unloading/*&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;arn:aws:s3:::snowflake-storage-integration-example/loading/*&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">				<span class="attr">&quot;StringEquals&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">					<span class="attr">&quot;aws:SourceVpc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vpc-abc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">			<span class="punctuation">&#125;</span></span><br><span class="line">		<span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">		<span class="punctuation">&#123;</span></span><br><span class="line">			<span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Statement2&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;s3:ListBucket&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:GetBucketLocation&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;arn:aws:s3:::snowflake-storage-integration-example&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">				<span class="attr">&quot;StringLike&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">					<span class="attr">&quot;s3:prefix&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">						<span class="string">&quot;unloading/*&quot;</span><span class="punctuation">,</span></span><br><span class="line">						<span class="string">&quot;loading/*&quot;</span></span><br><span class="line">					<span class="punctuation">]</span></span><br><span class="line">				<span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="attr">&quot;StringEquals&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">					<span class="attr">&quot;aws:SourceVpc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vpc-abc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">			<span class="punctuation">&#125;</span></span><br><span class="line">		<span class="punctuation">&#125;</span></span><br><span class="line">	<span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="创建-iam-角色"><a class="markdownIt-Anchor" href="#创建-iam-角色"></a> 创建 IAM 角色</h2>
+<p>接着，创建一个 <code>IAM</code> 角色并绑定前一步创建的 <code>S3</code> 策略。在 <code>IAM</code> 左侧导航栏 <code>Access management</code> 下选择 <code>Roles</code>，之后点击 <code>Create role</code>：</p>
+<p><img src="/images/snowflake-5.png" alt="alt" /></p>
+<p><code>Trusted entity type</code> 选择 <code>AWS account</code>，然后在 <code>An AWS account</code> 下选择 <code>Another AWS account</code>，<code>Account ID</code> 暂时先填当前账号的 <code>ID</code>，之后会修改：</p>
+<p><img src="/images/snowflake-6.png" alt="alt" /></p>
+<p>同时，选择 <code>Require external ID (Best practice when a third party will assume this role)</code>，<code>External ID</code> 暂时用一个假的例如 <code>0000</code> 替代，之后同样会修改：</p>
+<p><img src="/images/snowflake-7.png" alt="alt" /></p>
+<p>最后绑定先前创建的 <code>S3</code> 策略：</p>
+<p><img src="/images/snowflake-8.png" alt="alt" /></p>
+<p>创建角色之后，记录下角色的 <code>ARN</code>，接下来会用到：</p>
+<p><img src="/images/snowflake-9.png" alt="alt" /></p>
+<h2 id="创建-storage-integration"><a class="markdownIt-Anchor" href="#创建-storage-integration"></a> 创建 Storage Integration</h2>
+<p>这时就可以在 <code>Snowflake</code> 中创建 <code>Storage Integration</code> 了：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> STORAGE INTEGRATION snowflake_storage_integration_example</span><br><span class="line">  TYPE <span class="operator">=</span> EXTERNAL_STAGE</span><br><span class="line">  STORAGE_PROVIDER <span class="operator">=</span> <span class="string">&#x27;S3&#x27;</span></span><br><span class="line">  ENABLED <span class="operator">=</span> <span class="literal">TRUE</span></span><br><span class="line">  STORAGE_AWS_ROLE_ARN <span class="operator">=</span> <span class="string">&#x27;arn:aws:iam::123:role/snowflake-integration-role&#x27;</span></span><br><span class="line">  STORAGE_ALLOWED_LOCATIONS <span class="operator">=</span> (<span class="string">&#x27;s3://snowflake-storage-integration-example/loading/&#x27;</span>, <span class="string">&#x27;s3://snowflake-storage-integration-example/unloading/&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>其中 <code>STORAGE_AWS_ROLE_ARN</code> 是之前所创建的 <code>IAM</code> 角色的 <code>ARN</code>，<code>STORAGE_ALLOWED_LOCATIONS</code> 是示例 <code>Bucket</code> 下的两个文件夹的地址。</p>
+<blockquote>
+<p>只有授权了 <code>CREATE INTEGRATION</code> 权限的角色才能创建 <code>STORAGE INTEGRATION</code>，默认只有 <code>ACCOUNTADMIN</code> 才有这个权限。</p>
+</blockquote>
+<h2 id="获取-snowflake-的用户-arn-和-external-id"><a class="markdownIt-Anchor" href="#获取-snowflake-的用户-arn-和-external-id"></a> 获取 Snowflake 的用户 ARN 和 External ID</h2>
+<p>接着需要获取所创建的 <code>Storage Integration</code> 对应的 <code>Snowflake</code> <code>IAM</code> 用户的 <code>ARN</code> 和 <code>External ID</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">desc</span> integration snowflake_storage_integration_example;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/snowflake-10.png" alt="alt" /></p>
+<p>记录下 <code>STORAGE_AWS_IAM_USER_ARN</code> 和 <code>STORAGE_AWS_EXTERNAL_ID</code>。</p>
+<h2 id="授权-snowflake-用户"><a class="markdownIt-Anchor" href="#授权-snowflake-用户"></a> 授权 Snowflake 用户</h2>
+<p>回到之前创建的 <code>IAM</code> 角色，在 <code>Trust relationships</code> 下替换掉之前填写的临时 <code>Account ID</code> 和 <code>External ID</code>：</p>
+<p><img src="/images/snowflake-11.png" alt="alt" /></p>
+<p><img src="/images/snowflake-12.png" alt="alt" /></p>
+<p>完成后，我们就可以执行一条 <code>Data Unloading</code> 命令来验证配置是否成功：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">copy</span> <span class="keyword">into</span> <span class="string">&#x27;s3://snowflake-storage-integration-example/unloading/&#x27;</span></span><br><span class="line"><span class="keyword">from</span> (<span class="keyword">select</span> OBJECT_CONSTRUCT_KEEP_NULL(<span class="operator">*</span>) <span class="keyword">from</span> (<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> MY_DATABASE.MY_SCHEMA.MY_TABLE limit <span class="number">10</span>))</span><br><span class="line">FILE_FORMAT <span class="operator">=</span> (type <span class="operator">=</span> json, COMPRESSION <span class="operator">=</span> <span class="keyword">NONE</span>)</span><br><span class="line">STORAGE_INTEGRATION <span class="operator">=</span> snowflake_storage_integration_example</span><br></pre></td></tr></table></figure>
+<p>如果配置成功，那么 <code>Snowflake</code> 会将表 <code>MY_DATABASE.MY_SCHEMA.MY_TABLE</code> 的数据导出到 <code>s3://snowflake-storage-integration-example/unloading/</code> 文件夹下。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.snowflake.com/en/user-guide/data-load-s3-allow">Allowing the Virtual Private Cloud IDs</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.snowflake.com/en/user-guide/data-load-s3-config-storage-integration">Option 1: Configuring a Snowflake storage integration to access Amazon S3</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.snowflake.com/en/sql-reference/sql/create-storage-integration">CREATE STORAGE INTEGRATION</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1814,172 +1956,6 @@
 <li><a target="_blank" rel="noopener" href="https://www.kuniga.me/blog/2020/07/31/buddy-memory-allocation.html">Buddy Memory Allocation</a></li>
 <li><a target="_blank" rel="noopener" href="https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Buddy.html#buddy-methods">Buddy Methods</a></li>
 </ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/25/simple-template-engine/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/25/simple-template-engine/" class="post-title-link" itemprop="url">A Template Engine - 简易模板引擎实现</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2022-06-25 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-25T00:00:00+08:00">2022-06-25</time>
-    </span>
-
-  
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>8.2k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>14 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>本文内容主要来源于 <a target="_blank" rel="noopener" href="https://aosabook.org/en/500L/a-template-engine.html">A Template Engine</a>。</p>
-</blockquote>
-<h2 id="支持的语法"><a class="markdownIt-Anchor" href="#支持的语法"></a> 支持的语法</h2>
-<p>首先来看一下这个模板引擎所支持的语法。</p>
-<h3 id="变量"><a class="markdownIt-Anchor" href="#变量"></a> 变量</h3>
-<p>使用 <code>&#123;&#123; variable &#125;&#125;</code> 来表示变量，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;Welcome, &#123;&#123;user_name&#125;&#125;!&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-<p>如果 <code>user_name</code> 是 <code>Tom</code>，则最后渲染的结果为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;Welcome, Tom!&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="对象属性和方法"><a class="markdownIt-Anchor" href="#对象属性和方法"></a> 对象属性和方法</h3>
-<p>除了字面量外，模板引擎的变量还支持复杂对象，可以通过点操作符来访问对象的属性或方法，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;The price is: &#123;&#123;product.price&#125;&#125;, with a &#123;&#123;product.discount&#125;&#125;% discount.&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-<p>注意如果访问的是对象的方法，则不需要在方法名后添加 <code>()</code>，模板引擎会自动解析并调用方法。</p>
-<p>同时，还可以使用管道操作符来链式调用过滤器，从而改变所渲染的变量值，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;Short name: &#123;&#123;story.subject|slugify|lower&#125;&#125;&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="条件判断"><a class="markdownIt-Anchor" href="#条件判断"></a> 条件判断</h3>
-<p>使用 <code>&#123;% if condition %&#125; body &#123;% endif %&#125;</code> 来表示条件判断，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if user.is_logged_in %&#125;</span><br><span class="line">    &lt;p&gt;Welcome, &#123;&#123; user.name &#125;&#125;!&lt;/p&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="循环"><a class="markdownIt-Anchor" href="#循环"></a> 循环</h3>
-<p>使用 <code>&#123;% for item in list %&#125; body &#123;% endfor %&#125;</code> 来表示循环，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;Products:&lt;/p&gt;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">&#123;% for product in product_list %&#125;</span><br><span class="line">    &lt;li&gt;&#123;&#123; product.name &#125;&#125;: &#123;&#123; product.price|format_price &#125;&#125;&lt;/li&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="注释"><a class="markdownIt-Anchor" href="#注释"></a> 注释</h3>
-<p>使用 `` 来表示注释，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;# This is the best template ever! #&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="实现"><a class="markdownIt-Anchor" href="#实现"></a> 实现</h2>
-<p>一般来说，一个模板引擎主要做两件事：模板解析和渲染。这里要实现的模板引擎的渲染包括：</p>
-<ul>
-<li>管理动态数据</li>
-<li>执行逻辑语句，例如 <code>if</code>，<code>for</code></li>
-<li>实现点操作符访问和过滤器执行</li>
-</ul>
-<p>类似于编程语言的实现，模板引擎的解析也可以分为解释型和编译型两种。对于解释型来说，模板解析阶段需要生成某个特定的数据结构，然后在渲染阶段遍历该数据结构并执行所遇到的每一条指令；而对于编译型来说，模板解析阶段直接生成可执行代码，而渲染阶段则大大简化，直接执行代码即可。</p>
-<p>本文描述的模板引擎采用编译型的方式，原文的作者将模板编译为了 <code>Python</code> 代码，这里为了进一步加深理解，实现了 <code>.NET Core</code> 版本的简单编译。</p>
-<h2 id="编译为-c-代码"><a class="markdownIt-Anchor" href="#编译为-c-代码"></a> 编译为 C# 代码</h2>
-<p>在介绍模板引擎实现之前，先来看一下模板引擎编译出的 <code>C#</code> 代码示例，对于如下的模板：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;Welcome, &#123;&#123;userName&#125;&#125;!&lt;/p&gt;</span><br><span class="line">&lt;p&gt;Products:&lt;/p&gt;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">&#123;% for product in productList %&#125;</span><br><span class="line">    &lt;li&gt;&#123;&#123; product.Name &#125;&#125;:</span><br><span class="line">        &#123;&#123; product.Price|FormatPrice &#125;&#125;&lt;/li&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
-<p>模板引擎会生成类似于下面的代码：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="built_in">string</span> <span class="title">Render</span>(<span class="params">Dictionary&lt;<span class="built_in">string</span>, <span class="built_in">object</span>&gt; Context Context, Func&lt;<span class="built_in">object</span>, <span class="built_in">string</span>[], <span class="built_in">object</span>&gt; ResolveDots</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> result = <span class="keyword">new</span> List&lt;<span class="built_in">string</span>&gt;();</span><br><span class="line">    <span class="keyword">var</span> userName = Context[<span class="string">&quot;userName&quot;</span>];</span><br><span class="line">    <span class="keyword">var</span> productList = Context[<span class="string">&quot;productList&quot;</span>];</span><br><span class="line">    result.AddRange(<span class="keyword">new</span> List&lt;<span class="built_in">string</span>&gt; &#123;<span class="string">&quot;&lt;p&gt;Welcome, &quot;</span>, Convert.ToString(userName), <span class="string">&quot;!&lt;/p&gt;&lt;p&gt;Products:&lt;/p&gt;&lt;ul&gt;&quot;</span>&#125;);</span><br><span class="line">    <span class="keyword">foreach</span> (<span class="function"><span class="keyword">var</span> product <span class="keyword">in</span> <span class="title">ConvertToEnumerable</span>(<span class="params">productList</span>))</span> &#123;</span><br><span class="line">        result.AddRange(<span class="keyword">new</span> List&lt;<span class="built_in">string</span>&gt; &#123;<span class="string">&quot;&lt;li&gt;&quot;</span>, Convert.ToString(ResolveDots(product, <span class="keyword">new</span> [] &#123; <span class="string">&quot;Name&quot;</span> &#125;)), <span class="string">&quot;:&quot;</span>, Convert.ToString(FormatPrice(ResolveDots(product, <span class="keyword">new</span> [] &#123; <span class="string">&quot;Price&quot;</span> &#125;))), <span class="string">&quot;&lt;/li&gt;&quot;</span>&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    result.Add(<span class="string">&quot;&lt;/ul&gt;&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">string</span>.Join(<span class="built_in">string</span>.Empty, result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其中 <code>Context</code> 表示全局上下文，用于获取渲染需要的动态数据，例如例子中的 <code>userName</code>，<code>Render</code> 方法会先从 <code>Context</code> 中提取出模板中所有需要的变量；<code>ResolveDots</code> 是一个函数指针，用于执行点操作符调用；而变量的值都会通过 <code>Convert.ToString</code> 转为字符串。</p>
-<p>模板引擎的最终产物是一个字符串，所以在 <code>Render</code> 中先使用一个 <code>List</code> 保存每一行的渲染结果，最后再将 <code>List</code> 转换为字符串。</p>
-<p><code>.NET</code> 编译器提供了 <code>Microsoft.CodeAnalysis.CSharp.Scripting</code> 包来将某段字符串当做 <code>C#</code> 代码执行，所以最终模板引擎生成的代码将通过如下方式执行：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> code = <span class="string">&quot;some code&quot;</span>;</span><br><span class="line"><span class="keyword">var</span> scriptOptions = ScriptOptions.Default.WithImports(<span class="string">&quot;System&quot;</span>, <span class="string">&quot;System.Collections.Generic&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> script = CSharpScript.RunAsync(code, scriptOptions, yourCustomGlobals);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> script.Result.ReturnValue.ToString();</span><br></pre></td></tr></table></figure>
-<h2 id="模板引擎编写"><a class="markdownIt-Anchor" href="#模板引擎编写"></a> 模板引擎编写</h2>
-<h3 id="template"><a class="markdownIt-Anchor" href="#template"></a> Template</h3>
-<p><code>Template</code> 是整个模板引擎的核心类，它首先通过模板和全局上下文初始化一个实例，然后调用 <code>Render</code> 方法来渲染模板：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> context = <span class="keyword">new</span> Dictionary&lt;<span class="built_in">string</span>, <span class="built_in">object</span>&gt;()</span><br><span class="line">&#123;</span><br><span class="line">    &#123; <span class="string">&quot;numbers&quot;</span>, <span class="keyword">new</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span> &#125; &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">string</span> text = <span class="string">@&quot;&lt;ol&gt;&#123;% for number in numbers %&#125;&lt;li&gt;&#123;&#123; number &#125;&#125;&lt;/li&gt;&#123;% endfor %&#125;&lt;/ol&gt;&quot;</span>;</span><br><span class="line">Template template = <span class="keyword">new</span> Template(text, context);</span><br><span class="line"><span class="built_in">string</span> result = template.Render();</span><br></pre></td></tr></table></figure>
-<p>这里将 <code>text</code> 传入 <code>Template</code> 的构造函数后，会在构造函数中完成模板解析，后续的 <code>Render</code> 调用都不需要再执行模板解析。</p>
-<h3 id="codebuilder"><a class="markdownIt-Anchor" href="#codebuilder"></a> CodeBuilder</h3>
-<p>在介绍 <code>Template</code> 的实现之前，需要先了解下 <code>CodeBuilder</code>，<code>CodeBuilder</code> 用于辅助生成 <code>C#</code> 代码，<code>Template</code> 通过 <code>CodeBuilder</code> 添加代码行，以及管理缩进（原文的作者使用 <code>Python</code> 作为编译的目标语言所以这里需要维护正确的缩进，<code>C#</code> 则不需要），并最终通过 <code>CodeBuilder</code> 得到可执行代码。</p>
-<p><code>CodeBuilder</code> 内部维护了一个类型为 <code>List&lt;object&gt;</code> 的变量 <code>Codes</code> 来表示代码行，这里的 <code>List</code> 容器类型不是字符串是因为 <code>CodeBuilder</code> 间可以嵌套，一个 <code>CodeBuilder</code> 可以作为一个完整的逻辑单元添加到另一个 <code>CodeBuilder</code> 中，并最终通过自定义的 <code>ToString</code> 方法来生成可执行代码：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CodeBuilder</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">const</span> <span class="built_in">int</span> IndentStep = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CodeBuilder</span>()</span></span><br><span class="line"><span class="function">        : <span class="title">this</span>(<span class="params"><span class="number">0</span></span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CodeBuilder</span>(<span class="params"><span class="built_in">int</span> indentLevel</span>)</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.Codes = <span class="keyword">new</span> List&lt;<span class="built_in">object</span>&gt;();</span><br><span class="line">        <span class="keyword">this</span>.IndentLevel = indentLevel;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;<span class="built_in">object</span>&gt; Codes</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="built_in">int</span> IndentLevel</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span>;</span><br><span class="line">        <span class="keyword">set</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>CodeBuilder</code> 的 <code>AddLine</code> 方法非常简单，即根据缩进层级补齐空格后添加一行代码（这里 <code>C#</code> 版本保留了 <code>Python</code> 版本缩进的功能）：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddLine</span>(<span class="params"><span class="built_in">string</span> line</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>.Codes.AddRange(<span class="keyword">new</span> List&lt;<span class="built_in">object</span>&gt; &#123; <span class="keyword">new</span> <span class="built_in">string</span>(<span class="string">&#x27; &#x27;</span>, <span class="keyword">this</span>.IndentLevel), line, <span class="string">&quot;\n&quot;</span> &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>Indent</code> 和 <code>Dedent</code> 用于管理 <code>Python</code> 代码的缩进层级：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Indent</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>.IndentLevel += IndentStep;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Dedent</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>.IndentLevel -= IndentStep;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>AddSection</code> 用于创建一个新的 <code>CodeBuilder</code> 对象，并将其添加到当前 <code>CodeBuilder</code> 的代码行中，后续对子 <code>CodeBuilder</code> 的修改都会反应到父 <code>CodeBuilder</code> 中：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CodeBuilder <span class="title">AddSection</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    CodeBuilder section = <span class="keyword">new</span> CodeBuilder(<span class="keyword">this</span>.IndentLevel);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.Codes.Add(section);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> section;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>最后重写了 <code>ToString()</code> 方法来生成可执行代码：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="built_in">string</span> <span class="title">ToString</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">string</span>.Join(<span class="built_in">string</span>.Empty, <span class="keyword">this</span>.Codes.Select(code =&gt; code.ToString()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="template-实现"><a class="markdownIt-Anchor" href="#template-实现"></a> Template 实现</h3>
-<h4 id="编译"><a class="markdownIt-Anchor" href="#编译"></a> 编译</h4>
-<p>模板引擎的模板解析阶段发生在 <code>Template</code> 的构造函数中：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Template</span>(<span class="params"><span class="built_in">string</span> text, Dictionary&lt;<span class="built_in">string</span>, <span class="built_in">object</span>&gt; context</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>.Context = context;</span><br><span class="line">    <span class="keyword">this</span>.CodeBuilder = <span class="keyword">new</span> CodeBuilder();</span><br><span class="line">    <span class="keyword">this</span>.AllVariables = <span class="keyword">new</span> HashSet&lt;<span class="built_in">string</span>&gt;();</span><br><span class="line">    <span class="keyword">this</span>.LoopVariables = <span class="keyword">new</span> HashSet&lt;<span class="built_in">string</span>&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.Initialize(text);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>Python</code> 版本的代码支持多个 <code>context</code>，会由构造函数统一合并为一个上下文对象，这里只简单实现仅支持一个 <code>context</code>；<code>AllVariables</code> 用于记录模板 <code>text</code> 中需要用到的变量名，例如 <code>userName</code>，然后在代码生成阶段就可以遍历 <code>AllVariables</code> 并通过 <code>var someName = Context[someName];</code> 生成局部变量；不过由于模板中的变量可能还会有循环语句用到的临时变量，这些变量会记录到 <code>LoopVariables</code> 中，最终代码生成阶段用到的变量为 <code>AllVariables - LoopVariables</code>。</p>
-<p>接着我们再来看 <code>Initialize</code> 方法：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"><span class="built_in">string</span> text</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>.CodeBuilder.AddLine(<span class="string">&quot;var result = new List&lt;string&gt;();&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> variablesSection = <span class="keyword">this</span>.CodeBuilder.AddSection();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解析 text</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> (<span class="function"><span class="built_in">string</span> variableName <span class="keyword">in</span> <span class="keyword">new</span> <span class="title">HashSet</span>&lt;<span class="title">string</span>&gt;(<span class="params"><span class="keyword">this</span>.AllVariables.Except(<span class="keyword">this</span>.LoopVariables</span>)))</span></span><br><span class="line">    &#123;</span><br><span class="line">        variablesSection.AddLine(<span class="built_in">string</span>.Format(<span class="string">&quot;var &#123;0&#125; = Context[&#123;1&#125;];&quot;</span>, variableName, <span class="keyword">this</span>.ConvertToStringLiteral(variableName)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.CodeBuilder.AddLine(<span class="string">&quot;return string.Join(string.Empty, result);&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>Initialize</code> 首先会通过 <code>CodeBuilder</code> 分配一个 <code>List</code> 保存所有的代码行，然后新建一个子 <code>CodeBuilder</code> 来保存所有的局部变量，接着解析 <code>text</code>，在完成 <code>text</code> 的解析后就能知道模板中使用了哪些变量，从而根据 <code>AllVariables - LoopVariables</code> 生成局部变量，最后将所有的代码行转成字符串。</p>
-<p>同时，原文作者在这里有一个优化，相比于在生成的代码中不断的调用 <code>result.Add(xxx)</code>，从性能上考虑可以将多个操作合并为一个即 <code>result.AddRange(new List&lt;string&gt; &#123; xxx &#125;)</code>，从而引出了辅助变量 <code>buffered</code> 和辅助方法 <code>FlushOutput</code>：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> buffered = <span class="keyword">new</span> List&lt;<span class="built_in">string</span>&gt;();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">FlushOutput</span>(<span class="params">List&lt;<span class="built_in">string</span>&gt; buffered</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (buffered.Count == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.CodeBuilder.AddLine(<span class="built_in">string</span>.Format(<span class="string">&quot;result.Add(&#123;0&#125;);&quot;</span>, buffered[<span class="number">0</span>]));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (buffered.Count &gt; <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.CodeBuilder.AddLine(<span class="built_in">string</span>.Format(<span class="string">&quot;result.AddRange(new List&lt;string&gt; &#123;&#123;&#123;0&#125;&#125;&#125;);&quot;</span>, <span class="built_in">string</span>.Join(<span class="string">&quot;, &quot;</span>, buffered)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    buffered.Clear();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在解析 <code>text</code> 时，并不会处理完一个 <code>token</code> 就执行一次 <code>this.CodeBuilder.AddLine</code>，而是将多个 <code>token</code> 的处理结果批量的追加到最终的可执行代码中。</p>
-<p>接着，再回到 <code>Initialize</code> 方法中，由于模板中 <code>if</code>，<code>for</code> 可能存在嵌套，为了正确处理嵌套语句，这里引入一个栈 <code>var operationStack = new Stack&lt;string&gt;();</code> 来处理嵌套关系。例如，假设模板中存在 <code>&#123;% if xxx %&#125; &#123;% if xxx %&#125; &#123;% endif %&#125; &#123;% endif %&#125;</code>，每次遇到 <code>if</code> 时则执行入栈，遇到 <code>endif</code> 时则执行出栈，如果出栈时栈为空则说明 <code>if</code> 语句不完整，并抛出语法错误。</p>
-<p>那么，如何解析 <code>text</code> 呢？这里使用正则表达式来将 <code>text</code> 分割为 <code>token</code>：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Regex tokenPattern = <span class="keyword">new</span> Regex(<span class="string">&quot;(?s)(&#123;&#123;.*?&#125;&#125;|&#123;%.*?%&#125;|&#123;#.*?#&#125;)&quot;</span>, RegexOptions.Compiled);</span><br><span class="line"><span class="keyword">var</span> tokens = tokenPattern.Split(text);</span><br></pre></td></tr></table></figure>
-<p>其中正则表达式中的 <code>(?s)</code> 使得 <code>.</code> 能够匹配换行符。</p>
-<p>例如对于模板：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;ol&gt;&#123;% for number in numbers %&#125;&lt;li&gt;&#123;&#123; number &#125;&#125;&lt;/li&gt;&#123;% endfor %&#125;&lt;/ol&gt;</span><br></pre></td></tr></table></figure>
-<p>分割后的 <code>tokens</code> 为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#x27;&lt;ol&gt;&#x27;,</span><br><span class="line">    &#x27;&#123;% for number in numbers %&#125;&#x27;,</span><br><span class="line">    &#x27;&lt;li&gt;&#x27;,</span><br><span class="line">    &#x27;&#123;&#123; number &#125;&#125;&#x27;,</span><br><span class="line">    &#x27;&lt;/li&gt;&#x27;,</span><br><span class="line">    &#x27;&#123;% endfor %&#125;&#x27;,</span><br><span class="line">    &#x27;&lt;/ol&gt;&#x27;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-<p>然后我们就可以遍历 <code>tokens</code> 处理了，每种 <code>token</code> 对应一种策略，如果是注释，则忽略：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (token.StartsWith(<span class="string">&quot;&#123;#&quot;</span>))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果是变量，则解析变量的表达式（表达式解析会在后面介绍）的值，然后再将其转为字符串：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (token.StartsWith(<span class="string">&quot;&#123;&#123;&quot;</span>))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">string</span> expression = <span class="keyword">this</span>.EvaluateExpression(token.Substring(<span class="number">2</span>, token.Length - <span class="number">4</span>).Trim());</span><br><span class="line"></span><br><span class="line">    buffered.Add(<span class="built_in">string</span>.Format(<span class="string">&quot;Convert.ToString(&#123;0&#125;)&quot;</span>, expression));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>而如果是 `</p>
 
       
     </div>

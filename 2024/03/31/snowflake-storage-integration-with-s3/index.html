@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"frederick-s.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="介绍 Snowflake 的 Data Loading 和 Data Unloading 可以通过 S3 导入和导出数据。用户可以使用 AWS_KEY_ID 和 AWS_SECRET_KEY 来授权 Snowflake 访问 S3，不过出于安全和权限控制的考虑，一般不会这么做。 Snowflake 建议通过 Storage Integration 来管理权限。  获取 VPC ID 在配置 St">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Snowflake 配置 S3 Storage Integration">
+<meta property="og:url" content="https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="介绍 Snowflake 的 Data Loading 和 Data Unloading 可以通过 S3 导入和导出数据。用户可以使用 AWS_KEY_ID 和 AWS_SECRET_KEY 来授权 Snowflake 访问 S3，不过出于安全和权限控制的考虑，一般不会这么做。 Snowflake 建议通过 Storage Integration 来管理权限。  获取 VPC ID 在配置 St">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-1.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-2.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-3.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-4.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-5.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-6.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-7.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-8.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-9.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-10.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-11.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/snowflake-12.png">
+<meta property="article:published_time" content="2024-03-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-30T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="Snowflake">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frederick-s.github.io/images/snowflake-1.png">
+
+
+<link rel="canonical" href="https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/","path":"2024/03/31/snowflake-storage-integration-with-s3/","title":"Snowflake 配置 S3 Storage Integration"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Snowflake 配置 S3 Storage Integration | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-J1NC2B33VK","only_pageview":false,"measure_protocol_api_secret":null}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Übung macht den Meister</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-mit-6.824"><a href="/mit-6.824/" rel="section"><i class="fas fa-book fa-fw"></i>MIT 6.824</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-赞赏"><a href="/sponsor/" rel="section"><i class="fas fa-heart fa-fw"></i>赞赏</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text"> 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-vpc-id"><span class="nav-number">2.</span> <span class="nav-text"> 获取 VPC ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-iam-%E7%AD%96%E7%95%A5"><span class="nav-number">3.</span> <span class="nav-text"> 创建 IAM 策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-iam-%E8%A7%92%E8%89%B2"><span class="nav-number">4.</span> <span class="nav-text"> 创建 IAM 角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-storage-integration"><span class="nav-number">5.</span> <span class="nav-text"> 创建 Storage Integration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-snowflake-%E7%9A%84%E7%94%A8%E6%88%B7-arn-%E5%92%8C-external-id"><span class="nav-number">6.</span> <span class="nav-text"> 获取 Snowflake 的用户 ARN 和 External ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%88%E6%9D%83-snowflake-%E7%94%A8%E6%88%B7"><span class="nav-number">7.</span> <span class="nav-text"> 授权 Snowflake 用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">8.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Snowflake 配置 S3 Storage Integration | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Snowflake 配置 S3 Storage Integration
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-03-31 00:00:00" itemprop="dateCreated datePublished" datetime="2024-03-31T00:00:00+08:00">2024-03-31</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.7k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>6 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p><code>Snowflake</code> 的 <code>Data Loading</code> 和 <code>Data Unloading</code> 可以通过 <code>S3</code> 导入和导出数据。用户可以使用 <code>AWS_KEY_ID</code> 和 <code>AWS_SECRET_KEY</code> 来授权 <code>Snowflake</code> 访问 <code>S3</code>，不过出于安全和权限控制的考虑，一般不会这么做。</p>
+<p><code>Snowflake</code> 建议通过 <code>Storage Integration</code> 来管理权限。</p>
+<h2 id="获取-vpc-id"><a class="markdownIt-Anchor" href="#获取-vpc-id"></a> 获取 VPC ID</h2>
+<p>在配置 <code>Storage Integration</code> 前，需要设置 <code>S3</code> 策略。首先获取 <code>Snowflake</code> 的 <code>VPC ID</code>，后续的 <code>S3</code> 策略配置中将只允许该 <code>VPC</code> 访问。</p>
+<blockquote>
+<p>允许特定 VPC 访问的功能要求 Snowflake 实例和对应的 S3 Bucket 运行在相同的 AWS 区域内。</p>
+</blockquote>
+<p>切换到 <code>ACCOUNTADMIN</code> 角色在 <code>Snowflake</code> 中执行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">USE ROLE ACCOUNTADMIN;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">SYSTEM</span>$GET_SNOWFLAKE_PLATFORM_INFO();</span><br></pre></td></tr></table></figure>
+<p>记录下返回的 <code>VPC ID</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;snowflake-vpc-id&quot;:[&quot;vpc-abc&quot;]&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="创建-iam-策略"><a class="markdownIt-Anchor" href="#创建-iam-策略"></a> 创建 IAM 策略</h2>
+<p>然后，需要创建一个 <code>S3</code> 策略来定义 <code>Snowflake</code> 访问 <code>S3 Bucket</code> 的权限。</p>
+<p>从 <code>AWS</code> 控制台进入 <code>IAM</code>，在左侧导航栏 <code>Access management</code> 下选择 <code>Account settings</code>：</p>
+<p><img src="/images/snowflake-1.png" alt="alt" /></p>
+<p>在 <code>Security Token Service (STS)</code> 下查看所在区域的 <code>STS</code> 状态是否是 <code>Active</code>：</p>
+<p><img src="/images/snowflake-2.png" alt="alt" /></p>
+<p>接着，在左侧导航栏 <code>Access management</code> 下选择 <code>Policies</code>，之后点击 <code>Create policy</code>：</p>
+<p><img src="/images/snowflake-3.png" alt="alt" /></p>
+<p>切换到 <code>JSON</code> 后输入 <code>S3</code> 策略：</p>
+<p><img src="/images/snowflake-4.png" alt="alt" /></p>
+<p>下面的策略中 <code>vpc-abc</code> 是 <code>Snowflake</code> 实例的 <code>VPC</code>，<code>snowflake-storage-integration-example</code> 是示例 <code>Bucket</code> 的名字，<code>unloading</code> 和 <code>loading</code> 是该 <code>Bucket</code> 下的两个文件夹，分别用于 <code>Data Unloading</code> 和 <code>Data Loading</code> 使用：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;Version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2012-10-17&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;Statement&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">		<span class="punctuation">&#123;</span></span><br><span class="line">			<span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Statement1&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;s3:PutObject&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:GetObject&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:GetObjectVersion&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:DeleteObject&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:DeleteObjectVersion&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;arn:aws:s3:::snowflake-storage-integration-example/unloading/*&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;arn:aws:s3:::snowflake-storage-integration-example/loading/*&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">				<span class="attr">&quot;StringEquals&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">					<span class="attr">&quot;aws:SourceVpc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vpc-abc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">			<span class="punctuation">&#125;</span></span><br><span class="line">		<span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">		<span class="punctuation">&#123;</span></span><br><span class="line">			<span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Statement2&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;s3:ListBucket&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="string">&quot;s3:GetBucketLocation&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">				<span class="string">&quot;arn:aws:s3:::snowflake-storage-integration-example&quot;</span></span><br><span class="line">			<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">			<span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">				<span class="attr">&quot;StringLike&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">					<span class="attr">&quot;s3:prefix&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">						<span class="string">&quot;unloading/*&quot;</span><span class="punctuation">,</span></span><br><span class="line">						<span class="string">&quot;loading/*&quot;</span></span><br><span class="line">					<span class="punctuation">]</span></span><br><span class="line">				<span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="attr">&quot;StringEquals&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">					<span class="attr">&quot;aws:SourceVpc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vpc-abc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">			<span class="punctuation">&#125;</span></span><br><span class="line">		<span class="punctuation">&#125;</span></span><br><span class="line">	<span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="创建-iam-角色"><a class="markdownIt-Anchor" href="#创建-iam-角色"></a> 创建 IAM 角色</h2>
+<p>接着，创建一个 <code>IAM</code> 角色并绑定前一步创建的 <code>S3</code> 策略。在 <code>IAM</code> 左侧导航栏 <code>Access management</code> 下选择 <code>Roles</code>，之后点击 <code>Create role</code>：</p>
+<p><img src="/images/snowflake-5.png" alt="alt" /></p>
+<p><code>Trusted entity type</code> 选择 <code>AWS account</code>，然后在 <code>An AWS account</code> 下选择 <code>Another AWS account</code>，<code>Account ID</code> 暂时先填当前账号的 <code>ID</code>，之后会修改：</p>
+<p><img src="/images/snowflake-6.png" alt="alt" /></p>
+<p>同时，选择 <code>Require external ID (Best practice when a third party will assume this role)</code>，<code>External ID</code> 暂时用一个假的例如 <code>0000</code> 替代，之后同样会修改：</p>
+<p><img src="/images/snowflake-7.png" alt="alt" /></p>
+<p>最后绑定先前创建的 <code>S3</code> 策略：</p>
+<p><img src="/images/snowflake-8.png" alt="alt" /></p>
+<p>创建角色之后，记录下角色的 <code>ARN</code>，接下来会用到：</p>
+<p><img src="/images/snowflake-9.png" alt="alt" /></p>
+<h2 id="创建-storage-integration"><a class="markdownIt-Anchor" href="#创建-storage-integration"></a> 创建 Storage Integration</h2>
+<p>这时就可以在 <code>Snowflake</code> 中创建 <code>Storage Integration</code> 了：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> STORAGE INTEGRATION snowflake_storage_integration_example</span><br><span class="line">  TYPE <span class="operator">=</span> EXTERNAL_STAGE</span><br><span class="line">  STORAGE_PROVIDER <span class="operator">=</span> <span class="string">&#x27;S3&#x27;</span></span><br><span class="line">  ENABLED <span class="operator">=</span> <span class="literal">TRUE</span></span><br><span class="line">  STORAGE_AWS_ROLE_ARN <span class="operator">=</span> <span class="string">&#x27;arn:aws:iam::123:role/snowflake-integration-role&#x27;</span></span><br><span class="line">  STORAGE_ALLOWED_LOCATIONS <span class="operator">=</span> (<span class="string">&#x27;s3://snowflake-storage-integration-example/loading/&#x27;</span>, <span class="string">&#x27;s3://snowflake-storage-integration-example/unloading/&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>其中 <code>STORAGE_AWS_ROLE_ARN</code> 是之前所创建的 <code>IAM</code> 角色的 <code>ARN</code>，<code>STORAGE_ALLOWED_LOCATIONS</code> 是示例 <code>Bucket</code> 下的两个文件夹的地址。</p>
+<blockquote>
+<p>只有授权了 <code>CREATE INTEGRATION</code> 权限的角色才能创建 <code>STORAGE INTEGRATION</code>，默认只有 <code>ACCOUNTADMIN</code> 才有这个权限。</p>
+</blockquote>
+<h2 id="获取-snowflake-的用户-arn-和-external-id"><a class="markdownIt-Anchor" href="#获取-snowflake-的用户-arn-和-external-id"></a> 获取 Snowflake 的用户 ARN 和 External ID</h2>
+<p>接着需要获取所创建的 <code>Storage Integration</code> 对应的 <code>Snowflake</code> <code>IAM</code> 用户的 <code>ARN</code> 和 <code>External ID</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">desc</span> integration snowflake_storage_integration_example;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/snowflake-10.png" alt="alt" /></p>
+<p>记录下 <code>STORAGE_AWS_IAM_USER_ARN</code> 和 <code>STORAGE_AWS_EXTERNAL_ID</code>。</p>
+<h2 id="授权-snowflake-用户"><a class="markdownIt-Anchor" href="#授权-snowflake-用户"></a> 授权 Snowflake 用户</h2>
+<p>回到之前创建的 <code>IAM</code> 角色，在 <code>Trust relationships</code> 下替换掉之前填写的临时 <code>Account ID</code> 和 <code>External ID</code>：</p>
+<p><img src="/images/snowflake-11.png" alt="alt" /></p>
+<p><img src="/images/snowflake-12.png" alt="alt" /></p>
+<p>完成后，我们就可以执行一条 <code>Data Unloading</code> 命令来验证配置是否成功：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">copy</span> <span class="keyword">into</span> <span class="string">&#x27;s3://snowflake-storage-integration-example/unloading/&#x27;</span></span><br><span class="line"><span class="keyword">from</span> (<span class="keyword">select</span> OBJECT_CONSTRUCT_KEEP_NULL(<span class="operator">*</span>) <span class="keyword">from</span> (<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> MY_DATABASE.MY_SCHEMA.MY_TABLE limit <span class="number">10</span>))</span><br><span class="line">FILE_FORMAT <span class="operator">=</span> (type <span class="operator">=</span> json, COMPRESSION <span class="operator">=</span> <span class="keyword">NONE</span>)</span><br><span class="line">STORAGE_INTEGRATION <span class="operator">=</span> snowflake_storage_integration_example</span><br></pre></td></tr></table></figure>
+<p>如果配置成功，那么 <code>Snowflake</code> 会将表 <code>MY_DATABASE.MY_SCHEMA.MY_TABLE</code> 的数据导出到 <code>s3://snowflake-storage-integration-example/unloading/</code> 文件夹下。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.snowflake.com/en/user-guide/data-load-s3-allow">Allowing the Virtual Private Cloud IDs</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.snowflake.com/en/user-guide/data-load-s3-config-storage-integration">Option 1: Configuring a Snowflake storage integration to access Amazon S3</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.snowflake.com/en/sql-reference/sql/create-storage-integration">CREATE STORAGE INTEGRATION</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/" title="Snowflake 配置 S3 Storage Integration">https://frederick-s.github.io/2024/03/31/snowflake-storage-integration-with-s3/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Snowflake/" rel="tag"># Snowflake</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/03/03/hospital/" rel="prev" title="【读】Newton 科学世界 - 就诊指南">
+                  <i class="fa fa-angle-left"></i> 【读】Newton 科学世界 - 就诊指南
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
