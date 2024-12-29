@@ -42,12 +42,12 @@ $$
 即根据 `n` 的正负号来判断是向下取整还是向上取整，代表语言如 `ABAP`。
 
 ### Rounded division
-这是 `Common Lisp` 和 `IEEE 754` 采用的实现，约定 $q = round(\frac{a}{n})$，其中 `round` 使用 `rounding half to even`，即对于1.5，2.5，x.5这样的数字取整到最近的偶数，例如6.5取整到6，7.5取整到8。
+这是 `Common Lisp` 和 `IEEE 754` 采用的实现，约定 $q = round(\frac{a}{n})$，其中 `round` 使用 `rounding half to even`，即在常规的取整之外，对于1.5，2.5，x.5这样的数字取整到最近的偶数，例如6.5取整到6，7.5取整到8。
 
 ### Ceiling division
 这是 `Common Lisp` 提供的另一种实现，约定 $q = \lceil \frac{a}{n} \rceil$，即向上取整。
 
-## Python
+## Python 实现
 回到 `Python`，很难说上述哪种实现一定最优，`Python` 的作者提到采用 `floored division` 是因为对于某些应用来说，如果取模运算返回负数没有意义。例如，给定一个 `POSIX timestamp`，如何返回该天的时间部分，即时分秒？因为一天有86400秒，假设时间戳是 `t`，那么 `t % 86400` 就表示该天过了多少秒，就可以进一步转化为时分秒。而对于在 `1970-01-01T00:00:00Z` 之前的日期，`t` 则是负数，采用 `floored division` 的情况下 `t % 86400` 依然返回正数，并且结果也是正确的，而 `truncated division` 则返回负数，需要应用程序进一步处理。
 
 不过，一种编程语言中不一定只提供一种实现，其他实现可以借助函数库。例如，`Python` 中 `-5 % 2` 结果是1，实现方式为 `floored division`，但是 `math.fmod(-5, 2)` 结果是-1，实现方式为 `truncated division`。
@@ -55,4 +55,3 @@ $$
 ## 参考
 * [Why Python's Integer Division Floors](https://python-history.blogspot.com/2010/08/why-pythons-integer-division-floors.html)
 * [Modulo](https://en.wikipedia.org/wiki/Modulo)
-* [WHAT IS NEGATIVE NUMBER REPRESENTATION ?](https://www.computersciencecafe.com/14-negative-number-representation.html)
