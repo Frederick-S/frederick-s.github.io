@@ -3,6 +3,8 @@
   --content-bg-color: #fff;
   --card-bg-color: #f5f5f5;
   --text-color: #555;
+  --selection-bg: #262a30;
+  --selection-color: #eee;
   --blockquote-color: #666;
   --link-color: #555;
   --link-hover-color: #222;
@@ -173,8 +175,8 @@ template {
   display: none;
 }
 ::selection {
-  background: #262a30;
-  color: #eee;
+  background: var(--selection-bg);
+  color: var(--selection-color);
 }
 html,
 body {
@@ -333,7 +335,8 @@ td {
   left: 0;
   position: relative;
   top: 0;
-  transition: all 0.4s;
+  transition: 0.4s;
+  transition-property: left, opacity, top, transform, width;
   width: 100%;
 }
 .toggle .toggle-line:first-child {
@@ -365,6 +368,14 @@ td {
   top: -6px;
   transform: rotate(-45deg);
 }
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
 /*!
   Theme: Default
   Description: Original highlight.js style
@@ -373,7 +384,107 @@ td {
   Website: https://highlightjs.org/
   License: see project LICENSE
   Touched: 2021
-*/pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{background:#f3f3f3;color:#444}.hljs-comment{color:#697070}.hljs-punctuation,.hljs-tag{color:#444a}.hljs-tag .hljs-attr,.hljs-tag .hljs-name{color:#444}.hljs-attribute,.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-name,.hljs-selector-tag{font-weight:700}.hljs-deletion,.hljs-number,.hljs-quote,.hljs-selector-class,.hljs-selector-id,.hljs-string,.hljs-template-tag,.hljs-type{color:#800}.hljs-section,.hljs-title{color:#800;font-weight:700}.hljs-link,.hljs-operator,.hljs-regexp,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-symbol,.hljs-template-variable,.hljs-variable{color:#ab5656}.hljs-literal{color:#695}.hljs-addition,.hljs-built_in,.hljs-bullet,.hljs-code{color:#397300}.hljs-meta{color:#1f7199}.hljs-meta .hljs-string{color:#38a}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
+*/
+/*
+This is left on purpose making default.css the single file that can be lifted
+as-is from the repository directly without the need for a build step
+
+Typically this "required" baseline CSS is added by `makestuff.js` during build.
+*/
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/* end baseline CSS */
+.hljs {
+  background: #F3F3F3;
+  color: #444
+}
+/* Base color: saturation 0; */
+.hljs-subst {
+  /* default */
+  
+}
+/* purposely ignored */
+.hljs-formula,
+.hljs-attr,
+.hljs-property,
+.hljs-params {
+  
+}
+.hljs-comment {
+  color: #697070
+}
+.hljs-tag,
+.hljs-punctuation {
+  color: #444a
+}
+.hljs-tag .hljs-name,
+.hljs-tag .hljs-attr {
+  color: #444
+}
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta .hljs-keyword,
+.hljs-doctag,
+.hljs-name {
+  font-weight: bold
+}
+/* User color: hue: 0 */
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #880000
+}
+.hljs-title,
+.hljs-section {
+  color: #880000;
+  font-weight: bold
+}
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-operator,
+.hljs-selector-pseudo {
+  color: #ab5656
+}
+/* Language color: hue: 90; */
+.hljs-literal {
+  color: #695
+}
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #397300
+}
+/* Meta color: hue: 200 */
+.hljs-meta {
+  color: #1f7199
+}
+.hljs-meta .hljs-string {
+  color: #38a
+}
+/* Misc effects */
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
 code,
 kbd,
 figure.highlight,
@@ -1074,19 +1185,14 @@ pre code {
   margin-right: 8px;
 }
 .menu-item .badge {
-  display: inline-block;
+  background: #eee;
+  border-radius: 0;
+  color: #555;
   font-weight: bold;
   line-height: 1;
   margin-left: 0.35em;
-  margin-top: 0.35em;
-  text-align: center;
-  white-space: nowrap;
-}
-@media (max-width: 767px) {
-  .menu-item .badge {
-    float: right;
-    margin-left: 0;
-  }
+  padding: 1px 4px;
+  text-shadow: none;
 }
 .use-motion .menu-item {
   visibility: hidden;
@@ -1123,6 +1229,83 @@ pre code {
   40%, 80% {
     transform: rotate(10deg);
   }
+}
+.sidebar {
+  left: -320px;
+}
+.sidebar-active .sidebar {
+  left: 0;
+}
+.sidebar {
+  background: #222;
+  bottom: 0;
+  box-shadow: inset 0 2px 6px #000;
+  max-height: 100vh;
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  transition: 0.2s ease-out;
+  transition-property: left, right;
+  width: 320px;
+  z-index: 20;
+}
+.sidebar a {
+  border-bottom-color: #555;
+  color: #999;
+}
+.sidebar a:hover {
+  border-bottom-color: #eee;
+  color: #eee;
+}
+.links-of-author:not(:first-child) {
+  margin-top: 15px;
+}
+.links-of-author a {
+  border-bottom-color: #555;
+  display: inline-block;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.links-of-author a::before {
+  background: #93fc11;
+  display: inline-block;
+  margin-right: 3px;
+  transform: translateY(-2px);
+  border-radius: 50%;
+  content: ' ';
+  height: 4px;
+  width: 4px;
+}
+.links-of-blogroll-item {
+  padding: 2px 10px;
+}
+.links-of-blogroll-item a {
+  box-sizing: border-box;
+  display: inline-block;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.popular-posts .popular-posts-item .popular-posts-link:hover {
+  background: none;
+}
+.sidebar-dimmer {
+  background: #000;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  transition: visibility 0.4s, opacity 0.4s;
+  visibility: hidden;
+  width: 100%;
+  z-index: 10;
+}
+.sidebar-active .sidebar-dimmer {
+  opacity: 0.7;
+  visibility: visible;
 }
 .sidebar-inner {
   color: #999;
@@ -1504,7 +1687,8 @@ pre code {
   color: #fff;
   display: flex;
   height: 26px;
-  transition: bottom 0.2s ease-in-out;
+  transition: 0.2s ease-in-out;
+  transition-property: bottom;
   background: #222;
   cursor: pointer;
   opacity: 0.8;
@@ -1607,6 +1791,17 @@ pre code {
   margin: 60px 0;
   position: relative;
 }
+.posts-collapse .post-content .collection-year .collection-year-count {
+  font-size: 0.75em;
+  background: #eee;
+  border-radius: 0;
+  color: #555;
+  font-weight: bold;
+  line-height: 1;
+  margin-left: 0.35em;
+  padding: 1px 4px;
+  text-shadow: none;
+}
 .posts-collapse .post-content .collection-year::before {
   background: #bbb;
   margin-left: -4px;
@@ -1662,6 +1857,10 @@ pre code {
 .posts-collapse .post-content .post-title a {
   border-bottom: 0;
   color: var(--link-color);
+}
+.posts-collapse .post-content .post-title .fa {
+  font-size: 0.875em;
+  margin-left: 5px;
 }
 .posts-collapse .post-content::before {
   background: #f5f5f5;
@@ -1992,7 +2191,6 @@ pre code {
   border: 2px solid #87daff;
   border-radius: 2px;
   outline: 0;
-  transition: all 0.2s ease-in-out;
   vertical-align: text-top;
 }
 .reward-container button:hover {
@@ -2041,13 +2239,15 @@ pre code {
   margin: 5px 10px;
 }
 .category-all-page .category-list-count {
-  color: #bbb;
-}
-.category-all-page .category-list-count::before {
-  content: ' (';
-}
-.category-all-page .category-list-count::after {
-  content: ') ';
+  font-size: 0.75em;
+  background: #eee;
+  border-radius: 0;
+  color: #555;
+  font-weight: bold;
+  line-height: 1;
+  margin-left: 0.35em;
+  padding: 1px 4px;
+  text-shadow: none;
 }
 .category-all-page .category-list-child {
   padding-left: 10px;
@@ -2277,11 +2477,14 @@ ul.breadcrumb li:last-child {
   display: none;
 }
 .search-popup .search-result-container {
+  display: flex;
+  flex-direction: column;
   height: calc(100% - 55px);
   overflow: auto;
   padding: 5px 25px;
 }
 .search-popup .search-result-container hr {
+  flex-shrink: 0;
   margin: 5px 0 10px;
 }
 .search-popup .search-result-container hr:first-child {
@@ -2301,12 +2504,6 @@ ul.breadcrumb li:last-child {
 .search-popup .search-input-container {
   flex-grow: 1;
   padding: 2px;
-}
-.search-popup .no-result {
-  display: flex;
-}
-.search-popup .search-result-list {
-  width: 100%;
 }
 .search-popup .search-result-icon {
   color: #ccc;
@@ -2422,6 +2619,11 @@ header.header {
 @media (max-width: 767px) {
   .menu .menu-item a {
     padding: 5px 10px;
+    display: flex;
+    align-items: center;
+  }
+  .menu .menu-item a .badge {
+    margin-left: auto;
   }
 }
 .menu .menu-item a:hover,
@@ -2443,11 +2645,6 @@ header.header {
     width: 100%;
   }
 }
-.menu .menu-item .badge {
-  background: #eee;
-  color: #555;
-  padding: 1px 4px;
-}
 .sub-menu {
   margin: 10px 0;
 }
@@ -2455,91 +2652,13 @@ header.header {
   display: inline-block;
 }
 @media (min-width: 1200px) {
+  .sidebar-dimmer {
+    display: none;
+  }
   .sidebar-active {
     padding-left: 320px;
   }
   .sidebar-active .footer-fixed {
     left: 320px;
-  }
-}
-.sidebar {
-  left: -320px;
-}
-.sidebar-active .sidebar {
-  left: 0;
-}
-.sidebar {
-  background: #222;
-  bottom: 0;
-  box-shadow: inset 0 2px 6px #000;
-  max-height: 100vh;
-  overflow-y: auto;
-  position: fixed;
-  top: 0;
-  transition: all 0.2s ease-out;
-  width: 320px;
-  z-index: 20;
-}
-.sidebar a {
-  border-bottom-color: #555;
-  color: #999;
-}
-.sidebar a:hover {
-  border-bottom-color: #eee;
-  color: #eee;
-}
-.links-of-author:not(:first-child) {
-  margin-top: 15px;
-}
-.links-of-author a {
-  border-bottom-color: #555;
-  display: inline-block;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  vertical-align: middle;
-}
-.links-of-author a::before {
-  background: #a3363b;
-  display: inline-block;
-  margin-right: 3px;
-  transform: translateY(-2px);
-  border-radius: 50%;
-  content: ' ';
-  height: 4px;
-  width: 4px;
-}
-.links-of-blogroll-item {
-  padding: 2px 10px;
-}
-.links-of-blogroll-item a {
-  box-sizing: border-box;
-  display: inline-block;
-  max-width: 280px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.popular-posts .popular-posts-item .popular-posts-link:hover {
-  background: none;
-}
-.sidebar-dimmer {
-  background: #000;
-  height: 100%;
-  left: 0;
-  opacity: 0;
-  position: fixed;
-  top: 0;
-  transition: visibility 0.4s, opacity 0.4s;
-  visibility: hidden;
-  width: 100%;
-  z-index: 10;
-}
-.sidebar-active .sidebar-dimmer {
-  opacity: 0.7;
-  visibility: visible;
-}
-@media (min-width: 1200px) {
-  .sidebar-dimmer {
-    display: none;
   }
 }
