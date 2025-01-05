@@ -153,13 +153,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-count">58</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -176,6 +176,210 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2025/01/05/bitcask/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/01/05/bitcask/" class="post-title-link" itemprop="url">【读】Bitcask - A Log-Structured Hash Table for Fast Key/Value Data</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-01-05 00:00:00" itemprop="dateCreated datePublished" datetime="2025-01-05T00:00:00+08:00">2025-01-05</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>4 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p><code>Bitcask</code> 是一个单机 <code>KV</code> 存储引擎，项目起因于 <code>Riak</code> 分布式 <code>KV</code> 数据库需要一个能满足以下条件的单机 <code>KV</code> 存储引擎：</p>
+<ul>
+<li>低延迟的单条读写</li>
+<li>高吞吐，尤其是面对流式随机 <code>KV</code> 写入</li>
+<li>能支持远比内存大的数据量</li>
+<li>能从崩溃中快速恢复以及不丢失数据</li>
+<li>能轻松的备份和还原数据</li>
+<li>相对简单，易理解的代码结构和数据格式</li>
+<li>在高负载和大数据场景下系统的行为是可预期的</li>
+<li>软件的许可证要能轻易的适配 <code>Riak</code> 使用</li>
+</ul>
+<p>作者看了一圈发现市面上还没有一款 <code>KV</code> 存储能全部满足这些条件，因此 <code>Bitcask</code> 就应运而生。</p>
+<h2 id="api"><a class="markdownIt-Anchor" href="#api"></a> API</h2>
+<p><code>Bitcask</code> 的接口非常精简：</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bitcask:open(DirectoryName, Opts) -&gt; BitCaskHandle | {error, any()}</td>
+<td>在指定目录下以指定选项打开或新建一个 <code>Bitcask</code> 实例。支持的选项包括 <code>read_write</code> 或者 <code>sync_on_put</code>：<ul><li><code>read_write</code>：可读可写</li><li><code>sync_on_put</code>：每次写操作后刷盘</li></ul> 连接的进程需要有 <code>DirectoryName</code> 对应目录的读写权限，同时一个时刻只能有一个进程以 <code>read_write</code> 的方式打开 <code>Bitcask</code> 实例。</td>
+</tr>
+<tr>
+<td>bitcask:open(DirectoryName) -&gt; BitCaskHandle | {error, any()}</td>
+<td>在指定目录下以只读模式打开或新建一个 <code>Bitcask</code> 实例。连接的进程需要有 <code>DirectoryName</code> 对应目录及其内部所有文件的读权限。</td>
+</tr>
+<tr>
+<td>bitcask:get(BitCaskHandle, Key) -&gt; not_found | {ok, Value}</td>
+<td>获取指定键对应的值。</td>
+</tr>
+<tr>
+<td>bitcask:put(BitCaskHandle, Key, Value) -&gt; ok | {error, any()}</td>
+<td>插入一个键值对。</td>
+</tr>
+<tr>
+<td>bitcask:delete(BitCaskHandle, Key) -&gt; ok | {error, any()}</td>
+<td>删除指定键。</td>
+</tr>
+<tr>
+<td>bitcask:list_keys(BitCaskHandle) -&gt; [Key] | {error, any()}</td>
+<td>返回所有的键。</td>
+</tr>
+<tr>
+<td>bitcask:fold(BitCaskHandle, Fun, Acc0) -&gt; Acc</td>
+<td>对每一个键值对应用 <code>Fun</code> 函数，<code>Fun</code> 的函数签名为 <code>F(K, V, Acc0) -&gt; Acc</code>。类似于 <code>JavaScript</code> 的 <code>reduce</code>。</td>
+</tr>
+<tr>
+<td>bitcask:merge(DirectoryName) -&gt; ok | {error, any()}</td>
+<td>合并目录下的数据文件以减少重复的键值对。同时生成 <code>hintfile</code> 辅助加速程序启动时间。</td>
+</tr>
+<tr>
+<td>bitcask:sync(BitCaskHandle) -&gt; ok</td>
+<td>强制刷盘。</td>
+</tr>
+<tr>
+<td>bitcask:close(BitCaskHandle) -&gt; ok</td>
+<td>关闭 <code>Bitcask</code> 实例的连接并刷盘。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="存储"><a class="markdownIt-Anchor" href="#存储"></a> 存储</h2>
+<h3 id="文件组织"><a class="markdownIt-Anchor" href="#文件组织"></a> 文件组织</h3>
+<p><code>Bitcask</code> 的文件组织非常简单，任意时刻目录下最多只有一个 <code>active data file</code> 接收写操作，其余都是不可修改的历史数据文件。任意时刻 <code>Bitcask</code> 只允许一个进程以写模式建立连接，写入进程只会向 <code>active data file</code> 写入，当其大小超过指定阈值后就会关闭当前文件，然后新建一个 <code>active data file</code>。</p>
+<p><img src="/images/bitcask-1.png" alt="alt" /></p>
+<h3 id="数据格式"><a class="markdownIt-Anchor" href="#数据格式"></a> 数据格式</h3>
+<p>写入进程以追加写的方式写入 <code>active data file</code>，从而避免了随机写的磁盘寻址，其写入数据格式如下：</p>
+<p><img src="/images/bitcask-2.png" alt="alt" /></p>
+<ul>
+<li><code>crc</code>：循环冗余校验码，验证数据完整性</li>
+<li><code>tstamp</code>：32位整型本地时间戳，仅内部使用，不对外暴露</li>
+<li><code>ksz</code>：键的长度</li>
+<li><code>value_sz</code>：值的长度</li>
+<li><code>key</code>：键的内容</li>
+<li><code>value</code>：值的内容</li>
+</ul>
+<p>对于每一条记录，前面四个部分都是定长，以此为基址 <code>base</code>，则 <code>base</code> 到 <code>base + ksz</code> 就是键的内容，<code>base + ksz</code> 到 <code>base + ksz + value_sz</code> 就是值的内容。</p>
+<p>如果要删除指定的键，<code>Bitcask</code> 会再次追加写入一个键值对，只不过写入的值是一个特殊值，程序后续读到这条记录时比较值的内容就可以判断该条记录是否已被删除。所以，<code>Bitcask</code> 每个文件内容就是一行行的记录：</p>
+<p><img src="/images/bitcask-3.png" alt="alt" /></p>
+<h2 id="读写"><a class="markdownIt-Anchor" href="#读写"></a> 读写</h2>
+<h3 id="写"><a class="markdownIt-Anchor" href="#写"></a> 写</h3>
+<p><code>Bitcask</code> 写入的同时会在内存中维护写入的键到数据文件的映射（<code>keydir</code>）：<br />
+<img src="/images/bitcask-4.png" alt="alt" /></p>
+<p>其中 <code>file_id</code> 能够定位具体的数据文件，<code>value_pos</code> 是该条记录的值在文件中的起始偏移位置，那么 <code>value_pos</code> 到 <code>value_pos + value_sz</code> 就是值的内容。因为 <code>Bitcask</code> 每次写数据的长度是可知的，值在每条记录中的偏移量可知，写之前 <code>active data file</code> 文件总长也可知，所以 <code>value_pos</code> 也能够推算出来。</p>
+<p>对于重复写入的键值对，磁盘上会存在同一个键的多条记录，但是 <code>keydir</code> 中始终只保留最新的映射。</p>
+<h3 id="读"><a class="markdownIt-Anchor" href="#读"></a> 读</h3>
+<p>读取时先根据键查询 <code>keydir</code> 得到数据文件的映射，然后根据 <code>file_id</code> 定位数据文件，最后根据 <code>value_pos</code> 和 <code>value_sz</code> 返回值的内容，整个读取只涉及一次磁盘寻址。另一方面，文件系统的 <code>read-ahead</code> 缓存会进一步减少磁盘的交互：</p>
+<p><img src="/images/bitcask-5.png" alt="alt" /></p>
+<h2 id="数据合并"><a class="markdownIt-Anchor" href="#数据合并"></a> 数据合并</h2>
+<p>由于 <code>Bitcask</code> 追加写的特性，有两种类型的数据是冗余的：</p>
+<ul>
+<li>被标记删除的数据</li>
+<li>同一个键的旧版本的数据</li>
+</ul>
+<p>所以，为了避免磁盘空间的浪费，需要额外的数据合并操作对磁盘上的数据瘦身。数据合并只处理只读的数据文件，遍历剔除掉已删除和旧版本的数据。另外，每一个合并后的数据文件同时额外有一个对应的 <code>hint file</code>：</p>
+<p><img src="/images/bitcask-6.png" alt="alt" /></p>
+<p><code>hint file</code> 也是行记录的文件，每一行存储了：</p>
+<ul>
+<li><code>tstamp</code>：时间戳</li>
+<li><code>ksz</code>：键的长度</li>
+<li><code>value_sz</code>：值的长度</li>
+<li><code>value_pos</code>：值在数据文件中的起始地址偏移量</li>
+<li><code>key</code>：键</li>
+</ul>
+<p>当程序启动时，如果 <code>hint file</code> 存在，那么就可以直接扫描 <code>hint file</code> 构建 <code>keydir</code> 从而加速程序启动；反之，则要扫描数据文件。</p>
+<h2 id="性能数据"><a class="markdownIt-Anchor" href="#性能数据"></a> 性能数据</h2>
+<p>原文并没有给出非常正规的测试报告，仅列出了一些早期未优化的测试数据：</p>
+<ul>
+<li>读写延迟：毫秒内</li>
+<li>写吞吐：5000~6000次/秒</li>
+<li>内存占用：几百万的键在 <code>1GB</code> 内（<code>keydir</code> 需要）</li>
+</ul>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p><code>Bitcask</code> 的整体设计思路非常简单，其设计目的也不是为了成为最快的 <code>KV</code> 存储，而是最适合 <code>Riak</code> 的存储引擎，在足够快的同时有着高质量、简洁的代码，设计和数据格式。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://riak.com/assets/bitcask-intro.pdf">Bitcask - A Log-Structured Hash Table for Fast Key/Value Data</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1863,119 +2067,6 @@
 <li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/download-cloudwatch-agent-commandline.html">Download and configure the CloudWatch agent using the command line</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-collected-by-CloudWatch-agent.html">Metrics collected by the CloudWatch agent</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-iam-roles-for-cloudwatch-agent-commandline.html">Create IAM roles and users for use with CloudWatch agent</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/09/18/add-volume-to-aws-ec2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/09/18/add-volume-to-aws-ec2/" class="post-title-link" itemprop="url">AWS EC2 挂载磁盘</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2022-09-18 00:00:00" itemprop="dateCreated datePublished" datetime="2022-09-18T00:00:00+08:00">2022-09-18</time>
-    </span>
-
-  
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.6k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="挂载磁盘"><a class="markdownIt-Anchor" href="#挂载磁盘"></a> 挂载磁盘</h2>
-<p>在创建 <code>AWS</code> 的 <code>EC2</code> 实例时如果添加了额外的磁盘则需要手动挂载到系统中。</p>
-<p>首先运行 <code>lsblk</code> 来查看可用的块设备：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS</span><br><span class="line">loop0          7:0    0 22.2M  1 loop /snap/amazon-ssm-agent/5657</span><br><span class="line">loop1          7:1    0   49M  1 loop /snap/core18/2406</span><br><span class="line">loop2          7:2    0 57.8M  1 loop /snap/core20/1498</span><br><span class="line">loop3          7:3    0 38.7M  1 loop /snap/snapd/15909</span><br><span class="line">loop4          7:4    0 71.8M  1 loop /snap/lxd/22927</span><br><span class="line">nvme1n1      259:0    0    8G  0 disk</span><br><span class="line">nvme0n1      259:1    0    8G  0 disk</span><br><span class="line">├─nvme0n1p1  259:2    0  7.9G  0 part /</span><br><span class="line">└─nvme0n1p15 259:3    0   99M  0 part /boot/efi</span><br></pre></td></tr></table></figure>
-<p>其中的 <code>nvme1n1</code> 是本次新添加的磁盘，目前还未挂载到系统中，而 <code>nvme0n1</code> 则是根设备并且有两个分区。</p>
-<blockquote>
-<p><code>lsblk</code> 的输出结果会移除设备路径中的 <code>/dev/</code> 前缀，所以设备 <code>nvme1n1</code> 的完整路径为 <code>/dev/nvme1n1</code>。</p>
-</blockquote>
-<p>然后，我们需要在 <code>nvme1n1</code> 之上创建文件系统才能使用，执行 <code>sudo file -s /dev/nvme1n1</code> 显示 <code>nvme1n1</code> 还没有文件系统：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme1n1: data</span><br></pre></td></tr></table></figure>
-<p>而如果我们查看 <code>sudo file -s /dev/nvme0n1</code> 则会显示：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme0n1: DOS/MBR boot sector; partition 1 : ID=0xee, start-CHS (0x0,0,2), end-CHS (0x3ff,255,63), startsector 1, 16777215 sectors, extended partition table (last)</span><br></pre></td></tr></table></figure>
-<p>执行 <code>sudo mkfs -t xfs /dev/nvme1n1</code> 来为 <code>nvme1n1</code> 创建文件系统，其中 <code>xfs</code> 表示文件系统的类型：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">meta-data=/dev/nvme1n1           isize=512    agcount=8, agsize=262144 blks</span><br><span class="line">         =                       sectsz=512   attr=2, projid32bit=1</span><br><span class="line">         =                       crc=1        finobt=1, sparse=1, rmapbt=0</span><br><span class="line">         =                       reflink=1    bigtime=0 inobtcount=0</span><br><span class="line">data     =                       bsize=4096   blocks=2097152, imaxpct=25</span><br><span class="line">         =                       sunit=1      swidth=1 blks</span><br><span class="line">naming   =version 2              bsize=4096   ascii-ci=0, ftype=1</span><br><span class="line"><span class="built_in">log</span>      =internal <span class="built_in">log</span>           bsize=4096   blocks=2560, version=2</span><br><span class="line">         =                       sectsz=512   sunit=1 blks, lazy-count=1</span><br><span class="line">realtime =none                   extsz=4096   blocks=0, rtextents=0</span><br></pre></td></tr></table></figure>
-<p>接着，我们就可以创建一个文件夹用来挂载磁盘，例如 <code>sudo mkdir /data</code>。最后将 <code>/dev/nvme1n1</code> 挂载到 <code>/data</code> 上：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount /dev/nvme1n1 /data</span><br></pre></td></tr></table></figure>
-<p>此时如果查看 <code>df -h</code> 就会包含 <code>/dev/nvme1n1</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Filesystem       Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/root        7.6G  1.6G  6.1G  21% /</span><br><span class="line">tmpfs            926M     0  926M   0% /dev/shm</span><br><span class="line">tmpfs            371M 1000K  370M   1% /run</span><br><span class="line">tmpfs            5.0M     0  5.0M   0% /run/lock</span><br><span class="line">/dev/nvme0n1p15   98M  5.1M   93M   6% /boot/efi</span><br><span class="line">tmpfs            186M  4.0K  186M   1% /run/user/1000</span><br><span class="line">/dev/nvme1n1     8.0G   90M  8.0G   2% /data</span><br></pre></td></tr></table></figure>
-<h2 id="系统启动自动挂载磁盘"><a class="markdownIt-Anchor" href="#系统启动自动挂载磁盘"></a> 系统启动自动挂载磁盘</h2>
-<p>当前的磁盘挂载信息会在系统启动后丢失，如果希望系统启动后自动挂载磁盘则需要向 <code>/etc/fstab</code> 中添加一条记录。</p>
-<p>安全起见先备份下 <code>/etc/fstab</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">cp</span> /etc/fstab /etc/fstab.orig</span><br></pre></td></tr></table></figure>
-<p>然后运行 <code>sudo blkid</code> 来查看设备 <code>/dev/nvme1n1</code> 的 <code>UUID</code>：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/dev/nvme0n1p1: LABEL=<span class="string">&quot;cloudimg-rootfs&quot;</span> UUID=<span class="string">&quot;15ea47e1-ef7d-4928-9dbe-ffaf0e743653&quot;</span> BLOCK_SIZE=<span class="string">&quot;4096&quot;</span> TYPE=<span class="string">&quot;ext4&quot;</span> PARTUUID=<span class="string">&quot;1957f80e-a338-441c-a0e0-ed1575eefda3&quot;</span></span><br><span class="line">/dev/nvme0n1p15: LABEL_FATBOOT=<span class="string">&quot;UEFI&quot;</span> LABEL=<span class="string">&quot;UEFI&quot;</span> UUID=<span class="string">&quot;68E7-1A63&quot;</span> BLOCK_SIZE=<span class="string">&quot;512&quot;</span> TYPE=<span class="string">&quot;vfat&quot;</span> PARTUUID=<span class="string">&quot;1eeb08ab-0afd-4477-bd53-4389a42db8f6&quot;</span></span><br><span class="line">/dev/loop1: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop4: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop2: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/loop0: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br><span class="line">/dev/nvme1n1: UUID=<span class="string">&quot;aa81c000-325c-40b7-ba4c-598ec2c824e0&quot;</span> BLOCK_SIZE=<span class="string">&quot;512&quot;</span> TYPE=<span class="string">&quot;xfs&quot;</span></span><br><span class="line">/dev/loop3: TYPE=<span class="string">&quot;squashfs&quot;</span></span><br></pre></td></tr></table></figure>
-<p>最后向 <code>/etc/fstab</code> 添加一条记录：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UUID=aa81c000-325c-40b7-ba4c-598ec2c824e0  /data  xfs  defaults,nofail  0  2</span><br></pre></td></tr></table></figure>
-<p>可以通过先取消挂载 <code>/data</code> 即 <code>sudo umount /data</code> 然后再执行 <code>sudo mount -a</code> 来验证自动挂载是否生效。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html">Make an Amazon EBS volume available for use on Linux</a></li>
 </ul>
 
       

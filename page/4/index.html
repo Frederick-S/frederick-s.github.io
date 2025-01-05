@@ -153,13 +153,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-count">58</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -176,6 +176,109 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/03/27/mit-6.824-lab1-sequential-mapreduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/03/27/mit-6.824-lab1-sequential-mapreduce/" class="post-title-link" itemprop="url">MIT 6.824 - Lab 1 (3): 示例程序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-03-27 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-27T00:00:00+08:00">2022-03-27</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.9k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>Lab 1</code> 提供了一个串行化的示例 <code>MapReduce</code> 程序，整体分两部分，第一部分是用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，第二部分是框架代码。</p>
+<h2 id="用户自定义-map-和-reduce-函数"><a class="markdownIt-Anchor" href="#用户自定义-map-和-reduce-函数"></a> 用户自定义 map 和 reduce 函数</h2>
+<p>以单词计数应用 <code>wc.go</code> 为例，对于 <code>map</code> 函数来说，它的输入键值对类型为 <code>&lt;string, string&gt;</code>，中间结果数据类型为框架定义的 <code>KeyValue</code> 类型，本质上也是个 <code>&lt;string, string&gt;</code> 类型。<code>map</code> 函数首先将文件内容拆分为单词，然后遍历每个单词，输出对应中间结果数据 <code>&lt;w, &quot;1&quot;&gt;</code>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The map function is called once for each file of input. The first</span></span><br><span class="line"><span class="comment">// argument is the name of the input file, and the second is the</span></span><br><span class="line"><span class="comment">// file&#x27;s complete contents. You should ignore the input file name,</span></span><br><span class="line"><span class="comment">// and look only at the contents argument. The return value is a slice</span></span><br><span class="line"><span class="comment">// of key/value pairs.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Map</span><span class="params">(filename <span class="type">string</span>, contents <span class="type">string</span>)</span></span> []mr.KeyValue &#123;</span><br><span class="line">	<span class="comment">// function to detect word separators.</span></span><br><span class="line">	ff := <span class="function"><span class="keyword">func</span><span class="params">(r <span class="type">rune</span>)</span></span> <span class="type">bool</span> &#123; <span class="keyword">return</span> !unicode.IsLetter(r) &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// split contents into an array of words.</span></span><br><span class="line">	words := strings.FieldsFunc(contents, ff)</span><br><span class="line"></span><br><span class="line">	kva := []mr.KeyValue&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> _, w := <span class="keyword">range</span> words &#123;</span><br><span class="line">		kv := mr.KeyValue&#123;w, <span class="string">&quot;1&quot;</span>&#125;</span><br><span class="line">		kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> kva</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>reduce</code> 函数的输出类型为 <code>string</code>，其逻辑较为简单，中间结果数组的长度就是单词的个数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// The reduce function is called once for each key generated by the</span></span><br><span class="line"><span class="comment">// map tasks, with a list of all the values created for that key by</span></span><br><span class="line"><span class="comment">// any map task.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Reduce</span><span class="params">(key <span class="type">string</span>, values []<span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	<span class="comment">// return the number of occurrences of this word.</span></span><br><span class="line">	<span class="keyword">return</span> strconv.Itoa(<span class="built_in">len</span>(values))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="框架代码"><a class="markdownIt-Anchor" href="#框架代码"></a> 框架代码</h2>
+<p>我们可以通过 <code>go run -race mrsequential.go wc.so pg*.txt</code> 来运行串行化的 <code>MapReduce</code> 程序，这里的 <code>wc.so</code> 内包含了用户自定义的 <code>map</code> 和 <code>reduce</code> 函数，<code>pg*.txt</code> 则是本次 <code>MapReduce</code> 程序的原始输入数据。</p>
+<p>首先，根据入参提供的插件找到用户自定义的 <code>map</code> 和 <code>reduce</code> 函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mapf, reducef := loadPlugin(os.Args[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<p>接着，依次读取输入文件的内容，并调用用户自定义的 <code>map</code> 函数，生成一组中间结果数据：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// read each input file,</span></span><br><span class="line"><span class="comment">// pass it to Map,</span></span><br><span class="line"><span class="comment">// accumulate the intermediate Map output.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">intermediate := []mr.KeyValue&#123;&#125;</span><br><span class="line"><span class="keyword">for</span> _, filename := <span class="keyword">range</span> os.Args[<span class="number">2</span>:] &#123;</span><br><span class="line">	file, err := os.Open(filename)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot open %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	content, err := ioutil.ReadAll(file)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot read %v&quot;</span>, filename)</span><br><span class="line">	&#125;</span><br><span class="line">	file.Close()</span><br><span class="line">	kva := mapf(filename, <span class="type">string</span>(content))</span><br><span class="line">	intermediate = <span class="built_in">append</span>(intermediate, kva...)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后，对所有中间结果数据按照键进行排序，而在 <code>MapReduce</code> 论文中，中间结果数据会经过分片函数分发给不同的 <code>reduce</code> 节点，由 <code>reduce</code> 节点自行排序处理：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// a big difference from real MapReduce is that all the</span></span><br><span class="line"><span class="comment">// intermediate data is in one place, intermediate[],</span></span><br><span class="line"><span class="comment">// rather than being partitioned into NxM buckets.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line">sort.Sort(ByKey(intermediate))</span><br></pre></td></tr></table></figure>
+<p>最后，遍历所有中间结果数据，对同键的中间结果数据调用用户自定义的 <code>reduce</code> 函数，并将结果写入到最终输出文件中，同样的，这里也只有一个最终输出文件而不是多个：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">oname := <span class="string">&quot;mr-out-0&quot;</span></span><br><span class="line">ofile, _ := os.Create(oname)</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// call Reduce on each distinct key in intermediate[],</span></span><br><span class="line"><span class="comment">// and print the result to mr-out-0.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line">i := <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i &lt; <span class="built_in">len</span>(intermediate) &#123;</span><br><span class="line">	j := i + <span class="number">1</span></span><br><span class="line">	<span class="keyword">for</span> j &lt; <span class="built_in">len</span>(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key &#123;</span><br><span class="line">		j++</span><br><span class="line">	&#125;</span><br><span class="line">	values := []<span class="type">string</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> k := i; k &lt; j; k++ &#123;</span><br><span class="line">		values = <span class="built_in">append</span>(values, intermediate[k].Value)</span><br><span class="line">	&#125;</span><br><span class="line">	output := reducef(intermediate[i].Key, values)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// this is the correct format for each line of Reduce output.</span></span><br><span class="line">	fmt.Fprintf(ofile, <span class="string">&quot;%v %v\n&quot;</span>, intermediate[i].Key, output)</span><br><span class="line"></span><br><span class="line">	i = j</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ofile.Close()</span><br></pre></td></tr></table></figure>
+<p>至此，一个串行化的 <code>MapReduce</code> 程序就完成了。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1340,100 +1443,6 @@
 <p>参考：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/61989951/github-action-workflow-not-running">GitHub Action workflow not running</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2021/12/23/commodity-hardware/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/12/23/commodity-hardware/" class="post-title-link" itemprop="url">Commodity Hardware</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2021-12-23 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-23T00:00:00+08:00">2021-12-23</time>
-    </span>
-
-  
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>172</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><code>Commodity Hardware</code> 指较为廉价的硬件设备，它具有如下特点：</p>
-<ol>
-<li>价格相对低廉</li>
-<li>易采购</li>
-<li>和同类型的硬件可相互替换</li>
-</ol>
-<p>由此相关的一个概念叫 <code>commodity computing</code>，即使用大量的廉价硬件来实现低成本、高性能的并行计算，与之相对的则是使用较少数高成本的超级计算机。</p>
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://www.suse.com/suse-defines/definition/commodity-hardware/">Commodity Hardware</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Commodity_computing">Commodity computing</a></li>
 </ul>
 
       
