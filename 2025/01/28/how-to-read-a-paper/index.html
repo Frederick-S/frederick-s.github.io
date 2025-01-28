@@ -19,27 +19,27 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"frederick-s.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="I opened a git repo by VS Code, but it shows No source control providers registered. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of">
+    <meta name="description" content="介绍 本文提出了一种高效阅读文献的方式，相比于一上来就从头读到尾，作者将其拆解为三趟式阅读：  第一遍了解论文讲什么，解决了什么问题，提出了什么方法 第二遍理解论文的内容，但忽略细节 第三遍深入理解论文   第一遍阅读 第一遍阅读建议控制在5到10分钟内，阅读内容包括：  仔细阅读标题，摘要和简介部分 阅读每一节和每小节的标题，但忽略内容 阅读结论部分 扫一遍论文引用，并标记哪些已经读过  第一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="VS Code error - No source control providers registered">
-<meta property="og:url" content="https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/index.html">
+<meta property="og:title" content="【读】How to Read a Paper">
+<meta property="og:url" content="https://frederick-s.github.io/2025/01/28/how-to-read-a-paper/index.html">
 <meta property="og:site_name" content="Übung macht den Meister">
-<meta property="og:description" content="I opened a git repo by VS Code, but it shows No source control providers registered. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of">
+<meta property="og:description" content="介绍 本文提出了一种高效阅读文献的方式，相比于一上来就从头读到尾，作者将其拆解为三趟式阅读：  第一遍了解论文讲什么，解决了什么问题，提出了什么方法 第二遍理解论文的内容，但忽略细节 第三遍深入理解论文   第一遍阅读 第一遍阅读建议控制在5到10分钟内，阅读内容包括：  仔细阅读标题，摘要和简介部分 阅读每一节和每小节的标题，但忽略内容 阅读结论部分 扫一遍论文引用，并标记哪些已经读过  第一">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2019-11-23T16:00:00.000Z">
-<meta property="article:modified_time" content="2019-11-23T16:00:00.000Z">
+<meta property="article:published_time" content="2025-01-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-27T16:00:00.000Z">
 <meta property="article:author" content="Xiaodan Mao">
-<meta property="article:tag" content="Visual Studio Code">
+<meta property="article:tag" content="Paper">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/">
+<link rel="canonical" href="https://frederick-s.github.io/2025/01/28/how-to-read-a-paper/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/","path":"2019/11/24/vscode-no-source-control-providers-registered/","title":"VS Code error - No source control providers registered"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://frederick-s.github.io/2025/01/28/how-to-read-a-paper/","path":"2025/01/28/how-to-read-a-paper/","title":"【读】How to Read a Paper"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>VS Code error - No source control providers registered | Übung macht den Meister</title>
+<title>【读】How to Read a Paper | Übung macht den Meister</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
   <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-J1NC2B33VK","only_pageview":false,"measure_protocol_api_secret":null}</script>
@@ -133,7 +133,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -146,6 +146,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text"> 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%81%8D%E9%98%85%E8%AF%BB"><span class="nav-number">2.</span> <span class="nav-text"> 第一遍阅读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%81%8D%E9%98%85%E8%AF%BB"><span class="nav-number">3.</span> <span class="nav-text"> 第二遍阅读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%81%8D%E9%98%85%E8%AF%BB"><span class="nav-number">4.</span> <span class="nav-text"> 第三遍阅读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -191,7 +192,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2025/01/28/how-to-read-a-paper/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -204,12 +205,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="VS Code error - No source control providers registered | Übung macht den Meister">
+      <meta itemprop="name" content="【读】How to Read a Paper | Übung macht den Meister">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          VS Code error - No source control providers registered
+          【读】How to Read a Paper
         </h1>
 
         <div class="post-meta-container">
@@ -220,7 +221,7 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2019-11-24 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-24T00:00:00+08:00">2019-11-24</time>
+      <time title="Created: 2025-01-28 00:00:00" itemprop="dateCreated datePublished" datetime="2025-01-28T00:00:00+08:00">2025-01-28</time>
     </span>
 
   
@@ -229,14 +230,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>391</span>
+      <span>965</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -246,10 +247,50 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>I opened a git repo by VS Code, but it shows <code>No source control providers registered</code>. One possible reason is that VS Code couldn’t find the executable git command, so we can set the executable path of git in settings. Open <code>File -&gt; Preferences -&gt; Settings</code>, then find the <code>Git: Path</code> setting, click <code>Edit in settings.json</code>, and add <code>&quot;git.path&quot;: &quot;full-path-to-git&quot;</code> to <code>settings.json</code>.</p>
-<p>Reference:</p>
+    <div class="post-body" itemprop="articleBody"><h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p>本文提出了一种高效阅读文献的方式，相比于一上来就从头读到尾，作者将其拆解为三趟式阅读：</p>
+<ol>
+<li>第一遍了解论文讲什么，解决了什么问题，提出了什么方法</li>
+<li>第二遍理解论文的内容，但忽略细节</li>
+<li>第三遍深入理解论文</li>
+</ol>
+<h2 id="第一遍阅读"><a class="markdownIt-Anchor" href="#第一遍阅读"></a> 第一遍阅读</h2>
+<p>第一遍阅读建议控制在5到10分钟内，阅读内容包括：</p>
+<ol>
+<li>仔细阅读标题，摘要和简介部分</li>
+<li>阅读每一节和每小节的标题，但忽略内容</li>
+<li>阅读结论部分</li>
+<li>扫一遍论文引用，并标记哪些已经读过</li>
+</ol>
+<p>第一遍读完后，你应该能够回答5个问题：</p>
+<ol>
+<li>Category：这是一篇什么类型的论文？</li>
+<li>Context：有哪些其他相关的论文？</li>
+<li>Correctness：论文中的假设对吗？</li>
+<li>Contributions：这篇论文的主要贡献是什么？</li>
+<li>Clarity：这篇论文写的清晰易懂吗？</li>
+</ol>
+<p>当回答了这5个问题后，你就可以决定是否要继续读下去，不继续读的原因可能是因为这篇论文对你价值不大，也可能是因为你还没有足够的知识储备来理解，甚至是论文中描述的假设都是错的。</p>
+<h2 id="第二遍阅读"><a class="markdownIt-Anchor" href="#第二遍阅读"></a> 第二遍阅读</h2>
+<p>第二遍开始仔细阅读论文，但忽略细节比如证明环节：</p>
+<ol>
+<li>仔细阅读论文中的图表，尤其是图片。一些图表中的常见错误可以提前让你甄别出不严谨甚至是粗制滥造的论文</li>
+<li>标记还没有读过的相关论文引用以便之后阅读，这有助于更好理解该篇论文的背景</li>
+</ol>
+<p>第二遍阅读应该控制在1小时以内，通过第二遍阅读，你应该能够理解论文的内容，并能够自我总结论文的要旨给第三者。这个层次的掌握程度对于阅读感兴趣的论文已经足够，但用于科研工作还不够。</p>
+<p>如果第二遍读完还不能理解怎么办？这有可能是因为论文的主题对你来说是一个新事物，也可能是因为论文的作者采用的证明让你摸不着头脑，或者这篇论文就是写的晦涩难懂，甚至是因为夜深了。你可以选择：</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/46609255/git-missing-in-vs-code-no-source-control-providers">Git missing in VS Code – No source control providers</a></li>
+<li>把论文放一边，即使不理解这篇论文也不影响你事业的成功</li>
+<li>之后再看，先补充点背景材料</li>
+<li>硬着头皮开始第三遍阅读</li>
+</ul>
+<h2 id="第三遍阅读"><a class="markdownIt-Anchor" href="#第三遍阅读"></a> 第三遍阅读</h2>
+<p>第三遍阅读能让你真正的理解这篇论文。这次阅读的关键是假设自己是论文的作者，并且基于原作者的假设，重新构建论文。通过你所构建的论文和原论文对比，你就能轻易的发现原论文的创新点，以及潜在隐藏的缺点和假设。</p>
+<p>第三遍阅读需要高度关注细节，并时刻本着以怀疑的态度看待论文中的每一个假设。通过这次阅读，也能够为你之后的科研工作提供一些想法。</p>
+<p>对于新手来说第三遍阅读大概要花4到5个小时，而对于有经验的读者来说只需要1小时。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf">How to Read a Paper</a></li>
 </ul>
 
     </div>
@@ -268,7 +309,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>Post link: </strong>
-      <a href="https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/" title="VS Code error - No source control providers registered">https://frederick-s.github.io/2019/11/24/vscode-no-source-control-providers-registered/</a>
+      <a href="https://frederick-s.github.io/2025/01/28/how-to-read-a-paper/" title="【读】How to Read a Paper">https://frederick-s.github.io/2025/01/28/how-to-read-a-paper/</a>
   </li>
   <li class="post-copyright-license">
       <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -277,21 +318,18 @@
 </div>
 
           <div class="post-tags">
-              <a href="/tags/Visual-Studio-Code/" rel="tag"># Visual Studio Code</a>
+              <a href="/tags/Paper/" rel="tag"># Paper</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2019/11/16/why-Integer.valueOf(127)-==-Integer.valueOf(127)-is-true/" rel="prev" title="为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True">
-                  <i class="fa fa-angle-left"></i> 为什么 Integer.valueOf(127) == Integer.valueOf(127) 为 True
+                <a href="/2025/01/05/bitcask/" rel="prev" title="【读】Bitcask - A Log-Structured Hash Table for Fast Key/Value Data">
+                  <i class="fa fa-angle-left"></i> 【读】Bitcask - A Log-Structured Hash Table for Fast Key/Value Data
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2019/12/14/how-to-enable-word-wrap-in-vscode/" rel="next" title="How to enable word wrap in VS Code">
-                  How to enable word wrap in VS Code <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>

@@ -153,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">84</span>
+          <span class="site-state-item-count">85</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -176,6 +176,95 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/05/04/flutter-error-linked-and-embedded-framework-app.framework-was-built-for-ios/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/05/04/flutter-error-linked-and-embedded-framework-app.framework-was-built-for-ios/" class="post-title-link" itemprop="url">Flutter error - Building for iOS Simulator, but the linked and embedded framework 'App.framework' was built for iOS</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-05-04 00:00:00" itemprop="dateCreated datePublished" datetime="2020-05-04T00:00:00+08:00">2020-05-04</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>356</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>1 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><code>Flutter</code> 项目打包 <code>iOS</code> 应用的时候遇到个错误：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Building for iOS Simulator, but the linked and embedded framework &#x27;App.framework&#x27; was built for iOS. (in target &#x27;Runner&#x27; from project &#x27;Runner&#x27;)</span><br></pre></td></tr></table></figure>
+<p>这个问题在 <code>Flutter</code> 的 <code>GitHub</code> 仓库中也有人提到，解决方法也比较简单，删除 <code>App.framework</code> 文件夹即可，即 <code>rm -rf ios/Flutter/App.framework</code>。</p>
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/flutter/flutter/issues/50568">[App.framework] Linked and embedded framework ‘App.framework’ was built for iOS/iOS Simulator</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1172,94 +1261,6 @@
 <ul>
 <li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/49433452/forbidden-403-on-image-urls">forbidden 403 on image URLS</a></li>
 <li><a target="_blank" rel="noopener" href="https://juejin.im/post/5cc50deff265da03a97af3e8">解决图片访问403 Forbidden问题</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/03/15/how-to-config-flutter-to-use-a-mirror-site/" class="post-title-link" itemprop="url">配置 Flutter 国内镜像</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2020-03-15 00:00:00" itemprop="dateCreated datePublished" datetime="2020-03-15T00:00:00+08:00">2020-03-15</time>
-    </span>
-
-  
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>199</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>由于网络原因，<code>Flutter</code> 项目获取包依赖时有可能会失败，可通过设置镜像地址解决，新增如下两个环境变量即可：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PUB_HOSTED_URL=https://pub.flutter-io.cn</span><br><span class="line"><span class="built_in">export</span> FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn</span><br></pre></td></tr></table></figure>
-<p>参考：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://flutter.dev/community/china#configuring-flutter-to-use-a-mirror-site">Configuring Flutter to use a mirror site</a></li>
 </ul>
 
       
