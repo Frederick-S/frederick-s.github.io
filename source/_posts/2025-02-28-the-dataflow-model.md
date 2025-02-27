@@ -78,8 +78,8 @@ tags:
 ## Dataflow 模型
 ### 核心原语
 在批处理下，`Dataflow SDK` 提供了操作 `(key, value)` 键值对的两种方式：
-* `ParDo`：对每个输入，通过调用用户定义的方法（在 `Dataflow` 中称为 `DoFn`），返回0个或者多个输出
-* `GroupByKey`：将相同键的值聚合在一起
+* `ParDo`：对每个输入，通过调用用户定义的方法（在 `Dataflow` 中称为 `DoFn`），返回0个或者多个输出，各输入之间无关联，天然的适用于无界数据处理
+* `GroupByKey`：将相同键的值聚合在一起，不过对于无界数据来说，何时将相同键聚合后的数据发给下游成为了一个问题，因为无法预知数据的边界，通用的解决方法是借助窗口
 
 以下是一个 `ParDo` 的例子，对于每个输入，通过调用 `ExpandPrefixes` 方法，返回每个输入的所有前缀：
 $$
@@ -96,6 +96,32 @@ $$
 \big\downarrow \\
 (\text{f}, [1, 2]), (\text{fi}, [1, 2]), (\text{fix}, [1]), (\text{fit}, [2])
 $$
+
+### 窗口
+支持按键聚合的系统一般会将 `GroupByKey` 以 `GroupByKeyAndWindow` 的形式实现，本文的首要贡献在于支持非对齐的窗口。具体来说：
+1. `Dataflow` 模型的视角下可以将所有窗口都当做非对齐的，并交由具体实现来为对齐式的窗口场景优化
+2. 窗口计算可以拆解为两个操作：
+   * `Set<Window> AssignWindows(T datum)`：将输入分配给0个或者多个窗口
+   * `Set<Window> MergeWindows(Set<Window> windows)`：聚合时将多个窗口合并为一个
+
+为了支持基于事件时间的窗口，需要将数据传输的格式从 `(key, value)` 改为 `(key, value, event_time, window)`，`event_time` 是事件时间，`window` 默认是一个全局窗口，覆盖所有的事件，同时也适配了有界数据的场景。
+
+#### 窗口分配
+如果一个输入属于多个窗口，那么窗口分配会给每个窗口创建一个输入的副本。
+
+在下面这个例子中，键值对 `(k, v1)` 和 `(k, v2)` 分别复制到了两个窗口中，窗口的分配也不需要等到聚合，可以在 `pipeline` 的任意执行点发生：
+
+$$
+(\text{k}, \text{v1}, \text{12:00}, [0, \infty)), (\text{k}, \text{v2}, \text{12:01}, [0, \infty)) \\
+\big\downarrow \quad \text{AssignWindows(Sliding(2m, 1m))} \\
+(\text{k}, \text{v1}, \text{12:00}, [11:59, 12:01)), \\
+(\text{k}, \text{v1}, \text{12:00}, [12:00, 12:02)), \\
+(\text{k}, \text{v2}, \text{12:01}, [12:00, 12:02)), \\
+(\text{k}, \text{v2}, \text{12:01}, [12:01, 12:03))
+$$
+
+#### 窗口合并
+窗口合并发生于 `GroupByKeyAndWindow` 操作，
 
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
