@@ -183,5 +183,30 @@ PCollection<KV<String, Integer>> output = input
   .apply(Sum.integersPerKey());
 ```
 
+### 触发器和增量处理
+目前为止，还遗留两个问题：
+* 需要支持基于元组和处理时间的窗口，不然会和当前已有的系统不兼容
+* 需要知道窗口中的数据计算结果何时可以下发到下游
+
+本文认为借助 `watermark` 来解决第二个问题是不够的，因为 `watermark` 不能百分百确保所有数据都已经到达，真实场景中总会有晚到的数据。`Lambda` 架构则提供了一个思路：流式引擎部分提供低延迟的计算，不过其结果是近似值，而批处理引擎则提供最终一致性结果。不过，如何将两者合并到一个 `pipeline` 中？
+
+本文提出了触发器（`trigger`）的概念，和窗口的关系为：
+* 窗口：根据事件时间决定如何对事件分组
+* 触发器：决定何时（处理时间）告知窗口计算的数据结果可以下发到下游
+
+`Google` 实现的系统内置了几类触发器的实现用于在多种场合触发：
+* 当所有的数据已被系统接收时（预估，非精确，如 `watermark`）
+* 处理时间线上的某个时间点
+* 响应数据到达（如数量，大小，`data punctuations`，模式匹配等）
+
+另外，触发器之间还可以进行逻辑组合，例如使用 `and`，`or`，循环，序列等。
+
+引入触发器后，同一个窗口的计算结果有可能被多次下发，系统也提供了三种处理模式：
+* 丢弃（`Discarding`）：一旦窗口被触发，其内容下发后即被丢弃，后续触发和之前的触发没有任何关系。如果多次窗口触发的结果是幂等的，则可以采用该模式
+* 累加（`Accumulating`）：窗口被触发后，其计算结果会持久化，后续触发结果会作为历史结果的修正。适合于数据消费方收到新的窗口数据，直接替换就数据的场景。例如某个窗口计算是求窗口中所有数据的最大值，第一次触发时下发目前的最大值，后续有数据再次到达时根据持久化的历史值，直接和当前值比较就可以得到最新的最大值
+* 累加和撤销（`Accumulating and Retracting`）：在 `Accumulating` 的基础上，触发的窗口计算结果会先持久化，如果后续有新的触发，则会下发两个值，一个是用于告知下游系统撤销历史数据，另一个是最新的窗口计算结果。不过，这也需要下游系统具有响应数据撤销事件的能力
+
+### 设计原则
+
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
