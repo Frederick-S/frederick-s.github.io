@@ -153,9 +153,9 @@ $$
             (\textbf{[v3]}, [13:57, 14:27))]), \\
 (\text{k2}, [(\textbf{[v2]}, [13:14, 13:44))]) \\
 \bigg\downarrow \quad \text{ExpandToElements} \\
-(\text{k1}, [(\text{[v1, v4]}, \textbf{13:50}, [13:02, 13:50)), \\
-            (\text{[v3]}, \textbf{14:27}, [13:57, 14:27))]), \\
-(\text{k2}, [(\text{[v2]}, \textbf{13:44}, [13:14, 13:44))])
+(\text{k1}, \text{[v1, v4]}, \textbf{13:50}, [13:02, 13:50)), \\
+(\text{k1}, \text{[v3]}, \textbf{14:27}, [13:57, 14:27))), \\
+(\text{k2}, \text{[v2]}, \textbf{13:44}, [13:14, 13:44))
 $$
 
 ## 参考
