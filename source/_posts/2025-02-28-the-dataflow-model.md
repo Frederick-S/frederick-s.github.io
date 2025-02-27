@@ -164,5 +164,24 @@ $$
 * `GroupAlsoByWindow`：对每个键下的 `(value, window)` 元组按照窗口聚合，在上述例子中，`v1` 和 `v4` 因为有相同的窗口，所以被聚合在了一起
 * `ExpandToElements`：将每个键下的 `(value, window)` 元组展开为 `(key, value, event_time, window)` 的形式，新的 `event_time` 在上述例子中采用的是窗口的结束时间，不过实际上只要是大于窗口内最早的事件的时间戳都行。
 
+#### API
+现在通过 `Cloud Dataflow SDK` 的代码示例来展示如何使用窗口。下述代码将数据按照键聚合后，求所有值的加和：
+
+```java
+PCollection<KV<String, Integer>> input = IO.read(...);
+PCollection<KV<String, Integer>> output = input
+  .apply(Sum.integersPerKey());
+```
+
+如果要支持超时时间为30分钟的会话窗口，则在求和前调用 `Window.into` 即可：
+
+```java
+PCollection<KV<String, Integer>> input = IO.read(...);
+PCollection<KV<String, Integer>> output = input
+  .apply(Window.into(Sessions.withGapDuration(
+    Duration.standardMinutes(30))))
+  .apply(Sum.integersPerKey());
+```
+
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
