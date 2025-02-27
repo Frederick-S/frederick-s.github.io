@@ -121,7 +121,7 @@ $$
 $$
 
 #### 窗口合并
-窗口合并发生于 `GroupByKeyAndWindow` 操作，
+窗口合并发生于 `GroupByKeyAndWindow` 操作，我们以超时时间为30分钟的会话窗口为例，假设有 `(k1, v1)`，`(k2, v2)`，`(k1, v3)`，`(k1, v4)` 四个事件，其初始默认的窗口都为$[0, \infty]$。然后，`AssignWindows` 根据每个事件到达的起始时间分配一个时长为30分钟的会话窗口，在这期间如果有相同键的事件到达，则也将其归到同一个窗口内。然后，`GroupByKeyAndWindow` 操作可以拆解为如下步骤：
 
 $$
 (\text{k1}, \text{v1}, \text{13:02}, [0, \infty)), \\
@@ -157,6 +157,12 @@ $$
 (\text{k1}, \text{[v3]}, \textbf{14:27}, [13:57, 14:27))), \\
 (\text{k2}, \text{[v2]}, \textbf{13:44}, [13:14, 13:44))
 $$
+
+* `DropTimestamps`：丢弃事件的时间戳，因为这里只涉及窗口计算
+* `GroupByKey`：按照键聚合 `(value, window)` 元组
+* `MergeWindows`：合并每个键下 `(value, window)` 元组中的窗口，具体的合并逻辑由窗口策略决定。在上述的例子中，如果两个 `(value, window)` 元组中的窗口存在重叠，则每个元组合并后的窗口为两个窗口的并集
+* `GroupAlsoByWindow`：对每个键下的 `(value, window)` 元组按照窗口聚合，在上述例子中，`v1` 和 `v4` 因为有相同的窗口，所以被聚合在了一起
+* `ExpandToElements`：将每个键下的 `(value, window)` 元组展开为 `(key, value, event_time, window)` 的形式，新的 `event_time` 在上述例子中采用的是窗口的结束时间，不过实际上只要是大于窗口内最早的事件的时间戳都行。
 
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
