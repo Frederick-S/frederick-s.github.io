@@ -84,16 +84,16 @@ tags:
 以下是一个 `ParDo` 的例子，对于每个输入，通过调用 `ExpandPrefixes` 方法，返回每个输入的所有前缀：
 $$
 (\text{fix}, 1), (\text{fit}, 2) \\
-\big\downarrow \quad \text{ParDo(ExpandPrefixes)} \\
-\big\downarrow \\
+\bigg\downarrow \quad \text{ParDo(ExpandPrefixes)} \\
+\bigg\downarrow \\
 (\text{f}, 1), (\text{fi}, 1), (\text{fix}, 1), (\text{f}, 2), (\text{fi}, 2), (\text{fit}, 2)
 $$
 
 以下是一个 `GroupByKey` 的例子，将相同键的值聚合在一起：
 $$
 (\text{f}, 1), (\text{fi}, 1), (\text{fix}, 1), (\text{f}, 2), (\text{fi}, 2), (\text{fit}, 2) \\
-\big\downarrow \quad \text{GroupByKey} \\
-\big\downarrow \\
+\bigg\downarrow \quad \text{GroupByKey} \\
+\bigg\downarrow \\
 (\text{f}, [1, 2]), (\text{fi}, [1, 2]), (\text{fix}, [1]), (\text{fit}, [2])
 $$
 
@@ -113,7 +113,7 @@ $$
 
 $$
 (\text{k}, \text{v1}, \text{12:00}, [0, \infty)), (\text{k}, \text{v2}, \text{12:01}, [0, \infty)) \\
-\big\downarrow \quad \text{AssignWindows(Sliding(2m, 1m))} \\
+\bigg\downarrow \quad \text{AssignWindows(Sliding(2m, 1m))} \\
 (\text{k}, \text{v1}, \text{12:00}, [11:59, 12:01)), \\
 (\text{k}, \text{v1}, \text{12:00}, [12:00, 12:02)), \\
 (\text{k}, \text{v2}, \text{12:01}, [12:00, 12:02)), \\
@@ -122,6 +122,41 @@ $$
 
 #### 窗口合并
 窗口合并发生于 `GroupByKeyAndWindow` 操作，
+
+$$
+(\text{k1}, \text{v1}, \text{13:02}, [0, \infty)), \\
+(\text{k2}, \text{v2}, \text{13:14}, [0, \infty)), \\
+(\text{k1}, \text{v3}, \text{13:57}, [0, \infty)), \\
+(\text{k1}, \text{v4}, \text{13:20}, [0, \infty)), \\
+\bigg\downarrow \quad \text{AssignWindows(Sessions(30m))} \\
+(\text{k1}, \text{v1}, \text{13:02}, [13:02, 13:32)), \\
+(\text{k2}, \text{v2}, \text{13:14}, [13:14, 13:44)), \\
+(\text{k1}, \text{v3}, \text{13:57}, [13:57, 14:27)), \\
+(\text{k1}, \text{v4}, \text{13:20}, [13:20, 13:50)) \\
+\bigg\downarrow \quad \text{DropTimestamps} \\
+(\text{k1}, \text{v1}, [13:02, 13:32)), \\
+(\text{k2}, \text{v2}, [13:14, 13:44)), \\
+(\text{k1}, \text{v3}, [13:57, 14:27)), \\
+(\text{k1}, \text{v4}, [13:20, 13:50)) \\
+\bigg\downarrow \quad \text{GroupByKey} \\
+(\text{k1}, [(\text{v1}, [13:02, 13:32)), \\
+            (\text{v3}, [13:57, 14:27)), \\
+            (\text{v4}, [13:20, 13:50))]), \\
+(\text{k2}, [(\text{v2}, [13:14, 13:44))]) \\
+\bigg\downarrow \quad \text{MergeWindows(Sessions(30m))} \\
+(\text{k1}, [(\text{v1}, \textbf{[13:02, 13:50)}), \\
+            (\text{v3}, [13:57, 14:27)), \\
+            (\text{v4}, \textbf{[13:02, 13:50)})]), \\
+(\text{k2}, [(\text{v2}, [13:14, 13:44))]) \\
+\bigg\downarrow \quad \text{GroupAlsoByWindow} \\
+(\text{k1}, [(\textbf{[v1, v4]}, [13:02, 13:50)), \\
+            (\textbf{[v3]}, [13:57, 14:27))]), \\
+(\text{k2}, [(\textbf{[v2]}, [13:14, 13:44))]) \\
+\bigg\downarrow \quad \text{ExpandToElements} \\
+(\text{k1}, [(\text{[v1, v4]}, \textbf{13:50}, [13:02, 13:50)), \\
+            (\text{[v3]}, \textbf{14:27}, [13:57, 14:27))]), \\
+(\text{k2}, [(\text{[v2]}, \textbf{13:44}, [13:14, 13:44))])
+$$
 
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
