@@ -153,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">86</span>
+          <span class="site-state-item-count">87</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -176,6 +176,124 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2023/03/12/grafana-agent-remote-write-/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/03/12/grafana-agent-remote-write-/" class="post-title-link" itemprop="url">通过 Grafana Agent 上传 Prometheus 指标数据到 Grafana Cloud</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-03-12 00:00:00" itemprop="dateCreated datePublished" datetime="2023-03-12T00:00:00+08:00">2023-03-12</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>4.6k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>8 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p><code>Grafana Cloud</code> 为免费账户提供了一万条指标的存储额度，对于业余项目来说可以考虑将指标上传到由 <code>Grafana Cloud</code> 托管的 <code>Prometheus</code> 中。</p>
+<h2 id="安装-grafana-agent"><a class="markdownIt-Anchor" href="#安装-grafana-agent"></a> 安装 Grafana Agent</h2>
+<p><code>Prometheus</code> 指标数据的上传需要通过 <code>Grafana Agent</code> 来完成，以下安装步骤以 <code>Ubuntu</code> 为例：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p /etc/apt/keyrings/</span><br><span class="line">wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo <span class="built_in">tee</span> /etc/apt/keyrings/grafana.gpg</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main&quot;</span> | sudo <span class="built_in">tee</span> /etc/apt/sources.list.d/grafana.list</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install grafana-agent</span><br></pre></td></tr></table></figure>
+<p>安装完成之后通过 <code>sudo systemctl start grafana-agent</code> 将其启动，并可通过 <code>sudo systemctl status grafana-agent</code> 显示 <code>grafana-agent</code> 的当前状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">● grafana-agent.service - Monitoring system and forwarder</span><br><span class="line">     Loaded: loaded (/lib/systemd/system/grafana-agent.service; disabled; vendor preset: enabled)</span><br><span class="line">     Active: active (running) since Sun 2023-03-12 05:08:43 UTC; 13s ago</span><br><span class="line">       Docs: https://grafana.com/docs/agent/latest/</span><br><span class="line">   Main PID: 1049084 (grafana-agent)</span><br><span class="line">      Tasks: 7 (limit: 1041)</span><br><span class="line">     Memory: 125.6M</span><br><span class="line">     CGroup: /system.slice/grafana-agent.service</span><br><span class="line">             └─1049084 /usr/bin/grafana-agent --config.file /etc/grafana-agent.yaml -server.http.address=127.0.0.1:9090 -server.grpc.address=127.0.0.1:9091</span><br><span class="line"></span><br><span class="line">Mar 12 05:08:43 example-name systemd[1]: Started Monitoring system and forwarder.</span><br></pre></td></tr></table></figure>
+<p>同时，如果希望系统重启后自动启动 <code>grafana-agent</code> 服务，可以执行如下的命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl <span class="built_in">enable</span> grafana-agent.service</span><br></pre></td></tr></table></figure>
+<p>另外，可以通过 <code>sudo journalctl -u grafana-agent</code> 查看 <code>grafana-agent</code> 的运行日志：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-- Logs begin at Sun 2021-12-26 04:48:21 UTC, end at Sun 2023-03-12 06:34:53 UTC. --</span><br><span class="line">Mar 12 05:08:43 example-name systemd[1]: Started Monitoring system and forwarder.</span><br><span class="line">Mar 12 05:38:45 example-name grafana-agent[1049084]: ts=2023-03-12T05:38:45.6366501Z caller=cleaner.go:203 level=warn agent=prometheus component=cleaner msg=&quot;unable to fi&gt;</span><br><span class="line">Mar 12 06:08:45 example-name grafana-agent[1049084]: ts=2023-03-12T06:08:45.63549564Z caller=cleaner.go:203 level=warn agent=prometheus component=cleaner msg=&quot;unable to f&gt;</span><br><span class="line">Mar 12 06:20:16 example-name systemd[1]: Stopping Monitoring system and forwarder...</span><br><span class="line">Mar 12 06:20:16 example-name systemd[1]: grafana-agent.service: Succeeded.</span><br><span class="line">Mar 12 06:20:16 example-name systemd[1]: Stopped Monitoring system and forwarder.</span><br><span class="line">Mar 12 06:20:16 example-name systemd[1]: Started Monitoring system and forwarder.</span><br></pre></td></tr></table></figure>
+<h2 id="上报监控数据"><a class="markdownIt-Anchor" href="#上报监控数据"></a> 上报监控数据</h2>
+<p><code>grafana-agent</code> 上报的监控数据分两种，一种是 <code>grafana-agent</code> 自身及其所在主机的监控数据，另一种是自定义服务的监控数据，我们需要修改 <code>grafana-agent</code> 的配置文件来指定如何收集监控数据。</p>
+<p><code>grafana-agent</code> 的默认配置文件为 <code>/etc/grafana-agent.yaml</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># Sample config for Grafana Agent</span><br><span class="line"># For a full configuration reference, see: https://grafana.com/docs/agent/latest/configuration/.</span><br><span class="line">server:</span><br><span class="line">  log_level: warn</span><br><span class="line"></span><br><span class="line">metrics:</span><br><span class="line">  global:</span><br><span class="line">    scrape_interval: 1m</span><br><span class="line">  wal_directory: &#x27;/var/lib/grafana-agent&#x27;</span><br><span class="line">  configs:</span><br><span class="line">    # Example Prometheus scrape configuration to scrape the agent itself for metrics.</span><br><span class="line">    # This is not needed if the agent integration is enabled.</span><br><span class="line">    # - name: agent</span><br><span class="line">    #   host_filter: false</span><br><span class="line">    #   scrape_configs:</span><br><span class="line">    #     - job_name: agent</span><br><span class="line">    #       static_configs:</span><br><span class="line">    #         - targets: [&#x27;127.0.0.1:9090&#x27;]</span><br><span class="line"></span><br><span class="line">integrations:</span><br><span class="line">  agent:</span><br><span class="line">    enabled: true</span><br><span class="line">  node_exporter:</span><br><span class="line">    enabled: true</span><br><span class="line">    include_exporter_metrics: true</span><br><span class="line">    disable_collectors:</span><br><span class="line">      - &quot;mdadm&quot;</span><br></pre></td></tr></table></figure>
+<p>自定义服务的监控数据收集需要定义在 <code>metrics.configs</code> 下，<code>grafana-agent</code> 自身及其所在主机的监控数据收集默认已经是开启的。</p>
+<p>假设需要收集由 <code>Spring Boot</code> 的 <code>actuator</code> 模块所暴露的 <code>Prometheus</code> 监控数据，则需要在 <code>metrics.configs</code> 下新增如下类似配置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- name: &#x27;My Spring Boot App&#x27;</span><br><span class="line">  scrape_configs:</span><br><span class="line">    - job_name: &#x27;My Spring Boot App&#x27;</span><br><span class="line">      metrics_path: &#x27;/actuator/prometheus&#x27;</span><br><span class="line">      scrape_interval: 1m</span><br><span class="line">      static_configs:</span><br><span class="line">        - targets: [&#x27;127.0.0.1:8080&#x27;]</span><br><span class="line">          labels:</span><br><span class="line">            application: &#x27;My Spring Boot App&#x27;</span><br></pre></td></tr></table></figure>
+<p>最后，再通过 <code>remote_write</code> 设置将监控数据推送到 <code>Grafana Cloud</code> 下的 <code>Prometheus</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">remote_write:</span><br><span class="line">  - url: https://prometheus-xxx.grafana.net/api/prom/push</span><br><span class="line">    basic_auth:</span><br><span class="line">      username: username</span><br><span class="line">      password: password</span><br></pre></td></tr></table></figure>
+<p>其中 <code>url</code>，<code>username</code> 和 <code>password</code> 这三个信息都可以在所创建的 <code>Grafana Cloud Stack</code> 下的 <code>Prometheus</code> 的详情页中找到。<code>password</code> 对应 <code>Grafana Cloud API Key</code>，如果之前没有创建过的话需要新生成一个，角色选择 <code>MetricsPublisher</code> 即可：</p>
+<p><img src="/images/grafana-cloud-1.png" alt="alt" /></p>
+<p>完整的配置文件示例如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">  log_level: warn</span><br><span class="line"></span><br><span class="line">metrics:</span><br><span class="line">  global:</span><br><span class="line">    scrape_interval: 1m</span><br><span class="line">  wal_directory: &#x27;/var/lib/grafana-agent&#x27;</span><br><span class="line">  configs:</span><br><span class="line">    - name: &#x27;My Spring Boot App&#x27;</span><br><span class="line">      scrape_configs:</span><br><span class="line">        - job_name: &#x27;My Spring Boot App&#x27;</span><br><span class="line">          metrics_path: &#x27;/actuator/prometheus&#x27;</span><br><span class="line">          scrape_interval: 1m</span><br><span class="line">          static_configs:</span><br><span class="line">            - targets: [&#x27;127.0.0.1:8080&#x27;]</span><br><span class="line">              labels:</span><br><span class="line">                application: &#x27;My Spring Boot App&#x27;</span><br><span class="line">      remote_write:</span><br><span class="line">        - url: https://prometheus-xxx.grafana.net/api/prom/push</span><br><span class="line">          basic_auth:</span><br><span class="line">            username: username</span><br><span class="line">            password: password</span><br><span class="line"></span><br><span class="line">integrations:</span><br><span class="line">  agent:</span><br><span class="line">    enabled: true</span><br><span class="line">  node_exporter:</span><br><span class="line">    enabled: true</span><br><span class="line">    include_exporter_metrics: true</span><br><span class="line">    disable_collectors:</span><br><span class="line">      - &quot;mdadm&quot;</span><br><span class="line">  prometheus_remote_write:</span><br><span class="line">    - url: https://prometheus-xxx.grafana.net/api/prom/push</span><br><span class="line">      basic_auth:</span><br><span class="line">        username: username</span><br><span class="line">        password: password</span><br></pre></td></tr></table></figure>
+<p>配置文件修改完成之后，通过 <code>sudo systemctl restart grafana-agent</code> 来重启 <code>grafana-agent</code> 服务。</p>
+<h2 id="grafana-展示"><a class="markdownIt-Anchor" href="#grafana-展示"></a> Grafana 展示</h2>
+<p>对于自定义服务的监控展示使用自己熟悉的方式即可，例如 <code>Java</code> 应用可以配合使用 <a target="_blank" rel="noopener" href="https://grafana.com/grafana/dashboards/4701-jvm-micrometer/">JVM (Micrometer)</a>。</p>
+<p>对于 <code>grafana-agent</code> 自身的监控展示可以结合 <a target="_blank" rel="noopener" href="https://github.com/grafana/agent/blob/main/example/docker-compose/grafana/dashboards/agent-remote-write.json">agent-remote-write.json</a>：</p>
+<p><img src="/images/grafana-cloud-2.png" alt="alt" /></p>
+<p>最后，<code>grafana-agent</code> 对于所在主机的监控展示可以借助 <a target="_blank" rel="noopener" href="https://grafana.com/grafana/dashboards/1860-node-exporter-full/">Node Exporter Full</a>：</p>
+<p><img src="/images/grafana-cloud-3.png" alt="alt" /></p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://grafana.com/docs/agent/latest/set-up/install-agent-linux/">Install Grafana Agent on Linux</a></li>
+<li><a target="_blank" rel="noopener" href="https://grafana.com/blog/2020/07/02/getting-started-with-the-grafana-cloud-agent-a-remote_write-focused-prometheus-agent/">Getting started with the Grafana Cloud Agent, a remote_write-focused Prometheus agent</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2054,105 +2172,6 @@ s_1 &amp;&lt; s_2 \qquad&amp; (transitivity)
 <li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/thekkath-frangipani.pdf">Frangipani: A Scalable Distributed File System</a></li>
 <li><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/frangipani-faq.txt">FAQ for Frangipani, Thekkath, Mann, Lee, SOSP 1997</a></li>
 <li><a target="_blank" rel="noopener" href="https://kb.synology.com/en-global/DSM/tutorial/What_is_file_system_consistent_snapshot">What is the difference between crash-consistent and file-system consistent snapshots?</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2022/06/04/engineering-culture/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Xiaodan Mao">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Übung macht den Meister">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/04/engineering-culture/" class="post-title-link" itemprop="url">工程师文化和实事求是</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2022-06-04 00:00:00" itemprop="dateCreated datePublished" datetime="2022-06-04T00:00:00+08:00">2022-06-04</time>
-    </span>
-
-  
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>677</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>陈皓在 <a target="_blank" rel="noopener" href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a> 中谈到工程师文化由两点组成：自由和效率。不过我认为可以再加一点，那就是实事求是。实事求是要求尊重客观事实，不弄虚作假，不过现实中往往大相径庭。</p>
-<h2 id="不尊重客观事实"><a class="markdownIt-Anchor" href="#不尊重客观事实"></a> 不尊重客观事实</h2>
-<p>福尔摩斯里有一句话：</p>
-<blockquote>
-<p>Once you eliminate the impossible, whatever remains, no matter how improbable, must be the truth.</p>
-</blockquote>
-<p>对应了软件开发中一个烂大街的场景：在尽可能的考虑了所有的因素之后，不管完成一个工程所需要的时间是多么的不符合非执行者的预期，最终完成这个工程的时间也只会只多不少。如果无法正视客观事实，则会使得工程从开始到结束都弥漫着自我焦虑。而工程实施时往往只会拙劣的采用10个女人1个月生10个孩子的方式，最终也容易造成工程的反复返工，不过这倒能在总结大会上提供丰富的演讲素材，以及时间紧、任务重的自我感动，然后下次一定。</p>
-<h2 id="避实就虚"><a class="markdownIt-Anchor" href="#避实就虚"></a> 避实就虚</h2>
-<p>优秀的团队能正视问题，如果一个团队在面对问题分析时首先想的是哪些问题该提，哪些问题不该提，哪些问题提了会赢得芳心，那这种问题分析就是表演作秀，最终也继续重蹈覆辙。</p>
-<h2 id="形式主义"><a class="markdownIt-Anchor" href="#形式主义"></a> 形式主义</h2>
-<p>陈皓在 <a target="_blank" rel="noopener" href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a> 中关于工程师文化如何落地提到引入绩效考核，不过这可能会造成形式主义和和团队间无意义的攀比。例如，如果将 <code>Code Review</code> 作为考核指标，难免会出现：快到月末了，还需要再提20个 <code>comment</code>；某部门的人均 <code>comment</code> 有 <code>xx</code> 个，本部门才 <code>yy</code> 个，每个人努努力，提到 <code>zz</code> 个。</p>
-<h2 id="移花接木"><a class="markdownIt-Anchor" href="#移花接木"></a> 移花接木</h2>
-<p>在成果导向的规则下，如果通过 <code>A</code>，<code>B</code>，<code>C</code> 达成了 <code>D</code>，则直接对外宣称通过 <code>A</code> 达成了 <code>D</code>。</p>
-<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/17497.html">什么是工程师文化？</a></li>
 </ul>
 
       
