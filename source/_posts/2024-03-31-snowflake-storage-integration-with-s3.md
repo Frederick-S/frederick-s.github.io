@@ -1,6 +1,7 @@
 title: 'Snowflake 配置 S3 Storage Integration'
 tags:
 - Snowflake
+- Database
 ---
 
 ## 介绍

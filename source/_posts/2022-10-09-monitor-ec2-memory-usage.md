@@ -1,6 +1,7 @@
 title: AWS EC2 监控内存使用
 tags:
 - AWS
+- EC2
 ---
 
 `AWS` `EC2` 的监控页面默认没有显示内存使用率，需要搭配 `CloudWatch` 配置使用。

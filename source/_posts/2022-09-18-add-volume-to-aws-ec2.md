@@ -1,6 +1,7 @@
 title: AWS EC2 挂载磁盘
 tags:
 - AWS
+- EC2
 ---
 
 ## 挂载磁盘
