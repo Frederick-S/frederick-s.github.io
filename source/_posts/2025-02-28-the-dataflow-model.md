@@ -207,6 +207,12 @@ PCollection<KV<String, Integer>> output = input
 * 累加和撤销（`Accumulating and Retracting`）：在 `Accumulating` 的基础上，触发的窗口计算结果会先持久化，如果后续有新的触发，则会下发两个值，一个是用于告知下游系统撤销历史数据，另一个是最新的窗口计算结果。不过，这也需要下游系统具有响应数据撤销事件的能力
 
 ### 设计原则
+`Dataflow` 模型的一些设计原则：
+* 永远不要依赖任何完整性的概念
+* 要有足够好的灵活性，既可以适应已知的各种使用场景，又能支持未来可能的扩展
+* 在预想的执行引擎中要添加有价值的东西，而不仅仅是因为合理
+* 鼓励清晰的实现
+* 支持在数据产生的上下文中进行强大的数据分析
 
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
