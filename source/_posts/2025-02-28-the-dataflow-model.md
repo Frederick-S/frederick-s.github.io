@@ -75,5 +75,27 @@ tags:
 
 ![alt](/images/dataflow-4.png)
 
+## Dataflow 模型
+### 核心原语
+在批处理下，`Dataflow SDK` 提供了操作 `(key, value)` 键值对的两种方式：
+* `ParDo`：对每个输入，通过调用用户定义的方法（在 `Dataflow` 中称为 `DoFn`），返回0个或者多个输出
+* `GroupByKey`：将相同键的值聚合在一起
+
+以下是一个 `ParDo` 的例子，对于每个输入，通过调用 `ExpandPrefixes` 方法，返回每个输入的所有前缀：
+$$
+(\text{fix}, 1), (\text{fit}, 2) \\
+\big\downarrow \quad \text{ParDo(ExpandPrefixes)} \\
+\big\downarrow \\
+(\text{f}, 1), (\text{fi}, 1), (\text{fix}, 1), (\text{f}, 2), (\text{fi}, 2), (\text{fit}, 2)
+$$
+
+以下是一个 `GroupByKey` 的例子，将相同键的值聚合在一起：
+$$
+(\text{f}, 1), (\text{fi}, 1), (\text{fix}, 1), (\text{f}, 2), (\text{fi}, 2), (\text{fit}, 2) \\
+\big\downarrow \quad \text{GroupByKey} \\
+\big\downarrow \\
+(\text{f}, [1, 2]), (\text{fi}, [1, 2]), (\text{fix}, [1]), (\text{fit}, [2])
+$$
+
 ## 参考
 * [The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43864.pdf)
