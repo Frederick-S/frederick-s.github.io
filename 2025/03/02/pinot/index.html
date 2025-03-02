@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"frederick-s.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="介绍 作者对大数据时代下近实时的 OLAP 服务提出了如下要求：  高性能：系统应当能够快速的返回用户的查询请求 可扩展性：为了能够在处理大量并发查询请求的同时做到近实时的消费大量数据，系统应当提供近线性的扩展性和容错性来满足大规模的服务部署 低成本：随着数据容量以及查询并发量的增加，系统的成本不能无限制的增长 低延迟的实时数据消费：用户期望能够近实时的查询到刚添加到系统中的数据 灵活性：系统应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【读】Pinot: Realtime OLAP for 530 Million Users">
+<meta property="og:url" content="https://frederick-s.github.io/2025/03/02/pinot/index.html">
+<meta property="og:site_name" content="Übung macht den Meister">
+<meta property="og:description" content="介绍 作者对大数据时代下近实时的 OLAP 服务提出了如下要求：  高性能：系统应当能够快速的返回用户的查询请求 可扩展性：为了能够在处理大量并发查询请求的同时做到近实时的消费大量数据，系统应当提供近线性的扩展性和容错性来满足大规模的服务部署 低成本：随着数据容量以及查询并发量的增加，系统的成本不能无限制的增长 低延迟的实时数据消费：用户期望能够近实时的查询到刚添加到系统中的数据 灵活性：系统应">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-1.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-2.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-3.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-4.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-5.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-6.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-7.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-8.png">
+<meta property="og:image" content="https://frederick-s.github.io/images/pinot-9.png">
+<meta property="article:published_time" content="2025-03-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-03-01T16:00:00.000Z">
+<meta property="article:author" content="Xiaodan Mao">
+<meta property="article:tag" content="Paper">
+<meta property="article:tag" content="Distributed Systems">
+<meta property="article:tag" content="Database">
+<meta property="article:tag" content="Pinot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://frederick-s.github.io/images/pinot-1.png">
+
+
+<link rel="canonical" href="https://frederick-s.github.io/2025/03/02/pinot/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://frederick-s.github.io/2025/03/02/pinot/","path":"2025/03/02/pinot/","title":"【读】Pinot: Realtime OLAP for 530 Million Users"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【读】Pinot: Realtime OLAP for 530 Million Users | Übung macht den Meister</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1NC2B33VK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-J1NC2B33VK","only_pageview":false,"measure_protocol_api_secret":null}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><link rel="alternate" href="/atom.xml" title="Übung macht den Meister" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Übung macht den Meister</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fas fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fas fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-mit-6.824"><a href="/mit-6.824/" rel="section"><i class="fas fa-book fa-fw"></i>MIT 6.824</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fas fa-archive fa-fw"></i>Archives</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fas fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-赞赏"><a href="/sponsor/" rel="section"><i class="fas fa-heart fa-fw"></i>赞赏</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fas fa-rss fa-fw"></i>RSS</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text"> 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text"> 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%92%8C%E6%9F%A5%E8%AF%A2%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text"> 数据和查询模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6"><span class="nav-number">2.2.</span> <span class="nav-text"> 组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E6%93%8D%E4%BD%9C"><span class="nav-number">2.3.</span> <span class="nav-text"> 常见操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A0%E8%BD%BD-segment"><span class="nav-number">2.3.1.</span> <span class="nav-text"> 加载 segment</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%B7%AF%E7%94%B1%E8%A1%A8"><span class="nav-number">2.3.2.</span> <span class="nav-text"> 更新路由表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.3.3.</span> <span class="nav-text"> 查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#server-%E5%A6%82%E4%BD%95%E6%89%A7%E8%A1%8C%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.3.4.</span> <span class="nav-text"> server 如何执行查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8A%E4%BC%A0%E6%95%B0%E6%8D%AE"><span class="nav-number">2.3.5.</span> <span class="nav-text"> 上传数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E7%BB%93%E5%AE%9E%E6%97%B6-segment"><span class="nav-number">2.3.6.</span> <span class="nav-text"> 完结实时 segment</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%91%E8%AE%A1%E7%AE%97%E5%8F%8B%E5%A5%BD%E7%9A%84%E6%9E%B6%E6%9E%84"><span class="nav-number">2.4.</span> <span class="nav-text"> 云计算友好的架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95-pinot"><span class="nav-number">3.</span> <span class="nav-text"> 扩展 Pinot</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%89%A7%E8%A1%8C"><span class="nav-number">3.1.</span> <span class="nav-text"> 查询执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%92%8C%E7%89%A9%E7%90%86%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-number">3.2.</span> <span class="nav-text"> 索引和物理数据存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iceberg-%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.3.</span> <span class="nav-text"> Iceberg 查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%B7%AF%E7%94%B1%E5%92%8C%E5%88%86%E5%8C%BA"><span class="nav-number">3.4.</span> <span class="nav-text"> 查询路由和分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%A7%9F%E6%88%B7"><span class="nav-number">3.5.</span> <span class="nav-text"> 多租户</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A7%E7%BA%BF%E4%B8%AD%E7%9A%84-pinot"><span class="nav-number">4.</span> <span class="nav-text"> 产线中的 Pinot</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.1.</span> <span class="nav-text"> 应用场景类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E7%BB%B4%E8%80%83%E9%87%8F"><span class="nav-number">4.2.</span> <span class="nav-text"> 运维考量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text"> 参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiaodan Mao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://frederick-s.github.io/2025/03/02/pinot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiaodan Mao">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【读】Pinot: Realtime OLAP for 530 Million Users | Übung macht den Meister">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【读】Pinot: Realtime OLAP for 530 Million Users
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2025-03-02 00:00:00" itemprop="dateCreated datePublished" datetime="2025-03-02T00:00:00+08:00">2025-03-02</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>7.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>13 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="介绍"><a class="markdownIt-Anchor" href="#介绍"></a> 介绍</h2>
+<p>作者对大数据时代下近实时的 <code>OLAP</code> 服务提出了如下要求：</p>
+<ul>
+<li>高性能：系统应当能够快速的返回用户的查询请求</li>
+<li>可扩展性：为了能够在处理大量并发查询请求的同时做到近实时的消费大量数据，系统应当提供近线性的扩展性和容错性来满足大规模的服务部署</li>
+<li>低成本：随着数据容量以及查询并发量的增加，系统的成本不能无限制的增长</li>
+<li>低延迟的实时数据消费：用户期望能够近实时的查询到刚添加到系统中的数据</li>
+<li>灵活性：系统应当能够支持用户查询时下钻到任意维度，而不受限于预聚合的数据；同时，系统也能够以零停机的方式在生产环境增加新的查询模式</li>
+<li>容错性：系统异常时能够提供优雅的服务降级</li>
+<li>非中断式运维：系统能够以零停机的方式进行服务升级或者表结构变更</li>
+<li>云服务友好的架构：系统应当能够轻易的部署到商用的云服务环境中</li>
+</ul>
+<h2 id="架构"><a class="markdownIt-Anchor" href="#架构"></a> 架构</h2>
+<p><code>Pinot</code> 诞生于 <code>LinkedIn</code>，作为一款可扩展的分布式 <code>OLAP</code> 数据库，能够提供低延迟的实时数据分析。<code>Pinot</code> 构建在不可变的追加式数据存储之上，专门为数据分析查询场景作了优化，数据自开始接入到可被查询仅需几秒。</p>
+<p>在 <code>LinkedIn</code> 内部，业务数据会先接入到 <code>Kafka</code> 中，然后经过 <code>ETL</code> 处理存储到 <code>HDFS</code>。<code>Pinot</code> 既支持近实时的从 <code>Kafka</code> 中消费数据，也支持从类似 <code>Hadoop</code> 的离线系统中导入数据。因此，<code>Pinot</code> 遵循 <code>lambda</code> 架构，能够自动合并从 <code>Kafka</code> 接入的流式数据和 <code>Hadoop</code> 导入的离线数据。</p>
+<h3 id="数据和查询模型"><a class="markdownIt-Anchor" href="#数据和查询模型"></a> 数据和查询模型</h3>
+<p>和常见的数据库一样，<code>Pinot</code> 也以表的方式管理数据，每个表背后由 <code>schema</code> 定义了有哪些列。支持的数据类型包括不同长度的整型，浮点数，字符串，布尔值，以及基于这些数据类型的数组。<code>Pinot</code> 中的列即可以是 <code>dimension</code>，也可以是 <code>metric</code>。</p>
+<p><code>Pinot</code> 还支持一个特殊的时间列，一方面在查询时基于该列合并流式数据和离线数据，另一方面作为数据过期判断的依据。</p>
+<p><code>Pinot</code> 的表以 <code>segment</code> 为单位存储，每个 <code>segment</code> 一般能存储几千万条记录，一张表能支持几万个 <code>segment</code>。<code>segment</code> 可以有副本，从而确保数据的高可用性。<code>segment</code> 中的数据是不可修改的，但是可以整个替换 <code>segment</code> 来更新数据（数据更新代价较大）。</p>
+<p><code>segment</code> 采用列存储保存数据，并支持多种编码策略来减少单个 <code>segment</code> 的大小。一个 <code>segment</code> 的大小一般在几百 <code>MB</code> 到几 <code>GB</code> 不等。下图展示了 <code>segment</code> 的数据存储方式：</p>
+<p><img src="/images/pinot-1.png" alt="alt" /></p>
+<p><code>Pinot</code> 的查询语言为 <code>PQL</code>，是 <code>SQL</code> 的子集，支持 <code>select</code>，<code>projection</code>，<code>aggregation</code>，和 <code>top-n</code> 查询，不过不支持连接和嵌套查询。<code>PQL</code> 不支持单条记录级别的创建，更新或者删除。</p>
+<h3 id="组件"><a class="markdownIt-Anchor" href="#组件"></a> 组件</h3>
+<p><code>Pinot</code> 有四个主要的组件用于数据存储，数据管理和查询：</p>
+<ul>
+<li><code>controller</code></li>
+<li><code>broker</code></li>
+<li><code>server</code></li>
+<li><code>minion</code></li>
+</ul>
+<p>除此之外，<code>Pinot</code> 还依赖 <code>Zookeeper</code> 和持久化的对象存储。<code>Pinot</code> 借助 <code>Apache Helix</code> 来管理集群，<code>Apache Helix</code> 是一个通用的集群管理框架，用于管理分布式系统内的分区和副本。</p>
+<p><code>server</code> 主要负责存储 <code>segment</code> 并处理针对所负责的 <code>segment</code> 的查询请求。每个 <code>segment</code> 在 <code>UNIX</code> 的文件系统上对应一个目录，目录中保存了 <code>segment</code> 的元数据和索引文件。<code>segment</code> 的元数据保存了列的信息，包括类型，<code>cardinality</code>，编码，各式各样的统计信息，以及支持的索引。索引文件保存了每列的索引。索引文件只能追加写入，从而支持按需创建倒排索引（<code>inverted index</code>）。<code>server</code> 可插拔的架构支持从多种不同的存储格式加载列索引，以及在于运行时生成衍生列（<code>synthetic column</code>）。同时也能轻易的扩展从类似 <code>HDFS</code> 或者 <code>S3</code> 这样的分布式存储系统读取数据。<code>Pinot</code> 会维护一个 <code>segment</code> 的多个副本，并且所有副本都会参与查询。</p>
+<p><code>controller</code> 负责管理 <code>segment</code> 到 <code>server</code> 的分配。<code>controller</code> 会根据运维需求或者 <code>server</code> 的可用性动态更新 <code>segment</code> 的分配。另外，<code>controller</code> 还负责一系列管理任务，例如查询所有可用的表、<code>segment</code>，添加或者删除表、<code>segment</code>。<code>Pinot</code> 的表可以设置过期时间，超过过期时间的 <code>segment</code> 会被 <code>controller</code> 删除。<code>segment</code> 的所有元数据及 <code>segment</code> 到 <code>server</code> 的映射都由 <code>Apache Helix</code> 管理。出于容错性的考虑，<code>LinkedIn</code> 一般会在每个数据中心部署三个 <code>controller</code> 实例，其中一个作为主节点，由 <code>Apache Helix</code> 管理，非主节点在大多数时间里是空闲的。</p>
+<p><code>broker</code> 负责处理查询请求，它首先将查询分发到负责的各个 <code>server</code> 上，然后合并各个 <code>server</code> 的查询结果，最后返回给客户端。客户端通过 <code>HTTP</code> 和 <code>broker</code> 交互，所以可以前置负载均衡器来分摊各个 <code>broker</code> 的压力。</p>
+<p><code>minion</code> 负责运行一些计算密集型的任务，其任务由 <code>controller</code> 的调度器分配。另外，任务管理和调度支持扩展添加新的任务和调度类型以支持变化的业务需求。<code>minion</code> 的其中一个应用场景是数据清洗，出于数据合规的要求，<code>LinkedIn</code> 有时候需要清理特定成员的数据。由于 <code>Pinot</code> 数据的不可变性，<code>minion</code> 运行时需要先下载 <code>segment</code>，然后清洗数据，接着重新生成 <code>segment</code> 以及重建索引，最后上传 <code>segment</code> 到 <code>controller</code> 覆盖旧的 <code>segment</code>。</p>
+<p><code>Zookeeper</code> 用于持久化存储元数据，并作为集群中各节点间通信的渠道。集群的状态，<code>segment</code> 的分配，以及元数据都通过 <code>Helix</code> 保存在 <code>Zookeeper</code> 中。<code>segment</code> 本身保存在持久化的对象存储中。在 <code>LinkedIn</code> 内部，<code>Pinot</code> 使用本地的 <code>NFS</code> 作为数据存储层，而运行在 <code>LinkedIn</code> 数据中心之外则借助 <code>Azure Disk</code>。</p>
+<p>下图是 <code>Pinot</code> 的架构图：<br />
+<img src="/images/pinot-2.png" alt="alt" /></p>
+<h3 id="常见操作"><a class="markdownIt-Anchor" href="#常见操作"></a> 常见操作</h3>
+<h4 id="加载-segment"><a class="markdownIt-Anchor" href="#加载-segment"></a> 加载 segment</h4>
+<p><code>Helix</code> 借助状态机来描绘集群的状态，集群中的每个资源都有当前的状态以及期望的状态。当状态发生变更时，对应的节点就会执行状态变更流程。</p>
+<p>下图展示了 <code>segment</code> 的状态流转：</p>
+<p><img src="/images/pinot-3.png" alt="alt" /></p>
+<p><code>segment</code> 的初始状态为 <code>OFFLINE</code>，然后 <code>Helix</code> 会要求 <code>server</code> 执行 <code>segment</code> 从 <code>OFFLINE</code> 到 <code>ONLINE</code> 的状态迁移。<code>server</code> 首先会从对象存储拉取 <code>segment</code>，解压然后加载，完成后就可以服务查询请求，此时 <code>segment</code> 在 <code>Helix</code> 中的状态为 <code>ONLINE</code>。</p>
+<p>对于还在消费 <code>Kafka</code> 的 <code>segment</code>，<code>Helix</code> 会要求 <code>server</code> 执行 <code>segment</code> 从 <code>OFFLINE</code> 到 <code>CONSUMING</code> 的状态迁移。<code>server</code> 会从指定的 <code>Kafka</code> 分区的 <code>offset</code> 开始创建消费者，所有的副本也同时从这个 <code>offset</code> 开始消费。</p>
+<p>下图展示了 <code>segment</code> 的加载过程：</p>
+<p><img src="/images/pinot-4.png" alt="alt" /></p>
+<h4 id="更新路由表"><a class="markdownIt-Anchor" href="#更新路由表"></a> 更新路由表</h4>
+<p>每当 <code>server</code> 加载或者卸载 <code>segment</code>，<code>Helix</code> 都会更新集群的状态。<code>broker</code> 会监听集群状态的变更，并更新 <code>server</code> 到可用 <code>segment</code> 的路由表映射。这就确保 <code>broker</code> 能将查询请求正确的路由到可用的 <code>server</code> 上。</p>
+<h4 id="查询"><a class="markdownIt-Anchor" href="#查询"></a> 查询</h4>
+<p>当 <code>broker</code> 收到查询请求后，会执行以下步骤：</p>
+<ol>
+<li>解析查询并优化</li>
+<li>随机选择被查询表的路由表</li>
+<li><code>broker</code> 将查询发送给路由表中的所有 <code>server</code>，各个 <code>server</code> 会各自查询本地的 <code>segment</code></li>
+<li><code>server</code> 根据可用的索引和列的元数据生成逻辑和物理查询计划</li>
+<li><code>server</code> 会调度执行查询计划</li>
+<li>当所有查询计划执行完成后，<code>server</code> 会合并各个查询计划的结果，然后返回给 <code>broker</code></li>
+<li>当 <code>broker</code> 收到所有 <code>server</code> 的查询结果后，<code>broker</code> 会合并结果。如果某些 <code>server</code> 的查询出现了错误或者超时，那么该次查询会被标记为不完整，客户端就可以决定是否展示不完整的数据给用户还是之后重新提交查询</li>
+<li><code>broker</code> 返回查询结果给客户端</li>
+</ol>
+<p><code>Pinot</code> 会自动合并来自实时和离线的数据。如下图所示，该表每天生成两个 <code>segment</code>，实时数据和离线数据在8月1号和8月2号存在重合，当 <code>Pinot</code> 收到一个覆盖这段时间范围的查询时，会将其改写为两个查询，一个负责查询离线数据，其查询时间范围在8月2号之前，另一个负责查询实时数据，其查询时间范围在8月2号及其之后。</p>
+<p><img src="/images/pinot-5.png" alt="alt" /></p>
+<p>这也正是为什么 <code>Pinot</code> 的表需要一个时间列的原因。</p>
+<h4 id="server-如何执行查询"><a class="markdownIt-Anchor" href="#server-如何执行查询"></a> <code>server</code> 如何执行查询</h4>
+<p><code>server</code> 收到查询后，会生成逻辑和物理查询计划。因为每个 <code>segment</code> 中可用的索引和物理数据组织方式有可能不同，因此查询计划的粒度是 <code>segment</code>。这使得 <code>Pinot</code> 能够根据某些特殊场景做针对性的优化，例如判断 <code>segment</code> 中的值是否匹配某个查询条件。另外，<code>Pinot</code> 也会根据 <code>segment</code> 的元数据生成某些特殊的查询计划，例如查询 <code>segment</code> 中某列的最大值。</p>
+<p><code>Pinot</code> 会根据预估的执行代价选择物理算子（<code>physical operator</code>），并根据每一列的统计信息对物理算子重排序从而降低查询的整体成本。之后 <code>Pinot</code> 会将查询计划提交给查询执行器，然后并行处理。</p>
+<p>下图展示了查询计划生成的过程：</p>
+<p><img src="/images/pinot-6.png" alt="alt" /></p>
+<h4 id="上传数据"><a class="markdownIt-Anchor" href="#上传数据"></a> 上传数据</h4>
+<p>用户可以通过 <code>HTTP POST</code> 将 <code>segment</code> 上传给 <code>controller</code>。当 <code>controller</code> 收到 <code>segment</code> 后，首先会先将其解压，并检查数据的完整性，并确保新添加的 <code>segment</code> 的大小不会造成表的配额超出限制，然后将 <code>segment</code> 的元数据写入 <code>Zookeeper</code> 中，最后触发 <code>segment</code> 的状态变更为 <code>ONLINE</code> 并分配给合适的副本节点，从而将集群更新至期望的状态，各 <code>server</code> 就可以执行 <code>segment</code> 的加载流程。</p>
+<p>下图展示了这一过程：</p>
+<p><img src="/images/pinot-7.png" alt="alt" /></p>
+<h4 id="完结实时-segment"><a class="markdownIt-Anchor" href="#完结实时-segment"></a> 完结实时 segment</h4>
+<p>对于从 <code>Kafka</code> 接入实时数据的场景，每个副本都是独立的以相同的起始 <code>offset</code> 开始消费 <code>Kafka</code> 中的数据，并以相同的条件停止消费。当正在消费的 <code>segment</code> 结束消费时，<code>server</code> 会将其持久化到磁盘并提交给 <code>controller</code>。因为 <code>Kafka</code> 本身也有数据的过期策略，因此 <code>Pinot</code> 支持按照已消费的数据的条数或者所经过的时间来提交一个 <code>segment</code>。</p>
+<p>对于按照已消费的数据的条数来提交 <code>segment</code> 的场景，只要各副本都从相同的 <code>Kafka</code> 分区的 <code>offset</code> 开始消费，以及消费相同的数据条数，则生成的 <code>segment</code> 一定是相同的。不过，根据经过的时间来提交 <code>segment</code> 的场景，则可能因为各副本的本地时钟不同而造成生成的 <code>segment</code> 不一致。因此，<code>Pinot</code> 实现了一套 <code>segment</code> 完结协议来确保所有副本对最终生成的 <code>segment</code> 达成共识。</p>
+<p>当一个 <code>segment</code> 准备完结时，<code>server</code> 会将其目前所在的 <code>Kafka</code> 分区的 <code>offset</code> 发给 <code>controller</code>，并要求 <code>controller</code> 下发进一步的指令。<code>controller</code> 返回给 <code>server</code> 的指令可能有：</p>
+<ul>
+<li>等待：什么也不做，过段时间再继续询问 <code>controller</code></li>
+<li>丢弃：丢弃当前的 <code>segment</code>，并从 <code>controller</code> 拉取替代的 <code>segment</code>；这个发生的情况在于有其他副本已经提交了另一个版本的 <code>segment</code></li>
+<li>追赶：<code>server</code> 会继续消费直到 <code>controller</code> 指定的 <code>offset</code>，然后再次询问 <code>controller</code></li>
+<li>保持：将当前 <code>segment</code> 刷新到磁盘并加载；这个发生的情况在于有其他副本已经提交了一个完全一样的 <code>segment</code></li>
+<li>提交：将当前 <code>segment</code> 刷新到磁盘并尝试提交；如果提交失败，则继续尝试询问 <code>controller</code>，否则加载 <code>segment</code></li>
+<li>非主节点：当前 <code>controller</code> 不是主节点，需要 <code>server</code> 重新询问真正的主节点</li>
+</ul>
+<p><code>server</code> 询问 <code>controller</code> 的回复同样由状态机实现，<code>controller</code> 会等待直到足够数量的副本已经和 <code>controller</code> 进行了通信，或者距离第一次询问已经过去了足够的时间能够决定哪个副本能够提交 <code>segment</code>。<code>controller</code> 状态机会要求各个副本消费到所有副本中已消费的最大 <code>Kafka</code> 分区的 <code>offset</code>，然后让消费到最新 <code>offset</code> 的副本提交 <code>segment</code>。如果当前 <code>controller</code> 发生异常，则新的主节点会发起一个全新的状态机，接着继续上述的操作，所以这会暂缓 <code>segment</code> 的提交，不过对正确性没有影响。</p>
+<p>这个策略减少了网络的传输并确保当 <code>segment</code> 被提交时，所有副本都有相同的数据。</p>
+<h3 id="云计算友好的架构"><a class="markdownIt-Anchor" href="#云计算友好的架构"></a> 云计算友好的架构</h3>
+<p><code>Pinot</code> 的设计专门为在云计算环境中运行而优化。商用的云服务提供商为 <code>Pinot</code> 的执行提供了两个重要的条件：配有本地临时存储的计算实例，以及持久化的对象存储系统。</p>
+<p>因此，<code>Pinot</code> 被设计为 <code>share-nothing</code> 的架构，各实例都是无状态的。所有持久化的数据都存储在对象存储，所有的系统元数据都存储在 <code>Zookeeper</code> 中；本地磁盘仅作为缓存使用，当实例重启时，所有数据都会从对象存储或者 <code>Kafka</code> 重新读取。因此，可以随时删除一个节点并替换，而不会影响集群的正常运行。</p>
+<p>另外，所有面向用户的操作都通过 <code>HTTP</code> 完成，使得用户可以自行选择适合的负载均衡器。</p>
+<h2 id="扩展-pinot"><a class="markdownIt-Anchor" href="#扩展-pinot"></a> 扩展 Pinot</h2>
+<h3 id="查询执行"><a class="markdownIt-Anchor" href="#查询执行"></a> 查询执行</h3>
+<p><code>Pinot</code> 的查询执行模型被设计为可以扩展支持新的算子以及新的查询类型。例如，<code>Pinot</code> 的最初版本不支持 <code>SELECT COUNT(*)</code> 这样的查询，为了支持该查询则需要修改查询计划器，以及添加新的基于元数据的物理算子，不过不会涉及任何架构上的修改。</p>
+<p><code>Pinot</code> 的物理算子针对每一种数据形式都进行了专门处理；每一种数据编码都有对应的算子，从而能灵活的针对查询优化添加新的索引类型和特定的数据结构。<code>Pinot</code> 可以动态的由 <code>server</code> 或者 <code>minion</code> 重建 <code>segment</code> 内的索引，从而能动态的部署新的索引类型和编码，并且用户不会感知。</p>
+<h3 id="索引和物理数据存储"><a class="markdownIt-Anchor" href="#索引和物理数据存储"></a> 索引和物理数据存储</h3>
+<p>类似 <code>Druid</code>，<code>Pinot</code> 也支持基于位图的倒排索引。不过，如果能在存储数据时按照主列和二级列排序，则可以支持某些场景下更高效的查询。</p>
+<p>例如，<code>LinkedIn</code> 网站上有个功能叫做“谁看了我的档案“，所有相关的查询都涉及到根据 <code>vieweeId</code> 列过滤。如果将数据按照 <code>vieweeId</code> 列排序，那么对于任意一个相关的查询，只需要扫描连续的一部分数据即可，因此 <code>Pinot</code> 可以只保存每一个 <code>vieweeId</code> 的起始和终止位置。这种数据的相邻特性也使得使用向量查询成为了可能。</p>
+<p>因此，当创建物理过滤算子时，会先应用执行在已排序的列上，然后将过滤后的数据起始范围传递给后续的算子。后续的算子只需要扫描少部分的数据，从而提高了查询性能。</p>
+<h3 id="iceberg-查询"><a class="markdownIt-Anchor" href="#iceberg-查询"></a> Iceberg 查询</h3>
+<p><code>Iceberg</code> 查询是数据库查询的一个重要使用场景，它用于查询数据集中满足条件的一部分数据，然后进行聚合计算（如 <code>sum</code>，<code>max</code>，<code>min</code>）。例如，如果想知道哪个国家的人访问某个页面最多，只需要先查询出访问次数大于某个最小阈值的国家即可，然后就能回答谁访问最多这个问题。这特别适合分析数据有长尾分布的场景，并且查询只关注某些关键的指标。</p>
+<p><code>Pinot</code> 实现了 <code>star-tree</code> 索引对 <code>iceberg</code> 查询进行了优化。<code>star-tree</code> 包含了一系列预聚合的记录节点，树的每一层包含满足了 <code>iceberg</code> 的查询条件的某个维度的节点，以及表示这一层所有数据的 <code>star-node</code>。遍历树就等同于执行多个过滤条件的查询。下图展示了 <code>star-tree</code> 的两个例子：</p>
+<p><img src="/images/pinot-8.png" alt="alt" /></p>
+<p><img src="/images/pinot-9.png" alt="alt" /></p>
+<h3 id="查询路由和分区"><a class="markdownIt-Anchor" href="#查询路由和分区"></a> 查询路由和分区</h3>
+<p><code>Pinot</code> 对于未分区的表会事先生成一个路由表，用于 <code>server</code> 到 <code>segment</code> 的映射，并支持多种路由策略。默认的路由策略是平衡策略（<code>balanced strategy</code>），它将 <code>segment</code> 均匀的分配给 <code>server</code>。当查询到达时，所有的 <code>server</code> 都会收到查询请求并查询对应的 <code>segment</code>。</p>
+<p>平衡策略适合于中小规模的集群，不过不适用于大型集群。因为集群越大，出现异常节点的概率也越高，从而由于异常节点拖慢一次查询。因此，<code>Pinot</code> 针对大型集群实现了另一种策略，从而尽量减少单词查询需要通信的 <code>server</code> 的数量。</p>
+<p><code>Pinot</code> 同时也支持对表按照某个分区函数进行分区。对于分区表，<code>Pinot</code> 不会生成路由表，而是根据查询条件将请求路由到持有特定 <code>segment</code> 的 <code>server</code>。另一方面，<code>Pinot</code> 的分区函数也会和 <code>Kafka</code> 的分区函数行为保持一致，从而确保 <code>Pinot</code> 的离线数据也能和实时数据一样按照相同的分区方式分区。</p>
+<h3 id="多租户"><a class="markdownIt-Anchor" href="#多租户"></a> 多租户</h3>
+<p>对于大型公司来说，如果给每一个应用场景创建一个 <code>Pinot</code> 集群则过于昂贵和难以维护。因此，多租户的支持就尤为重要。为了避免某个租户的查询请求占用另一个租户的资源，<code>Pinot</code> 会给每个租户分配令牌桶（<code>token bucket</code>）。每个查询请求都会根据实际查询的耗时来按比例的消耗令牌，当令牌不足时，查询就会被放入队列中等待。令牌桶会随着时间推移缓慢恢复，一方面满足了瞬时的查询高峰，另一方面也避免了某个租户的查询耗尽另一个租户的资源。</p>
+<h2 id="产线中的-pinot"><a class="markdownIt-Anchor" href="#产线中的-pinot"></a> 产线中的 Pinot</h2>
+<p>在 <code>LinkedIn</code> 的产线中，<code>Pinot</code> 运行在超过3000台分布在不同地理位置的服务器上，维护了超过1500张表，对应超过100万个 <code>segment</code>。压缩后的数据大小将近30 <code>TB</code>（未计算副本数据的大小）。各数据中心每秒共处理超过50000次查询。</p>
+<h3 id="应用场景类型"><a class="markdownIt-Anchor" href="#应用场景类型"></a> 应用场景类型</h3>
+<p><code>LinkedIn</code> 的 <code>Pinot</code> 的使用场景主要分为两类：</p>
+<ul>
+<li>高吞吐，简单的查询</li>
+<li>低频，复杂的查询或者涉及数据量巨大</li>
+</ul>
+<p>对于第一种场景，要求数据尽量在内存中缓存从而能提供每秒几万的查询，这类查询的查询模式一般不多。</p>
+<p>对于第二种场景，一般数据都在磁盘上，由于其低频的查询，因此可以按需加载数据。虽然这类查询频率较低，但是有可能会有瞬时的大量查询，比如用户在访问某个报表页面。对于这种情况，实现资源的多租户共享就显得尤为重要，从而实现最小化硬件资源的占用，避免资源在长时间内处于空闲状态。</p>
+<h3 id="运维考量"><a class="markdownIt-Anchor" href="#运维考量"></a> 运维考量</h3>
+<p>为了减轻运维的压力，<code>LinkedIn</code> 在设计 <code>Pinot</code> 时就考虑到了尽可能的将 <code>Pinot</code> 设计为能够让用户自助运维的系统。</p>
+<p>例如，可以随时修改表的结构来添加新的字段而不需要停机。当 <code>schema</code> 添加了新的列时，<code>Pinot</code> 会在几分钟内给所有已有的 <code>segment</code> 以某个默认值添加该列。同时，<code>Pinot</code> 的运维团队也在持续收集查询日志和执行统计信息，从而能自动的为某些列添加倒排索引以提高查询性能。</p>
+<p>不过，在多个数据中心之间和环境（测试和生产环境）之间复制表配置成为了一个问题。目前的解决方案是将表配置保存在源代码控制软件内，然后通过 <code>Pinot</code> 的 <code>REST</code> 接口进行同步。这样做的好处在于能够追踪所有配置的变化，以及提供搜索，验证，代码审查等功能。</p>
+<h2 id="参考"><a class="markdownIt-Anchor" href="#参考"></a> 参考</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/10.1145/3183713.3190661">Pinot: Realtime OLAP for 530 Million Users</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Xiaodan Mao
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="https://frederick-s.github.io/2025/03/02/pinot/" title="【读】Pinot: Realtime OLAP for 530 Million Users">https://frederick-s.github.io/2025/03/02/pinot/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Paper/" rel="tag"># Paper</a>
+              <a href="/tags/Distributed-Systems/" rel="tag"># Distributed Systems</a>
+              <a href="/tags/Database/" rel="tag"># Database</a>
+              <a href="/tags/Pinot/" rel="tag"># Pinot</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/02/27/the-dataflow-model/" rel="prev" title="【读】The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing">
+                  <i class="fa fa-angle-left"></i> 【读】The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiaodan Mao</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/Frederick-S" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
