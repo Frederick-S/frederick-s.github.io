@@ -1082,10 +1082,10 @@ hexo-generator-index@^4.0.0:
   dependencies:
     hexo-pagination "3.0.0"
 
-hexo-generator-searchdb@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/hexo-generator-searchdb/-/hexo-generator-searchdb-1.4.1.tgz#e33c9bd22130a6705673e889b6497fcc3fe80fa5"
-  integrity sha512-7m8IBpZbI6iKb2jRYxs4pghD6Ln8ylQSRGl6MIC4G9wws21vYSXSD8rvC3MoCO+pWBHs6E/mTA/rjG+p2AZfVg==
+hexo-generator-searchdb@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/hexo-generator-searchdb/-/hexo-generator-searchdb-1.5.0.tgz#ba7b48670e997378b3151684fffa2913b662a031"
+  integrity sha512-d0b5SueDxJimTFaHpPg430FQFx7DtMkmEIHo0UTOjXWRy+eDqNSp1CuS04P7fWzMnH2h+aQc6O9D2yY+3sdAUg==
   dependencies:
     nunjucks "^3.2.2"
 
@@ -1180,10 +1180,10 @@ hexo-symbols-count-time@^0.7.1:
   dependencies:
     hexo-util "1.9.0"
 
-hexo-theme-next@^8.21.1:
-  version "8.21.1"
-  resolved "https://registry.yarnpkg.com/hexo-theme-next/-/hexo-theme-next-8.21.1.tgz#27d61630fc7ce8fc443c1f99f43552a08e592b98"
-  integrity sha512-837Ycl/LWvp3CH7MhROComTncy23FuhSHkIIh418iTaU5Nc88tgb5aXtq53nD1eUgbKKMdmBm6AJBgr8FAGP2g==
+hexo-theme-next@^8.24.1:
+  version "8.24.1"
+  resolved "https://registry.yarnpkg.com/hexo-theme-next/-/hexo-theme-next-8.24.1.tgz#37aa3080a1788724ecfdd7e70b0347e3ea727347"
+  integrity sha512-DTa+umV5XTDa8XEtiLkaKDzgHqlnrj5HXi+6auI690TJdbIULm9sgaUQFkriDr2jeeGQDUV4ptsvgTTRaZjiGw==
 
 hexo-util@1.9.0:
   version "1.9.0"
