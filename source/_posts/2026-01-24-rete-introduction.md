@@ -32,7 +32,7 @@ rule "Apply Discount for VIP Customers"
 end
 ```
 
-在上面这个例子中，如果顾客是 `VIP` 并且订单的金额大于500（条件），就给订单打9折（行为）。`Drools` 规则语法的一个特点就是披着 `Java` 的外衣，并且能和应用系统以 `Java` 的方式交互（`$order.setDiscount/System.out.println`）。另一方面，我们也可以用 `JSON/XML` 或者其他的表现形式来表达规则，例如：
+在上面这个例子中，如果顾客是 `VIP` 并且其订单的金额大于500（条件），就给订单打9折（行为）。`Drools` 规则语法的一个特点就是披着 `Java` 的外衣，并且能和应用系统以 `Java` 的方式交互（`$order.setDiscount/System.out.println`）。另一方面，我们也可以用 `JSON/XML` 或者其他的表现形式来表达相同的规则，例如：
 
 ```json
 {
@@ -59,6 +59,11 @@ end
   ]
 }
 ```
+
+相比于 `Drools` 的语法，`JSON` 更轻量和容易解析，但其表现力和灵活性不如 `Drools Rule Language (DRL)`。
+
+## Rete 网络
+
 
 ## 参考
 * [Mastering the Rete Algorithm: A Deep Dive into Drools Rule Engine](https://blog.devgenius.io/mastering-the-rete-algorithm-a-deep-dive-into-drools-rule-engine-b6b96ae76ea6)
